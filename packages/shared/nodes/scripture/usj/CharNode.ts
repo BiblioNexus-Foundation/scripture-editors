@@ -10,11 +10,25 @@ import {
   EditorConfig,
 } from "lexical";
 import {
+  CHAR_NODE_TYPE,
+  PLAIN_FONT_CLASS_NAME,
   extractNonNumberedStyles,
   extractNumberedStyles,
   isValidNumberedStyle,
 } from "./node.utils";
 
+const VALID_CHAR_FOOTNOTE_STYLES = ["fr", "ft", "fk", "fq", "fqa", "fl", "fw", "fp", "fv", "fdc"];
+const VALID_CHAR_CROSS_REFERENCE_STYLES = [
+  "xo",
+  "xop",
+  "xt",
+  "xta",
+  "xk",
+  "xq",
+  "xot",
+  "xnt",
+  "xdc",
+];
 /**
  * @see https://ubsicap.github.io/usx/charstyles.html
  * @see https://ubsicap.github.io/usx/notes.html
@@ -61,27 +75,8 @@ const VALID_CHAR_STYLES = [
   // Linking
   "jmp",
 
-  // Footnote
-  "fr",
-  "ft",
-  "fk",
-  "fq",
-  "fqa",
-  "fl",
-  "fw",
-  "fp",
-  "fv",
-  "fdc",
-  // Cross Reference
-  "xo",
-  "xop",
-  "xt",
-  "xta",
-  "xk",
-  "xq",
-  "xot",
-  "xnt",
-  "xdc",
+  ...VALID_CHAR_FOOTNOTE_STYLES,
+  ...VALID_CHAR_CROSS_REFERENCE_STYLES,
 ] as const;
 
 const VALID_CHAR_STYLES_NUMBERED = extractNumberedStyles(VALID_CHAR_STYLES);
@@ -111,7 +106,7 @@ export class CharNode extends TextNode {
   }
 
   static getType(): string {
-    return "char";
+    return CHAR_NODE_TYPE;
   }
 
   static clone(node: CharNode): CharNode {
@@ -119,11 +114,12 @@ export class CharNode extends TextNode {
   }
 
   static importJSON(serializedNode: SerializedCharNode): CharNode {
-    const node = $createCharNode(serializedNode.text, serializedNode.usxStyle);
-    node.setDetail(serializedNode.detail);
-    node.setFormat(serializedNode.format);
-    node.setMode(serializedNode.mode);
-    node.setStyle(serializedNode.style);
+    const { text, usxStyle, detail, format, mode, style } = serializedNode;
+    const node = $createCharNode(text, usxStyle);
+    node.setDetail(detail);
+    node.setFormat(format);
+    node.setMode(mode);
+    node.setStyle(style);
     return node;
   }
 
@@ -132,6 +128,14 @@ export class CharNode extends TextNode {
       VALID_CHAR_STYLES_NON_NUMBERED.includes(style) ||
       isValidNumberedStyle(style, VALID_CHAR_STYLES_NUMBERED)
     );
+  }
+
+  static isValidFootnoteStyle(style: string): boolean {
+    return VALID_CHAR_FOOTNOTE_STYLES.includes(style);
+  }
+
+  static isValidCrossReferenceStyle(style: string): boolean {
+    return VALID_CHAR_CROSS_REFERENCE_STYLES.includes(style);
   }
 
   setUsxStyle(usxStyle: CharUsxStyle): void {
@@ -148,13 +152,12 @@ export class CharNode extends TextNode {
     const dom = super.createDOM(config);
     dom.setAttribute("data-usx-style", this.__usxStyle);
     dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
+    if (
+      CharNode.isValidFootnoteStyle(this.__usxStyle) ||
+      CharNode.isValidCrossReferenceStyle(this.__usxStyle)
+    )
+      dom.classList.add(PLAIN_FONT_CLASS_NAME);
     return dom;
-  }
-
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
-    return false;
   }
 
   exportJSON(): SerializedCharNode {
@@ -164,6 +167,10 @@ export class CharNode extends TextNode {
       usxStyle: this.getUsxStyle(),
       version: CHAR_VERSION,
     };
+  }
+
+  isTextEntity(): true {
+    return true;
   }
 }
 

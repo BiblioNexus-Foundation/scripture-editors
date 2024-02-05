@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { VERSE_CLASS_NAME, getVisibleMarkerText } from "./node.utils";
+import { VERSE_CLASS_NAME, getVisibleOpenMarkerText } from "./node.utils";
 
 export const VERSE_STYLE = "v";
 export const IMMUTABLE_VERSE_VERSION = 1;
@@ -144,7 +144,7 @@ export class ImmutableVerseNode extends DecoratorNode<void> {
 
   decorate(): string {
     return this.getShowMarker()
-      ? getVisibleMarkerText(this.getUsxStyle(), this.getNumber())
+      ? getVisibleOpenMarkerText(this.getUsxStyle(), this.getNumber())
       : this.getNumber();
   }
 

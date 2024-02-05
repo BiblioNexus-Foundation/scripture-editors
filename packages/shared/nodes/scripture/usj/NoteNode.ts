@@ -1,6 +1,13 @@
 /** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#note */
 
-import { type NodeKey, DecoratorNode, SerializedLexicalNode, Spread } from "lexical";
+import {
+  type NodeKey,
+  ElementNode,
+  SerializedElementNode,
+  Spread,
+  $applyNodeReplacement,
+  LexicalNode,
+} from "lexical";
 
 /** @see https://ubsicap.github.io/usx/notes.html */
 const VALID_NOTE_STYLES = [
@@ -13,42 +20,44 @@ const VALID_NOTE_STYLES = [
   "ex",
 ] as const;
 
-export const NOTE_VERSION = 1;
-
 export type NoteUsxStyle = (typeof VALID_NOTE_STYLES)[number];
 
-export type SerializedNoteBaseNode = Spread<
+export type SerializedNoteNode = Spread<
   {
     usxStyle: NoteUsxStyle;
     caller: string;
-    previewText: string;
     category?: string;
   },
-  SerializedLexicalNode
+  SerializedElementNode
 >;
 
-export class NoteBaseNode<T> extends DecoratorNode<T> {
+export const NOTE_VERSION = 1;
+
+export class NoteNode extends ElementNode {
   __usxStyle: NoteUsxStyle;
   __caller: string;
-  __previewText: string;
   __category?: string;
 
-  constructor(
-    usxStyle: NoteUsxStyle,
-    caller: string,
-    previewText: string,
-    category?: string,
-    key?: NodeKey,
-  ) {
+  constructor(usxStyle: NoteUsxStyle, caller: string, category?: string, key?: NodeKey) {
     super(key);
     this.__usxStyle = usxStyle;
     this.__caller = caller;
-    this.__previewText = previewText;
     this.__category = category;
   }
 
   static getType(): string {
     return "note";
+  }
+
+  static clone(node: NoteNode): NoteNode {
+    const { __usxStyle, __caller, __category, __key } = node;
+    return new NoteNode(__usxStyle, __caller, __category, __key);
+  }
+
+  static importJSON(serializedNode: SerializedNoteNode): NoteNode {
+    const { usxStyle, caller, category } = serializedNode;
+    const node = $createNoteNode(usxStyle, caller, category);
+    return node;
   }
 
   static isValidStyle(style: string): boolean {
@@ -75,16 +84,6 @@ export class NoteBaseNode<T> extends DecoratorNode<T> {
     return self.__caller;
   }
 
-  setPreviewText(previewText: string): void {
-    const self = this.getWritable();
-    self.__previewText = previewText;
-  }
-
-  getPreviewText(): string {
-    const self = this.getLatest();
-    return self.__previewText;
-  }
-
   setCategory(category: string | undefined): void {
     const self = this.getWritable();
     self.__category = category;
@@ -100,7 +99,6 @@ export class NoteBaseNode<T> extends DecoratorNode<T> {
     dom.setAttribute("data-usx-style", this.__usxStyle);
     dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
     dom.setAttribute("data-caller", this.__caller);
-    dom.setAttribute("data-preview-text", this.__previewText);
     return dom;
   }
 
@@ -110,18 +108,28 @@ export class NoteBaseNode<T> extends DecoratorNode<T> {
     return false;
   }
 
-  decorate(): T {
-    throw new Error("decorate: base method not extended");
-  }
-
-  exportJSON(): SerializedNoteBaseNode {
+  exportJSON(): SerializedNoteNode {
     return {
+      ...super.exportJSON(),
       type: this.getType(),
       usxStyle: this.getUsxStyle(),
       caller: this.getCaller(),
-      previewText: this.getPreviewText(),
       category: this.getCategory(),
       version: NOTE_VERSION,
     };
   }
+}
+
+export const noteNodeName = Symbol.for(NoteNode.name);
+
+export function $createNoteNode(
+  usxStyle: NoteUsxStyle,
+  caller: string,
+  category?: string,
+): NoteNode {
+  return $applyNodeReplacement(new NoteNode(usxStyle, caller, category));
+}
+
+export function $isNoteNode(node: LexicalNode | null | undefined): node is NoteNode {
+  return node instanceof NoteNode;
 }

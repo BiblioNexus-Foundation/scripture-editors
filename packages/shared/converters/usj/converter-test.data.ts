@@ -39,8 +39,10 @@ export const usjEmpty: Usj = {
 
 /** para index where the note exists */
 export const NOTE_PARA_INDEX = 3;
-/** index in para children of the note */
+/** index of the note in para children */
 export const NOTE_INDEX = 1;
+/** index of the note caller in note children */
+export const NOTE_CALLER_INDEX = 0;
 
 /**
  * Modified from:
@@ -282,9 +284,39 @@ export const editorStateGen1v1 = {
           {
             type: "note",
             usxStyle: "f",
-            caller: "a",
-            previewText: "3:2  The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).",
+            caller: "+",
+            direction: null,
+            format: "",
+            indent: 0,
             version: 1,
+            children: [
+              {
+                type: "immutable-note-caller",
+                caller: "a",
+                previewText: "3:2  The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).",
+                version: 1,
+              },
+              {
+                type: "char",
+                usxStyle: "fr",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "display: none",
+                text: "3:2 ",
+                version: 1,
+              },
+              {
+                type: "char",
+                usxStyle: "ft",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "display: none",
+                text: "The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).",
+                version: 1,
+              },
+            ],
           },
           {
             detail: 0,

@@ -5,7 +5,9 @@ import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
 import { CharNode } from "./CharNode";
+import { NoteNode } from "./NoteNode";
 import { MilestoneNode } from "./MilestoneNode";
+import { MarkerNode } from "./MarkerNode";
 import { ImpliedParaNode } from "./ImpliedParaNode";
 import { ParaNode } from "./ParaNode";
 
@@ -16,7 +18,9 @@ const scriptureUsjNodes = [
   ChapterNode,
   VerseNode,
   CharNode,
+  NoteNode,
   MilestoneNode,
+  MarkerNode,
   ImpliedParaNode,
   ParaNode,
   {

@@ -17,7 +17,8 @@ export type ViewOptions = {
 /**
  * Get view option properties based on the view mode.
  * @param viewMode - View mode of the editor.
- * @returns the view options if the view is defined, `undefined` otherwise.
+ * @returns the view options if the view exists, the default options if the viewMode is undefined,
+ *   `undefined` otherwise.
  */
 export function getViewOptions(viewMode: string | undefined): ViewOptions | undefined {
   let viewOptions: ViewOptions | undefined;
