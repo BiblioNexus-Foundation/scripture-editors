@@ -1,4 +1,16 @@
-# BibleLexicalEditor
+# Scripture Editors
+
+This monorepo contains packages for various Scripture editors.
+
+Each Scripture application's editor will have many behaviors in common with other Scripture applications. Each will need some features that are unique. We are developing all of these parts in a compatible way and in one place in order to maximize collaboration and sharing.
+
+In this monorepo:
+
+- Each application produces their own editor package - the application uses the package produced from this repo because the source is there.
+- Common nodes, plugins, and formatters for the toolbar plugin.
+- Specific sets of nodes, plugins, and formatters for each data type extending from the common items where applicable.
+
+Sharing in this monorepo is a commitment to maintain and organize it. Each application package is free to move in its own direction but keeping in mind items that can be pushed up outside the specific editor package to be used in common.
 
 ## Developer Quick Start
 
@@ -9,8 +21,8 @@
    ```
 3. Clone the monorepo:
    ```bash
-   git clone https://github.com/abelpz/bible-lexical-editor.git
-   cd bible-lexical-editor
+   git clone https://github.com/BiblioNexus-Foundation/scripture-editors.git
+   cd scripture-editors
    pnpm install
    ```
 4. Run one of the top level developer environments (see the **Nx Graph** below), e.g.:
@@ -33,10 +45,10 @@ NOTE: there is a [known limitation using PNPM with Volta](https://docs.volta.sh/
 title: Nx Graph
 ---
 graph TB
-  R(<a href='/abelpz/bible-lexical-editor/tree/main/packages/perf-react'>perf-react</a>) --> S(<a href='/abelpz/bible-lexical-editor/tree/main/packages/shared'>shared</a>)
-  V(<a href='/abelpz/bible-lexical-editor/tree/main/packages/perf-vanilla'>perf-vanilla</a>) --> S
-  P(<a href='/abelpz/bible-lexical-editor/tree/main/packages/platform'>platform</a>) --> SR
-  SR(<a href='/abelpz/bible-lexical-editor/tree/main/packages/shared-react'>shared-react</a>) --> S
+  R(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/perf-react'>perf-react</a>) --> S(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared'>shared</a>)
+  V(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/perf-vanilla'>perf-vanilla</a>) --> S
+  P(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform'>platform</a>) --> SR
+  SR(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared-react'>shared-react</a>) --> S
   P --> S
 ```
 
@@ -146,4 +158,4 @@ nx run-many -t typecheck # to check types
 
 ## Collaborative Web Development Environment
 
-Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/abelpz/bible-lexical-editor/main
+Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main

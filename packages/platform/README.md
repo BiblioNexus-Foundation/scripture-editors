@@ -6,8 +6,8 @@ title: ScriptureData—Editor flow
 ---
 graph TB
   DB[(DB)] <-- USX --> C
-  C[<a href='/abelpz/bible-lexical-editor/tree/main/packages/shared/converters/usj'>USX-USJ converter</a>] -- USJ --> A
-  A[<a href='/abelpz/bible-lexical-editor/tree/main/packages/platform/src/editor/plugins/UpdateStatePlugin.tsx'>USJ-Editor adapter</a>] -- Editor State --> Editor
+  C[<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared/converters/usj'>USX-USJ converter</a>] -- USJ --> A
+  A[<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform/src/editor/plugins/UpdateStatePlugin.tsx'>USJ-Editor adapter</a>] -- Editor State --> Editor
   A -. NYI* .-> C
   Editor -. NYI* .-> A
 
