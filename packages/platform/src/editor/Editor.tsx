@@ -15,6 +15,7 @@ import editorTheme from "./themes/editor-theme";
 import ScriptureReferencePlugin from "./plugins/ScriptureReferencePlugin";
 import ToolbarPlugin from "./plugins/toolbar/ToolbarPlugin";
 import { ViewOptions } from "./adaptors/view-options.utils";
+import BackslashPlugin from "./plugins/BackslashPlugin";
 
 type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
@@ -108,6 +109,7 @@ export default function Editor<TLogger extends LoggerBasic>({
             viewOptions={viewOptions}
             logger={logger}
           />
+          <BackslashPlugin />
         </div>
       </div>
     </LexicalComposer>

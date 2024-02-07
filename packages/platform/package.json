@@ -34,5 +34,8 @@
     "react-dom": "^18.2.0",
     "shared": "*",
     "shared-react": "*"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.6.1"
   }
 }
