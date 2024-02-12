@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, getVisibleMarkerText } from "./node.utils";
+import { CHAPTER_CLASS_NAME, getVisibleOpenMarkerText } from "./node.utils";
 
 export const CHAPTER_STYLE = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
@@ -144,7 +144,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
 
   decorate(): string {
     return this.getShowMarker()
-      ? getVisibleMarkerText(this.getUsxStyle(), this.getNumber())
+      ? getVisibleOpenMarkerText(this.getUsxStyle(), this.getNumber())
       : this.getNumber();
   }
 

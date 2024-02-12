@@ -1,10 +1,11 @@
 /** Utility functions for editor nodes */
 
-import { $isElementNode, LexicalNode } from "lexical";
+import { $isElementNode, LexicalNode, SerializedElementNode, SerializedTextNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
+import { CharNode, SerializedCharNode } from "./CharNode";
 
 // If you want use these utils with your own chapter node, add it to this list of types.
 type ChapterNodes = ChapterNode | ImmutableChapterNode;
@@ -14,9 +15,14 @@ type VerseNodes = VerseNode | ImmutableVerseNode;
 /** RegEx to test for a string only containing digits. */
 export const ONLY_DIGITS_TEST = /^\d+$/;
 
+// Can't use `CharNode.getType()` as that sets up a circular dependency.
+export const CHAR_NODE_TYPE = "char";
+
 export const NBSP = "\xa0";
 export const CHAPTER_CLASS_NAME = "chapter";
 export const VERSE_CLASS_NAME = "verse";
+export const NO_INDENT_CLASS_NAME = "no-indent";
+export const PLAIN_FONT_CLASS_NAME = "plain-font";
 
 const NUMBERED_STYLE_PLACEHOLDER = "#";
 
@@ -302,28 +308,67 @@ export function removeNodesBeforeNode(
 }
 
 /**
- * Gets the marker text with the marker visible.
+ * Gets the opening marker text.
+ * @param style - Verse style.
+ * @returns the opening marker text.
+ */
+export function openingMarkerText(style: string): string {
+  return `\\${style}`;
+}
+
+/**
+ * Gets the closing marker text.
+ * @param style - Verse style.
+ * @returns the closing marker text.
+ */
+export function closingMarkerText(style: string): string {
+  return `\\${style}*`;
+}
+
+/**
+ * Gets the open marker text with the marker visible.
  * @param style - Verse style.
  * @param content - Content such as chapter or verse number.
- * @returns the marker text with the marker visible.
+ * @returns the marker text with the open marker visible.
  */
-export function getVisibleMarkerText(style: string, content: string | undefined): string {
-  let text = `\\${style}`;
-  if (content) text += ` ${content}`;
-  text += NBSP;
+export function getVisibleOpenMarkerText(style: string, content: string | undefined): string {
+  let text = openingMarkerText(style);
+  if (content) text += `${NBSP}${content}`;
+  text += " ";
   return text;
 }
 
 /**
- * Gets the inline marker text with the marker visible.
- * @param style - Verse style.
- * @param content - Content such as chapter or verse number.
- * @returns the inline marker text with the marker visible.
+ * Gets the preview text for a serialized note caller.
+ * @param childNodes - child nodes of the NoteNode.
+ * @returns the preview text.
  */
-export function getVisibleInlineMarkerText(style: string, content: string | undefined): string {
-  let text = `\\${style}`;
-  if (content) text += ` ${content}`;
-  text += ` \\${style}*`;
-  text += NBSP;
-  return text;
+export function getPreviewTextFromSerializedNodes(
+  childNodes: (SerializedElementNode | SerializedTextNode)[],
+): string {
+  const previewText = childNodes
+    .reduce(
+      (text, node) =>
+        text + (node.type === CHAR_NODE_TYPE ? ` ${(node as SerializedCharNode).text}` : ""),
+      "",
+    )
+    .trim();
+  return previewText;
+}
+
+/**
+ * Gets the preview text for a note caller.
+ * @param childNodes - child nodes of the NoteNode.
+ * @returns the preview text.
+ */
+
+export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
+  const previewText = childNodes
+    .reduce(
+      (text, node) =>
+        text + (node.getType() === CHAR_NODE_TYPE ? ` ${(node as CharNode).getTextContent()}` : ""),
+      "",
+    )
+    .trim();
+  return previewText;
 }

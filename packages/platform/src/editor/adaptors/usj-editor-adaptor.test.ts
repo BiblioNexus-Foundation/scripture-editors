@@ -1,5 +1,6 @@
 import { SerializedEditorState } from "lexical";
 import {
+  NOTE_CALLER_INDEX,
   NOTE_INDEX,
   NOTE_PARA_INDEX,
   editorStateEmpty,
@@ -11,8 +12,9 @@ import {
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedNoteNode } from "shared-react/nodes/scripture/usj/NoteNode";
+import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { loadEditorState, reset } from "./usj-editor.adaptor";
+import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 
 /**
  * Remove the `onClick` function because it can't be compared since it's anonymous.
@@ -21,7 +23,8 @@ import { loadEditorState, reset } from "./usj-editor.adaptor";
 function removeOnClick(serializedEditorState: SerializedEditorState) {
   const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
     .children[NOTE_INDEX] as SerializedNoteNode;
-  delete note.onClick;
+  const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+  delete noteCaller.onClick;
 }
 
 describe("USJ Editor Adaptor", () => {
@@ -34,7 +37,8 @@ describe("USJ Editor Adaptor", () => {
     const serializedEditorState = loadEditorState(usjGen1v1);
     const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
       .children[NOTE_INDEX] as SerializedNoteNode;
-    expect(typeof note.onClick).toBe("function");
+    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+    expect(typeof noteCaller.onClick).toBe("function");
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateGen1v1);
   });
@@ -53,7 +57,8 @@ describe("USJ Editor Adaptor", () => {
     const editorStateCallerUpdated = editorStateGen1v1;
     const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
       .children[NOTE_INDEX] as SerializedNoteNode;
-    note.caller = "z";
+    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+    noteCaller.caller = "z";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
 
@@ -62,7 +67,7 @@ describe("USJ Editor Adaptor", () => {
     // SUT
     serializedEditorState = loadEditorState(usjGen1v1);
 
-    note.caller = "ba";
+    noteCaller.caller = "ba";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
   });
@@ -76,7 +81,8 @@ describe("USJ Editor Adaptor", () => {
     const editorStateCallerUpdated = editorStateGen1v1;
     const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
       .children[NOTE_INDEX] as SerializedNoteNode;
-    note.caller = "zz";
+    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+    noteCaller.caller = "zz";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
 
@@ -85,7 +91,7 @@ describe("USJ Editor Adaptor", () => {
     // SUT
     serializedEditorState = loadEditorState(usjGen1v1);
 
-    note.caller = "a";
+    noteCaller.caller = "a";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
   });

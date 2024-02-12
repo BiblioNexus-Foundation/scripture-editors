@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { usxStringToJson } from "shared/converters/usj/usx-to-usj";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
-import { noteNodeName } from "shared-react/nodes/scripture/usj/NoteNode";
+import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { getViewOptions, viewOptionsToMode } from "./editor/adaptors/view-options.utils";
 import { UsjNodeOptions } from "./editor/adaptors/usj-editor.adaptor";
 import { formattedViewMode as defaultViewMode } from "./editor/plugins/toolbar/view-mode.model";
@@ -15,7 +15,7 @@ const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1
 
 const usj = usxStringToJson(usx);
 
-const nodeOptions: UsjNodeOptions = { [noteNodeName]: { onClick: () => undefined } };
+const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 
 export default function App() {
   const [viewMode, setViewMode] = useState(defaultViewMode);

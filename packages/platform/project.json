@@ -55,7 +55,7 @@
     "devpub": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "production",
-      "options": { "command": "yalc publish", "cwd": "{projectRoot}" }
+      "options": { "command": "yalc push", "cwd": "{projectRoot}" }
     },
     "typecheck": {},
     "test": {},

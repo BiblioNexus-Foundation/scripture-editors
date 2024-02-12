@@ -54,10 +54,15 @@ import {
   NOTE_VERSION,
   NoteNode,
   NoteUsxStyle,
-  OnClick,
   SerializedNoteNode,
-  noteNodeName,
-} from "shared-react/nodes/scripture/usj/NoteNode";
+} from "shared/nodes/scripture/usj/NoteNode";
+import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
   VERSE_STYLE,
@@ -69,16 +74,20 @@ import {
   VERSE_VERSION,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
-  getVisibleInlineMarkerText,
-  getVisibleMarkerText,
+  NBSP,
+  NO_INDENT_CLASS_NAME,
+  PLAIN_FONT_CLASS_NAME,
+  getPreviewTextFromSerializedNodes,
+  getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor, NodeOptions } from "shared-react/adaptors/editor-adaptor.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getViewOptions } from "./view-options.utils";
 
 export interface UsjNodeOptions extends NodeOptions {
-  [noteNodeName]?: {
+  [immutableNoteCallerNodeName]?: {
     noteCallers?: string[];
     onClick?: OnClick;
   };
@@ -90,8 +99,6 @@ interface UsjEditorAdaptor extends EditorAdaptor {
   loadEditorState: typeof loadEditorState;
 }
 
-const NO_INDENT_CLASS_NAME = "no-indent";
-const PLAIN_FONT_CLASS_NAME = "plain-font";
 const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
   version: 1,
@@ -236,7 +243,7 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
  *   callers list, '*' if undefined.
  */
 function getNoteCaller(markerCaller: string | undefined): string {
-  const optionsNoteCallers = _nodeOptions[noteNodeName]?.noteCallers;
+  const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName]?.noteCallers;
   const noteCallers =
     optionsNoteCallers && optionsNoteCallers.length > 0 ? optionsNoteCallers : defaultNoteCallers;
   let caller = markerCaller;
@@ -305,7 +312,7 @@ function createChapter(
   let classList: string[] | undefined;
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleMarkerText(style, marker.number);
+    text = getVisibleOpenMarkerText(style, marker.number);
     classList = [PLAIN_FONT_CLASS_NAME];
   } else if (_viewOptions?.markerMode === "visible") showMarker = true;
 
@@ -338,7 +345,7 @@ function createVerse(
   let classList: string[] | undefined;
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleMarkerText(style, marker.number);
+    text = getVisibleOpenMarkerText(style, marker.number);
     classList = [PLAIN_FONT_CLASS_NAME];
   } else if (_viewOptions?.markerMode === "visible") showMarker = true;
 
@@ -354,16 +361,13 @@ function createVerse(
   };
 }
 
-function createChar(style: string, marker: MarkerObject): SerializedCharNode | undefined {
+function createChar(style: string, marker: MarkerObject): SerializedCharNode {
   if (!CharNode.isValidStyle(style)) {
-    _logger?.error(`Unexpected char style '${style}'!`);
-    return undefined;
+    _logger?.warn(`Unexpected char style '${style}'!`);
   }
-
-  const text =
-    _viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable"
-      ? getVisibleInlineMarkerText(style, getTextContent(marker.content))
-      : getTextContent(marker.content);
+  let text = getTextContent(marker.content);
+  if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
+    text = NBSP + text;
 
   return {
     type: CharNode.getType(),
@@ -399,8 +403,7 @@ function createPara(style: string): SerializedParaNode {
   if (!_viewOptions?.isIndented) classList.push(NO_INDENT_CLASS_NAME);
   if (_viewOptions?.isPlainFont) classList.push(PLAIN_FONT_CLASS_NAME);
   const children: SerializedLexicalNode[] = [];
-  if (_viewOptions?.markerMode === "editable")
-    children.push(createText(getVisibleMarkerText(style, undefined)));
+  if (_viewOptions?.markerMode === "editable") children.push(createMarker(style), createText(NBSP));
 
   return {
     type: ParaNode.getType(),
@@ -414,23 +417,51 @@ function createPara(style: string): SerializedParaNode {
   };
 }
 
+function createNoteCaller(
+  caller: string,
+  childNodes: (SerializedElementNode | SerializedTextNode)[],
+): SerializedImmutableNoteCallerNode {
+  const previewText = getPreviewTextFromSerializedNodes(childNodes);
+  const onClick =
+    (_nodeOptions[immutableNoteCallerNodeName]?.onClick as OnClick) ?? (() => undefined);
+
+  return {
+    type: ImmutableNoteCallerNode.getType(),
+    caller,
+    previewText,
+    onClick,
+    version: IMMUTABLE_NOTE_CALLER_VERSION,
+  };
+}
+
 function createNote(
   style: string,
   marker: MarkerObject,
-  elementNodes: (SerializedElementNode | SerializedTextNode)[],
-): SerializedNoteNode | undefined {
+  childNodes: (SerializedElementNode | SerializedTextNode)[],
+): SerializedNoteNode {
   if (!NoteNode.isValidStyle(style)) {
-    _logger?.error(`Unexpected note style '${style}'!`);
-    return undefined;
+    _logger?.warn(`Unexpected note style '${style}'!`);
   }
-
-  const previewText = elementNodes
-    .reduce(
-      (text, node) => text + (node.type === "char" ? ` ${(node as SerializedTextNode).text}` : ""),
-      "",
-    )
-    .trim();
-  const onClick = (_nodeOptions[noteNodeName]?.onClick as OnClick) ?? (() => undefined);
+  const caller = marker.caller ?? "*";
+  let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
+  if (_viewOptions?.markerMode === "editable") {
+    callerNode = createText(NBSP + caller + " ");
+  } else {
+    callerNode = createNoteCaller(getNoteCaller(marker.caller), childNodes);
+    childNodes.forEach((node) => {
+      (node as SerializedTextNode).style = "display: none";
+    });
+  }
+  let openingMarkerNode: SerializedTextNode | undefined;
+  let closingMarkerNode: SerializedTextNode | undefined;
+  if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") {
+    openingMarkerNode = createMarker(style);
+    closingMarkerNode = createMarker(style, false);
+  }
+  const children: SerializedLexicalNode[] = [];
+  if (openingMarkerNode) children.push(openingMarkerNode);
+  children.push(callerNode, ...childNodes);
+  if (closingMarkerNode) children.push(closingMarkerNode);
   const node = { ...marker };
   delete node.content;
 
@@ -438,9 +469,11 @@ function createNote(
     ...node,
     type: NoteNode.getType(),
     usxStyle: style as NoteUsxStyle,
-    caller: getNoteCaller(marker.caller),
-    previewText,
-    onClick,
+    caller,
+    children,
+    direction: null,
+    format: "",
+    indent: 0,
     version: NOTE_VERSION,
   };
 }
@@ -458,6 +491,20 @@ function createMilestone(style: string, marker: MarkerObject): SerializedMilesto
     type: MilestoneNode.getType(),
     usxStyle: style as MilestoneUsxStyle,
     version: MILESTONE_VERSION,
+  };
+}
+
+function createMarker(style: string, isOpening = true): SerializedMarkerNode {
+  return {
+    type: MarkerNode.getType(),
+    usxStyle: style,
+    isOpening,
+    text: "",
+    detail: 0,
+    format: 0,
+    mode: "normal",
+    style: "",
+    version: 1,
   };
 }
 
@@ -479,6 +526,33 @@ function addNode(
 ) {
   if (lexicalNode) {
     (elementNodes as SerializedLexicalNode[]).push(lexicalNode);
+  }
+}
+
+function addOpeningMarker(
+  style: string,
+  lexicalNode: SerializedLexicalNode | undefined,
+  elementNodes: (SerializedElementNode | SerializedTextNode)[],
+) {
+  if (
+    lexicalNode &&
+    (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
+  ) {
+    (elementNodes as SerializedLexicalNode[]).push(createMarker(style));
+  }
+}
+
+function addClosingMarker(
+  style: string,
+  lexicalNode: SerializedLexicalNode | undefined,
+  elementNodes: (SerializedElementNode | SerializedTextNode)[],
+) {
+  if (
+    lexicalNode &&
+    (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") &&
+    !(CharNode.isValidFootnoteStyle(style) || CharNode.isValidCrossReferenceStyle(style))
+  ) {
+    (elementNodes as SerializedLexicalNode[]).push(createMarker(style, false));
   }
 }
 
@@ -509,7 +583,9 @@ function recurseNodes(
           break;
         case "char":
           lexicalNode = createChar(style, marker);
+          addOpeningMarker(style, lexicalNode, elementNodes);
           addNode(lexicalNode, elementNodes);
+          addClosingMarker(style, lexicalNode, elementNodes);
           break;
         case "para":
           elementNode = createPara(style);
