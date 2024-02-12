@@ -24,16 +24,12 @@ type Mutable<T> = {
 type EditorProps<TLogger extends LoggerBasic> = {
   /** Scripture data in USJ form */
   usj?: Usj;
-  /** View Options state */
-  viewOptionsState?: [
-    viewOptions: ViewOptions | undefined,
-    setViewOptions: React.Dispatch<React.SetStateAction<ViewOptions>>,
-  ];
-  /** Scripture Ref state */
-  scrRefState?: [
-    scrRef: ScriptureReference,
-    setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>,
-  ];
+  /** View options */
+  viewOptions?: ViewOptions;
+  /** Scripture reference */
+  scrRef?: ScriptureReference;
+  /** Scripture reference set function */
+  setScrRef?: React.Dispatch<React.SetStateAction<ScriptureReference>>;
   /** Options for each node */
   nodeOptions?: UsjNodeOptions;
   /** Is the editor readonly or editable */
@@ -65,10 +61,10 @@ function Placeholder(): JSX.Element {
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
  * @param props.usj - USJ Scripture data.
- * @param props.viewModeState - View Mode state object containing the viewMode and the function to
- *   set it.
- * @param props.scrRefState - Scripture reference state object containing the ref and the function
- *   to set it.
+ * @param props.viewOptions - View options to select different view modes.
+ * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
+ * @param props.setScrRef - Scripture reference set function when the reference changes in the
+ *   editor as the cursor moves.
  * @param props.nodeOptions - Options for each node.
  * @param props.nodeOptions[].noteCallers - Possible note callers to use when caller is
  *   '+' for NoteNode.
@@ -79,13 +75,13 @@ function Placeholder(): JSX.Element {
  */
 export default function Editor<TLogger extends LoggerBasic>({
   usj,
-  viewOptionsState,
-  scrRefState,
+  viewOptions,
+  scrRef,
+  setScrRef,
   nodeOptions,
   isReadonly,
   logger,
 }: EditorProps<TLogger>): JSX.Element {
-  const viewOptions = viewOptionsState ? viewOptionsState[0] : undefined;
   editorConfig.editable = !isReadonly;
 
   return (
@@ -99,8 +95,12 @@ export default function Editor<TLogger extends LoggerBasic>({
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          {scrRefState && (
-            <ScriptureReferencePlugin scrRefState={scrRefState} viewOptions={viewOptions} />
+          {scrRef && setScrRef && (
+            <ScriptureReferencePlugin
+              scrRef={scrRef}
+              setScrRef={setScrRef}
+              viewOptions={viewOptions}
+            />
           )}
           <UpdateStatePlugin
             scripture={usj}
