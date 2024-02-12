@@ -26,22 +26,22 @@ let hasSelectionChanged = false;
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.
- * @param props.scrRefState - Scripture reference state object containing the ref and the function
- *   to set it.
+ * @param props.scrRef - Scripture reference.
+ * @param props.setScrRef - Scripture reference set function.
+ * @param props.viewOptions - View options to select different view modes.
  * @returns null, i.e. no DOM elements.
  */
 export default function ScriptureReferencePlugin({
-  scrRefState,
+  scrRef,
+  setScrRef,
   viewOptions,
 }: {
-  scrRefState: [
-    scrRef: ScriptureReference,
-    setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>,
-  ];
+  scrRef: ScriptureReference;
+  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
   viewOptions?: ViewOptions;
 }): null {
   const [editor] = useLexicalComposerContext();
-  const [{ bookNum, chapterNum, verseNum }, setScrRef] = scrRefState;
+  const { bookNum, chapterNum, verseNum } = scrRef;
 
   // Book loaded or changed
   useEffect(
