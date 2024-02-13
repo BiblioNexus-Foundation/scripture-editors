@@ -1,4 +1,14 @@
-# A PoC for assembling Lexical using USX3.0 <-> USJ
+# Scripture Editor for Platform.Bible using USX3.0 <-> USJ
+
+<div align="center">
+
+[![Build Status][github-actions-status]][github-actions-url]
+[![CodeQL][gitghub-codeql-status]][gitghub-codeql-url]
+[![Github Tag][npm-version-image]][npm-version-url]
+
+</div>
+
+A Scripture editor React component that works on USJ Scripture data. A utility that converts USX to USJ is also included. It is expected that data conforms to [USX v3.0](https://ubsicap.github.io/usx/).
 
 ```mermaid
 ---
@@ -6,8 +16,8 @@ title: ScriptureData—Editor flow
 ---
 graph TB
   DB[(DB)] <-- USX --> C
-  C[<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared/converters/usj'>USX-USJ converter</a>] -- USJ --> A
-  A[<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform/src/editor/plugins/UpdateStatePlugin.tsx'>USJ-Editor adapter</a>] -- Editor State --> Editor
+  C[USX-USJ converter] -- USJ --> A
+  A[USJ-Editor adapter] -- Editor State --> Editor
   A -. NYI* .-> C
   Editor -. NYI* .-> A
 
@@ -15,28 +25,86 @@ graph TB
   style Key fill:#fff,stroke:#fff
 ```
 
+## Install
+
+```sh
+npm install @biblionexus-foundation/platform-editor
+```
+
+## Usage
+
+```typescript
+import { Editor, usxStringToJson } from '@biblionexus-foundation/platform-editor';
+import { RefSelector } from 'platform-bible-react';
+
+const usx = `
+<?xml version="1.0" encoding="utf-8"?>
+<usx version="3.0">
+  <book code="PSA" style="id">World English Bible (WEB)</book>
+  <para style="h">Psalms</para>
+  <chapter number="1" style="c" sid="PSA 1" />
+  <para style="ms1">BOOK 1</para>
+  <para style="q1">
+    <verse number="1" style="v" sid="PSA 1:1" />Blessed is the man who doesn’t walk in the counsel of the wicked,</para>
+  <para style="q2" vid="PSA 1:1">nor stand on the path of sinners,</para>
+  <para style="q2" vid="PSA 1:1">nor sit in the seat of scoffers;<verse eid="PSA 1:1" /></para>
+</usx>
+`;
+const usj = usxStringToJson(usx);
+
+export default function App() {
+  const [scrRef, setScrRef] = useState(defaultScrRef);
+
+  return (
+    <>
+      <div className="ref-selector">
+        <RefSelector handleSubmit={setScrRef} scrRef={scrRef} />
+      </div>
+      <Editor
+        usj={usj}
+        scrRef={scrRef}
+        setScrRef={setScrRef}
+        logger={console}
+      />
+    </>
+  );
+}
+```
+
+## Demo and Collaborative Web Development Environment
+
+Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main
+
+This package is the third tab (`dev:platform:5175`).
+
 ## Develop in App
 
 To develop an editor in a target application you can use [yalc](https://www.npmjs.com/package/yalc) to link the editor in without having to publish to NPM every time something changes.
 
-1. Install `yalc` globally (note we intentionally use `npm` rather than `pnpm` for global installs, see [JavaScript Tool Manager](/README.md#javascript-tool-manager)):
-   ```bash
-   npm i -g yalc
-   ```
-2. In this monorepo, publish the editor to `yalc`, e.g.:
+1. In this monorepo, publish the editor to `yalc`, e.g.:
    ```bash
    nx devpub platform
    ```
-3. In the target application repo, link from `yalc`:
+2. In the target application repo, link from `yalc`:
    ```bash
-   yalc link platform
+   yalc link @biblionexus-foundation/platform-editor
    ```
-4. In this monorepo, make changes and re-publish the editor (see step 2).
-5. In the target application repo, update from `yalc`:
+3. In this monorepo, make changes and re-publish the editor (see step 2).
+4. When you have finished developing in the target application repo, unlink from `yalc`:
    ```bash
-   yalc update platform
+   yalc remove @biblionexus-foundation/platform-editor && npm i
    ```
-6. When you have finished developing, unlink from `yalc`:
-   ```bash
-   yalc remove platform
-   ```
+
+## License
+
+[MIT][github-license] © [BiblioNexus Foundation](https://biblionexus.org/)
+
+<!-- define variables used above -->
+
+[github-actions-status]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/test-publish.yml/badge.svg
+[github-actions-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions
+[gitghub-codeql-status]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/codeql.yml/badge.svg
+[gitghub-codeql-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/codeql.yml
+[npm-version-image]: https://img.shields.io/npm/v/@biblionexus-foundation/platform-editor
+[npm-version-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/releases
+[github-license]: https://github.com/BiblioNexus-Foundation/scripture-editors/blob/main/packages/platform/LICENSE

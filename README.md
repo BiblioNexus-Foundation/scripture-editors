@@ -45,10 +45,10 @@ NOTE: there is a [known limitation using PNPM with Volta](https://docs.volta.sh/
 title: Nx Graph
 ---
 graph TB
-  R(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/perf-react'>perf-react</a>) --> S(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared'>shared</a>)
-  V(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/perf-vanilla'>perf-vanilla</a>) --> S
-  P(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform'>platform</a>) --> SR
-  SR(<a href='/BiblioNexus-Foundation/scripture-editors/tree/main/packages/shared-react'>shared-react</a>) --> S
+  V(perf-vanilla) --> S(shared)
+  R(perf-react) --> S
+  P(platform) --> SR
+  SR(shared-react) --> S
   P --> S
 ```
 
@@ -159,3 +159,11 @@ nx run-many -t typecheck # to check types
 ## Collaborative Web Development Environment
 
 Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main
+
+## License
+
+[MIT][github-license] © [BiblioNexus Foundation](https://biblionexus.org/)
+
+<!-- define variables used above -->
+
+[github-license]: https://github.com/BiblioNexus-Foundation/scripture-editors/blob/main/LICENSE
