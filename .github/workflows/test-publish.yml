@@ -62,7 +62,7 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/platform_v') && contains(github.ref, '.') }}
         uses: JS-DevTools/npm-publish@v2
         with:
-          package: ./package/platform
+          package: ./packages/platform
           access: public
           token: ${{ secrets.NPM_TOKEN }}
 
