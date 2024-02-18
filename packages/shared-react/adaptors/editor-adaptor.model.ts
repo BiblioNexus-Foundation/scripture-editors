@@ -11,7 +11,10 @@ export interface EditorAdaptor {
    * @param viewOptions - View options of the editor, if any.
    * @returns the serialized editor state.
    */
-  loadEditorState(scripture: unknown | undefined, viewOptions?: unknown): SerializedEditorState;
+  serializeEditorState(
+    scripture: unknown | undefined,
+    viewOptions?: unknown,
+  ): SerializedEditorState;
 
   /**
    * Initialize the adaptor.

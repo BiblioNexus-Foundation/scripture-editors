@@ -86,6 +86,8 @@ const VALID_CHAR_STYLES_NON_NUMBERED = [
   ...VALID_CHAR_STYLES_NUMBERED,
 ] as const;
 
+export const CHAR_ELEMENT_NAME = "char";
+
 export const CHAR_VERSION = 1;
 
 export type CharUsxStyle = string;

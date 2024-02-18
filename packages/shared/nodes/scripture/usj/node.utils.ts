@@ -357,6 +357,15 @@ export function getPreviewTextFromSerializedNodes(
 }
 
 /**
+ * Get editable note caller text.
+ * @param noteCaller - Note caller.
+ * @returns caller text.
+ */
+export function getEditableCallerText(noteCaller: string): string {
+  return NBSP + noteCaller + " ";
+}
+
+/**
  * Gets the preview text for a note caller.
  * @param childNodes - child nodes of the NoteNode.
  * @returns the preview text.

@@ -27,7 +27,7 @@ let hasSelectionChanged = false;
 /**
  * A component (plugin) that keeps the Scripture reference updated.
  * @param props.scrRef - Scripture reference.
- * @param props.setScrRef - Scripture reference set function.
+ * @param props.setScrRef - Set Scripture reference callback function.
  * @param props.viewOptions - View options to select different view modes.
  * @returns null, i.e. no DOM elements.
  */
@@ -37,7 +37,7 @@ export default function ScriptureReferencePlugin({
   viewOptions,
 }: {
   scrRef: ScriptureReference;
-  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
+  setScrRef: (scrRef: ScriptureReference) => void;
   viewOptions?: ViewOptions;
 }): null {
   const [editor] = useLexicalComposerContext();
@@ -103,7 +103,7 @@ function findAndSetChapterAndVerse(
   bookNum: number,
   chapterNum: number,
   verseNum: number,
-  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>,
+  setScrRef: (scrRef: ScriptureReference) => void,
   viewOptions?: ViewOptions,
 ) {
   const startNode = $getSelection()?.getNodes()[0];

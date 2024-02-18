@@ -32,6 +32,8 @@ const VALID_MILESTONE_STYLES = [
   "qt-e",
 ] as const;
 
+export const MILESTONE_ELEMENT_NAME = "ms";
+
 export const MILESTONE_VERSION = 1;
 
 export type MilestoneUsxStyle = (typeof VALID_MILESTONE_STYLES)[number];

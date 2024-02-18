@@ -12,6 +12,8 @@ import {
 } from "lexical";
 import { BookCode } from "../../../converters/usj/usj.model";
 
+export const BOOK_ELEMENT_NAME = "book";
+
 export const BOOK_STYLE = "id";
 export const BOOK_VERSION = 1;
 

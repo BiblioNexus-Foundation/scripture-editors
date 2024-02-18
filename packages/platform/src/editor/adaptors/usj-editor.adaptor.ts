@@ -16,6 +16,7 @@ import {
 } from "shared/converters/usj/usj.model";
 import { deserializeUsjType } from "shared/converters/usj/usj.util";
 import {
+  BOOK_ELEMENT_NAME,
   BOOK_STYLE,
   BOOK_VERSION,
   BookNode,
@@ -31,9 +32,16 @@ import {
   SerializedChapterNode,
   CHAPTER_VERSION,
   ChapterNode,
+  CHAPTER_ELEMENT_NAME,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
 import {
+  CHAR_ELEMENT_NAME,
+  CHAR_VERSION,
+  CharNode,
+  SerializedCharNode,
+} from "shared/nodes/scripture/usj/CharNode";
+import {
+  MILESTONE_ELEMENT_NAME,
   MILESTONE_VERSION,
   MilestoneNode,
   MilestoneUsxStyle,
@@ -45,12 +53,14 @@ import {
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
+  PARA_ELEMENT_NAME,
   PARA_STYLE_DEFAULT,
   PARA_VERSION,
   ParaNode,
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
 import {
+  NOTE_ELEMENT_NAME,
   NOTE_VERSION,
   NoteNode,
   NoteUsxStyle,
@@ -71,6 +81,7 @@ import {
 } from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   SerializedVerseNode,
+  VERSE_ELEMENT_NAME,
   VERSE_VERSION,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
@@ -79,24 +90,19 @@ import {
   NBSP,
   NO_INDENT_CLASS_NAME,
   PLAIN_FONT_CLASS_NAME,
+  getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor, NodeOptions } from "shared-react/adaptors/editor-adaptor.model";
+import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getViewOptions } from "./view-options.utils";
-
-export interface UsjNodeOptions extends NodeOptions {
-  [immutableNoteCallerNodeName]?: {
-    noteCallers?: string[];
-    onClick?: OnClick;
-  };
-}
 
 interface UsjEditorAdaptor extends EditorAdaptor {
   initialize: typeof initialize;
   reset: typeof reset;
-  loadEditorState: typeof loadEditorState;
+  serializeEditorState: typeof serializeEditorState;
 }
 
 const serializedLineBreakNode: SerializedLineBreakNode = {
@@ -136,7 +142,7 @@ const defaultNoteCallers = [
 /** View options - view mode parameters */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node */
-let _nodeOptions: UsjNodeOptions = {};
+let _nodeOptions: UsjNodeOptions | undefined;
 /** Count used for note callers */
 let callerCount = 0;
 /** Logger instance */
@@ -154,7 +160,7 @@ export function reset(callerCountValue = 0) {
   resetCallerCount(callerCountValue);
 }
 
-export function loadEditorState(
+export function serializeEditorState(
   usj: Usj | undefined,
   viewOptions?: ViewOptions,
 ): SerializedEditorState {
@@ -243,9 +249,11 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
  *   callers list, '*' if undefined.
  */
 function getNoteCaller(markerCaller: string | undefined): string {
-  const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName]?.noteCallers;
-  const noteCallers =
-    optionsNoteCallers && optionsNoteCallers.length > 0 ? optionsNoteCallers : defaultNoteCallers;
+  let noteCallers = defaultNoteCallers;
+  if (_nodeOptions) {
+    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
+    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
+  }
   let caller = markerCaller;
   if (markerCaller === "+") {
     if (callerCount >= noteCallers.length ** 2 + noteCallers.length) {
@@ -422,8 +430,9 @@ function createNoteCaller(
   childNodes: (SerializedElementNode | SerializedTextNode)[],
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
-  const onClick =
-    (_nodeOptions[immutableNoteCallerNodeName]?.onClick as OnClick) ?? (() => undefined);
+  let onClick: OnClick = () => undefined;
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName].onClick)
+    onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return {
     type: ImmutableNoteCallerNode.getType(),
@@ -445,7 +454,7 @@ function createNote(
   const caller = marker.caller ?? "*";
   let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
   if (_viewOptions?.markerMode === "editable") {
-    callerNode = createText(NBSP + caller + " ");
+    callerNode = createText(getEditableCallerText(caller));
   } else {
     callerNode = createNoteCaller(getNoteCaller(marker.caller), childNodes);
     childNodes.forEach((node) => {
@@ -568,39 +577,37 @@ function recurseNodes(
       let elementNode: SerializedElementNode | undefined;
       const { element, style } = deserializeUsjType(marker.type);
       switch (element) {
-        case "book":
+        case BOOK_ELEMENT_NAME:
           lexicalNode = createBook(style, marker);
           addNode(lexicalNode, elementNodes);
           break;
-        case "chapter":
+        case CHAPTER_ELEMENT_NAME:
           lexicalNode = createChapter(style, marker);
           addNode(lexicalNode, elementNodes);
           break;
-        case "verse":
+        case VERSE_ELEMENT_NAME:
           lexicalNode = createVerse(style, marker);
           if (!_viewOptions?.isIndented) addNode(serializedLineBreakNode, elementNodes);
           addNode(lexicalNode, elementNodes);
           break;
-        case "char":
+        case CHAR_ELEMENT_NAME:
           lexicalNode = createChar(style, marker);
           addOpeningMarker(style, lexicalNode, elementNodes);
           addNode(lexicalNode, elementNodes);
           addClosingMarker(style, lexicalNode, elementNodes);
           break;
-        case "para":
+        case PARA_ELEMENT_NAME:
           elementNode = createPara(style);
           if (elementNode) {
             elementNode.children.push(...recurseNodes(marker.content));
             elementNodes.push(elementNode);
           }
           break;
-        case "note":
-          if (marker.caller === "-") break;
-
+        case NOTE_ELEMENT_NAME:
           lexicalNode = createNote(style, marker, recurseNodes(marker.content));
           addNode(lexicalNode, elementNodes);
           break;
-        case "ms":
+        case MILESTONE_ELEMENT_NAME:
           lexicalNode = createMilestone(style, marker);
           addNode(lexicalNode, elementNodes);
           break;
@@ -648,6 +655,6 @@ function insertImpliedParasRecurse(
 const usjEditorAdaptor: UsjEditorAdaptor = {
   initialize,
   reset,
-  loadEditorState,
+  serializeEditorState,
 };
 export default usjEditorAdaptor;
