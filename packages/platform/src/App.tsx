@@ -14,11 +14,13 @@ import "./App.css";
 
 const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 
+const start = performance.now();
 const usj = usxStringToJson(usx);
+console.log(`usxStringToJson() took ${Math.round(performance.now() - start)} ms`);
 
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 
-const onChange = (usj: Usj) => console.log({ usj });
+const onChange = (usj: Usj) => console.log({ usjContent0_25: usj.content.slice(0, 26) });
 
 export default function App() {
   const [viewMode, setViewMode] = useState(defaultViewMode);

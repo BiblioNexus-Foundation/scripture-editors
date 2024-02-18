@@ -94,8 +94,10 @@ export default function Editor<TLogger extends LoggerBasic>({
   editorUsjAdaptor.initialize(logger);
   const handleChange = useCallback(
     (editorState: EditorState) => {
+      const start = performance.now();
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
       if (usj && onChange) onChange(usj);
+      console.log(`onChange() took ${Math.round(performance.now() - start)} ms`);
     },
     [onChange],
   );
