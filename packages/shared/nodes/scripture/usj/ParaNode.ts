@@ -9,15 +9,15 @@ import {
   SerializedElementNode,
 } from "lexical";
 import {
-  extractNonNumberedStyles,
-  extractNumberedStyles,
-  isValidNumberedStyle,
+  extractNonNumberedMarkers,
+  extractNumberedMarkers,
+  isValidNumberedMarker,
 } from "./node.utils";
 
-export const PARA_STYLE_DEFAULT = "p";
+export const PARA_MARKER_DEFAULT = "p";
 
 /** @see https://ubsicap.github.io/usx/parastyles.html */
-const VALID_PARA_STYLES = [
+const VALID_PARA_MARKERS = [
   // Identification
   "h",
   "toc1",
@@ -56,7 +56,7 @@ const VALID_PARA_STYLES = [
   "sp",
   "sd#",
   // Paragraphs
-  PARA_STYLE_DEFAULT,
+  PARA_MARKER_DEFAULT,
   "m",
   "po",
   "pr",
@@ -86,38 +86,32 @@ const VALID_PARA_STYLES = [
   "litl",
 ] as const;
 
-const VALID_PARA_STYLES_NUMBERED = extractNumberedStyles(VALID_PARA_STYLES);
-const VALID_PARA_STYLES_NON_NUMBERED = [
-  ...extractNonNumberedStyles(VALID_PARA_STYLES),
+const VALID_PARA_MARKERS_NUMBERED = extractNumberedMarkers(VALID_PARA_MARKERS);
+const VALID_PARA_MARKERS_NON_NUMBERED = [
+  ...extractNonNumberedMarkers(VALID_PARA_MARKERS),
   // Include the numbered styles, i.e. not ending in a number since pi (= pi1) is valid.
-  ...VALID_PARA_STYLES_NUMBERED,
+  ...VALID_PARA_MARKERS_NUMBERED,
 ] as const;
-
-export const PARA_ELEMENT_NAME = "para";
 
 export const PARA_VERSION = 1;
 
-export type ParaUsxStyle = string;
-
 export type SerializedParaNode = Spread<
   {
-    usxStyle: ParaUsxStyle;
+    marker: ParaMarker;
     classList: string[];
   },
   SerializedElementNode
 >;
 
+type ParaMarker = string;
+
 export class ParaNode extends ParagraphNode {
-  __usxStyle: ParaUsxStyle;
+  __marker: ParaMarker;
   __classList: string[];
 
-  constructor(
-    usxStyle: ParaUsxStyle = PARA_STYLE_DEFAULT,
-    classList: string[] = [],
-    key?: NodeKey,
-  ) {
+  constructor(marker: ParaMarker = PARA_MARKER_DEFAULT, classList: string[] = [], key?: NodeKey) {
     super(key);
-    this.__usxStyle = usxStyle;
+    this.__marker = marker;
     this.__classList = classList;
   }
 
@@ -126,34 +120,34 @@ export class ParaNode extends ParagraphNode {
   }
 
   static clone(node: ParaNode): ParaNode {
-    const { __usxStyle, __classList, __key } = node;
-    return new ParaNode(__usxStyle, __classList, __key);
+    const { __marker, __classList, __key } = node;
+    return new ParaNode(__marker, __classList, __key);
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const { usxStyle, classList, format, indent, direction } = serializedNode;
-    const node = $createParaNode(usxStyle, classList);
+    const { marker, classList, format, indent, direction } = serializedNode;
+    const node = $createParaNode(marker, classList);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
     return node;
   }
 
-  static isValidStyle(style: string): boolean {
+  static isValidMarker(marker: string): boolean {
     return (
-      VALID_PARA_STYLES_NON_NUMBERED.includes(style) ||
-      isValidNumberedStyle(style, VALID_PARA_STYLES_NUMBERED)
+      VALID_PARA_MARKERS_NON_NUMBERED.includes(marker) ||
+      isValidNumberedMarker(marker, VALID_PARA_MARKERS_NUMBERED)
     );
   }
 
-  setUsxStyle(usxStyle: ParaUsxStyle): void {
+  setMarker(marker: ParaMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): ParaUsxStyle {
+  getMarker(): ParaMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setClassList(classList: string[]): void {
@@ -169,8 +163,8 @@ export class ParaNode extends ParagraphNode {
   createDOM(): HTMLElement {
     // Define the DOM element here
     const dom = document.createElement("p");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`, ...this.__classList);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(this.getType(), `usfm_${this.__marker}`, ...this.__classList);
     return dom;
   }
 
@@ -184,15 +178,15 @@ export class ParaNode extends ParagraphNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       classList: this.getClassList(),
       version: PARA_VERSION,
     };
   }
 }
 
-export function $createParaNode(usxStyle?: ParaUsxStyle, classList?: string[]): ParaNode {
-  return $applyNodeReplacement(new ParaNode(usxStyle, classList));
+export function $createParaNode(marker?: ParaMarker, classList?: string[]): ParaNode {
+  return $applyNodeReplacement(new ParaNode(marker, classList));
 }
 
 export function $isParaNode(node: LexicalNode | null | undefined): node is ParaNode {

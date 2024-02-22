@@ -10,7 +10,7 @@ import {
 } from "lexical";
 
 /** @see https://ubsicap.github.io/usx/msstyles.html */
-const VALID_MILESTONE_STYLES = [
+const VALID_MILESTONE_MARKERS = [
   "ts-s",
   "ts-e",
   "t-s",
@@ -32,15 +32,13 @@ const VALID_MILESTONE_STYLES = [
   "qt-e",
 ] as const;
 
-export const MILESTONE_ELEMENT_NAME = "ms";
-
 export const MILESTONE_VERSION = 1;
 
-export type MilestoneUsxStyle = (typeof VALID_MILESTONE_STYLES)[number];
+export type MilestoneMarker = (typeof VALID_MILESTONE_MARKERS)[number];
 
 export type SerializedMilestoneNode = Spread<
   {
-    usxStyle: MilestoneUsxStyle;
+    marker: MilestoneMarker;
     sid?: string;
     eid?: string;
   },
@@ -48,44 +46,44 @@ export type SerializedMilestoneNode = Spread<
 >;
 
 export class MilestoneNode extends DecoratorNode<void> {
-  __usxStyle: MilestoneUsxStyle;
+  __marker: MilestoneMarker;
   __sid?: string;
   __eid?: string;
 
-  constructor(usxStyle: MilestoneUsxStyle, sid?: string, eid?: string, key?: NodeKey) {
+  constructor(marker: MilestoneMarker, sid?: string, eid?: string, key?: NodeKey) {
     super(key);
-    this.__usxStyle = usxStyle;
+    this.__marker = marker;
     this.__sid = sid;
     this.__eid = eid;
   }
 
   static getType(): string {
-    return "milestone";
+    return "ms";
   }
 
   static clone(node: MilestoneNode): MilestoneNode {
-    const { __usxStyle, __sid, __eid, __key } = node;
-    return new MilestoneNode(__usxStyle, __sid, __eid, __key);
+    const { __marker, __sid, __eid, __key } = node;
+    return new MilestoneNode(__marker, __sid, __eid, __key);
   }
 
   static importJSON(serializedNode: SerializedMilestoneNode): MilestoneNode {
-    const { usxStyle, sid, eid } = serializedNode;
-    const node = $createMilestoneNode(usxStyle, sid, eid);
+    const { marker, sid, eid } = serializedNode;
+    const node = $createMilestoneNode(marker, sid, eid);
     return node;
   }
 
-  static isValidStyle(style: string): boolean {
-    return VALID_MILESTONE_STYLES.includes(style as MilestoneUsxStyle) || style.startsWith("z");
+  static isValidMarker(marker: string): boolean {
+    return VALID_MILESTONE_MARKERS.includes(marker as MilestoneMarker) || marker.startsWith("z");
   }
 
-  setUsxStyle(usxStyle: MilestoneUsxStyle): void {
+  setMarker(marker: MilestoneMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): MilestoneUsxStyle {
+  getMarker(): MilestoneMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setSid(sid: string | undefined): void {
@@ -110,8 +108,8 @@ export class MilestoneNode extends DecoratorNode<void> {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
     return dom;
   }
 
@@ -128,7 +126,7 @@ export class MilestoneNode extends DecoratorNode<void> {
   exportJSON(): SerializedMilestoneNode {
     return {
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       sid: this.getSid(),
       eid: this.getEid(),
       version: MILESTONE_VERSION,
@@ -137,11 +135,11 @@ export class MilestoneNode extends DecoratorNode<void> {
 }
 
 export function $createMilestoneNode(
-  usxStyle: MilestoneUsxStyle,
+  marker: MilestoneMarker,
   sid?: string,
   eid?: string,
 ): MilestoneNode {
-  return $applyNodeReplacement(new MilestoneNode(usxStyle, sid, eid));
+  return $applyNodeReplacement(new MilestoneNode(marker, sid, eid));
 }
 
 export function $isMilestoneNode(node: LexicalNode | null | undefined): node is MilestoneNode {

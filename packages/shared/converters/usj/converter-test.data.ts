@@ -36,7 +36,7 @@ export const usxGen1v1ImpliedPara = `
 
 export const usjEmpty: Usj = {
   type: "USJ",
-  version: "0.0.1-alpha.2",
+  version: "0.2.1",
   content: [],
 };
 
@@ -64,66 +64,78 @@ export const VERSE_2_EDITABLE_INDEX = 6;
  */
 export const usjGen1v1: Usj = {
   type: "USJ",
-  version: "0.0.1-alpha.2",
+  version: "0.2.1",
   content: [
     {
-      type: "book:id",
+      type: "book",
+      marker: "id",
       code: "GEN",
     },
     {
-      type: "chapter:c",
+      type: "chapter",
+      marker: "c",
       number: "1",
       sid: "GEN 1",
     },
     {
-      type: "para:p",
+      type: "para",
+      marker: "p",
       content: [
         {
-          type: "verse:v",
+          type: "verse",
+          marker: "v",
           number: "1",
           sid: "GEN 1:1",
         },
         "the first verse ",
         {
-          type: "verse:v",
+          type: "verse",
+          marker: "v",
           number: "2",
           sid: "GEN 1:2",
         },
         "the second verse ",
         {
-          type: "verse:v",
+          type: "verse",
+          marker: "v",
           number: "15",
           sid: "GEN 1:15",
         },
         "Tell the Israelites that I, the ",
         {
-          type: "char:nd",
+          type: "char",
+          marker: "nd",
           content: ["Lord"],
         },
         ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
       ],
     },
     {
-      type: "para:q2",
+      type: "para",
+      marker: "q2",
       content: [
         "“There is no help for him in God.”",
         {
-          type: "note:f",
+          type: "note",
+          marker: "f",
           caller: "+",
           content: [
             {
-              type: "char:fr",
+              type: "char",
+              marker: "fr",
               content: ["3:2 "],
             },
             {
-              type: "char:ft",
+              type: "char",
+              marker: "ft",
               content: ["The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim)."],
             },
           ],
         },
         " ",
         {
-          type: "char:qs",
+          type: "char",
+          marker: "qs",
           content: ["Selah."],
         },
       ],
@@ -133,37 +145,43 @@ export const usjGen1v1: Usj = {
 
 export const usjGen1v1ImpliedPara: Usj = {
   type: "USJ",
-  version: "0.0.1-alpha.2",
+  version: "0.2.1",
   content: [
     {
-      type: "book:id",
+      type: "book",
+      marker: "id",
       code: "GEN",
     },
     {
-      type: "chapter:c",
+      type: "chapter",
+      marker: "c",
       number: "1",
       sid: "GEN 1",
     },
     {
-      type: "verse:v",
+      type: "verse",
+      marker: "v",
       number: "1",
       sid: "GEN 1:1",
     },
     "the first verse ",
     {
-      type: "verse:v",
+      type: "verse",
+      marker: "v",
       number: "2",
       sid: "GEN 1:2",
     },
     "the second verse ",
     {
-      type: "verse:v",
+      type: "verse",
+      marker: "v",
       number: "15",
       sid: "GEN 1:15",
     },
     "Tell the Israelites that I, the ",
     {
-      type: "char:nd",
+      type: "char",
+      marker: "nd",
       content: ["Lord"],
     },
     ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
@@ -180,7 +198,7 @@ export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
     children: [
       {
         type: "para",
-        usxStyle: "p",
+        marker: "p",
         classList: [],
         direction: null,
         format: "",
@@ -203,7 +221,7 @@ export const editorStateGen1v1 = {
     children: [
       {
         type: "book",
-        usxStyle: "id",
+        marker: "id",
         code: "GEN",
         text: "",
         direction: null,
@@ -212,17 +230,17 @@ export const editorStateGen1v1 = {
         version: 1,
         children: [],
       },
-      { type: "immutable-chapter", usxStyle: "c", number: "1", sid: "GEN 1", version: 1 },
+      { type: "immutable-chapter", marker: "c", number: "1", sid: "GEN 1", version: 1 },
       {
         type: "para",
-        usxStyle: "p",
+        marker: "p",
         classList: [],
         direction: null,
         format: "",
         indent: 0,
         version: 1,
         children: [
-          { type: "immutable-verse", usxStyle: "v", number: "1", sid: "GEN 1:1", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
           {
             type: "text",
             text: "the first verse ",
@@ -232,7 +250,7 @@ export const editorStateGen1v1 = {
             style: "",
             version: 1,
           },
-          { type: "immutable-verse", usxStyle: "v", number: "2", sid: "GEN 1:2", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "2", sid: "GEN 1:2", version: 1 },
           {
             type: "text",
             text: "the second verse ",
@@ -242,7 +260,7 @@ export const editorStateGen1v1 = {
             style: "",
             version: 1,
           },
-          { type: "immutable-verse", usxStyle: "v", number: "15", sid: "GEN 1:15", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "15", sid: "GEN 1:15", version: 1 },
           {
             type: "text",
             text: "Tell the Israelites that I, the ",
@@ -254,7 +272,7 @@ export const editorStateGen1v1 = {
           },
           {
             type: "char",
-            usxStyle: "nd",
+            marker: "nd",
             text: "Lord",
             detail: 0,
             format: 0,
@@ -275,7 +293,7 @@ export const editorStateGen1v1 = {
       },
       {
         type: "para",
-        usxStyle: "q2",
+        marker: "q2",
         classList: [],
         direction: null,
         format: "",
@@ -293,7 +311,7 @@ export const editorStateGen1v1 = {
           },
           {
             type: "note",
-            usxStyle: "f",
+            marker: "f",
             caller: "+",
             direction: null,
             format: "",
@@ -308,7 +326,7 @@ export const editorStateGen1v1 = {
               },
               {
                 type: "char",
-                usxStyle: "fr",
+                marker: "fr",
                 text: "3:2 ",
                 style: "display: none",
                 detail: 0,
@@ -318,7 +336,7 @@ export const editorStateGen1v1 = {
               },
               {
                 type: "char",
-                usxStyle: "ft",
+                marker: "ft",
                 text: "The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).",
                 style: "display: none",
                 detail: 0,
@@ -339,7 +357,7 @@ export const editorStateGen1v1 = {
           },
           {
             type: "char",
-            usxStyle: "qs",
+            marker: "qs",
             text: "Selah.",
             detail: 0,
             format: 0,
@@ -364,7 +382,7 @@ export const editorStateGen1v1Editable = {
     children: [
       {
         type: "book",
-        usxStyle: "id",
+        marker: "id",
         code: "GEN",
         direction: null,
         format: "",
@@ -375,7 +393,7 @@ export const editorStateGen1v1Editable = {
       },
       {
         type: "chapter",
-        usxStyle: "c",
+        marker: "c",
         number: "1",
         sid: "GEN 1",
         text: `\\c${NBSP}1 `,
@@ -384,7 +402,7 @@ export const editorStateGen1v1Editable = {
       },
       {
         type: "para",
-        usxStyle: "p",
+        marker: "p",
         classList: ["no-indent", "plain-font"],
         direction: null,
         format: "",
@@ -393,7 +411,7 @@ export const editorStateGen1v1Editable = {
         children: [
           {
             type: "marker",
-            usxStyle: "p",
+            marker: "p",
             isOpening: true,
             detail: 0,
             format: 0,
@@ -417,7 +435,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "verse",
-            usxStyle: "v",
+            marker: "v",
             number: "1",
             sid: "GEN 1:1",
             text: `\\v${NBSP}1 `,
@@ -439,7 +457,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "verse",
-            usxStyle: "v",
+            marker: "v",
             number: "2",
             sid: "GEN 1:2",
             text: `\\v${NBSP}2 `,
@@ -461,7 +479,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "verse",
-            usxStyle: "v",
+            marker: "v",
             number: "15",
             sid: "GEN 1:15",
             text: `\\v${NBSP}15 `,
@@ -479,7 +497,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "marker",
-            usxStyle: "nd",
+            marker: "nd",
             isOpening: true,
             detail: 0,
             format: 0,
@@ -490,7 +508,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "char",
-            usxStyle: "nd",
+            marker: "nd",
             text: `${NBSP}Lord`,
             detail: 0,
             format: 0,
@@ -500,7 +518,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "marker",
-            usxStyle: "nd",
+            marker: "nd",
             isOpening: false,
             detail: 0,
             format: 0,
@@ -522,7 +540,7 @@ export const editorStateGen1v1Editable = {
       },
       {
         type: "para",
-        usxStyle: "q2",
+        marker: "q2",
         classList: ["no-indent", "plain-font"],
         direction: null,
         format: "",
@@ -531,7 +549,7 @@ export const editorStateGen1v1Editable = {
         children: [
           {
             type: "marker",
-            usxStyle: "q2",
+            marker: "q2",
             isOpening: true,
             detail: 0,
             format: 0,
@@ -560,7 +578,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "note",
-            usxStyle: "f",
+            marker: "f",
             caller: "+",
             direction: null,
             format: "",
@@ -569,7 +587,7 @@ export const editorStateGen1v1Editable = {
             children: [
               {
                 type: "marker",
-                usxStyle: "f",
+                marker: "f",
                 isOpening: true,
                 detail: 0,
                 format: 0,
@@ -589,7 +607,7 @@ export const editorStateGen1v1Editable = {
               },
               {
                 type: "marker",
-                usxStyle: "fr",
+                marker: "fr",
                 isOpening: true,
                 detail: 0,
                 format: 0,
@@ -600,7 +618,7 @@ export const editorStateGen1v1Editable = {
               },
               {
                 type: "char",
-                usxStyle: "fr",
+                marker: "fr",
                 text: `${NBSP}3:2 `,
                 detail: 0,
                 format: 0,
@@ -610,7 +628,7 @@ export const editorStateGen1v1Editable = {
               },
               {
                 type: "marker",
-                usxStyle: "ft",
+                marker: "ft",
                 isOpening: true,
                 detail: 0,
                 format: 0,
@@ -621,7 +639,7 @@ export const editorStateGen1v1Editable = {
               },
               {
                 type: "char",
-                usxStyle: "ft",
+                marker: "ft",
                 text: `${NBSP}The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).`,
                 detail: 0,
                 format: 0,
@@ -631,7 +649,7 @@ export const editorStateGen1v1Editable = {
               },
               {
                 type: "marker",
-                usxStyle: "f",
+                marker: "f",
                 isOpening: false,
                 detail: 0,
                 format: 0,
@@ -653,7 +671,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "marker",
-            usxStyle: "qs",
+            marker: "qs",
             isOpening: true,
             detail: 0,
             format: 0,
@@ -664,7 +682,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "char",
-            usxStyle: "qs",
+            marker: "qs",
             text: `${NBSP}Selah.`,
             detail: 0,
             format: 0,
@@ -674,7 +692,7 @@ export const editorStateGen1v1Editable = {
           },
           {
             type: "marker",
-            usxStyle: "qs",
+            marker: "qs",
             isOpening: false,
             detail: 0,
             format: 0,
@@ -700,7 +718,7 @@ export const editorStateGen1v1ImpliedPara = {
       {
         type: "book",
         code: "GEN",
-        usxStyle: "id",
+        marker: "id",
         text: "",
         direction: null,
         format: "",
@@ -715,8 +733,8 @@ export const editorStateGen1v1ImpliedPara = {
         indent: 0,
         version: 1,
         children: [
-          { type: "immutable-chapter", usxStyle: "c", number: "1", sid: "GEN 1", version: 1 },
-          { type: "immutable-verse", usxStyle: "v", number: "1", sid: "GEN 1:1", version: 1 },
+          { type: "immutable-chapter", marker: "c", number: "1", sid: "GEN 1", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
           {
             type: "text",
             text: "the first verse ",
@@ -726,7 +744,7 @@ export const editorStateGen1v1ImpliedPara = {
             style: "",
             version: 1,
           },
-          { type: "immutable-verse", usxStyle: "v", number: "2", sid: "GEN 1:2", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "2", sid: "GEN 1:2", version: 1 },
           {
             type: "text",
             text: "the second verse ",
@@ -736,7 +754,7 @@ export const editorStateGen1v1ImpliedPara = {
             style: "",
             version: 1,
           },
-          { type: "immutable-verse", usxStyle: "v", number: "15", sid: "GEN 1:15", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "15", sid: "GEN 1:15", version: 1 },
           {
             type: "text",
             text: "Tell the Israelites that I, the ",
@@ -748,7 +766,7 @@ export const editorStateGen1v1ImpliedPara = {
           },
           {
             type: "char",
-            usxStyle: "nd",
+            marker: "nd",
             text: "Lord",
             detail: 0,
             format: 0,

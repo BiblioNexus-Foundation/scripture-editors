@@ -2,11 +2,12 @@
  * Convert Scripture from USX to USJ.
  * Adapted to TypeScript from this file:
  * @see https://github.com/mvh-solutions/nice-usfm-json/blob/main/javascript/lib/usx-to-usj.js
+ * And kept updated with changes from this file:
+ * @see https://github.com/usfm-bible/tcdocs/blob/main/python/scripts/usx2usj.py
  */
 
 import { DOMParser } from "@xmldom/xmldom";
 import { MarkerObject, USJ_TYPE, USJ_VERSION, Usj } from "./usj.model";
-import { SerializedUsjType, serializeUsjType } from "./usj.util";
 
 type Action = "append" | "merge" | "ignore";
 type Attribs = { [name: string]: string };
@@ -16,10 +17,13 @@ const USX_TYPE = "usx";
 function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
   inputUsxElement: HTMLElement,
 ): [outputJson: T, action: Action] {
+  const attribs: Attribs = {};
   let type: string = inputUsxElement.tagName;
+  let marker: string | undefined;
   let text: string | undefined;
   let action: Action = "append";
-  const attribs: Attribs = {};
+
+  if (["row", "cell"].includes(type)) type = "table:" + type;
   if (inputUsxElement.attributes) {
     for (let i = 0; i < inputUsxElement.attributes.length; i++) {
       const attrib = inputUsxElement.attributes[i];
@@ -28,16 +32,21 @@ function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
   }
 
   if (attribs.style) {
-    type = serializeUsjType(type, attribs.style);
+    marker = attribs.style;
     delete attribs.style;
   }
+  // dropping because presence of vid in para elements is not consistent in USX
+  if (attribs.vid) delete attribs.vid;
+  if (attribs.closed) delete attribs.closed;
+  if (attribs.status) delete attribs.status;
 
-  let outObj: MarkerObject | MarkerObject[] = { type };
+  let outObj: T = { type } as T;
+  if (marker) (outObj as MarkerObject).marker = marker;
   outObj = { ...outObj, ...attribs };
 
   if (
     inputUsxElement.firstChild &&
-    inputUsxElement.firstChild.nodeType === 3 &&
+    inputUsxElement.firstChild.nodeType === Node.TEXT_NODE &&
     inputUsxElement.firstChild.nodeValue &&
     inputUsxElement.firstChild.nodeValue.trim() !== ""
   ) {
@@ -74,7 +83,7 @@ function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
 
     if (
       child.nextSibling &&
-      child.nextSibling.nodeType === 3 &&
+      child.nextSibling.nodeType === Node.TEXT_NODE &&
       child.nextSibling.nodeValue &&
       (child.nextSibling.nodeValue.trim() !== "" || child.nextSibling.nodeValue === " ")
     ) {
@@ -82,46 +91,19 @@ function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
     }
   }
 
-  if (outObj.content.length === 0 && outObj.type !== USX_TYPE) {
+  if (
+    (outObj.content.length === 0 && outObj.type !== USX_TYPE) ||
+    ["chapter", "verse", "optbreak", "ms"].includes(type) ||
+    (marker && ["va", "ca", "b"].includes(marker))
+  ) {
     delete outObj.content;
   }
 
-  if ("eid" in outObj && ["verse", "chapter"].includes(inputUsxElement.tagName)) {
+  if ("eid" in outObj && ["verse", "chapter"].includes(type)) {
     action = "ignore";
   }
 
-  if (
-    [serializeUsjType("chapter", "c"), serializeUsjType("verse", "v")].includes(
-      type as SerializedUsjType,
-    )
-  ) {
-    if ("altnumber" in outObj) {
-      outObj = [outObj];
-      outObj.push({
-        type: `char:${type.slice(-1)}a`,
-        // The check above confirms `altnumber` exists.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        content: [outObj[0].altnumber!],
-      });
-      delete outObj[0].altnumber;
-      action = "merge";
-    }
-
-    if ("pubnumber" in outObj) {
-      if (!Array.isArray(outObj)) {
-        outObj = [outObj];
-      }
-      outObj.push({
-        type: `para:${type.slice(-1)}p`,
-        content: [outObj[0].pubnumber],
-      });
-      delete outObj[0].pubnumber;
-      action = "merge";
-    }
-  }
-
-  // Assert return type since MarkerObject[] are only in the content property.
-  return [outObj as T, action];
+  return [outObj, action];
 }
 
 export function usxDomToJson(inputUsxDom: HTMLElement): Usj {

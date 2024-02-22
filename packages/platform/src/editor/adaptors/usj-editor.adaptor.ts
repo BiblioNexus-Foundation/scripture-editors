@@ -14,17 +14,15 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
-import { deserializeUsjType } from "shared/converters/usj/usj.util";
 import {
-  BOOK_ELEMENT_NAME,
-  BOOK_STYLE,
+  BOOK_MARKER,
   BOOK_VERSION,
   BookNode,
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
 import {
   SerializedImmutableChapterNode,
-  CHAPTER_STYLE,
+  CHAPTER_MARKER,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
@@ -32,19 +30,12 @@ import {
   SerializedChapterNode,
   CHAPTER_VERSION,
   ChapterNode,
-  CHAPTER_ELEMENT_NAME,
 } from "shared/nodes/scripture/usj/ChapterNode";
+import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
 import {
-  CHAR_ELEMENT_NAME,
-  CHAR_VERSION,
-  CharNode,
-  SerializedCharNode,
-} from "shared/nodes/scripture/usj/CharNode";
-import {
-  MILESTONE_ELEMENT_NAME,
   MILESTONE_VERSION,
   MilestoneNode,
-  MilestoneUsxStyle,
+  MilestoneMarker,
   SerializedMilestoneNode,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
@@ -53,17 +44,15 @@ import {
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
-  PARA_ELEMENT_NAME,
-  PARA_STYLE_DEFAULT,
+  PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
 import {
-  NOTE_ELEMENT_NAME,
   NOTE_VERSION,
   NoteNode,
-  NoteUsxStyle,
+  NoteMarker,
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import {
@@ -75,13 +64,12 @@ import {
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
-  VERSE_STYLE,
+  VERSE_MARKER,
   IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
 } from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   SerializedVerseNode,
-  VERSE_ELEMENT_NAME,
   VERSE_VERSION,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
@@ -168,7 +156,7 @@ export function serializeEditorState(
   // use default view mode
   else _viewOptions = getViewOptions(undefined);
   /** empty para node for an 'empty' editor */
-  const emptyParaNode: SerializedParaNode = createPara(PARA_STYLE_DEFAULT);
+  const emptyParaNode: SerializedParaNode = createPara(PARA_MARKER_DEFAULT);
   let children: SerializedElementNode[];
   if (usj) {
     if (usj.type !== USJ_TYPE)
@@ -279,21 +267,22 @@ function getTextContent(markers: MarkerContent[] | undefined): string {
   return markers[0];
 }
 
-function createBook(style: string, marker: MarkerObject): SerializedBookNode | undefined {
-  if (!marker.code) {
-    _logger?.error(`Unexpected book code '${marker.code}'!`);
+function createBook(markerObject: MarkerObject): SerializedBookNode | undefined {
+  const { marker, code } = markerObject;
+  if (marker !== BOOK_MARKER) {
+    _logger?.error(`Unexpected book marker '${marker}'!`);
     return undefined;
   }
-  if (style !== BOOK_STYLE) {
-    _logger?.error(`Unexpected book style '${style}'!`);
+  if (!code) {
+    _logger?.error(`Unexpected book code '${code}'!`);
     return undefined;
   }
 
   return {
     type: BookNode.getType(),
-    usxStyle: BOOK_STYLE,
-    code: marker.code,
-    text: getTextContent(marker.content),
+    marker: BOOK_MARKER,
+    code,
+    text: getTextContent(markerObject.content),
     children: [],
     direction: null,
     format: "",
@@ -303,15 +292,13 @@ function createBook(style: string, marker: MarkerObject): SerializedBookNode | u
 }
 
 function createChapter(
-  style: string,
-  marker: MarkerObject,
+  markerObject: MarkerObject,
 ): SerializedChapterNode | SerializedImmutableChapterNode | undefined {
-  if (style !== CHAPTER_STYLE) {
-    _logger?.error(`Unexpected chapter style '${style}'!`);
+  const { marker, number, sid, altnumber, pubnumber } = markerObject;
+  if (marker !== CHAPTER_MARKER) {
+    _logger?.error(`Unexpected chapter marker '${marker}'!`);
     return undefined;
   }
-  const node = { ...marker };
-  delete node.content;
   const ChapterNodeClass = getChapterNodeClass(_viewOptions) ?? ImmutableChapterNode;
   const type = ChapterNodeClass.getType();
   const version =
@@ -320,16 +307,18 @@ function createChapter(
   let classList: string[] | undefined;
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleOpenMarkerText(style, marker.number);
+    text = getVisibleOpenMarkerText(marker, number);
     classList = [PLAIN_FONT_CLASS_NAME];
   } else if (_viewOptions?.markerMode === "visible") showMarker = true;
 
   return {
-    ...node,
     type,
     text,
-    usxStyle: CHAPTER_STYLE,
-    number: marker.number ?? "",
+    marker: CHAPTER_MARKER,
+    number: number ?? "",
+    sid,
+    altnumber,
+    pubnumber,
     classList,
     showMarker,
     version,
@@ -337,15 +326,13 @@ function createChapter(
 }
 
 function createVerse(
-  style: string,
-  marker: MarkerObject,
+  markerObject: MarkerObject,
 ): SerializedVerseNode | SerializedImmutableVerseNode | undefined {
-  if (style !== VERSE_STYLE) {
-    _logger?.error(`Unexpected verse style '${style}'!`);
+  const { marker, number, sid, altnumber, pubnumber } = markerObject;
+  if (marker !== VERSE_MARKER) {
+    _logger?.error(`Unexpected verse marker '${marker}'!`);
     return undefined;
   }
-  const node = { ...marker };
-  delete node.content;
   const VerseNodeClass = getVerseNodeClass(_viewOptions) ?? ImmutableVerseNode;
   const type = VerseNodeClass.getType();
   const version = _viewOptions?.markerMode === "editable" ? VERSE_VERSION : IMMUTABLE_VERSE_VERSION;
@@ -353,33 +340,36 @@ function createVerse(
   let classList: string[] | undefined;
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleOpenMarkerText(style, marker.number);
+    text = getVisibleOpenMarkerText(marker, number);
     classList = [PLAIN_FONT_CLASS_NAME];
   } else if (_viewOptions?.markerMode === "visible") showMarker = true;
 
   return {
-    ...node,
     type,
     text,
-    usxStyle: VERSE_STYLE,
-    number: marker.number ?? "",
+    marker: VERSE_MARKER,
+    number: number ?? "",
+    sid,
+    altnumber,
+    pubnumber,
     classList,
     showMarker,
     version,
   };
 }
 
-function createChar(style: string, marker: MarkerObject): SerializedCharNode {
-  if (!CharNode.isValidStyle(style)) {
-    _logger?.warn(`Unexpected char style '${style}'!`);
+function createChar(markerObject: MarkerObject): SerializedCharNode {
+  const { marker } = markerObject;
+  if (!CharNode.isValidMarker(marker)) {
+    _logger?.warn(`Unexpected char marker '${marker}'!`);
   }
-  let text = getTextContent(marker.content);
+  let text = getTextContent(markerObject.content);
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
     text = NBSP + text;
 
   return {
     type: CharNode.getType(),
-    usxStyle: style,
+    marker,
     text,
     detail: 0,
     format: 0,
@@ -402,20 +392,21 @@ function createImpliedPara(
   };
 }
 
-function createPara(style: string): SerializedParaNode {
-  if (!ParaNode.isValidStyle(style)) {
-    _logger?.warn(`Unexpected para style '${style}'!`);
+function createPara(marker: string): SerializedParaNode {
+  if (!ParaNode.isValidMarker(marker)) {
+    _logger?.warn(`Unexpected para marker '${marker}'!`);
     // Always return with data as other elements need this structure.
   }
   const classList: string[] = [];
   if (!_viewOptions?.isIndented) classList.push(NO_INDENT_CLASS_NAME);
   if (_viewOptions?.isPlainFont) classList.push(PLAIN_FONT_CLASS_NAME);
   const children: SerializedLexicalNode[] = [];
-  if (_viewOptions?.markerMode === "editable") children.push(createMarker(style), createText(NBSP));
+  if (_viewOptions?.markerMode === "editable")
+    children.push(createMarker(marker), createText(NBSP));
 
   return {
     type: ParaNode.getType(),
-    usxStyle: style,
+    marker,
     classList,
     children,
     direction: null,
@@ -444,19 +435,19 @@ function createNoteCaller(
 }
 
 function createNote(
-  style: string,
-  marker: MarkerObject,
+  markerObject: MarkerObject,
   childNodes: (SerializedElementNode | SerializedTextNode)[],
 ): SerializedNoteNode {
-  if (!NoteNode.isValidStyle(style)) {
-    _logger?.warn(`Unexpected note style '${style}'!`);
+  const { marker, category } = markerObject;
+  if (!NoteNode.isValidMarker(marker)) {
+    _logger?.warn(`Unexpected note marker '${marker}'!`);
   }
-  const caller = marker.caller ?? "*";
+  const caller = markerObject.caller ?? "*";
   let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
   if (_viewOptions?.markerMode === "editable") {
     callerNode = createText(getEditableCallerText(caller));
   } else {
-    callerNode = createNoteCaller(getNoteCaller(marker.caller), childNodes);
+    callerNode = createNoteCaller(getNoteCaller(markerObject.caller), childNodes);
     childNodes.forEach((node) => {
       (node as SerializedTextNode).style = "display: none";
     });
@@ -464,21 +455,19 @@ function createNote(
   let openingMarkerNode: SerializedTextNode | undefined;
   let closingMarkerNode: SerializedTextNode | undefined;
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") {
-    openingMarkerNode = createMarker(style);
-    closingMarkerNode = createMarker(style, false);
+    openingMarkerNode = createMarker(marker);
+    closingMarkerNode = createMarker(marker, false);
   }
   const children: SerializedLexicalNode[] = [];
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  const node = { ...marker };
-  delete node.content;
 
   return {
-    ...node,
     type: NoteNode.getType(),
-    usxStyle: style as NoteUsxStyle,
+    marker: marker as NoteMarker,
     caller,
+    category,
     children,
     direction: null,
     format: "",
@@ -487,26 +476,26 @@ function createNote(
   };
 }
 
-function createMilestone(style: string, marker: MarkerObject): SerializedMilestoneNode | undefined {
-  if (!MilestoneNode.isValidStyle(style)) {
-    _logger?.error(`Unexpected milestone style '${style}'!`);
+function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode | undefined {
+  const { marker, sid, eid } = markerObject;
+  if (!marker || !MilestoneNode.isValidMarker(marker)) {
+    _logger?.error(`Unexpected milestone marker '${marker}'!`);
     return undefined;
   }
-  const node = { ...marker };
-  delete node.content;
 
   return {
-    ...node,
     type: MilestoneNode.getType(),
-    usxStyle: style as MilestoneUsxStyle,
+    marker: marker as MilestoneMarker,
+    sid,
+    eid,
     version: MILESTONE_VERSION,
   };
 }
 
-function createMarker(style: string, isOpening = true): SerializedMarkerNode {
+function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
   return {
     type: MarkerNode.getType(),
-    usxStyle: style,
+    marker,
     isOpening,
     text: "",
     detail: 0,
@@ -539,7 +528,7 @@ function addNode(
 }
 
 function addOpeningMarker(
-  style: string,
+  marker: string,
   lexicalNode: SerializedLexicalNode | undefined,
   elementNodes: (SerializedElementNode | SerializedTextNode)[],
 ) {
@@ -547,21 +536,21 @@ function addOpeningMarker(
     lexicalNode &&
     (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
   ) {
-    (elementNodes as SerializedLexicalNode[]).push(createMarker(style));
+    (elementNodes as SerializedLexicalNode[]).push(createMarker(marker));
   }
 }
 
 function addClosingMarker(
-  style: string,
+  marker: string,
   lexicalNode: SerializedLexicalNode | undefined,
   elementNodes: (SerializedElementNode | SerializedTextNode)[],
 ) {
   if (
     lexicalNode &&
     (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") &&
-    !(CharNode.isValidFootnoteStyle(style) || CharNode.isValidCrossReferenceStyle(style))
+    !(CharNode.isValidFootnoteMarker(marker) || CharNode.isValidCrossReferenceMarker(marker))
   ) {
-    (elementNodes as SerializedLexicalNode[]).push(createMarker(style, false));
+    (elementNodes as SerializedLexicalNode[]).push(createMarker(marker, false));
   }
 }
 
@@ -569,51 +558,50 @@ function recurseNodes(
   markers: MarkerContent[] | undefined,
 ): (SerializedElementNode | SerializedTextNode)[] {
   const elementNodes: (SerializedElementNode | SerializedTextNode)[] = [];
-  markers?.forEach((marker) => {
-    if (typeof marker === "string") {
-      elementNodes.push(createText(marker));
+  markers?.forEach((markerContent) => {
+    if (typeof markerContent === "string") {
+      elementNodes.push(createText(markerContent));
     } else {
       let lexicalNode: SerializedLexicalNode | undefined;
       let elementNode: SerializedElementNode | undefined;
-      const { element, style } = deserializeUsjType(marker.type);
-      switch (element) {
-        case BOOK_ELEMENT_NAME:
-          lexicalNode = createBook(style, marker);
+      switch (markerContent.type) {
+        case BookNode.getType():
+          lexicalNode = createBook(markerContent);
           addNode(lexicalNode, elementNodes);
           break;
-        case CHAPTER_ELEMENT_NAME:
-          lexicalNode = createChapter(style, marker);
+        case ChapterNode.getType():
+          lexicalNode = createChapter(markerContent);
           addNode(lexicalNode, elementNodes);
           break;
-        case VERSE_ELEMENT_NAME:
-          lexicalNode = createVerse(style, marker);
+        case VerseNode.getType():
+          lexicalNode = createVerse(markerContent);
           if (!_viewOptions?.isIndented) addNode(serializedLineBreakNode, elementNodes);
           addNode(lexicalNode, elementNodes);
           break;
-        case CHAR_ELEMENT_NAME:
-          lexicalNode = createChar(style, marker);
-          addOpeningMarker(style, lexicalNode, elementNodes);
+        case CharNode.getType():
+          lexicalNode = createChar(markerContent);
+          addOpeningMarker(markerContent.marker, lexicalNode, elementNodes);
           addNode(lexicalNode, elementNodes);
-          addClosingMarker(style, lexicalNode, elementNodes);
+          addClosingMarker(markerContent.marker, lexicalNode, elementNodes);
           break;
-        case PARA_ELEMENT_NAME:
-          elementNode = createPara(style);
+        case ParaNode.getType():
+          elementNode = createPara(markerContent.marker);
           if (elementNode) {
-            elementNode.children.push(...recurseNodes(marker.content));
+            elementNode.children.push(...recurseNodes(markerContent.content));
             elementNodes.push(elementNode);
           }
           break;
-        case NOTE_ELEMENT_NAME:
-          lexicalNode = createNote(style, marker, recurseNodes(marker.content));
+        case NoteNode.getType():
+          lexicalNode = createNote(markerContent, recurseNodes(markerContent.content));
           addNode(lexicalNode, elementNodes);
           break;
-        case MILESTONE_ELEMENT_NAME:
-          lexicalNode = createMilestone(style, marker);
+        case MilestoneNode.getType():
+          lexicalNode = createMilestone(markerContent);
           addNode(lexicalNode, elementNodes);
           break;
         default:
-          if (!marker.type) break;
-          _logger?.error(`Unexpected node type '${marker.type}'!`);
+          if (!markerContent.type) break;
+          _logger?.error(`Unexpected marker type '${markerContent.type}:${markerContent.marker}'!`);
       }
     }
   });

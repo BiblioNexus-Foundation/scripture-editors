@@ -12,13 +12,13 @@ import {
 import {
   CHAR_NODE_TYPE,
   PLAIN_FONT_CLASS_NAME,
-  extractNonNumberedStyles,
-  extractNumberedStyles,
-  isValidNumberedStyle,
+  extractNonNumberedMarkers,
+  extractNumberedMarkers,
+  isValidNumberedMarker,
 } from "./node.utils";
 
-const VALID_CHAR_FOOTNOTE_STYLES = ["fr", "ft", "fk", "fq", "fqa", "fl", "fw", "fp", "fv", "fdc"];
-const VALID_CHAR_CROSS_REFERENCE_STYLES = [
+const VALID_CHAR_FOOTNOTE_MARKERS = ["fr", "ft", "fk", "fq", "fqa", "fl", "fw", "fp", "fv", "fdc"];
+const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
   "xo",
   "xop",
   "xt",
@@ -33,7 +33,7 @@ const VALID_CHAR_CROSS_REFERENCE_STYLES = [
  * @see https://ubsicap.github.io/usx/charstyles.html
  * @see https://ubsicap.github.io/usx/notes.html
  */
-const VALID_CHAR_STYLES = [
+const VALID_CHAR_MARKERS = [
   // Special Text
   "add",
   "bk",
@@ -75,36 +75,34 @@ const VALID_CHAR_STYLES = [
   // Linking
   "jmp",
 
-  ...VALID_CHAR_FOOTNOTE_STYLES,
-  ...VALID_CHAR_CROSS_REFERENCE_STYLES,
+  ...VALID_CHAR_FOOTNOTE_MARKERS,
+  ...VALID_CHAR_CROSS_REFERENCE_MARKERS,
 ] as const;
 
-const VALID_CHAR_STYLES_NUMBERED = extractNumberedStyles(VALID_CHAR_STYLES);
-const VALID_CHAR_STYLES_NON_NUMBERED = [
-  ...extractNonNumberedStyles(VALID_CHAR_STYLES),
-  // Include the numbered styles, i.e. not ending in a number since pi (= pi1) is valid.
-  ...VALID_CHAR_STYLES_NUMBERED,
+const VALID_CHAR_MARKERS_NUMBERED = extractNumberedMarkers(VALID_CHAR_MARKERS);
+const VALID_CHAR_MARKERS_NON_NUMBERED = [
+  ...extractNonNumberedMarkers(VALID_CHAR_MARKERS),
+  // Include the numbered markers, i.e. not ending in a number since pi (= pi1) is valid.
+  ...VALID_CHAR_MARKERS_NUMBERED,
 ] as const;
-
-export const CHAR_ELEMENT_NAME = "char";
 
 export const CHAR_VERSION = 1;
 
-export type CharUsxStyle = string;
-
 export type SerializedCharNode = Spread<
   {
-    usxStyle: CharUsxStyle;
+    marker: CharMarker;
   },
   SerializedTextNode
 >;
 
-export class CharNode extends TextNode {
-  __usxStyle: CharUsxStyle;
+type CharMarker = string;
 
-  constructor(text: string, usxStyle: CharUsxStyle, key?: NodeKey) {
+export class CharNode extends TextNode {
+  __marker: CharMarker;
+
+  constructor(marker: CharMarker, text: string, key?: NodeKey) {
     super(text, key);
-    this.__usxStyle = usxStyle;
+    this.__marker = marker;
   }
 
   static getType(): string {
@@ -112,12 +110,12 @@ export class CharNode extends TextNode {
   }
 
   static clone(node: CharNode): CharNode {
-    return new CharNode(node.__text, node.__usxStyle, node.__key);
+    return new CharNode(node.__marker, node.__text, node.__key);
   }
 
   static importJSON(serializedNode: SerializedCharNode): CharNode {
-    const { text, usxStyle, detail, format, mode, style } = serializedNode;
-    const node = $createCharNode(text, usxStyle);
+    const { marker, text, detail, format, mode, style } = serializedNode;
+    const node = $createCharNode(marker, text);
     node.setDetail(detail);
     node.setFormat(format);
     node.setMode(mode);
@@ -125,38 +123,38 @@ export class CharNode extends TextNode {
     return node;
   }
 
-  static isValidStyle(style: string): boolean {
+  static isValidMarker(marker: string): boolean {
     return (
-      VALID_CHAR_STYLES_NON_NUMBERED.includes(style) ||
-      isValidNumberedStyle(style, VALID_CHAR_STYLES_NUMBERED)
+      VALID_CHAR_MARKERS_NON_NUMBERED.includes(marker) ||
+      isValidNumberedMarker(marker, VALID_CHAR_MARKERS_NUMBERED)
     );
   }
 
-  static isValidFootnoteStyle(style: string): boolean {
-    return VALID_CHAR_FOOTNOTE_STYLES.includes(style);
+  static isValidFootnoteMarker(marker: string): boolean {
+    return VALID_CHAR_FOOTNOTE_MARKERS.includes(marker);
   }
 
-  static isValidCrossReferenceStyle(style: string): boolean {
-    return VALID_CHAR_CROSS_REFERENCE_STYLES.includes(style);
+  static isValidCrossReferenceMarker(marker: string): boolean {
+    return VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
   }
 
-  setUsxStyle(usxStyle: CharUsxStyle): void {
+  setMarker(marker: CharMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): CharUsxStyle {
+  getMarker(): CharMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
     if (
-      CharNode.isValidFootnoteStyle(this.__usxStyle) ||
-      CharNode.isValidCrossReferenceStyle(this.__usxStyle)
+      CharNode.isValidFootnoteMarker(this.__marker) ||
+      CharNode.isValidCrossReferenceMarker(this.__marker)
     )
       dom.classList.add(PLAIN_FONT_CLASS_NAME);
     return dom;
@@ -166,7 +164,7 @@ export class CharNode extends TextNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       version: CHAR_VERSION,
     };
   }
@@ -176,8 +174,8 @@ export class CharNode extends TextNode {
   }
 }
 
-export function $createCharNode(text: string, usxStyle: CharUsxStyle): CharNode {
-  return $applyNodeReplacement(new CharNode(text, usxStyle));
+export function $createCharNode(marker: CharMarker, text: string): CharNode {
+  return $applyNodeReplacement(new CharNode(marker, text));
 }
 
 export function $isCharNode(node: LexicalNode | null | undefined): node is CharNode {
