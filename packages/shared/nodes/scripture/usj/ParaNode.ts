@@ -93,6 +93,8 @@ const VALID_PARA_STYLES_NON_NUMBERED = [
   ...VALID_PARA_STYLES_NUMBERED,
 ] as const;
 
+export const PARA_ELEMENT_NAME = "para";
+
 export const PARA_VERSION = 1;
 
 export type ParaUsxStyle = string;

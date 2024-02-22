@@ -1,11 +1,12 @@
 import { RefSelector, ScriptureReference } from "papi-components";
 import { useMemo, useState } from "react";
 import { usxStringToJson } from "shared/converters/usj/usx-to-usj";
+import { Usj } from "shared/converters/usj/usj.model";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { getViewOptions } from "./editor/adaptors/view-options.utils";
-import { UsjNodeOptions } from "./editor/adaptors/usj-editor.adaptor";
 import { formattedViewMode as defaultViewMode } from "./editor/plugins/toolbar/view-mode.model";
 import ViewModeDropDown from "./editor/plugins/toolbar/ViewModeDropDown";
 import Editor from "./editor/Editor";
@@ -16,6 +17,8 @@ const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1
 const usj = usxStringToJson(usx);
 
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
+
+const onChange = (usj: Usj) => console.log({ usj });
 
 export default function App() {
   const [viewMode, setViewMode] = useState(defaultViewMode);
@@ -34,6 +37,7 @@ export default function App() {
         scrRef={scrRef}
         setScrRef={setScrRef}
         nodeOptions={nodeOptions}
+        onChange={onChange}
         logger={console}
       />
     </>

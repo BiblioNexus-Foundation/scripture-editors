@@ -5,6 +5,7 @@ import {
   NOTE_PARA_INDEX,
   editorStateEmpty,
   editorStateGen1v1,
+  editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
   usjEmpty,
   usjGen1v1,
@@ -12,9 +13,11 @@ import {
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { loadEditorState, reset } from "./usj-editor.adaptor";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { unformattedViewMode } from "../plugins/toolbar/view-mode.model";
+import { getViewOptions } from "./view-options.utils";
+import { serializeEditorState, reset } from "./usj-editor.adaptor";
 
 /**
  * Remove the `onClick` function because it can't be compared since it's anonymous.
@@ -29,12 +32,14 @@ function removeOnClick(serializedEditorState: SerializedEditorState) {
 
 describe("USJ Editor Adaptor", () => {
   it("should convert from empty USJ to Lexical editor state JSON", () => {
-    const serializedEditorState = loadEditorState(usjEmpty);
+    const serializedEditorState = serializeEditorState(usjEmpty);
+
     expect(serializedEditorState).toEqual(editorStateEmpty);
   });
 
   it("should convert from USJ to Lexical editor state JSON", () => {
-    const serializedEditorState = loadEditorState(usjGen1v1);
+    const serializedEditorState = serializeEditorState(usjGen1v1);
+
     const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
       .children[NOTE_INDEX] as SerializedNoteNode;
     const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
@@ -44,15 +49,25 @@ describe("USJ Editor Adaptor", () => {
   });
 
   it("should convert from USJ with implied para to Lexical editor state JSON", () => {
-    const serializedEditorState = loadEditorState(usjGen1v1ImpliedPara);
+    const serializedEditorState = serializeEditorState(usjGen1v1ImpliedPara);
+
     expect(serializedEditorState).toEqual(editorStateGen1v1ImpliedPara);
+  });
+
+  it("should convert from USJ to Lexical editor state JSON with editable view", () => {
+    const serializedEditorState = serializeEditorState(
+      usjGen1v1,
+      getViewOptions(unformattedViewMode),
+    );
+
+    expect(serializedEditorState).toEqual(editorStateGen1v1Editable);
   });
 
   it("should convert from USJ to Lexical editor state JSON with caller clocked", () => {
     reset(25);
 
     // SUT
-    let serializedEditorState = loadEditorState(usjGen1v1);
+    let serializedEditorState = serializeEditorState(usjGen1v1);
 
     const editorStateCallerUpdated = editorStateGen1v1;
     const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
@@ -65,7 +80,7 @@ describe("USJ Editor Adaptor", () => {
     reset(52);
 
     // SUT
-    serializedEditorState = loadEditorState(usjGen1v1);
+    serializedEditorState = serializeEditorState(usjGen1v1);
 
     noteCaller.caller = "ba";
     removeOnClick(serializedEditorState);
@@ -76,7 +91,7 @@ describe("USJ Editor Adaptor", () => {
     reset(701);
 
     // SUT
-    let serializedEditorState = loadEditorState(usjGen1v1);
+    let serializedEditorState = serializeEditorState(usjGen1v1);
 
     const editorStateCallerUpdated = editorStateGen1v1;
     const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
@@ -89,25 +104,29 @@ describe("USJ Editor Adaptor", () => {
     reset(702);
 
     // SUT
-    serializedEditorState = loadEditorState(usjGen1v1);
+    serializedEditorState = serializeEditorState(usjGen1v1);
 
     noteCaller.caller = "a";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
   });
 
-  it("should convert from USJ to Lexical editor state JSON without note", () => {
+  it("should convert from USJ to Lexical editor state JSON including the hidden caller", () => {
     const usjGen1v1Updated = usjGen1v1;
     const usjNote = (
       (usjGen1v1Updated.content[NOTE_PARA_INDEX] as MarkerObject).content as MarkerObject[]
     )[NOTE_INDEX];
     usjNote.caller = "-";
 
-    const serializedEditorState = loadEditorState(usjGen1v1Updated);
+    const serializedEditorState = serializeEditorState(usjGen1v1Updated);
 
     const editorStateCallerUpdated = editorStateGen1v1;
-    const notePara = editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode;
-    notePara.children.splice(NOTE_INDEX, 1);
+    const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
+      .children[NOTE_INDEX] as SerializedNoteNode;
+    note.caller = "-";
+    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+    noteCaller.caller = "-";
+    removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
   });
 });

@@ -11,6 +11,8 @@ import {
 } from "lexical";
 import { VERSE_CLASS_NAME } from "./node.utils";
 
+export const VERSE_ELEMENT_NAME = "verse";
+
 export const VERSE_STYLE = "v";
 export const VERSE_VERSION = 1;
 

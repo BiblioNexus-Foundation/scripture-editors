@@ -7,3 +7,4 @@ export {
   getViewOptions,
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
+export { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";

@@ -31,7 +31,7 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
 
   useEffect(() => {
     editorAdaptor.reset?.();
-    const serializedEditorState = editorAdaptor.loadEditorState(scripture, viewOptions);
+    const serializedEditorState = editorAdaptor.serializeEditorState(scripture, viewOptions);
     const editorState = editor.parseEditorState(serializedEditorState);
     // Execute after the current render cycle.
     setTimeout(() => {

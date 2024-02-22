@@ -23,6 +23,7 @@ export type SerializedImmutableNoteCallerNode = Spread<
 
 export const IMMUTABLE_NOTE_CALLER_VERSION = 1;
 
+export const immutableNoteCallerNodeName = "ImmutableNoteCallerNode";
 export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
   __caller: string;
   __previewText: string;
@@ -112,8 +113,6 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
     };
   }
 }
-
-export const immutableNoteCallerNodeName = Symbol.for(ImmutableNoteCallerNode.name);
 
 export function $createImmutableNoteCallerNode(
   caller: string,

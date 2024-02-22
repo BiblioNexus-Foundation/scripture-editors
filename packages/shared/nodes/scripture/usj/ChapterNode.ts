@@ -12,6 +12,8 @@ import {
 } from "lexical";
 import { CHAPTER_CLASS_NAME } from "./node.utils";
 
+export const CHAPTER_ELEMENT_NAME = "chapter";
+
 export const CHAPTER_STYLE = "c";
 export const CHAPTER_VERSION = 1;
 

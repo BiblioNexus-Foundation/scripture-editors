@@ -11,6 +11,10 @@
   font-size: 80%;
 }
 
+.immutable-note-caller[data-caller="-"] {
+  display: none;
+}
+
 .immutable-note-caller > button {
   cursor: pointer;
   color: #00f;

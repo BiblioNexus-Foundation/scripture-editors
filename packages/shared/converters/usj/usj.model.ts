@@ -24,6 +24,8 @@ export type MarkerObject = {
   content?: MarkerContent[];
   /** Indicates the Book-chapter-verse value in the paragraph based structure */
   sid?: string;
+  /** Milestone end ID, matches start ID (not currently included in USJ spec) */
+  eid?: string;
   /** Chapter number or verse number */
   number?: string;
   /** The 3-letter book code in ID element */
