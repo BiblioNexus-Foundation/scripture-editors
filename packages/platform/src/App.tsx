@@ -1,6 +1,6 @@
 import { RefSelector, ScriptureReference } from "papi-components";
 import { useMemo, useState } from "react";
-import { usxStringToJson } from "shared/converters/usj/usx-to-usj";
+import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 import { Usj } from "shared/converters/usj/usj.model";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
@@ -14,7 +14,7 @@ import "./App.css";
 
 const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 
-const usj = usxStringToJson(usx);
+const usj = usxStringToUsj(usx);
 
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 

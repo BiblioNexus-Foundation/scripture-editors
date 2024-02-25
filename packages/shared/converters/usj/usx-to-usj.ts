@@ -8,13 +8,12 @@
 
 import { DOMParser } from "@xmldom/xmldom";
 import { MarkerObject, USJ_TYPE, USJ_VERSION, Usj } from "./usj.model";
+import { USX_TYPE } from "./usx.model";
 
 type Action = "append" | "merge" | "ignore";
 type Attribs = { [name: string]: string };
 
-const USX_TYPE = "usx";
-
-function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
+function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
   inputUsxElement: HTMLElement,
 ): [outputJson: T, action: Action] {
   const attribs: Attribs = {};
@@ -66,7 +65,7 @@ function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
       continue;
     }
     // ChildNodes are Elements.
-    const [childDict, whatToDo] = usxDomToJsonRecurse<MarkerObject>(child as HTMLElement);
+    const [childDict, whatToDo] = usxDomToUsjRecurse<MarkerObject>(child as HTMLElement);
 
     switch (whatToDo) {
       case "append":
@@ -106,15 +105,15 @@ function usxDomToJsonRecurse<T extends Usj | MarkerObject = Usj>(
   return [outObj, action];
 }
 
-export function usxDomToJson(inputUsxDom: HTMLElement): Usj {
-  const [outputJson] = usxDomToJsonRecurse(inputUsxDom);
+export function usxDomToUsj(inputUsxDom: HTMLElement): Usj {
+  const [outputJson] = usxDomToUsjRecurse(inputUsxDom);
   outputJson.type = USJ_TYPE;
   outputJson.version = USJ_VERSION;
   return outputJson;
 }
 
-export function usxStringToJson(usxString: string): Usj {
+export function usxStringToUsj(usxString: string): Usj {
   const parser = new DOMParser();
   const inputUsxDom = parser.parseFromString(usxString, "text/xml");
-  return usxDomToJson(inputUsxDom.documentElement);
+  return usxDomToUsj(inputUsxDom.documentElement);
 }
