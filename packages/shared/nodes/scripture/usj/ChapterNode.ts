@@ -12,16 +12,14 @@ import {
 } from "lexical";
 import { CHAPTER_CLASS_NAME } from "./node.utils";
 
-export const CHAPTER_ELEMENT_NAME = "chapter";
-
-export const CHAPTER_STYLE = "c";
+export const CHAPTER_MARKER = "c";
 export const CHAPTER_VERSION = 1;
 
-type ChapterUsxStyle = typeof CHAPTER_STYLE;
+type ChapterMarker = typeof CHAPTER_MARKER;
 
 export type SerializedChapterNode = Spread<
   {
-    usxStyle: ChapterUsxStyle;
+    marker: ChapterMarker;
     number: string;
     classList: string[];
     text?: string;
@@ -33,7 +31,7 @@ export type SerializedChapterNode = Spread<
 >;
 
 export class ChapterNode extends ElementNode {
-  __usxStyle: ChapterUsxStyle;
+  __marker: ChapterMarker;
   __number: string;
   __classList: string[];
   __sid?: string;
@@ -50,7 +48,7 @@ export class ChapterNode extends ElementNode {
     key?: NodeKey,
   ) {
     super(key);
-    this.__usxStyle = CHAPTER_STYLE;
+    this.__marker = CHAPTER_MARKER;
     this.__number = chapterNumber;
     this.__classList = classList;
     this.__sid = sid;
@@ -80,24 +78,24 @@ export class ChapterNode extends ElementNode {
       format,
       indent,
       direction,
-      usxStyle,
+      marker,
     } = serializedNode;
     const node = $createChapterNode(number, classList, text, sid, altnumber, pubnumber);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
-    node.setUsxStyle(usxStyle);
+    node.setMarker(marker);
     return node;
   }
 
-  setUsxStyle(usxStyle: ChapterUsxStyle): void {
+  setMarker(marker: ChapterMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): ChapterUsxStyle {
+  getMarker(): ChapterMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setNumber(chapterNumber: string): void {
@@ -152,8 +150,8 @@ export class ChapterNode extends ElementNode {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__usxStyle}`, ...this.__classList);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
     dom.setAttribute("data-number", this.__number);
     return dom;
   }
@@ -162,7 +160,7 @@ export class ChapterNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       number: this.getNumber(),
       classList: this.getClassList(),
       text: this.getFirstChild<TextNode>()?.getTextContent(),

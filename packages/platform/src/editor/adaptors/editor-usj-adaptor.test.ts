@@ -14,9 +14,9 @@ import {
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { CHAPTER_STYLE, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
+import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedVerseNode, VERSE_STYLE } from "shared/nodes/scripture/usj/VerseNode";
+import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
@@ -58,11 +58,11 @@ describe("Editor USJ Adaptor", () => {
     const editorStateEdited = editorStateGen1v1Editable;
     const chapter1 = editorStateEdited.root.children[CHAPTER_1_INDEX] as SerializedChapterNode;
     const chapter1Number = "101";
-    chapter1.text = getVisibleOpenMarkerText(CHAPTER_STYLE, chapter1Number);
+    chapter1.text = getVisibleOpenMarkerText(CHAPTER_MARKER, chapter1Number);
     const verse2 = (editorStateEdited.root.children[VERSE_PARA_INDEX] as SerializedParaNode)
       .children[VERSE_2_EDITABLE_INDEX] as SerializedVerseNode;
     const verse2Number = "202";
-    verse2.text = getVisibleOpenMarkerText(VERSE_STYLE, verse2Number);
+    verse2.text = getVisibleOpenMarkerText(VERSE_MARKER, verse2Number);
     const editorState = editor.parseEditorState(editorStateEdited);
 
     const usj = editorUsjAdaptor.deserializeEditorState(editorState);

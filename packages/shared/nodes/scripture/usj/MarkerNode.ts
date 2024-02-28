@@ -13,24 +13,24 @@ import { PLAIN_FONT_CLASS_NAME, closingMarkerText, openingMarkerText } from "./n
 
 export const MARKER_VERSION = 1;
 
-export type MarkerUsxStyle = string;
-
 export type SerializedMarkerNode = Spread<
   {
-    usxStyle: MarkerUsxStyle;
+    marker: MarkerMarker;
     isOpening?: boolean;
   },
   SerializedTextNode
 >;
 
+type MarkerMarker = string;
+
 export class MarkerNode extends TextNode {
-  __usxStyle: MarkerUsxStyle;
+  __marker: MarkerMarker;
   __isOpening: boolean;
 
-  constructor(usxStyle: MarkerUsxStyle, isOpening = true, key?: NodeKey) {
-    const text = isOpening ? openingMarkerText(usxStyle) : closingMarkerText(usxStyle);
+  constructor(marker: MarkerMarker, isOpening = true, key?: NodeKey) {
+    const text = isOpening ? openingMarkerText(marker) : closingMarkerText(marker);
     super(text, key);
-    this.__usxStyle = usxStyle;
+    this.__marker = marker;
     this.__isOpening = isOpening;
   }
 
@@ -39,12 +39,12 @@ export class MarkerNode extends TextNode {
   }
 
   static clone(node: MarkerNode): MarkerNode {
-    return new MarkerNode(node.__usxStyle, node.__isOpening, node.__key);
+    return new MarkerNode(node.__marker, node.__isOpening, node.__key);
   }
 
   static importJSON(serializedNode: SerializedMarkerNode): MarkerNode {
-    const { usxStyle, isOpening, detail, format, mode, style } = serializedNode;
-    const node = $createMarkerNode(usxStyle, isOpening);
+    const { marker, isOpening, detail, format, mode, style } = serializedNode;
+    const node = $createMarkerNode(marker, isOpening);
     node.setDetail(detail);
     node.setFormat(format);
     node.setMode(mode);
@@ -52,14 +52,14 @@ export class MarkerNode extends TextNode {
     return node;
   }
 
-  setUsxStyle(usxStyle: MarkerUsxStyle): void {
+  setMarker(marker: MarkerMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): MarkerUsxStyle {
+  getMarker(): MarkerMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setIsOpening(isOpening: boolean): void {
@@ -74,7 +74,7 @@ export class MarkerNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
-    dom.setAttribute("data-usx-style", this.__usxStyle);
+    dom.setAttribute("data-marker", this.__marker);
     dom.classList.add(
       this.getType(),
       this.__isOpening ? "opening" : "closing",
@@ -88,15 +88,15 @@ export class MarkerNode extends TextNode {
       ...super.exportJSON(),
       type: this.getType(),
       text: this.getTextContent(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       isOpening: this.getIsOpening(),
       version: MARKER_VERSION,
     };
   }
 }
 
-export function $createMarkerNode(usxStyle: MarkerUsxStyle, isOpening?: boolean): MarkerNode {
-  return $applyNodeReplacement(new MarkerNode(usxStyle, isOpening));
+export function $createMarkerNode(marker: MarkerMarker, isOpening?: boolean): MarkerNode {
+  return $applyNodeReplacement(new MarkerNode(marker, isOpening));
 }
 
 export function $isMarkerNode(node: LexicalNode | null | undefined): node is MarkerNode {

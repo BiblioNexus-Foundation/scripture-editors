@@ -12,16 +12,14 @@ import {
 } from "lexical";
 import { BookCode } from "../../../converters/usj/usj.model";
 
-export const BOOK_ELEMENT_NAME = "book";
-
-export const BOOK_STYLE = "id";
+export const BOOK_MARKER = "id";
 export const BOOK_VERSION = 1;
 
-type BookUsxStyle = typeof BOOK_STYLE;
+type BookMarker = typeof BOOK_MARKER;
 
 export type SerializedBookNode = Spread<
   {
-    usxStyle: BookUsxStyle;
+    marker: BookMarker;
     code: BookCode;
     text?: string;
   },
@@ -29,12 +27,12 @@ export type SerializedBookNode = Spread<
 >;
 
 export class BookNode extends ElementNode {
-  __usxStyle: BookUsxStyle;
+  __marker: BookMarker;
   __code: BookCode;
 
   constructor(code: BookCode, text?: string, key?: NodeKey) {
     super(key);
-    this.__usxStyle = BOOK_STYLE;
+    this.__marker = BOOK_MARKER;
     this.__code = code;
     this.append($createTextNode(text));
   }
@@ -49,23 +47,23 @@ export class BookNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedBookNode): BookNode {
-    const { code, text, usxStyle, format, indent, direction } = serializedNode;
+    const { code, text, marker, format, indent, direction } = serializedNode;
     const node = $createBookNode(code, text);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
-    node.setUsxStyle(usxStyle);
+    node.setMarker(marker);
     return node;
   }
 
-  setUsxStyle(usxStyle: BookUsxStyle): void {
+  setMarker(marker: BookMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): BookUsxStyle {
+  getMarker(): BookMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setCode(code: BookCode): void {
@@ -84,8 +82,8 @@ export class BookNode extends ElementNode {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
     dom.setAttribute("data-code", this.__code);
     return dom;
   }
@@ -100,7 +98,7 @@ export class BookNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       code: this.getCode(),
       text: this.getFirstChild<TextNode>()?.getTextContent(),
       version: BOOK_VERSION,

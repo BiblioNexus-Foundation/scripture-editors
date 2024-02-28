@@ -24,46 +24,48 @@ export const VERSE_CLASS_NAME = "verse";
 export const NO_INDENT_CLASS_NAME = "no-indent";
 export const PLAIN_FONT_CLASS_NAME = "plain-font";
 
-const NUMBERED_STYLE_PLACEHOLDER = "#";
+const NUMBERED_MARKER_PLACEHOLDER = "#";
 
 /**
- * Check if the style is valid and numbered.
- * @param style - style to check.
- * @param numberedStyles - list of valid numbered styles.
- * @returns true if the style is a valid numbered style, false otherwise.
+ * Check if the marker is valid and numbered.
+ * @param marker - marker to check.
+ * @param numberedMarkers - list of valid numbered markers.
+ * @returns true if the marker is a valid numbered marker, false otherwise.
  */
-export function isValidNumberedStyle(style: string, numberedStyles: string[]): boolean {
-  // Starts with a valid numbered style.
-  const numberedStyle = numberedStyles.find((styleNumbered) => style.startsWith(styleNumbered));
-  if (!numberedStyle) return false;
+export function isValidNumberedMarker(marker: string, numberedMarkers: string[]): boolean {
+  // Starts with a valid numbered marker.
+  const numberedMarker = numberedMarkers.find((markerNumbered) =>
+    marker.startsWith(markerNumbered),
+  );
+  if (!numberedMarker) return false;
 
   // Ends with a number.
-  const maybeNumber = style.slice(numberedStyle.length);
+  const maybeNumber = marker.slice(numberedMarker.length);
   return ONLY_DIGITS_TEST.test(maybeNumber);
 }
 
 /**
- * Extracts a list of numbered styles with the '#' removed.
- * @param styles - list of styles containing placeholder numbered styles, e.g. ['p', 'pi#'].
- * @returns list of numbered styles (non-numbered are filtered out) with the '#' removed,
+ * Extracts a list of numbered markers with the '#' removed.
+ * @param markers - list of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
+ * @returns list of numbered markers (non-numbered are filtered out) with the '#' removed,
  *   e.g. ['pi'].
  */
-export function extractNumberedStyles(styles: string[] | readonly string[]): string[] {
+export function extractNumberedMarkers(markers: string[] | readonly string[]): string[] {
   return (
-    styles
-      .filter((style) => style.endsWith(NUMBERED_STYLE_PLACEHOLDER))
+    markers
+      .filter((marker) => marker.endsWith(NUMBERED_MARKER_PLACEHOLDER))
       // remove placeholder
-      .map((style) => style.slice(0, -1))
+      .map((marker) => marker.slice(0, -1))
   );
 }
 
 /**
- * Extracts a list of non-numbered styles.
- * @param styles - list of styles containing placeholder numbered styles, e.g. ['p', 'pi#'].
- * @returns list of non-numbered styles (numbered are filtered out), e.g. ['p'].
+ * Extracts a list of non-numbered markers.
+ * @param markers - list of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
+ * @returns list of non-numbered markers (numbered are filtered out), e.g. ['p'].
  */
-export function extractNonNumberedStyles(styles: string[] | readonly string[]): string[] {
-  return styles.filter((style) => !style.endsWith(NUMBERED_STYLE_PLACEHOLDER));
+export function extractNonNumberedMarkers(markers: string[] | readonly string[]): string[] {
+  return markers.filter((marker) => !marker.endsWith(NUMBERED_MARKER_PLACEHOLDER));
 }
 
 /**
@@ -309,30 +311,30 @@ export function removeNodesBeforeNode(
 
 /**
  * Gets the opening marker text.
- * @param style - Verse style.
+ * @param marker - Verse marker.
  * @returns the opening marker text.
  */
-export function openingMarkerText(style: string): string {
-  return `\\${style}`;
+export function openingMarkerText(marker: string): string {
+  return `\\${marker}`;
 }
 
 /**
  * Gets the closing marker text.
- * @param style - Verse style.
+ * @param marker - Verse marker.
  * @returns the closing marker text.
  */
-export function closingMarkerText(style: string): string {
-  return `\\${style}*`;
+export function closingMarkerText(marker: string): string {
+  return `\\${marker}*`;
 }
 
 /**
  * Gets the open marker text with the marker visible.
- * @param style - Verse style.
+ * @param marker - Verse marker.
  * @param content - Content such as chapter or verse number.
  * @returns the marker text with the open marker visible.
  */
-export function getVisibleOpenMarkerText(style: string, content: string | undefined): string {
-  let text = openingMarkerText(style);
+export function getVisibleOpenMarkerText(marker: string, content: string | undefined): string {
+  let text = openingMarkerText(marker);
   if (content) text += `${NBSP}${content}`;
   text += " ";
   return text;

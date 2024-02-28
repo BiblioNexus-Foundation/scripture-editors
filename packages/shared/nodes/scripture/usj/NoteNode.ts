@@ -10,7 +10,7 @@ import {
 } from "lexical";
 
 /** @see https://ubsicap.github.io/usx/notes.html */
-const VALID_NOTE_STYLES = [
+const VALID_NOTE_MARKERS = [
   // Footnote
   "f",
   "fe",
@@ -20,29 +20,27 @@ const VALID_NOTE_STYLES = [
   "ex",
 ] as const;
 
-export type NoteUsxStyle = (typeof VALID_NOTE_STYLES)[number];
+export type NoteMarker = (typeof VALID_NOTE_MARKERS)[number];
 
 export type SerializedNoteNode = Spread<
   {
-    usxStyle: NoteUsxStyle;
+    marker: NoteMarker;
     caller: string;
     category?: string;
   },
   SerializedElementNode
 >;
 
-export const NOTE_ELEMENT_NAME = "note";
-
 export const NOTE_VERSION = 1;
 
 export class NoteNode extends ElementNode {
-  __usxStyle: NoteUsxStyle;
+  __marker: NoteMarker;
   __caller: string;
   __category?: string;
 
-  constructor(usxStyle: NoteUsxStyle, caller: string, category?: string, key?: NodeKey) {
+  constructor(marker: NoteMarker, caller: string, category?: string, key?: NodeKey) {
     super(key);
-    this.__usxStyle = usxStyle;
+    this.__marker = marker;
     this.__caller = caller;
     this.__category = category;
   }
@@ -52,28 +50,28 @@ export class NoteNode extends ElementNode {
   }
 
   static clone(node: NoteNode): NoteNode {
-    const { __usxStyle, __caller, __category, __key } = node;
-    return new NoteNode(__usxStyle, __caller, __category, __key);
+    const { __marker, __caller, __category, __key } = node;
+    return new NoteNode(__marker, __caller, __category, __key);
   }
 
   static importJSON(serializedNode: SerializedNoteNode): NoteNode {
-    const { usxStyle, caller, category } = serializedNode;
-    const node = $createNoteNode(usxStyle, caller, category);
+    const { marker, caller, category } = serializedNode;
+    const node = $createNoteNode(marker, caller, category);
     return node;
   }
 
-  static isValidStyle(style: string): boolean {
-    return VALID_NOTE_STYLES.includes(style as NoteUsxStyle);
+  static isValidMarker(marker: string): boolean {
+    return VALID_NOTE_MARKERS.includes(marker as NoteMarker);
   }
 
-  setUsxStyle(usxStyle: NoteUsxStyle): void {
+  setMarker(marker: NoteMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): NoteUsxStyle {
+  getMarker(): NoteMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setCaller(caller: string): void {
@@ -98,8 +96,8 @@ export class NoteNode extends ElementNode {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(this.getType(), `usfm_${this.__usxStyle}`);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
     dom.setAttribute("data-caller", this.__caller);
     return dom;
   }
@@ -114,7 +112,7 @@ export class NoteNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       caller: this.getCaller(),
       category: this.getCategory(),
       version: NOTE_VERSION,
@@ -124,12 +122,8 @@ export class NoteNode extends ElementNode {
 
 export const noteNodeName = Symbol.for(NoteNode.name);
 
-export function $createNoteNode(
-  usxStyle: NoteUsxStyle,
-  caller: string,
-  category?: string,
-): NoteNode {
-  return $applyNodeReplacement(new NoteNode(usxStyle, caller, category));
+export function $createNoteNode(marker: NoteMarker, caller: string, category?: string): NoteNode {
+  return $applyNodeReplacement(new NoteNode(marker, caller, category));
 }
 
 export function $isNoteNode(node: LexicalNode | null | undefined): node is NoteNode {

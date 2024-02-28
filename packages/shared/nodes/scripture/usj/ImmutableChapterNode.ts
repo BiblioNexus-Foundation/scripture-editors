@@ -10,14 +10,14 @@ import {
 } from "lexical";
 import { CHAPTER_CLASS_NAME, getVisibleOpenMarkerText } from "./node.utils";
 
-export const CHAPTER_STYLE = "c";
+export const CHAPTER_MARKER = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
 
-type ChapterUsxStyle = typeof CHAPTER_STYLE;
+type ChapterMarker = typeof CHAPTER_MARKER;
 
 export type SerializedImmutableChapterNode = Spread<
   {
-    usxStyle: ChapterUsxStyle;
+    marker: ChapterMarker;
     number: string;
     showMarker?: boolean;
     sid?: string;
@@ -28,7 +28,7 @@ export type SerializedImmutableChapterNode = Spread<
 >;
 
 export class ImmutableChapterNode extends DecoratorNode<void> {
-  __usxStyle: ChapterUsxStyle;
+  __marker: ChapterMarker;
   __number: string;
   __showMarker?: boolean;
   __sid?: string;
@@ -44,7 +44,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     key?: NodeKey,
   ) {
     super(key);
-    this.__usxStyle = CHAPTER_STYLE;
+    this.__marker = CHAPTER_MARKER;
     this.__number = chapterNumber;
     this.__showMarker = showMarker;
     this.__sid = sid;
@@ -62,20 +62,20 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 
   static importJSON(serializedNode: SerializedImmutableChapterNode): ImmutableChapterNode {
-    const { number, showMarker, sid, altnumber, pubnumber, usxStyle } = serializedNode;
+    const { number, showMarker, sid, altnumber, pubnumber, marker } = serializedNode;
     const node = $createImmutableChapterNode(number, showMarker, sid, altnumber, pubnumber);
-    node.setUsxStyle(usxStyle);
+    node.setMarker(marker);
     return node;
   }
 
-  setUsxStyle(usxStyle: ChapterUsxStyle): void {
+  setMarker(marker: ChapterMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): ChapterUsxStyle {
+  getMarker(): ChapterMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setNumber(chapterNumber: string): void {
@@ -130,8 +130,8 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__usxStyle}`);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`);
     dom.setAttribute("data-number", this.__number);
     return dom;
   }
@@ -144,14 +144,14 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
 
   decorate(): string {
     return this.getShowMarker()
-      ? getVisibleOpenMarkerText(this.getUsxStyle(), this.getNumber())
+      ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
       : this.getNumber();
   }
 
   exportJSON(): SerializedImmutableChapterNode {
     return {
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       number: this.getNumber(),
       showMarker: this.getShowMarker(),
       sid: this.getSid(),

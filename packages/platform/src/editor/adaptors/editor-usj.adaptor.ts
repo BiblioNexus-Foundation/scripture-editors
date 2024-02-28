@@ -12,7 +12,6 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
-import { serializeUsjType } from "shared/converters/usj/usj.util";
 import {
   NBSP,
   getEditableCallerText,
@@ -64,7 +63,7 @@ export function deserializeEditorState(editorState: EditorState): Usj | undefine
   if (
     rootChildren.length === 1 &&
     rootChildren[0].type === "para" &&
-    (rootChildren[0] as SerializedParaNode).usxStyle === "p" &&
+    (rootChildren[0] as SerializedParaNode).marker === "p" &&
     (!(rootChildren[0] as SerializedParaNode).children ||
       (rootChildren[0] as SerializedParaNode).children.length === 0)
   )
@@ -79,17 +78,19 @@ export function deserializeEditorState(editorState: EditorState): Usj | undefine
 }
 
 function createBookMarker(node: SerializedBookNode): MarkerObject {
+  const { type, marker, code, text } = node;
   let content: MarkerContent[] | undefined;
-  if (node.text) content = [node.text];
+  if (text) content = [text];
   return {
-    type: serializeUsjType(node.type, node.usxStyle),
-    code: node.code,
+    type,
+    marker,
+    code,
     content,
   };
 }
 
-function parseNumberFromText(usxStyle: string, text: string | undefined, number: string): string {
-  const openMarkerText = openingMarkerText(usxStyle);
+function parseNumberFromText(marker: string, text: string | undefined, number: string): string {
+  const openMarkerText = openingMarkerText(marker);
   if (text && text.startsWith(openMarkerText)) {
     const numberText = parseInt(text.slice(openMarkerText.length), 10);
     if (!isNaN(numberText)) number = numberText.toString();
@@ -100,12 +101,13 @@ function parseNumberFromText(usxStyle: string, text: string | undefined, number:
 function createChapterMarker(
   node: SerializedImmutableChapterNode | SerializedChapterNode,
 ): MarkerObject {
-  const { usxStyle, sid, altnumber, pubnumber } = node;
+  const { marker, sid, altnumber, pubnumber } = node;
   const { text } = node as SerializedChapterNode;
   let { number } = node;
-  number = parseNumberFromText(usxStyle, text, number);
+  number = parseNumberFromText(marker, text, number);
   return {
-    type: serializeUsjType(ChapterNode.getType(), usxStyle),
+    type: ChapterNode.getType(),
+    marker,
     number,
     sid,
     altnumber,
@@ -114,12 +116,13 @@ function createChapterMarker(
 }
 
 function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseNode): MarkerObject {
-  const { usxStyle, sid, altnumber, pubnumber } = node;
+  const { marker, sid, altnumber, pubnumber } = node;
   const { text } = node as SerializedVerseNode;
   let { number } = node;
-  number = parseNumberFromText(usxStyle, text, number);
+  number = parseNumberFromText(marker, text, number);
   return {
-    type: serializeUsjType(VerseNode.getType(), usxStyle),
+    type: VerseNode.getType(),
+    marker,
     number,
     sid,
     altnumber,
@@ -128,10 +131,12 @@ function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseN
 }
 
 function createCharMarker(node: SerializedCharNode): MarkerObject {
+  const { type, marker } = node;
   let { text } = node;
   if (text.startsWith(NBSP)) text = text.slice(1);
   return {
-    type: serializeUsjType(node.type, node.usxStyle),
+    type,
+    marker,
     content: [text],
   };
 }
@@ -140,8 +145,10 @@ function createParaMarker(
   node: SerializedParaNode,
   content: MarkerContent[] | undefined,
 ): MarkerObject {
+  const { type, marker } = node;
   return {
-    type: serializeUsjType(node.type, node.usxStyle),
+    type,
+    marker,
     content,
   };
 }
@@ -150,9 +157,10 @@ function createNoteMarker(
   node: SerializedNoteNode,
   content: MarkerContent[] | undefined,
 ): MarkerObject {
-  const { type, usxStyle, caller, category } = node;
+  const { type, marker, caller, category } = node;
   return {
-    type: serializeUsjType(type, usxStyle),
+    type,
+    marker,
     caller,
     category,
     content,
@@ -160,9 +168,10 @@ function createNoteMarker(
 }
 
 function createMilestoneMarker(node: SerializedMilestoneNode): MarkerObject {
-  const { type, usxStyle, sid, eid } = node;
+  const { type, marker, sid, eid } = node;
   return {
-    type: serializeUsjType(type, usxStyle),
+    type,
+    marker,
     sid,
     eid,
   };

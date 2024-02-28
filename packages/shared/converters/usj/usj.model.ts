@@ -7,7 +7,7 @@
 /** The USJ spec type */
 export const USJ_TYPE = "USJ";
 /** The USJ spec version */
-export const USJ_VERSION = "0.0.1-alpha.2";
+export const USJ_VERSION = "0.2.1";
 
 /** Single piece of Scripture content */
 export type MarkerContent = string | MarkerObject;
@@ -15,11 +15,15 @@ export type MarkerContent = string | MarkerObject;
 /** A Scripture Marker and its contents */
 export type MarkerObject = {
   /**
-   * The kind of node or element this is, corresponding each marker in USFM or each node in USX
-   * Its format is `element:style`
-   * @example `para:p`, `verse:v`, `char:nd`
+   * The kind/category of node or element this is, corresponding the USFM marker and USX node
+   * @example `para`, `verse`, `char`
    */
   type: string;
+  /**
+   * The corresponding marker in USFM or style in USX
+   * @example `p`, `v`, `nd`
+   */
+  marker: string;
   /** This marker's contents laid out in order */
   content?: MarkerContent[];
   /** Indicates the Book-chapter-verse value in the paragraph based structure */

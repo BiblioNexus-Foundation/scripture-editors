@@ -11,16 +11,12 @@ import {
 } from "lexical";
 import { VERSE_CLASS_NAME } from "./node.utils";
 
-export const VERSE_ELEMENT_NAME = "verse";
-
-export const VERSE_STYLE = "v";
+export const VERSE_MARKER = "v";
 export const VERSE_VERSION = 1;
-
-type VerseUsxStyle = typeof VERSE_STYLE;
 
 export type SerializedVerseNode = Spread<
   {
-    usxStyle: VerseUsxStyle;
+    marker: VerseMarker;
     number: string;
     classList: string[];
     sid?: string;
@@ -30,8 +26,10 @@ export type SerializedVerseNode = Spread<
   SerializedTextNode
 >;
 
+type VerseMarker = typeof VERSE_MARKER;
+
 export class VerseNode extends TextNode {
-  __usxStyle: VerseUsxStyle;
+  __marker: VerseMarker;
   __number: string;
   __classList: string[];
   __sid?: string;
@@ -48,7 +46,7 @@ export class VerseNode extends TextNode {
     key?: NodeKey,
   ) {
     super(text ?? verseNumber, key);
-    this.__usxStyle = VERSE_STYLE;
+    this.__marker = VERSE_MARKER;
     this.__number = verseNumber;
     this.__classList = classList;
     this.__sid = sid;
@@ -77,25 +75,25 @@ export class VerseNode extends TextNode {
       format,
       mode,
       style,
-      usxStyle,
+      marker,
     } = serializedNode;
     const node = $createVerseNode(number, classList, text, sid, altnumber, pubnumber);
     node.setDetail(detail);
     node.setFormat(format);
     node.setMode(mode);
     node.setStyle(style);
-    node.setUsxStyle(usxStyle);
+    node.setMarker(marker);
     return node;
   }
 
-  setUsxStyle(usxStyle: VerseUsxStyle): void {
+  setMarker(marker: VerseMarker): void {
     const self = this.getWritable();
-    self.__usxStyle = usxStyle;
+    self.__marker = marker;
   }
 
-  getUsxStyle(): VerseUsxStyle {
+  getMarker(): VerseMarker {
     const self = this.getLatest();
-    return self.__usxStyle;
+    return self.__marker;
   }
 
   setNumber(verseNumber: string): void {
@@ -150,8 +148,8 @@ export class VerseNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
-    dom.setAttribute("data-usx-style", this.__usxStyle);
-    dom.classList.add(VERSE_CLASS_NAME, `usfm_${this.__usxStyle}`, ...this.__classList);
+    dom.setAttribute("data-marker", this.__marker);
+    dom.classList.add(VERSE_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
     dom.setAttribute("data-number", this.__number);
     return dom;
   }
@@ -160,7 +158,7 @@ export class VerseNode extends TextNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
-      usxStyle: this.getUsxStyle(),
+      marker: this.getMarker(),
       number: this.getNumber(),
       classList: this.getClassList(),
       sid: this.getSid(),

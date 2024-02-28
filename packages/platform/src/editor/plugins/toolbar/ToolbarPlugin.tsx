@@ -21,7 +21,6 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { useCallback, useEffect, useState } from "react";
-import { serializeUsjType } from "shared/converters/usj/usj.util";
 import { IS_APPLE } from "shared/lexical/environment";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
@@ -33,7 +32,7 @@ function Divider(): JSX.Element {
 export default function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
-  const [blockType, setBlockType] = useState("");
+  const [blockMarker, setBlockMarker] = useState("");
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [isEditable, setIsEditable] = useState(() => editor.isEditable());
@@ -42,7 +41,7 @@ export default function ToolbarPlugin(): JSX.Element {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode();
-      let element =
+      let node =
         anchorNode.getKey() === "root"
           ? anchorNode
           : $findMatchingParent(anchorNode, (e) => {
@@ -50,17 +49,14 @@ export default function ToolbarPlugin(): JSX.Element {
               return parent !== null && $isRootOrShadowRoot(parent);
             });
 
-      if (element === null) {
-        element = anchorNode.getTopLevelElementOrThrow();
+      if (node === null) {
+        node = anchorNode.getTopLevelElementOrThrow();
       }
 
-      const elementKey = element.getKey();
-      const elementDOM = activeEditor.getElementByKey(elementKey);
+      const nodeKey = node.getKey();
+      const elementDOM = activeEditor.getElementByKey(nodeKey);
 
-      if (elementDOM !== null) {
-        const type = serializeUsjType(element.getType(), (element as ParaNode).getUsxStyle());
-        setBlockType(type);
-      }
+      if (elementDOM !== null) setBlockMarker((node as ParaNode).getMarker());
     }
   }, [activeEditor]);
 
@@ -134,7 +130,7 @@ export default function ToolbarPlugin(): JSX.Element {
       <Divider />
       {activeEditor === editor && (
         <>
-          <BlockFormatDropDown disabled={!isEditable} blockType={blockType} editor={editor} />
+          <BlockFormatDropDown disabled={!isEditable} blockMarker={blockMarker} editor={editor} />
           <Divider />
         </>
       )}
