@@ -3,7 +3,7 @@ import { Usj } from "./usj.model";
 import { NBSP } from "../../nodes/scripture/usj/node.utils";
 import { SerializedParaNode } from "../../nodes/scripture/usj/ParaNode";
 
-export const usxEmpty = '<usx version="3.0" />';
+export const usxEmpty = '<usx version="3.0"/>';
 
 /**
  * Reformatted from:
@@ -11,39 +11,35 @@ export const usxEmpty = '<usx version="3.0" />';
  */
 export const usxGen1v1 = `
 <usx version="3.0">
-  <book code="GEN" style="id" />
-  <chapter number="1" style="c" sid="GEN 1" />
+  <book style="id" code="GEN" />
+  <chapter style="c" number="1" sid="GEN 1" />
     <para style="p">
-      <verse number="1" style="v" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
-      <verse number="2" style="v" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
-      <verse number="15" style="v" sid="GEN 1:15" />Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
+      <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
+      <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
+      <verse style="v" number="15" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
     </para>
-    <para style="q2">“There is no help for him in God.”<note caller="+" style="f"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <char style="qs">Selah.</char></para>
+    <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
   <chapter eid="GEN 1" />
 </usx>
 `;
 
 export const usxGen1v1ImpliedPara = `
 <usx version="3.0">
-  <book code="GEN" style="id" />
-  <chapter number="1" style="c" sid="GEN 1" />
-    <verse number="1" style="v" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
-    <verse number="2" style="v" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
-    <verse number="15" style="v" sid="GEN 1:15" />Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
+  <book style="id" code="GEN" />
+  <chapter style="c" number="1" sid="GEN 1" />
+    <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
+    <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
+    <verse style="v" number="15" sid="GEN 1:15" />Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
   <chapter eid="GEN 1" />
 </usx>
 `;
 
-export const usjEmpty: Usj = {
-  type: "USJ",
-  version: "0.2.1",
-  content: [],
-};
+export const usjEmpty: Usj = { type: "USJ", version: "0.2.1", content: [] };
 
 /** para index where the note exists */
 export const NOTE_PARA_INDEX = 3;
 /** index of the note in para children */
-export const NOTE_INDEX = 1;
+export const NOTE_INDEX = 2;
 /** index of the note caller in note children */
 export const NOTE_CALLER_INDEX = 0;
 /** index of chapter 1 */
@@ -66,47 +62,19 @@ export const usjGen1v1: Usj = {
   type: "USJ",
   version: "0.2.1",
   content: [
-    {
-      type: "book",
-      marker: "id",
-      code: "GEN",
-    },
-    {
-      type: "chapter",
-      marker: "c",
-      number: "1",
-      sid: "GEN 1",
-    },
+    { type: "book", marker: "id", code: "GEN" },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
     {
       type: "para",
       marker: "p",
       content: [
-        {
-          type: "verse",
-          marker: "v",
-          number: "1",
-          sid: "GEN 1:1",
-        },
+        { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
         "the first verse ",
-        {
-          type: "verse",
-          marker: "v",
-          number: "2",
-          sid: "GEN 1:2",
-        },
+        { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
         "the second verse ",
-        {
-          type: "verse",
-          marker: "v",
-          number: "15",
-          sid: "GEN 1:15",
-        },
+        { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
         "Tell the Israelites that I, the ",
-        {
-          type: "char",
-          marker: "nd",
-          content: ["Lord"],
-        },
+        { type: "char", marker: "nd", content: ["Lord"] },
         ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
       ],
     },
@@ -114,17 +82,14 @@ export const usjGen1v1: Usj = {
       type: "para",
       marker: "q2",
       content: [
+        { type: "verse", marker: "v", number: "16", sid: "GEN 1:16" },
         "“There is no help for him in God.”",
         {
           type: "note",
           marker: "f",
           caller: "+",
           content: [
-            {
-              type: "char",
-              marker: "fr",
-              content: ["3:2 "],
-            },
+            { type: "char", marker: "fr", content: ["3:2 "] },
             {
               type: "char",
               marker: "ft",
@@ -133,11 +98,7 @@ export const usjGen1v1: Usj = {
           ],
         },
         " ",
-        {
-          type: "char",
-          marker: "qs",
-          content: ["Selah."],
-        },
+        { type: "char", marker: "qs", content: ["Selah."] },
       ],
     },
   ],
@@ -147,43 +108,15 @@ export const usjGen1v1ImpliedPara: Usj = {
   type: "USJ",
   version: "0.2.1",
   content: [
-    {
-      type: "book",
-      marker: "id",
-      code: "GEN",
-    },
-    {
-      type: "chapter",
-      marker: "c",
-      number: "1",
-      sid: "GEN 1",
-    },
-    {
-      type: "verse",
-      marker: "v",
-      number: "1",
-      sid: "GEN 1:1",
-    },
+    { type: "book", marker: "id", code: "GEN" },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
+    { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
     "the first verse ",
-    {
-      type: "verse",
-      marker: "v",
-      number: "2",
-      sid: "GEN 1:2",
-    },
+    { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
     "the second verse ",
-    {
-      type: "verse",
-      marker: "v",
-      number: "15",
-      sid: "GEN 1:15",
-    },
+    { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
     "Tell the Israelites that I, the ",
-    {
-      type: "char",
-      marker: "nd",
-      content: ["Lord"],
-    },
+    { type: "char", marker: "nd", content: ["Lord"] },
     ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
   ],
 };
@@ -300,6 +233,7 @@ export const editorStateGen1v1 = {
         indent: 0,
         version: 1,
         children: [
+          { type: "immutable-verse", marker: "v", number: "16", sid: "GEN 1:16", version: 1 },
           {
             type: "text",
             text: "“There is no help for him in God.”",
@@ -429,10 +363,7 @@ export const editorStateGen1v1Editable = {
             style: "",
             version: 1,
           },
-          {
-            type: "linebreak",
-            version: 1,
-          },
+          { type: "linebreak", version: 1 },
           {
             type: "verse",
             marker: "v",
@@ -451,10 +382,7 @@ export const editorStateGen1v1Editable = {
             style: "",
             version: 1,
           },
-          {
-            type: "linebreak",
-            version: 1,
-          },
+          { type: "linebreak", version: 1 },
           {
             type: "verse",
             marker: "v",
@@ -473,10 +401,7 @@ export const editorStateGen1v1Editable = {
             style: "",
             version: 1,
           },
-          {
-            type: "linebreak",
-            version: 1,
-          },
+          { type: "linebreak", version: 1 },
           {
             type: "verse",
             marker: "v",
@@ -565,6 +490,16 @@ export const editorStateGen1v1Editable = {
             format: 0,
             mode: "normal",
             style: "",
+            version: 1,
+          },
+          { type: "linebreak", version: 1 },
+          {
+            type: "verse",
+            marker: "v",
+            number: "16",
+            sid: "GEN 1:16",
+            text: `\\v${NBSP}16 `,
+            classList: ["plain-font"],
             version: 1,
           },
           {
