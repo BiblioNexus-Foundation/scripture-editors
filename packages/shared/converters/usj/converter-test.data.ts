@@ -3,7 +3,7 @@ import { Usj } from "./usj.model";
 import { NBSP } from "../../nodes/scripture/usj/node.utils";
 import { SerializedParaNode } from "../../nodes/scripture/usj/ParaNode";
 
-export const usxEmpty = '<usx version="3.0"/>';
+export const usxEmpty = '<usx version="3.0" />';
 
 /**
  * Reformatted from:
@@ -18,6 +18,7 @@ export const usxGen1v1 = `
       <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
       <verse style="v" number="15" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
     </para>
+    <para style="b" />
     <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
   <chapter eid="GEN 1" />
 </usx>
@@ -37,7 +38,7 @@ export const usxGen1v1ImpliedPara = `
 export const usjEmpty: Usj = { type: "USJ", version: "0.2.1", content: [] };
 
 /** para index where the note exists */
-export const NOTE_PARA_INDEX = 3;
+export const NOTE_PARA_INDEX = 4;
 /** index of the note in para children */
 export const NOTE_INDEX = 2;
 /** index of the note caller in note children */
@@ -78,6 +79,7 @@ export const usjGen1v1: Usj = {
         ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
       ],
     },
+    { type: "para", marker: "b" },
     {
       type: "para",
       marker: "q2",
@@ -223,6 +225,16 @@ export const editorStateGen1v1 = {
             version: 1,
           },
         ],
+      },
+      {
+        type: "para",
+        marker: "b",
+        classList: [],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [],
       },
       {
         type: "para",
@@ -455,6 +467,37 @@ export const editorStateGen1v1Editable = {
           {
             type: "text",
             text: ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "para",
+        marker: "b",
+        classList: ["no-indent", "plain-font"],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "marker",
+            marker: "b",
+            detail: 0,
+            format: 0,
+            isOpening: true,
+            mode: "normal",
+            style: "",
+            text: "",
+            version: 1,
+          },
+          {
+            type: "text",
+            text: NBSP,
             detail: 0,
             format: 0,
             mode: "normal",

@@ -34,11 +34,12 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
     const serializedEditorState = editorAdaptor.serializeEditorState(scripture, viewOptions);
     const editorState = editor.parseEditorState(serializedEditorState);
     // Execute after the current render cycle.
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       editor.setEditorState(editorState);
       editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
     }, 0);
-  }, [editor, scripture, viewOptions, logger, editorAdaptor]);
+    return () => clearTimeout(timeoutId);
+  }, [editor, scripture, viewOptions, editorAdaptor]);
 
   return null;
 }

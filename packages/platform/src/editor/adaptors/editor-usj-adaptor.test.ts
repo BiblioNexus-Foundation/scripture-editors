@@ -1,3 +1,4 @@
+import { deepEqual } from "fast-equals";
 import { createEditor } from "lexical";
 import {
   CHAPTER_1_INDEX,
@@ -16,10 +17,11 @@ import { MarkerObject } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
 import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import editorUsjAdaptor from "./editor-usj.adaptor";
-import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
+import usjEditorAdaptor from "./usj-editor.adaptor";
 
 const testConfig = {
   namespace: "TestEditor",
@@ -75,5 +77,16 @@ describe("Editor USJ Adaptor", () => {
     )[VERSE_2_INDEX];
     usjVerse2.number = verse2Number;
     expect(usj).toEqual(usjGen1v1Edited);
+  });
+
+  it("should convert USJ to Lexical editor state JSON and back again", () => {
+    const serializedEditorState = usjEditorAdaptor.serializeEditorState(usjGen1v1);
+    const editorState = editor.parseEditorState(serializedEditorState);
+
+    const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+
+    const isEqual = deepEqual(usj, usjGen1v1);
+    expect(usj).toEqual(usjGen1v1);
+    expect(isEqual).toBe(true);
   });
 });

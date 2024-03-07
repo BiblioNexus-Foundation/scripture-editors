@@ -1,5 +1,5 @@
 import { RefSelector, ScriptureReference } from "papi-components";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 import { Usj } from "shared/converters/usj/usj.model";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
@@ -9,21 +9,27 @@ import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-option
 import { getViewOptions } from "./editor/adaptors/view-options.utils";
 import { formattedViewMode as defaultViewMode } from "./editor/plugins/toolbar/view-mode.model";
 import ViewModeDropDown from "./editor/plugins/toolbar/ViewModeDropDown";
-import Editor from "./editor/Editor";
+import Editor, { EditorRef } from "./editor/Editor";
 import "./App.css";
 
+const defaultUsj = usxStringToUsj('<usx version="3.0" />');
 const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
-
-const usj = usxStringToUsj(usx);
-
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 
-const onChange = (usj: Usj) => console.log({ usj });
-
 export default function App() {
+  const editorRef = useRef<EditorRef>(null);
   const [viewMode, setViewMode] = useState(defaultViewMode);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
+
+  setTimeout(() => {
+    editorRef.current?.setUsj(usxStringToUsj(usx));
+  }, 1000);
+
+  const onChange = useCallback((usj: Usj) => {
+    console.log({ usj });
+    editorRef.current?.setUsj(usj);
+  }, []);
 
   return (
     <>
@@ -32,7 +38,8 @@ export default function App() {
       </div>
       <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       <Editor
-        usj={usj}
+        defaultUsj={defaultUsj}
+        ref={editorRef}
         viewOptions={viewOptions}
         scrRef={scrRef}
         setScrRef={setScrRef}
