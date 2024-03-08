@@ -56,7 +56,7 @@ const defaultUsj = usxStringToUsj(emptyUsx);
 const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 
 export default function App() {
-  const editorRef = useRef<EditorRef>(null);
+  const editorRef = useRef<EditorRef>(null!);
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
   setTimeout(() => {
@@ -79,6 +79,18 @@ export default function App() {
   );
 }
 ```
+
+## Features
+
+- USJ editor with USX support
+- Read-only and edit mode
+- Data in but not yet out (coming soon)
+- History - undo & redo
+- Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
+- BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
+- Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
+- Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
+- Node options - callback for `<note>` link
 
 ## Demo and Collaborative Web Development Environment
 

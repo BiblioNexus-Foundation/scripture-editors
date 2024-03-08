@@ -17,7 +17,9 @@ const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 
 export default function App() {
-  const editorRef = useRef<EditorRef>(null);
+  // This ref becomes defined when passed to the editor.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const editorRef = useRef<EditorRef>(null!);
   const [viewMode, setViewMode] = useState(defaultViewMode);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
