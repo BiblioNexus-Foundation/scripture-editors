@@ -9,10 +9,11 @@ import {
   Spread,
   TextNode,
 } from "lexical";
-import { VERSE_CLASS_NAME } from "./node.utils";
+import { UnknownAttributes, VERSE_CLASS_NAME } from "./node.utils";
 
 export const VERSE_MARKER = "v";
 export const VERSE_VERSION = 1;
+export type VerseMarker = typeof VERSE_MARKER;
 
 export type SerializedVerseNode = Spread<
   {
@@ -22,11 +23,10 @@ export type SerializedVerseNode = Spread<
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedTextNode
 >;
-
-type VerseMarker = typeof VERSE_MARKER;
 
 export class VerseNode extends TextNode {
   __marker: VerseMarker;
@@ -35,6 +35,7 @@ export class VerseNode extends TextNode {
   __sid?: string;
   __altnumber?: string;
   __pubnumber?: string;
+  __unknownAttributes?: UnknownAttributes;
 
   constructor(
     verseNumber: string,
@@ -43,6 +44,7 @@ export class VerseNode extends TextNode {
     sid?: string,
     altnumber?: string,
     pubnumber?: string,
+    unknownAttributes?: UnknownAttributes,
     key?: NodeKey,
   ) {
     super(text ?? verseNumber, key);
@@ -52,6 +54,7 @@ export class VerseNode extends TextNode {
     this.__sid = sid;
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -59,30 +62,57 @@ export class VerseNode extends TextNode {
   }
 
   static clone(node: VerseNode): VerseNode {
-    const { __number, __classList, __text, __sid, __altnumber, __pubnumber, __key } = node;
-    return new VerseNode(__number, __classList, __text, __sid, __altnumber, __pubnumber, __key);
+    const {
+      __number,
+      __classList,
+      __text,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    } = node;
+    return new VerseNode(
+      __number,
+      __classList,
+      __text,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    );
   }
 
   static importJSON(serializedNode: SerializedVerseNode): VerseNode {
     const {
+      marker,
       number,
       classList,
       text,
       sid,
       altnumber,
       pubnumber,
+      unknownAttributes,
       detail,
       format,
       mode,
       style,
-      marker,
     } = serializedNode;
-    const node = $createVerseNode(number, classList, text, sid, altnumber, pubnumber);
+    const node = $createVerseNode(
+      number,
+      classList,
+      text,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    );
+    node.setMarker(marker);
     node.setDetail(detail);
     node.setFormat(format);
     node.setMode(mode);
     node.setStyle(style);
-    node.setMarker(marker);
     return node;
   }
 
@@ -146,6 +176,16 @@ export class VerseNode extends TextNode {
     return self.__pubnumber;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
@@ -164,6 +204,7 @@ export class VerseNode extends TextNode {
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: VERSE_VERSION,
     };
   }
@@ -176,9 +217,10 @@ export function $createVerseNode(
   sid?: string,
   altnumber?: string,
   pubnumber?: string,
+  unknownAttributes?: UnknownAttributes,
 ): VerseNode {
   return $applyNodeReplacement(
-    new VerseNode(verseNumber, classList, text, sid, altnumber, pubnumber),
+    new VerseNode(verseNumber, classList, text, sid, altnumber, pubnumber, unknownAttributes),
   );
 }
 

@@ -39,6 +39,7 @@ import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNod
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;
@@ -84,13 +85,14 @@ function removeUndefinedProperties<T>(obj: T): T {
 }
 
 function createBookMarker(node: SerializedBookNode): MarkerObject {
-  const { type, marker, code, text } = node;
+  const { type, marker, code, text, unknownAttributes } = node;
   let content: MarkerContent[] | undefined;
   if (text) content = [text];
   return removeUndefinedProperties({
     type,
     marker,
     code,
+    ...unknownAttributes,
     content,
   });
 }
@@ -107,7 +109,7 @@ function parseNumberFromText(marker: string, text: string | undefined, number: s
 function createChapterMarker(
   node: SerializedImmutableChapterNode | SerializedChapterNode,
 ): MarkerObject {
-  const { marker, sid, altnumber, pubnumber } = node;
+  const { marker, sid, altnumber, pubnumber, unknownAttributes } = node;
   const { text } = node as SerializedChapterNode;
   let { number } = node;
   number = parseNumberFromText(marker, text, number);
@@ -118,11 +120,12 @@ function createChapterMarker(
     sid,
     altnumber,
     pubnumber,
+    ...unknownAttributes,
   });
 }
 
 function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseNode): MarkerObject {
-  const { marker, sid, altnumber, pubnumber } = node;
+  const { marker, sid, altnumber, pubnumber, unknownAttributes } = node;
   const { text } = node as SerializedVerseNode;
   let { number } = node;
   number = parseNumberFromText(marker, text, number);
@@ -133,16 +136,18 @@ function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseN
     sid,
     altnumber,
     pubnumber,
+    ...unknownAttributes,
   });
 }
 
 function createCharMarker(node: SerializedCharNode): MarkerObject {
-  const { type, marker } = node;
+  const { type, marker, unknownAttributes } = node;
   let { text } = node;
   if (text.startsWith(NBSP)) text = text.slice(1);
   return removeUndefinedProperties({
     type,
     marker,
+    ...unknownAttributes,
     content: [text],
   });
 }
@@ -151,12 +156,13 @@ function createParaMarker(
   node: SerializedParaNode,
   content: MarkerContent[] | undefined,
 ): MarkerObject {
-  const { type, marker } = node;
+  const { type, marker, unknownAttributes } = node;
   // Ensure empty arrays are removed.
   const _content = content && content.length > 0 ? content : undefined;
   return removeUndefinedProperties({
     type,
     marker,
+    ...unknownAttributes,
     content: _content,
   });
 }
@@ -165,7 +171,7 @@ function createNoteMarker(
   node: SerializedNoteNode,
   content: MarkerContent[] | undefined,
 ): MarkerObject {
-  const { type, marker, caller, category } = node;
+  const { type, marker, caller, category, unknownAttributes } = node;
   // Ensure empty arrays are removed.
   const _content = content && content.length > 0 ? content : undefined;
   return removeUndefinedProperties({
@@ -173,22 +179,39 @@ function createNoteMarker(
     marker,
     caller,
     category,
+    ...unknownAttributes,
     content: _content,
   });
 }
 
 function createMilestoneMarker(node: SerializedMilestoneNode): MarkerObject {
-  const { type, marker, sid, eid } = node;
+  const { type, marker, sid, eid, unknownAttributes } = node;
   return removeUndefinedProperties({
     type,
     marker,
     sid,
     eid,
+    ...unknownAttributes,
   });
 }
 
 function createTextMarker(node: SerializedTextNode): string {
   return node.text;
+}
+
+function createUnknownMarker(
+  node: SerializedUnknownNode,
+  content: MarkerContent[] | undefined,
+): MarkerObject {
+  const { tag, marker, unknownAttributes } = node;
+  // Ensure empty arrays are removed.
+  const _content = content && content.length > 0 ? content : undefined;
+  return removeUndefinedProperties({
+    type: tag,
+    marker,
+    ...unknownAttributes,
+    content: _content,
+  });
 }
 
 function recurseNodes(
@@ -200,6 +223,7 @@ function recurseNodes(
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
+    const serializedUnknownNode = node as SerializedUnknownNode;
     switch (node.type) {
       case BookNode.getType():
         markers.push(createBookMarker(node as SerializedBookNode));
@@ -245,6 +269,11 @@ function recurseNodes(
         ) {
           markers.push(createTextMarker(serializedTextNode));
         }
+        break;
+      case UnknownNode.getType():
+        markers.push(
+          createUnknownMarker(serializedUnknownNode, recurseNodes(serializedUnknownNode.children)),
+        );
         break;
       default:
         _logger?.error(`Unexpected node type '${node.type}'!`);

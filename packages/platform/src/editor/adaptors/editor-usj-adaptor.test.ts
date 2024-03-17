@@ -9,9 +9,11 @@ import {
   editorStateGen1v1,
   editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
+  editorStateWithUnknownItems,
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjWithUnknownItems,
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
@@ -88,5 +90,13 @@ describe("Editor USJ Adaptor", () => {
     const isEqual = deepEqual(usj, usjGen1v1);
     expect(usj).toEqual(usjGen1v1);
     expect(isEqual).toBe(true);
+  });
+
+  it("should convert to USJ from Lexical editor state JSON with unknown items", () => {
+    const editorState = editor.parseEditorState(editorStateWithUnknownItems);
+
+    const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+
+    expect(usj).toEqual(usjWithUnknownItems);
   });
 });

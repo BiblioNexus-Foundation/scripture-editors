@@ -8,6 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
+import { UnknownAttributes } from "./node.utils";
 
 /** @see https://ubsicap.github.io/usx/msstyles.html */
 const VALID_MILESTONE_MARKERS = [
@@ -41,6 +42,7 @@ export type SerializedMilestoneNode = Spread<
     marker: MilestoneMarker;
     sid?: string;
     eid?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedLexicalNode
 >;
@@ -49,12 +51,20 @@ export class MilestoneNode extends DecoratorNode<void> {
   __marker: MilestoneMarker;
   __sid?: string;
   __eid?: string;
+  __unknownAttributes?: UnknownAttributes;
 
-  constructor(marker: MilestoneMarker, sid?: string, eid?: string, key?: NodeKey) {
+  constructor(
+    marker: MilestoneMarker,
+    sid?: string,
+    eid?: string,
+    unknownAttributes?: UnknownAttributes,
+    key?: NodeKey,
+  ) {
     super(key);
     this.__marker = marker;
     this.__sid = sid;
     this.__eid = eid;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -62,13 +72,13 @@ export class MilestoneNode extends DecoratorNode<void> {
   }
 
   static clone(node: MilestoneNode): MilestoneNode {
-    const { __marker, __sid, __eid, __key } = node;
-    return new MilestoneNode(__marker, __sid, __eid, __key);
+    const { __marker, __sid, __eid, __unknownAttributes, __key } = node;
+    return new MilestoneNode(__marker, __sid, __eid, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedMilestoneNode): MilestoneNode {
-    const { marker, sid, eid } = serializedNode;
-    const node = $createMilestoneNode(marker, sid, eid);
+    const { marker, sid, eid, unknownAttributes } = serializedNode;
+    const node = $createMilestoneNode(marker, sid, eid, unknownAttributes);
     return node;
   }
 
@@ -106,6 +116,16 @@ export class MilestoneNode extends DecoratorNode<void> {
     return self.__eid;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
@@ -129,6 +149,7 @@ export class MilestoneNode extends DecoratorNode<void> {
       marker: this.getMarker(),
       sid: this.getSid(),
       eid: this.getEid(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: MILESTONE_VERSION,
     };
   }
@@ -138,8 +159,9 @@ export function $createMilestoneNode(
   marker: MilestoneMarker,
   sid?: string,
   eid?: string,
+  unknownAttributes?: UnknownAttributes,
 ): MilestoneNode {
-  return $applyNodeReplacement(new MilestoneNode(marker, sid, eid));
+  return $applyNodeReplacement(new MilestoneNode(marker, sid, eid, unknownAttributes));
 }
 
 export function $isMilestoneNode(node: LexicalNode | null | undefined): node is MilestoneNode {

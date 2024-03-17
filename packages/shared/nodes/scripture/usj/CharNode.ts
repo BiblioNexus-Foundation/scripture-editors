@@ -12,6 +12,7 @@ import {
 import {
   CHAR_NODE_TYPE,
   PLAIN_FONT_CLASS_NAME,
+  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,
@@ -91,6 +92,7 @@ export const CHAR_VERSION = 1;
 export type SerializedCharNode = Spread<
   {
     marker: CharMarker;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedTextNode
 >;
@@ -99,10 +101,17 @@ type CharMarker = string;
 
 export class CharNode extends TextNode {
   __marker: CharMarker;
+  __unknownAttributes?: UnknownAttributes;
 
-  constructor(marker: CharMarker, text: string, key?: NodeKey) {
+  constructor(
+    marker: CharMarker,
+    text: string,
+    unknownAttributes?: UnknownAttributes,
+    key?: NodeKey,
+  ) {
     super(text, key);
     this.__marker = marker;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -110,12 +119,13 @@ export class CharNode extends TextNode {
   }
 
   static clone(node: CharNode): CharNode {
-    return new CharNode(node.__marker, node.__text, node.__key);
+    const { __marker, __text, __unknownAttributes, __key } = node;
+    return new CharNode(__marker, __text, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedCharNode): CharNode {
-    const { marker, text, detail, format, mode, style } = serializedNode;
-    const node = $createCharNode(marker, text);
+    const { marker, text, unknownAttributes, detail, format, mode, style } = serializedNode;
+    const node = $createCharNode(marker, text, unknownAttributes);
     node.setDetail(detail);
     node.setFormat(format);
     node.setMode(mode);
@@ -148,6 +158,16 @@ export class CharNode extends TextNode {
     return self.__marker;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
@@ -165,6 +185,7 @@ export class CharNode extends TextNode {
       ...super.exportJSON(),
       type: this.getType(),
       marker: this.getMarker(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: CHAR_VERSION,
     };
   }
@@ -174,8 +195,12 @@ export class CharNode extends TextNode {
   }
 }
 
-export function $createCharNode(marker: CharMarker, text: string): CharNode {
-  return $applyNodeReplacement(new CharNode(marker, text));
+export function $createCharNode(
+  marker: CharMarker,
+  text: string,
+  unknownAttributes?: UnknownAttributes,
+): CharNode {
+  return $applyNodeReplacement(new CharNode(marker, text, unknownAttributes));
 }
 
 export function $isCharNode(node: LexicalNode | null | undefined): node is CharNode {

@@ -1,3 +1,4 @@
+// Modified from original: unknown items (wat:z) added in first para:q1.
 export const WEB_PSA_USX = `
 <?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
@@ -12,6 +13,7 @@ export const WEB_PSA_USX = `
   <chapter number="1" style="c" sid="PSA 1" />
   <para style="ms1">BOOK 1</para>
   <para style="q1">
+    <wat style="z" attr-unknown="watAttr">wat content?</wat>
     <verse number="1" style="v" sid="PSA 1:1" />Blessed is the man who doesn’t walk in the counsel of the wicked,</para>
   <para style="q2" vid="PSA 1:1">nor stand on the path of sinners,</para>
   <para style="q2" vid="PSA 1:1">nor sit in the seat of scoffers;<verse eid="PSA 1:1" /></para>

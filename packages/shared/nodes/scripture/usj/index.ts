@@ -10,6 +10,7 @@ import { MilestoneNode } from "./MilestoneNode";
 import { MarkerNode } from "./MarkerNode";
 import { ImpliedParaNode } from "./ImpliedParaNode";
 import { ParaNode } from "./ParaNode";
+import { UnknownNode } from "./UnknownNode";
 
 const scriptureUsjNodes = [
   BookNode,
@@ -21,6 +22,7 @@ const scriptureUsjNodes = [
   NoteNode,
   MilestoneNode,
   MarkerNode,
+  UnknownNode,
   ImpliedParaNode,
   ParaNode,
   {

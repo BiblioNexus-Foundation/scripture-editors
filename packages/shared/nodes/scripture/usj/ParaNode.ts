@@ -9,6 +9,7 @@ import {
   SerializedElementNode,
 } from "lexical";
 import {
+  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,
@@ -99,6 +100,7 @@ export type SerializedParaNode = Spread<
   {
     marker: ParaMarker;
     classList: string[];
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
 >;
@@ -108,11 +110,18 @@ type ParaMarker = string;
 export class ParaNode extends ParagraphNode {
   __marker: ParaMarker;
   __classList: string[];
+  __unknownAttributes?: UnknownAttributes;
 
-  constructor(marker: ParaMarker = PARA_MARKER_DEFAULT, classList: string[] = [], key?: NodeKey) {
+  constructor(
+    marker: ParaMarker = PARA_MARKER_DEFAULT,
+    classList: string[] = [],
+    unknownAttributes?: UnknownAttributes,
+    key?: NodeKey,
+  ) {
     super(key);
     this.__marker = marker;
     this.__classList = classList;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -120,13 +129,13 @@ export class ParaNode extends ParagraphNode {
   }
 
   static clone(node: ParaNode): ParaNode {
-    const { __marker, __classList, __key } = node;
-    return new ParaNode(__marker, __classList, __key);
+    const { __marker, __classList, __unknownAttributes, __key } = node;
+    return new ParaNode(__marker, __classList, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const { marker, classList, format, indent, direction } = serializedNode;
-    const node = $createParaNode(marker, classList);
+    const { marker, classList, unknownAttributes, format, indent, direction } = serializedNode;
+    const node = $createParaNode(marker, classList, unknownAttributes);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -160,6 +169,16 @@ export class ParaNode extends ParagraphNode {
     return self.__classList;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     // Define the DOM element here
     const dom = document.createElement("p");
@@ -180,13 +199,18 @@ export class ParaNode extends ParagraphNode {
       type: this.getType(),
       marker: this.getMarker(),
       classList: this.getClassList(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: PARA_VERSION,
     };
   }
 }
 
-export function $createParaNode(marker?: ParaMarker, classList?: string[]): ParaNode {
-  return $applyNodeReplacement(new ParaNode(marker, classList));
+export function $createParaNode(
+  marker?: ParaMarker,
+  classList?: string[],
+  unknownAttributes?: UnknownAttributes,
+): ParaNode {
+  return $applyNodeReplacement(new ParaNode(marker, classList, unknownAttributes));
 }
 
 export function $isParaNode(node: LexicalNode | null | undefined): node is ParaNode {

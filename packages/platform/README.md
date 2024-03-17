@@ -17,11 +17,7 @@ title: ScriptureData—Editor flow
 graph TB
   DB[(DB)] <-- USX --> C
   C[USX-USJ converter] <-- USJ --> A
-  A[USJ-Editor adapter] -- Editor State --> Editor
-  Editor -. NYI* .-> A
-
-  Editor ~~~ Key[NYI* - Not Yet Implemented]
-  style Key fill:#fff,stroke:#fff
+  A[USJ-Editor adapter] <-- Editor State --> Editor
 ```
 
 ## Install
@@ -35,7 +31,7 @@ npm install @biblionexus-foundation/platform-editor
 **Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
 
 ```typescript
-import { Editor, EditorRef, usxStringToUsj } from '@biblionexus-foundation/platform-editor';
+import { Editor, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
 import { RefSelector } from 'platform-bible-react';
 
 const emptyUsx = '<usx version="3.0" />';
@@ -54,14 +50,18 @@ const usx = `
 `;
 const defaultUsj = usxStringToUsj(emptyUsx);
 const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
+const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => console.log('Note was clicked!') } };
 
 export default function App() {
   const editorRef = useRef<EditorRef>(null!);
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
+  // Simulate USJ updating after the editor is loaded.
   setTimeout(() => {
     editorRef.current?.setUsj(usxStringToUsj(usx));
   }, 1000);
+
+  const handleChange = useCallback((usj: Usj) => console.log({ usj }), []);
 
   return (
     <>
@@ -73,6 +73,8 @@ export default function App() {
         ref={editorRef}
         scrRef={scrRef}
         setScrRef={setScrRef}
+        nodeOptions={nodeOptions}
+        onChange={handleChange}
         logger={console}
       />
     </>
@@ -84,7 +86,6 @@ export default function App() {
 
 - USJ editor with USX support
 - Read-only and edit mode
-- Data in but not yet out (coming soon)
 - History - undo & redo
 - Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
