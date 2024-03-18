@@ -31,8 +31,8 @@ export default function Editor() {
     nodes: [...scriptureNodes],
   };
 
-  const onChange: OnChange = (editorState, editor, tags) => {
-    console.log({ editorState, editor, tags });
+  const onChange: OnChange = () => {
+    // console.log({ editorState, editor, tags });
   };
 
   return !lexicalState ? null : (
