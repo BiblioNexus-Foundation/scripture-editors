@@ -20,7 +20,7 @@ export const getLexicalState = (usfmText) => {
 
   return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions }).then((perf) => {
     const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
-    console.log("Perf to Lexical", { perf, lexicalState: _lexicalState });
+    // console.log("Perf to Lexical", { perf, lexicalState: _lexicalState });
     return JSON.stringify(_lexicalState);
   });
 };
