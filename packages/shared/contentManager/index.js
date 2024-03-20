@@ -11,7 +11,8 @@ export const getLexicalState = (usfmText) => {
     versionId: "ult",
   });
 
-  const bibleHandler = new Epitelete({
+  const bibleStore = new BibleStore();
+  const bibleHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,
     options: { historySize: 100 },
   });
@@ -43,7 +44,9 @@ class BibleStore {
    * and params for Epitelete's constructor
    */
   create(epiteleteParams) {
-    this.store.set(epiteleteParams.docSetId, new Epitelete(epiteleteParams));
+    const epitelete = new Epitelete(epiteleteParams);
+    this.store.set(epiteleteParams.docSetId, epitelete);
+    return epitelete;
   }
 
   /** adds an Epitelete instance to the store
