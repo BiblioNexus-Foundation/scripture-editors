@@ -4,8 +4,9 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
-import { OnChangePlugin, OnChange } from "../lexical/plugins/OnChangePlugin";
+import { OnChangePlugin } from "../lexical/plugins/OnChangePlugin";
 import { useLexicalState } from "./useLexicalState";
+import { UpdateListener } from "lexical/LexicalEditor";
 
 const theme = {
   // Theme styling goes here
@@ -31,7 +32,7 @@ export default function Editor() {
     nodes: [...scriptureNodes],
   };
 
-  const onChange: OnChange = () => {
+  const onChange: UpdateListener = () => {
     // console.log({ editorState, editor, tags });
   };
 
