@@ -27,7 +27,7 @@
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0"
   },
-  "devDependencies": {
+  "dependencies": {
     "@lexical/code": "^0.13.1",
     "@lexical/link": "^0.13.1",
     "@lexical/list": "^0.13.1",
@@ -35,9 +35,12 @@
     "@lexical/rich-text": "^0.13.1",
     "@lexical/selection": "^0.13.1",
     "@lexical/utils": "^0.13.1",
+    "fast-equals": "^5.0.1",
+    "lexical": "^0.13.1"
+  },
+  "devDependencies": {
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
-    "lexical": "^0.13.1",
     "papi-components": "file:./lib/papi-components",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
