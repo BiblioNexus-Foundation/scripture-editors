@@ -1,5 +1,5 @@
 import { $getNodeByKey, EditorState, ElementNode, LexicalNode } from "lexical";
-import { PerfAction } from "./PerfOperation";
+import { PerfAction, PerfKind } from "./PerfOperation";
 import { SerializedUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
 /**
  * this module provides utility functions for the Perf plugin.
@@ -65,11 +65,11 @@ export function recursiveGetNodePath(
   pathArray: Array<string | number> = [],
 ): Array<string | number> {
   const parent: UsfmElementNode | null = node.getParent();
-  const kind = getPerfKindFromNode(node, parent);
+  const kind = getPerfKindFromNode(node);
   const nodeKey = node.getKey();
   const index = parent ? parent.getChildrenKeys?.().findIndex((key) => nodeKey === key) : 0;
 
-  if (kind === "sequence") {
+  if (kind === PerfKind.Sequence) {
     const target = node.getAttributes?.()?.["data-target"];
     pathArray.unshift(target ?? "main"); // Add the target to the path array
     return pathArray;
@@ -77,11 +77,11 @@ export function recursiveGetNodePath(
 
   pathArray.unshift(index); // Add the index to the path array
 
-  if (kind === "content") {
+  if (kind === PerfKind.ContentElement) {
     pathArray.unshift("content"); // Add "content" to the path array
   }
 
-  if (kind === "block") {
+  if (kind === PerfKind.Block) {
     pathArray.unshift("blocks"); // Add "blocks" to the path array
   }
 
@@ -89,14 +89,14 @@ export function recursiveGetNodePath(
 }
 
 // Function to determine the perf kind based on the path length
-export function getPerfKindbyPathLength(len: number) {
+export function getPerfKindbyPathLength(len: number): PerfKind {
   switch (true) {
     case len === 1:
-      return "sequence"; // If the path length is 1, it's a sequence
+      return PerfKind.Sequence; // If the path length is 1, it's a sequence
     case len === 3:
-      return "block"; // If the path length is 3, it's a block
+      return PerfKind.Block; // If the path length is 3, it's a block
     default:
-      return "contentElement"; // Otherwise, it's a content element
+      return PerfKind.ContentElement; // Otherwise, it's a content element
   }
 }
 
@@ -106,13 +106,11 @@ export function getPerfKindbyPathLength(len: number) {
  * @param parent - The parent node of the given node.
  * @returns The kind of the node.
  */
-export function getPerfKindFromNode(
-  node: UsfmElementNode | ElementNode,
-  parent: UsfmElementNode | ElementNode | null,
-) {
-  if (node && checkIsSequence(node)) return "sequence"; // If the node is a sequence, return "sequence"
-  if (parent && checkIsSequence(parent)) return "block"; // If the parent is a sequence, return "block"
-  return "content"; // Otherwise, return "content"
+export function getPerfKindFromNode(node: UsfmElementNode | ElementNode) {
+  if (node && checkIsSequence(node)) return PerfKind.Sequence; // If the node is a sequence, return "sequence"
+  const parent = node.getParent();
+  if (parent && checkIsSequence(parent)) return PerfKind.Block; // If the parent is a sequence, return PerfKind.Block
+  return PerfKind.ContentElement; // Otherwise, return "content"
 }
 
 /**
@@ -121,7 +119,7 @@ export function getPerfKindFromNode(
  * @returns A boolean indicating whether the node is a sequence.
  */
 export function checkIsSequence(node: UsfmElementNode | ElementNode) {
-  return ["root", "graft"].includes(node?.getType() || "");
+  return ["root", "graft"].includes(node.getType() || "");
 }
 
 /**
@@ -136,3 +134,60 @@ export const getNodeJson = (node: UsfmElementNode) => {
   }
   return _nodeJson;
 };
+
+/**
+ * Retrieves the common path from the dirty elements based on the provided editor state.
+ * @param dirtyElements - A map of dirty elements.
+ * @param editorState - The editor state.
+ * @returns An array representing the path from the dirty elements.
+ */
+export function getPathFromElements(dirtyElements: Map<string, boolean>, editorState: EditorState) {
+  const perfPathArray = [];
+  for (const [nodeKey] of dirtyElements) {
+    const { index, kind, target } = getNodeInfo(editorState, nodeKey);
+    if (kind === "sequence") {
+      perfPathArray.unshift(target ?? "main"); // Add target to the path array if it's a sequence
+      break;
+    }
+    perfPathArray.unshift(index); // Add index to the path array
+    if (kind === "content") {
+      perfPathArray.unshift("content"); // Add "content" to the path array if it's a content element
+    }
+    if (kind === "block") {
+      perfPathArray.unshift("blocks"); // Add "blocks" to the path array if it's a block
+    }
+  }
+  return perfPathArray;
+}
+
+// Function to get information about a node in the editor state
+/**
+ * Retrieves information about a node in the editor state.
+ * @param editorState - The current editor state.
+ * @param nodeKey - The key of the node to retrieve information for.
+ * @returns An object containing information about the node.
+ */
+function getNodeInfo(
+  editorState: EditorState,
+  nodeKey: string,
+): {
+  node?: UsfmElementNode;
+  index?: number;
+  kind?: string;
+  children?: LexicalNode[];
+  type?: string;
+  target?: string;
+} {
+  return editorState.read(() => {
+    const node: UsfmElementNode | null = $getNodeByKey(nodeKey);
+    if (!node) return {}; // If the node doesn't exist, return an empty object
+    const parent = node.getParent();
+    const atts = node.getAttributes?.() || {};
+    const type = atts["data-type"];
+    const target = atts["data-target"];
+    const kind = getPerfKindFromNode(node); // Get the kind of the node
+    const index = parent ? parent.getChildrenKeys?.().findIndex((key) => nodeKey === key) : 0; // Get the index of the node in its parent's children
+    const children = node.getChildren?.(); // Get the children of the node
+    return { node, index, kind, children, type, target };
+  });
+}
