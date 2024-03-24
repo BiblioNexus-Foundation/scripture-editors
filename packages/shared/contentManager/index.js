@@ -10,7 +10,6 @@ export const getLexicalState = (usfmText) => {
     languageCode: "en",
     versionId: "ult",
   });
-
   const bibleStore = new BibleStore();
   const bibleHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,
@@ -20,6 +19,7 @@ export const getLexicalState = (usfmText) => {
   const readOptions = { readPipeline: "stripAlignmentPipeline" };
 
   return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions }).then((perf) => {
+    console.log({ perf });
     const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
     // console.log("Perf to Lexical", { perf, lexicalState: _lexicalState });
     return JSON.stringify(_lexicalState);

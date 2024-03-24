@@ -7,35 +7,36 @@ export const enum PerfAction {
   Replace = "replace",
   Move = "move",
 }
+
+export const enum PerfKind {
+  Sequence = "sequence",
+  Block = "block",
+  ContentElement = "contentElement",
+}
+
 type PerfPath = Array<string | number>;
+
+interface BaseOperation {
+  nodeKey: string; // Key of the node
+  action: PerfAction; // Action performed on the node
+  path: PerfPath; // Array representing the path to the node
+  kind: PerfKind; // Type of node (sequence, block, contentElement)
+  lexicalState: SerializedUsfmElementNode; // Serialized JSON representation of the node
+}
+
 // Interface for the PerfOperation object
-interface AddOperation {
-  nodeKey: string; // Key of the node
+export interface AddOperation extends BaseOperation {
   action: PerfAction.Add;
-  path: PerfPath; // Array representing the path to the location of the new node
-  kind: string; // Type of node (sequence, block, contentElement)
-  lexicalState: SerializedUsfmElementNode; // Serialized JSON representation of the node
 }
-interface DeleteOperation {
-  nodeKey: string; // Key of the node
+export interface DeleteOperation extends Omit<BaseOperation, "lexicalState"> {
   action: PerfAction.Delete;
-  path: PerfPath; // Array representing the path to the node
-  kind: string; // Type of node (sequence, block, contentElement)
 }
-interface ReplaceOperation {
-  nodeKey: string; // Key of the node
+export interface ReplaceOperation extends BaseOperation {
   action: PerfAction.Replace;
-  path: PerfPath; // Array representing the path to the node
-  kind: string; // Type of node (sequence, block, contentElement)
-  lexicalState: SerializedUsfmElementNode; // Serialized JSON representation of the new node
 }
-interface MoveOperation {
-  nodeKey: string; // Key of the node
+export interface MoveOperation extends BaseOperation {
   action: PerfAction.Move;
-  path: PerfPath; // Array representing the path to the original location of the node
-  to: PerfPath; // Array representing the path to the new location of the node
-  kind: string; // Type of node (sequence, block, contentElement)
-  lexicalState: SerializedUsfmElementNode; // Serialized JSON representation of the node
+  from: PerfPath; // Array representing the path to the new location of the node
 }
 
 export type PerfOperation = AddOperation | DeleteOperation | ReplaceOperation | MoveOperation;
