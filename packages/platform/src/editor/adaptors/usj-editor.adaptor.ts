@@ -84,8 +84,8 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
-  NO_INDENT_CLASS_NAME,
-  PLAIN_FONT_CLASS_NAME,
+  TEXT_SPACING_CLASS_NAME,
+  FORMATTED_FONT_CLASS_NAME,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -243,6 +243,18 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
 }
 
 /**
+ * Get the class list for an element node.
+ * @param viewOptions - View options of the editor.
+ * @returns the element class list based on view options.
+ */
+function getClassList(viewOptions: ViewOptions | undefined) {
+  const classList: string[] = [];
+  if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
+  if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
+  return classList;
+}
+
+/**
  * Get the note caller to use. E.g. for '+' replace with a-z, aa-zz.
  * @param markerCaller - the specified note caller.
  * @returns the specified caller, if '+' replace with up to 2 characters from the possible note
@@ -315,12 +327,10 @@ function createChapter(
   const version =
     _viewOptions?.markerMode === "editable" ? CHAPTER_VERSION : IMMUTABLE_CHAPTER_VERSION;
   let text: string | undefined;
-  let classList: string[] | undefined;
+  const classList = getClassList(_viewOptions);
   let showMarker: boolean | undefined;
-  if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleOpenMarkerText(marker, number);
-    classList = [PLAIN_FONT_CLASS_NAME];
-  } else if (_viewOptions?.markerMode === "visible") showMarker = true;
+  if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
+  else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
   return {
@@ -328,10 +338,10 @@ function createChapter(
     text,
     marker: marker as ChapterMarker,
     number: number ?? "",
+    classList,
     sid,
     altnumber,
     pubnumber,
-    classList,
     showMarker,
     unknownAttributes,
     version,
@@ -349,12 +359,9 @@ function createVerse(
   const type = VerseNodeClass.getType();
   const version = _viewOptions?.markerMode === "editable" ? VERSE_VERSION : IMMUTABLE_VERSE_VERSION;
   let text: string | undefined;
-  let classList: string[] | undefined;
   let showMarker: boolean | undefined;
-  if (_viewOptions?.markerMode === "editable") {
-    text = getVisibleOpenMarkerText(marker, number);
-    classList = [PLAIN_FONT_CLASS_NAME];
-  } else if (_viewOptions?.markerMode === "visible") showMarker = true;
+  if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
+  else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
   return {
@@ -365,7 +372,6 @@ function createVerse(
     sid,
     altnumber,
     pubnumber,
-    classList,
     showMarker,
     unknownAttributes,
     version,
@@ -414,9 +420,7 @@ function createPara(
   if (!ParaNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected para marker '${marker}'!`);
   }
-  const classList: string[] = [];
-  if (!_viewOptions?.isIndented) classList.push(NO_INDENT_CLASS_NAME);
-  if (_viewOptions?.isPlainFont) classList.push(PLAIN_FONT_CLASS_NAME);
+  const classList = getClassList(_viewOptions);
   const children: SerializedLexicalNode[] = [];
   if (_viewOptions?.markerMode === "editable")
     children.push(createMarker(marker), createText(NBSP));
@@ -593,7 +597,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           nodes.push(createChapter(markerContent));
           break;
         case VerseNode.getType():
-          if (!_viewOptions?.isIndented) nodes.push(serializedLineBreakNode);
+          if (!_viewOptions?.hasSpacing) nodes.push(serializedLineBreakNode);
           nodes.push(createVerse(markerContent));
           break;
         case CharNode.getType():

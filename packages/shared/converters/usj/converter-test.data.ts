@@ -18,7 +18,7 @@ export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
       {
         type: "para",
         marker: "p",
-        classList: [],
+        classList: ["text-spacing", "formatted-font"],
         direction: null,
         format: "",
         indent: 0,
@@ -137,11 +137,18 @@ export const editorStateGen1v1 = {
         version: 1,
         children: [],
       },
-      { type: "immutable-chapter", marker: "c", number: "1", sid: "GEN 1", version: 1 },
+      {
+        type: "immutable-chapter",
+        marker: "c",
+        number: "1",
+        classList: ["text-spacing", "formatted-font"],
+        sid: "GEN 1",
+        version: 1,
+      },
       {
         type: "para",
         marker: "p",
-        classList: [],
+        classList: ["text-spacing", "formatted-font"],
         direction: null,
         format: "",
         indent: 0,
@@ -201,7 +208,7 @@ export const editorStateGen1v1 = {
       {
         type: "para",
         marker: "b",
-        classList: [],
+        classList: ["text-spacing", "formatted-font"],
         direction: null,
         format: "",
         indent: 0,
@@ -211,7 +218,7 @@ export const editorStateGen1v1 = {
       {
         type: "para",
         marker: "q2",
-        classList: [],
+        classList: ["text-spacing", "formatted-font"],
         direction: null,
         format: "",
         indent: 0,
@@ -315,13 +322,13 @@ export const editorStateGen1v1Editable = {
         number: "1",
         sid: "GEN 1",
         text: `\\c${NBSP}1 `,
-        classList: ["plain-font"],
+        classList: [],
         version: 1,
       },
       {
         type: "para",
         marker: "p",
-        classList: ["no-indent", "plain-font"],
+        classList: [],
         direction: null,
         format: "",
         indent: 0,
@@ -354,7 +361,6 @@ export const editorStateGen1v1Editable = {
             number: "1",
             sid: "GEN 1:1",
             text: `\\v${NBSP}1 `,
-            classList: ["plain-font"],
             version: 1,
           },
           {
@@ -373,7 +379,6 @@ export const editorStateGen1v1Editable = {
             number: "2",
             sid: "GEN 1:2",
             text: `\\v${NBSP}2 `,
-            classList: ["plain-font"],
             version: 1,
           },
           {
@@ -392,7 +397,6 @@ export const editorStateGen1v1Editable = {
             number: "15",
             sid: "GEN 1:15",
             text: `\\v${NBSP}15 `,
-            classList: ["plain-font"],
             version: 1,
           },
           {
@@ -450,7 +454,7 @@ export const editorStateGen1v1Editable = {
       {
         type: "para",
         marker: "b",
-        classList: ["no-indent", "plain-font"],
+        classList: [],
         direction: null,
         format: "",
         indent: 0,
@@ -481,7 +485,7 @@ export const editorStateGen1v1Editable = {
       {
         type: "para",
         marker: "q2",
-        classList: ["no-indent", "plain-font"],
+        classList: [],
         direction: null,
         format: "",
         indent: 0,
@@ -514,7 +518,6 @@ export const editorStateGen1v1Editable = {
             number: "16",
             sid: "GEN 1:16",
             text: `\\v${NBSP}16 `,
-            classList: ["plain-font"],
             version: 1,
           },
           {
@@ -711,7 +714,14 @@ export const editorStateGen1v1ImpliedPara = {
         indent: 0,
         version: 1,
         children: [
-          { type: "immutable-chapter", marker: "c", number: "1", sid: "GEN 1", version: 1 },
+          {
+            type: "immutable-chapter",
+            marker: "c",
+            number: "1",
+            classList: ["text-spacing", "formatted-font"],
+            sid: "GEN 1",
+            version: 1,
+          },
           { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
           {
             type: "text",
@@ -851,13 +861,14 @@ export const editorStateWithUnknownItems = {
         type: "immutable-chapter",
         marker: "c",
         number: "1",
+        classList: ["text-spacing", "formatted-font"],
         unknownAttributes: { "attr-unknown": "watAttr" },
         version: 1,
       },
       {
         type: "para",
         marker: "p",
-        classList: [],
+        classList: ["text-spacing", "formatted-font"],
         unknownAttributes: { "attr-unknown": "watAttr" },
         direction: null,
         format: "",
