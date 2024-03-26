@@ -51,6 +51,83 @@
   font-size: 100%;
 }
 
+.book[data-code]::before {
+  content: attr(data-code) " ";
+}
+
+/* ChapterNode, ImmutableChapterNode */
+
+.usfm_c {
+  text-align: start;
+}
+.formatted-font.usfm_c {
+  font-weight: bold;
+  font-size: 150%;
+}
+.text-spacing.usfm_c {
+  margin-bottom: 4pt;
+  margin-top: 8pt;
+}
+
+.usfm_ca {
+  text-align: start;
+}
+.formatted-font.usfm_ca {
+  color: #007306;
+  font-size: 133%;
+  font-style: italic;
+}
+
+.usfm_cp {
+  text-align: start;
+}
+.formatted-font.usfm_cp {
+  font-weight: bold;
+  color: #003380;
+  font-size: 150%;
+}
+.text-spacing.usfm_cp {
+  margin-bottom: 4pt;
+  margin-top: 8pt;
+}
+
+/* VerseNode, ImmutableVerseNode */
+
+.usfm_v {
+  text-align: start;
+}
+.formatted-font .usfm_v {
+  font-size: 100%;
+  vertical-align: text-top;
+  font-size: 66%;
+}
+.text-spacing .usfm_v {
+  white-space: nowrap;
+  unicode-bidi: embed;
+}
+
+.usfm_va {
+  text-align: start;
+}
+.formatted-font .usfm_va {
+  color: #007306;
+  font-size: 100%;
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+.usfm_vp {
+  text-align: start;
+}
+.formatted-font .usfm_vp {
+  color: #003380;
+  font-size: 100%;
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+/* ParaNode */
+
 .usfm_usfm {
   text-align: start;
 }
@@ -58,13 +135,6 @@
   font-size: 100%;
 }
 
-.book[data-code]::before {
-  content: attr(data-code) " ";
-}
-
-/* ParaNode */
-
-/* @deprecated in USX3.0 */
 .usfm_ide {
   text-align: start;
 }
@@ -159,7 +229,6 @@
   font-style: italic;
 }
 
-/* check if deprecated */
 .usfm_rem {
   text-align: start;
 }
@@ -168,7 +237,6 @@
   font-size: 100%;
 }
 
-/* check if deprecated */
 .usfm_sts {
   text-align: start;
 }
@@ -599,44 +667,6 @@
   font-size: 83%;
 }
 
-/* ChapterNode, ImmutableChapterNode */
-
-.usfm_c {
-  text-align: start;
-}
-.formatted-font.usfm_c {
-  font-weight: bold;
-  font-size: 150%;
-}
-.text-spacing.usfm_c {
-  margin-bottom: 4pt;
-  margin-top: 8pt;
-}
-
-.usfm_ca {
-  text-align: start;
-}
-.formatted-font.usfm_ca {
-  color: #007306;
-  font-size: 133%;
-  font-style: italic;
-}
-
-/** ParaNode */
-
-.usfm_cp {
-  text-align: start;
-}
-.formatted-font.usfm_cp {
-  font-weight: bold;
-  color: #003380;
-  font-size: 150%;
-}
-.text-spacing.usfm_cp {
-  margin-bottom: 4pt;
-  margin-top: 8pt;
-}
-
 .usfm_cl {
   text-align: start;
 }
@@ -660,43 +690,6 @@
   margin-bottom: 4pt;
   margin-top: 8pt;
 }
-
-/* VerseNode, ImmutableVerseNode */
-
-.usfm_v {
-  text-align: start;
-}
-.formatted-font .usfm_v {
-  font-size: 100%;
-  vertical-align: text-top;
-  font-size: 66%;
-}
-.text-spacing .usfm_v {
-  white-space: nowrap;
-  unicode-bidi: embed;
-}
-
-.usfm_va {
-  text-align: start;
-}
-.formatted-font .usfm_va {
-  color: #007306;
-  font-size: 100%;
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-.usfm_vp {
-  text-align: start;
-}
-.formatted-font .usfm_vp {
-  color: #003380;
-  font-size: 100%;
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-/* ParaNode */
 
 .usfm_p {
   text-align: start;
@@ -934,26 +927,6 @@
 .formatted-font.usfm_qr {
   font-size: 100%;
 }
-
-/* CharNode */
-
-.usfm_qs {
-  text-align: start;
-}
-.formatted-font .usfm_qs {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_qac {
-  text-align: start;
-}
-.formatted-font .usfm_qac {
-  font-size: 100%;
-  font-style: italic;
-}
-
-/* ParaNode */
 
 .usfm_qa {
   text-align: start;
@@ -1343,6 +1316,830 @@
   margin-top: 8pt;
 }
 
+.usfm_lh {
+  text-align: start;
+}
+.formatted-font.usfm_lh {
+  font-size: 100%;
+}
+.text-spacing.usfm_lh {
+  text-indent: 2.5vw;
+}
+
+.usfm_li {
+  text-align: start;
+}
+.formatted-font.usfm_li {
+  font-size: 100%;
+}
+.text-spacing.usfm_li {
+  text-indent: -7.5vw;
+  margin-left: 10vw;
+}
+
+.usfm_li1 {
+  text-align: start;
+}
+.formatted-font.usfm_li1 {
+  font-size: 100%;
+}
+.text-spacing.usfm_li1 {
+  text-indent: -7.5vw;
+  margin-left: 10vw;
+}
+
+.usfm_li2 {
+  text-align: start;
+}
+.formatted-font.usfm_li2 {
+  font-size: 100%;
+}
+.text-spacing.usfm_li2 {
+  text-indent: -7.5vw;
+  margin-left: 15vw;
+}
+
+.usfm_li3 {
+  text-align: start;
+}
+.formatted-font.usfm_li3 {
+  font-size: 100%;
+}
+.text-spacing.usfm_li3 {
+  text-indent: -7.5vw;
+  margin-left: 20vw;
+}
+
+.usfm_li4 {
+  text-align: start;
+}
+.formatted-font.usfm_li4 {
+  font-size: 100%;
+}
+.text-spacing.usfm_li4 {
+  text-indent: -7.5vw;
+  margin-left: 25vw;
+}
+
+.usfm_lf {
+  text-align: start;
+}
+.formatted-font.usfm_lf {
+  font-size: 100%;
+}
+
+.usfm_lim {
+  text-align: start;
+}
+.formatted-font.usfm_lim {
+  font-size: 100%;
+}
+.text-spacing.usfm_lim {
+  text-indent: -7.5vw;
+  margin-left: 15vw;
+  margin-right: 5vw;
+}
+
+.usfm_lim1 {
+  text-align: start;
+}
+.formatted-font.usfm_lim1 {
+  font-size: 100%;
+}
+.text-spacing.usfm_lim1 {
+  text-indent: -7.5vw;
+  margin-left: 15vw;
+  margin-right: 5vw;
+}
+
+.usfm_lim2 {
+  text-align: start;
+}
+.formatted-font.usfm_lim2 {
+  font-size: 100%;
+}
+.text-spacing.usfm_lim2 {
+  text-indent: -7.5vw;
+  margin-left: 20vw;
+}
+
+.usfm_lim3 {
+  text-align: start;
+}
+.formatted-font.usfm_lim3 {
+  font-size: 100%;
+}
+.text-spacing.usfm_lim3 {
+  text-indent: -7.5vw;
+  margin-left: 25vw;
+}
+
+.usfm_lim4 {
+  text-align: start;
+}
+.formatted-font.usfm_lim4 {
+  font-size: 100%;
+}
+.text-spacing.usfm_lim4 {
+  text-indent: -7.5vw;
+  margin-left: 30vw;
+}
+
+.usfm_lit {
+  text-align: end;
+}
+.formatted-font.usfm_lit {
+  font-weight: bold;
+  font-size: 100%;
+}
+
+.usfm_ph {
+  text-align: start;
+}
+.formatted-font.usfm_ph {
+  font-size: 100%;
+}
+.text-spacing.usfm_ph {
+  text-indent: -5vw;
+  margin-left: 10vw;
+}
+
+.usfm_ph1 {
+  text-align: start;
+}
+.formatted-font.usfm_ph1 {
+  font-size: 100%;
+}
+.text-spacing.usfm_ph1 {
+  text-indent: -5vw;
+  margin-left: 10vw;
+}
+
+.usfm_ph2 {
+  text-align: start;
+}
+.formatted-font.usfm_ph2 {
+  font-size: 100%;
+}
+.text-spacing.usfm_ph2 {
+  text-indent: -5vw;
+  margin-left: 15vw;
+}
+
+.usfm_ph3 {
+  text-align: start;
+}
+.formatted-font.usfm_ph3 {
+  font-size: 100%;
+}
+.text-spacing.usfm_ph3 {
+  text-indent: -5vw;
+  margin-left: 20vw;
+}
+
+/* check if deprecated */
+.usfm_phi {
+  text-align: start;
+}
+.text-spacing.usfm_phi {
+  margin-left: 20vw;
+}
+
+/* CharNode */
+
+.usfm_qs {
+  text-align: start;
+}
+.formatted-font .usfm_qs {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_qac {
+  text-align: start;
+}
+.formatted-font .usfm_qac {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_litl {
+  text-align: start;
+}
+.formatted-font .usfm_litl {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_lik {
+  text-align: start;
+}
+.formatted-font .usfm_lik {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_liv {
+  text-align: start;
+}
+.formatted-font .usfm_liv {
+  font-size: 100%;
+}
+
+.usfm_liv1 {
+  text-align: start;
+}
+.formatted-font .usfm_liv1 {
+  font-size: 100%;
+}
+
+.usfm_liv2 {
+  text-align: start;
+}
+.formatted-font .usfm_liv2 {
+  font-size: 100%;
+}
+
+.usfm_liv3 {
+  text-align: start;
+}
+.formatted-font .usfm_liv3 {
+  font-size: 100%;
+}
+
+.usfm_liv4 {
+  text-align: start;
+}
+.formatted-font .usfm_liv4 {
+  font-size: 100%;
+}
+
+.usfm_liv5 {
+  text-align: start;
+}
+.formatted-font .usfm_liv5 {
+  font-size: 100%;
+}
+
+.usfm_rq {
+  text-align: start;
+}
+.formatted-font .usfm_rq {
+  font-size: 83%;
+  font-style: italic;
+}
+
+.usfm_qt {
+  text-align: start;
+}
+.formatted-font .usfm_qt {
+  font-weight: bold;
+  font-size: 100%;
+}
+
+.usfm_nd {
+  text-align: start;
+}
+.formatted-font .usfm_nd {
+  font-size: 100%;
+  text-decoration: underline;
+}
+
+.usfm_tl {
+  text-align: start;
+}
+.formatted-font .usfm_tl {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_dc {
+  text-align: start;
+}
+.formatted-font .usfm_dc {
+  font-style: italic;
+}
+
+.usfm_bk {
+  text-align: start;
+}
+.formatted-font .usfm_bk {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_sig {
+  text-align: start;
+}
+.formatted-font .usfm_sig {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_pn {
+  text-align: start;
+}
+.formatted-font .usfm_pn {
+  font-weight: bold;
+  font-size: 100%;
+  text-decoration: underline;
+}
+
+.usfm_png {
+  text-align: start;
+}
+.formatted-font .usfm_png {
+  font-size: 100%;
+  text-decoration: underline;
+}
+
+/* check if deprecated */
+.usfm_addpn {
+  text-align: start;
+}
+.formatted-font .usfm_addpn {
+  font-weight: bold;
+  font-size: 100%;
+  font-style: italic;
+  text-decoration: underline;
+}
+
+.usfm_wj {
+  text-align: start;
+}
+.formatted-font .usfm_wj {
+  color: #d43128;
+  font-size: 100%;
+}
+
+.usfm_k {
+  text-align: start;
+}
+.formatted-font .usfm_k {
+  font-weight: bold;
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_sls {
+  text-align: start;
+}
+.formatted-font .usfm_sls {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_ord {
+  text-align: start;
+}
+.formatted-font .usfm_ord {
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+.usfm_add {
+  text-align: start;
+}
+.formatted-font .usfm_add {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.usfm_no {
+  text-align: start;
+}
+.formatted-font .usfm_no {
+  font-size: 100%;
+}
+
+.usfm_it {
+  text-align: start;
+}
+.formatted-font .usfm_it {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_bd {
+  text-align: start;
+}
+.formatted-font .usfm_bd {
+  font-weight: bold;
+  font-size: 100%;
+}
+
+.usfm_bdit {
+  text-align: start;
+}
+.formatted-font .usfm_bdit {
+  font-weight: bold;
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_em {
+  text-align: start;
+}
+.formatted-font .usfm_em {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_sc {
+  text-align: start;
+}
+.formatted-font .usfm_sc {
+  font-size: 100%;
+  font-variant: small-caps;
+}
+
+.usfm_sup {
+  text-align: start;
+}
+.formatted-font .usfm_sup {
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+/* check if deprecated */
+.usfm_pb {
+  text-align: start;
+}
+.formatted-font .usfm_pb {
+  font-size: 100%;
+}
+
+/* check if deprecated */
+.usfm_fig {
+  text-align: start;
+}
+.formatted-font .usfm_fig {
+  font-size: 100%;
+}
+
+.usfm_jmp {
+  text-align: start;
+}
+.formatted-font .usfm_jmp {
+  color: #003380;
+  text-decoration: underline;
+}
+
+.usfm_pro {
+  text-align: start;
+}
+.formatted-font .usfm_pro {
+  font-size: 83%;
+}
+
+.usfm_rb {
+  text-align: start;
+}
+
+.usfm_w {
+  text-align: start;
+}
+.formatted-font .usfm_w {
+  font-size: 100%;
+}
+
+.usfm_wh {
+  text-align: start;
+}
+.formatted-font .usfm_wh {
+  font-size: 100%;
+}
+
+.usfm_wg {
+  text-align: start;
+}
+.formatted-font .usfm_wg {
+  font-size: 100%;
+}
+
+.usfm_wa {
+  text-align: start;
+}
+.formatted-font .usfm_wa {
+  font-size: 100%;
+}
+
+/* check if deprecated */
+.usfm_ndx {
+  text-align: start;
+}
+.formatted-font .usfm_ndx {
+  font-size: 100%;
+}
+
+/* NoteNode */
+
+.usfm_f {
+  text-align: start;
+}
+.formatted-font .usfm_f {
+  font-size: 100%;
+}
+
+.usfm_fe {
+  text-align: start;
+}
+.formatted-font .usfm_fe {
+  font-size: 100%;
+}
+
+/* CharNode */
+
+.usfm_fr {
+  text-align: start;
+}
+.formatted-font .usfm_fr {
+  font-weight: bold;
+  font-size: 100%;
+}
+
+.usfm_ft {
+  text-align: start;
+}
+.formatted-font .usfm_ft {
+  font-size: 100%;
+}
+
+.usfm_fk {
+  text-align: start;
+}
+.formatted-font .usfm_fk {
+  font-weight: bold;
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_fq {
+  text-align: start;
+}
+.formatted-font .usfm_fq {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_fqa {
+  text-align: start;
+}
+.formatted-font .usfm_fqa {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_fl {
+  text-align: start;
+}
+.formatted-font .usfm_fl {
+  font-weight: bold;
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_fw {
+  text-align: start;
+}
+.formatted-font .usfm_fw {
+  font-size: 100%;
+}
+
+.usfm_fp {
+  text-align: start;
+}
+.formatted-font .usfm_fp {
+  font-size: 100%;
+}
+
+.usfm_fv {
+  text-align: start;
+}
+.formatted-font .usfm_fv {
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+.usfm_fdc {
+  text-align: start;
+}
+.formatted-font .usfm_fdc {
+  font-size: 100%;
+}
+
+.usfm_fm {
+  text-align: start;
+}
+.formatted-font .usfm_fm {
+  vertical-align: text-top;
+  font-size: 66%;
+}
+
+/* NoteNode */
+
+.usfm_x {
+  text-align: start;
+}
+.formatted-font .usfm_x {
+  font-size: 100%;
+}
+
+/* CharNode */
+
+.usfm_xo {
+  text-align: start;
+}
+.formatted-font .usfm_xo {
+  font-weight: bold;
+  font-size: 100%;
+}
+
+.usfm_xop {
+  text-align: start;
+}
+.formatted-font .usfm_xop {
+  font-size: 100%;
+}
+
+.usfm_xt {
+  text-align: start;
+}
+.formatted-font .usfm_xt {
+  font-size: 100%;
+  unicode-bidi: embed;
+}
+
+.usfm_xta {
+  text-align: start;
+}
+.formatted-font .usfm_xta {
+  font-size: 100%;
+}
+
+.usfm_xk {
+  text-align: start;
+}
+.formatted-font .usfm_xk {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_xq {
+  text-align: start;
+}
+.formatted-font .usfm_xq {
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_xot {
+  text-align: start;
+}
+.formatted-font .usfm_xot {
+  font-size: 100%;
+}
+
+.usfm_xnt {
+  text-align: start;
+}
+.formatted-font .usfm_xnt {
+  font-size: 100%;
+}
+
+.usfm_xdc {
+  text-align: start;
+}
+.formatted-font .usfm_xdc {
+  font-size: 100%;
+}
+
+/* periph */
+
+.usfm_periph {
+  text-align: start;
+}
+.formatted-font.usfm_periph {
+  font-weight: bold;
+  color: #e87217;
+  font-size: 116%;
+}
+.text-spacing.usfm_periph {
+  margin-bottom: 4pt;
+  margin-top: 16pt;
+}
+
+.usfm_p1 {
+  text-align: start;
+}
+.formatted-font.usfm_p1 {
+  font-size: 100%;
+}
+.text-spacing.usfm_p1 {
+  text-indent: 2.5vw;
+}
+
+.usfm_p2 {
+  text-align: start;
+}
+.formatted-font.usfm_p2 {
+  font-size: 100%;
+}
+.text-spacing.usfm_p2 {
+  text-indent: 2.5vw;
+  margin-left: 2.5vw;
+}
+
+.usfm_k1 {
+  text-align: start;
+}
+.formatted-font.usfm_k1 {
+  font-size: 100%;
+}
+
+.usfm_k2 {
+  text-align: start;
+}
+.formatted-font.usfm_k2 {
+  font-size: 100%;
+}
+
+.usfm_xtSee {
+  text-align: start;
+}
+.formatted-font.usfm_xtSee {
+  color: #003380;
+  font-size: 100%;
+  font-style: italic;
+}
+
+.usfm_xtSeeAlso {
+  text-align: start;
+}
+.formatted-font.usfm_xtSeeAlso {
+  color: #003380;
+  font-size: 100%;
+  font-style: italic;
+}
+
+/* MilestoneNode */
+
+.usfm_qt-s {
+  text-align: start;
+}
+
+.usfm_qt-e {
+  text-align: start;
+}
+
+.usfm_qt1-s {
+  text-align: start;
+}
+
+.usfm_qt1-e {
+  text-align: start;
+}
+
+.usfm_qt2-s {
+  text-align: start;
+}
+
+.usfm_qt2-e {
+  text-align: start;
+}
+
+.usfm_qt3-s {
+  text-align: start;
+}
+
+.usfm_qt3-e {
+  text-align: start;
+}
+
+.usfm_qt4-s {
+  text-align: start;
+}
+
+.usfm_qt4-e {
+  text-align: start;
+}
+
+.usfm_qt5-s {
+  text-align: start;
+}
+
+.usfm_qt5-e {
+  text-align: start;
+}
+
+.usfm_ts-s {
+  text-align: start;
+}
+
+.usfm_ts-e {
+  text-align: start;
+}
+
 /* table */
 
 .usfm_tr {
@@ -1641,822 +2438,6 @@
   text-align: end;
 }
 
-/* ParaNode */
-
-.usfm_lh {
-  text-align: start;
-}
-.formatted-font.usfm_lh {
-  font-size: 100%;
-}
-.text-spacing.usfm_lh {
-  text-indent: 2.5vw;
-}
-
-.usfm_li {
-  text-align: start;
-}
-.formatted-font.usfm_li {
-  font-size: 100%;
-}
-.text-spacing.usfm_li {
-  text-indent: -7.5vw;
-  margin-left: 10vw;
-}
-
-.usfm_li1 {
-  text-align: start;
-}
-.formatted-font.usfm_li1 {
-  font-size: 100%;
-}
-.text-spacing.usfm_li1 {
-  text-indent: -7.5vw;
-  margin-left: 10vw;
-}
-
-.usfm_li2 {
-  text-align: start;
-}
-.formatted-font.usfm_li2 {
-  font-size: 100%;
-}
-.text-spacing.usfm_li2 {
-  text-indent: -7.5vw;
-  margin-left: 15vw;
-}
-
-.usfm_li3 {
-  text-align: start;
-}
-.formatted-font.usfm_li3 {
-  font-size: 100%;
-}
-.text-spacing.usfm_li3 {
-  text-indent: -7.5vw;
-  margin-left: 20vw;
-}
-
-.usfm_li4 {
-  text-align: start;
-}
-.formatted-font.usfm_li4 {
-  font-size: 100%;
-}
-.text-spacing.usfm_li4 {
-  text-indent: -7.5vw;
-  margin-left: 25vw;
-}
-
-.usfm_lf {
-  text-align: start;
-}
-.formatted-font.usfm_lf {
-  font-size: 100%;
-}
-
-.usfm_lim {
-  text-align: start;
-}
-.formatted-font.usfm_lim {
-  font-size: 100%;
-}
-.text-spacing.usfm_lim {
-  text-indent: -7.5vw;
-  margin-left: 15vw;
-  margin-right: 5vw;
-}
-
-.usfm_lim1 {
-  text-align: start;
-}
-.formatted-font.usfm_lim1 {
-  font-size: 100%;
-}
-.text-spacing.usfm_lim1 {
-  text-indent: -7.5vw;
-  margin-left: 15vw;
-  margin-right: 5vw;
-}
-
-.usfm_lim2 {
-  text-align: start;
-}
-.formatted-font.usfm_lim2 {
-  font-size: 100%;
-}
-.text-spacing.usfm_lim2 {
-  text-indent: -7.5vw;
-  margin-left: 20vw;
-}
-
-.usfm_lim3 {
-  text-align: start;
-}
-.formatted-font.usfm_lim3 {
-  font-size: 100%;
-}
-.text-spacing.usfm_lim3 {
-  text-indent: -7.5vw;
-  margin-left: 25vw;
-}
-
-.usfm_lim4 {
-  text-align: start;
-}
-.formatted-font.usfm_lim4 {
-  font-size: 100%;
-}
-.text-spacing.usfm_lim4 {
-  text-indent: -7.5vw;
-  margin-left: 30vw;
-}
-
-/* CharNode */
-
-.usfm_litl {
-  text-align: start;
-}
-.formatted-font .usfm_litl {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_lik {
-  text-align: start;
-}
-.formatted-font .usfm_lik {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_liv {
-  text-align: start;
-}
-.formatted-font .usfm_liv {
-  font-size: 100%;
-}
-
-.usfm_liv1 {
-  text-align: start;
-}
-.formatted-font .usfm_liv1 {
-  font-size: 100%;
-}
-
-.usfm_liv2 {
-  text-align: start;
-}
-.formatted-font .usfm_liv2 {
-  font-size: 100%;
-}
-
-.usfm_liv3 {
-  text-align: start;
-}
-.formatted-font .usfm_liv3 {
-  font-size: 100%;
-}
-
-.usfm_liv4 {
-  text-align: start;
-}
-.formatted-font .usfm_liv4 {
-  font-size: 100%;
-}
-
-.usfm_liv5 {
-  text-align: start;
-}
-.formatted-font .usfm_liv5 {
-  font-size: 100%;
-}
-
-/* NoteNode */
-
-.usfm_f {
-  text-align: start;
-}
-.formatted-font .usfm_f {
-  font-size: 100%;
-}
-
-.usfm_fe {
-  text-align: start;
-}
-.formatted-font .usfm_fe {
-  font-size: 100%;
-}
-
-/* CharNode */
-
-.usfm_fr {
-  text-align: start;
-}
-.formatted-font .usfm_fr {
-  font-weight: bold;
-  font-size: 100%;
-}
-
-.usfm_ft {
-  text-align: start;
-}
-.formatted-font .usfm_ft {
-  font-size: 100%;
-}
-
-.usfm_fk {
-  text-align: start;
-}
-.formatted-font .usfm_fk {
-  font-weight: bold;
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_fq {
-  text-align: start;
-}
-.formatted-font .usfm_fq {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_fqa {
-  text-align: start;
-}
-.formatted-font .usfm_fqa {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_fl {
-  text-align: start;
-}
-.formatted-font .usfm_fl {
-  font-weight: bold;
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_fw {
-  text-align: start;
-}
-.formatted-font .usfm_fw {
-  font-size: 100%;
-}
-
-.usfm_fp {
-  text-align: start;
-}
-.formatted-font .usfm_fp {
-  font-size: 100%;
-}
-
-.usfm_fv {
-  text-align: start;
-}
-.formatted-font .usfm_fv {
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-.usfm_fdc {
-  text-align: start;
-}
-.formatted-font .usfm_fdc {
-  font-size: 100%;
-}
-
-/* check if deprecated */
-.usfm_fm {
-  text-align: start;
-}
-.formatted-font .usfm_fm {
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-/* NoteNode */
-
-.usfm_x {
-  text-align: start;
-}
-.formatted-font .usfm_x {
-  font-size: 100%;
-}
-
-/* CharNode */
-
-.usfm_xo {
-  text-align: start;
-}
-.formatted-font .usfm_xo {
-  font-weight: bold;
-  font-size: 100%;
-}
-
-.usfm_xop {
-  text-align: start;
-}
-.formatted-font .usfm_xop {
-  font-size: 100%;
-}
-
-.usfm_xt {
-  text-align: start;
-}
-.formatted-font .usfm_xt {
-  font-size: 100%;
-}
-
-.usfm_xta {
-  text-align: start;
-}
-.formatted-font .usfm_xta {
-  font-size: 100%;
-}
-
-.usfm_xk {
-  text-align: start;
-}
-.formatted-font .usfm_xk {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_xq {
-  text-align: start;
-}
-.formatted-font .usfm_xq {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_xot {
-  text-align: start;
-}
-.formatted-font .usfm_xot {
-  font-size: 100%;
-}
-
-.usfm_xnt {
-  text-align: start;
-}
-.formatted-font .usfm_xnt {
-  font-size: 100%;
-}
-
-.usfm_xdc {
-  text-align: start;
-}
-.formatted-font .usfm_xdc {
-  font-size: 100%;
-}
-
-.usfm_rq {
-  text-align: start;
-}
-.formatted-font .usfm_rq {
-  font-size: 83%;
-  font-style: italic;
-}
-
-.usfm_qt {
-  text-align: start;
-}
-.formatted-font .usfm_qt {
-  font-weight: bold;
-  font-size: 100%;
-}
-
-.usfm_nd {
-  text-align: start;
-}
-.formatted-font .usfm_nd {
-  font-size: 100%;
-  text-decoration: underline;
-}
-
-.usfm_tl {
-  text-align: start;
-}
-.formatted-font .usfm_tl {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_dc {
-  text-align: start;
-}
-.formatted-font .usfm_dc {
-  font-style: italic;
-}
-
-.usfm_bk {
-  text-align: start;
-}
-.formatted-font .usfm_bk {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_sig {
-  text-align: start;
-}
-.formatted-font .usfm_sig {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_pn {
-  text-align: start;
-}
-.formatted-font .usfm_pn {
-  font-weight: bold;
-  font-size: 100%;
-  text-decoration: underline;
-}
-
-.usfm_png {
-  text-align: start;
-}
-.formatted-font .usfm_png {
-  font-size: 100%;
-  text-decoration: underline;
-}
-
-/* check if deprecated */
-.usfm_addpn {
-  text-align: start;
-}
-.formatted-font .usfm_addpn {
-  font-weight: bold;
-  font-size: 100%;
-  font-style: italic;
-  text-decoration: underline;
-}
-
-.usfm_wj {
-  text-align: start;
-}
-.formatted-font .usfm_wj {
-  color: #d43128;
-  font-size: 100%;
-}
-
-.usfm_k {
-  text-align: start;
-}
-.formatted-font .usfm_k {
-  font-weight: bold;
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_sls {
-  text-align: start;
-}
-.formatted-font .usfm_sls {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_ord {
-  text-align: start;
-}
-.formatted-font .usfm_ord {
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-.usfm_add {
-  text-align: start;
-}
-.formatted-font .usfm_add {
-  font-weight: bold;
-  font-style: italic;
-}
-
-/* ParaNode */
-
-.usfm_lit {
-  text-align: end;
-}
-.formatted-font.usfm_lit {
-  font-weight: bold;
-  font-size: 100%;
-}
-
-/* CharNode */
-
-.usfm_no {
-  text-align: start;
-}
-.formatted-font .usfm_no {
-  font-size: 100%;
-}
-
-.usfm_it {
-  text-align: start;
-}
-.formatted-font .usfm_it {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_bd {
-  text-align: start;
-}
-.formatted-font .usfm_bd {
-  font-weight: bold;
-  font-size: 100%;
-}
-
-.usfm_bdit {
-  text-align: start;
-}
-.formatted-font .usfm_bdit {
-  font-weight: bold;
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_em {
-  text-align: start;
-}
-.formatted-font .usfm_em {
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_sc {
-  text-align: start;
-}
-.formatted-font .usfm_sc {
-  font-size: 100%;
-  font-variant: small-caps;
-}
-
-.usfm_sup {
-  text-align: start;
-}
-.formatted-font .usfm_sup {
-  vertical-align: text-top;
-  font-size: 66%;
-}
-
-/* check if deprecated */
-.usfm_pb {
-  text-align: start;
-}
-.formatted-font .usfm_pb {
-  font-size: 100%;
-}
-
-/* check if deprecated */
-.usfm_fig {
-  text-align: start;
-}
-.formatted-font .usfm_fig {
-  font-size: 100%;
-}
-
-.usfm_jmp {
-  text-align: start;
-}
-.formatted-font .usfm_jmp {
-  color: #003380;
-  text-decoration: underline;
-}
-
-.usfm_pro {
-  text-align: start;
-}
-.formatted-font .usfm_pro {
-  font-size: 83%;
-}
-
-.usfm_rb {
-  text-align: start;
-}
-
-.usfm_w {
-  text-align: start;
-}
-.formatted-font .usfm_w {
-  font-size: 100%;
-}
-
-.usfm_wh {
-  text-align: start;
-}
-.formatted-font .usfm_wh {
-  font-size: 100%;
-}
-
-.usfm_wg {
-  text-align: start;
-}
-.formatted-font .usfm_wg {
-  font-size: 100%;
-}
-
-.usfm_wa {
-  text-align: start;
-}
-.formatted-font .usfm_wa {
-  font-size: 100%;
-}
-
-/* check if deprecated */
-.usfm_ndx {
-  text-align: start;
-}
-.formatted-font .usfm_ndx {
-  font-size: 100%;
-}
-
-/* periph */
-
-.usfm_periph {
-  text-align: start;
-}
-.formatted-font.usfm_periph {
-  font-weight: bold;
-  color: #e87217;
-  font-size: 116%;
-}
-.text-spacing.usfm_periph {
-  margin-bottom: 4pt;
-  margin-top: 16pt;
-}
-
-.usfm_p1 {
-  text-align: start;
-}
-.formatted-font.usfm_p1 {
-  font-size: 100%;
-}
-.text-spacing.usfm_p1 {
-  text-indent: 2.5vw;
-}
-
-.usfm_p2 {
-  text-align: start;
-}
-.formatted-font.usfm_p2 {
-  font-size: 100%;
-}
-.text-spacing.usfm_p2 {
-  text-indent: 2.5vw;
-  margin-left: 2.5vw;
-}
-
-.usfm_k1 {
-  text-align: start;
-}
-.formatted-font.usfm_k1 {
-  font-size: 100%;
-}
-
-.usfm_k2 {
-  text-align: start;
-}
-.formatted-font.usfm_k2 {
-  font-size: 100%;
-}
-
-.usfm_xtSee {
-  text-align: start;
-}
-.formatted-font.usfm_xtSee {
-  color: #003380;
-  font-size: 100%;
-  font-style: italic;
-}
-
-.usfm_xtSeeAlso {
-  text-align: start;
-}
-.formatted-font.usfm_xtSeeAlso {
-  color: #003380;
-  font-size: 100%;
-  font-style: italic;
-}
-
-/* MilestoneNode */
-
-.usfm_qt-s {
-  text-align: start;
-}
-
-.usfm_qt-e {
-  text-align: start;
-}
-
-.usfm_qt1-s {
-  text-align: start;
-}
-
-.usfm_qt1-e {
-  text-align: start;
-}
-
-.usfm_qt2-s {
-  text-align: start;
-}
-
-.usfm_qt2-e {
-  text-align: start;
-}
-
-.usfm_qt3-s {
-  text-align: start;
-}
-
-.usfm_qt3-e {
-  text-align: start;
-}
-
-.usfm_qt4-s {
-  text-align: start;
-}
-
-.usfm_qt4-e {
-  text-align: start;
-}
-
-.usfm_qt5-s {
-  text-align: start;
-}
-
-.usfm_qt5-e {
-  text-align: start;
-}
-
-.usfm_ts-s {
-  text-align: start;
-}
-
-.usfm_ts-e {
-  text-align: start;
-}
-
-/* ParaNode */
-
-.usfm_ph {
-  text-align: start;
-}
-.formatted-font.usfm_ph {
-  font-size: 100%;
-}
-.text-spacing.usfm_ph {
-  text-indent: -5vw;
-  margin-left: 10vw;
-}
-
-.usfm_ph1 {
-  text-align: start;
-}
-.formatted-font.usfm_ph1 {
-  font-size: 100%;
-}
-.text-spacing.usfm_ph1 {
-  text-indent: -5vw;
-  margin-left: 10vw;
-}
-
-.usfm_ph2 {
-  text-align: start;
-}
-.formatted-font.usfm_ph2 {
-  font-size: 100%;
-}
-.text-spacing.usfm_ph2 {
-  text-indent: -5vw;
-  margin-left: 15vw;
-}
-
-.usfm_ph3 {
-  text-align: start;
-}
-.formatted-font.usfm_ph3 {
-  font-size: 100%;
-}
-.text-spacing.usfm_ph3 {
-  text-indent: -5vw;
-  margin-left: 20vw;
-}
-
-/* check if deprecated */
-.usfm_phi {
-  text-align: start;
-}
-.text-spacing.usfm_phi {
-  margin-left: 20vw;
-}
-
 /* table/unknown */
 
 .usfm_tr1 {
@@ -2656,13 +2637,6 @@ body {
   font-weight: bold;
 }
 
-/* CharNode */
-/* added for FB24898 */
-/* Updated for FB34868 */
-.formatted-font.usfm_xt {
-  unicode-bidi: embed;
-}
-
 /* NoteNode, ImmutableNoteCallerNode */
 
 .immutable-note-caller,
@@ -2761,6 +2735,8 @@ rt {
   border: solid 1px rgba(18, 82, 179, 1);
   margin-left: 10px;
 }
+
+/* VerseNode, ImmutableVerseNode */
 
 .formatted-font .verse {
   background-color: rgba(222, 222, 222, 1);
