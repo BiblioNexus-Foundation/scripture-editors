@@ -77,16 +77,22 @@ export function deserializeEditorState(editorState: EditorState): Usj | undefine
   return usj;
 }
 
+function removeUndefinedProperties<T>(obj: T): T {
+  return Object.fromEntries(
+    Object.entries(obj as Partial<T>).filter(([_, value]) => value !== undefined),
+  ) as T;
+}
+
 function createBookMarker(node: SerializedBookNode): MarkerObject {
   const { type, marker, code, text } = node;
   let content: MarkerContent[] | undefined;
   if (text) content = [text];
-  return {
+  return removeUndefinedProperties({
     type,
     marker,
     code,
     content,
-  };
+  });
 }
 
 function parseNumberFromText(marker: string, text: string | undefined, number: string): string {
@@ -105,14 +111,14 @@ function createChapterMarker(
   const { text } = node as SerializedChapterNode;
   let { number } = node;
   number = parseNumberFromText(marker, text, number);
-  return {
+  return removeUndefinedProperties({
     type: ChapterNode.getType(),
     marker,
     number,
     sid,
     altnumber,
     pubnumber,
-  };
+  });
 }
 
 function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseNode): MarkerObject {
@@ -120,25 +126,25 @@ function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseN
   const { text } = node as SerializedVerseNode;
   let { number } = node;
   number = parseNumberFromText(marker, text, number);
-  return {
+  return removeUndefinedProperties({
     type: VerseNode.getType(),
     marker,
     number,
     sid,
     altnumber,
     pubnumber,
-  };
+  });
 }
 
 function createCharMarker(node: SerializedCharNode): MarkerObject {
   const { type, marker } = node;
   let { text } = node;
   if (text.startsWith(NBSP)) text = text.slice(1);
-  return {
+  return removeUndefinedProperties({
     type,
     marker,
     content: [text],
-  };
+  });
 }
 
 function createParaMarker(
@@ -146,11 +152,13 @@ function createParaMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker } = node;
-  return {
+  // Ensure empty arrays are removed.
+  const _content = content && content.length > 0 ? content : undefined;
+  return removeUndefinedProperties({
     type,
     marker,
-    content,
-  };
+    content: _content,
+  });
 }
 
 function createNoteMarker(
@@ -158,23 +166,25 @@ function createNoteMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category } = node;
-  return {
+  // Ensure empty arrays are removed.
+  const _content = content && content.length > 0 ? content : undefined;
+  return removeUndefinedProperties({
     type,
     marker,
     caller,
     category,
-    content,
-  };
+    content: _content,
+  });
 }
 
 function createMilestoneMarker(node: SerializedMilestoneNode): MarkerObject {
   const { type, marker, sid, eid } = node;
-  return {
+  return removeUndefinedProperties({
     type,
     marker,
     sid,
     eid,
-  };
+  });
 }
 
 function createTextMarker(node: SerializedTextNode): string {

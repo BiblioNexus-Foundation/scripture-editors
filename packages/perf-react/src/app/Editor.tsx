@@ -1,13 +1,11 @@
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
-
 import { useLexicalState } from "./useLexicalState";
-import { UpdateListener } from "lexical/LexicalEditor";
-import { OnChangePlugin } from "shared-react/plugins/OnChange/OnChangePlugin";
+import { HistoryMergeListener } from "shared/plugins/History";
+import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
 
 const theme = {
   // Theme styling goes here
@@ -33,8 +31,8 @@ export default function Editor() {
     nodes: [...scriptureNodes],
   };
 
-  const onChange: UpdateListener = () => {
-    // console.log({ editorState, editor, tags });
+  const onChange: HistoryMergeListener = (args) => {
+    console.log(args);
   };
 
   return !lexicalState ? null : (
@@ -49,8 +47,7 @@ export default function Editor() {
           placeholder={<div className="placeholder">Enter some text...</div>}
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <OnChangePlugin onChange={onChange} />
-        <HistoryPlugin />
+        <HistoryPlugin onChange={onChange} />
       </div>
     </LexicalComposer>
   );

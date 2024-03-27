@@ -1,12 +1,13 @@
-import { ScriptureReference } from "papi-components";
-import { JSX, useCallback } from "react";
+import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { EditorState } from "lexical";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { EditorState, LexicalEditor } from "lexical";
+import React, { JSX, forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
+import { ScriptureReference } from "papi-components";
 import { Usj } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -17,17 +18,19 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { ViewOptions } from "./adaptors/view-options.utils";
-import editorTheme from "./themes/editor-theme";
 import ScriptureReferencePlugin from "./plugins/ScriptureReferencePlugin";
 import ToolbarPlugin from "./plugins/toolbar/ToolbarPlugin";
+import editorTheme from "./themes/editor-theme";
+import useDeferredState from "./use-deferred-state.hook";
 
-type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
+export type EditorRef = {
+  focus(): void;
+  setUsj(usj: Usj): void;
 };
 
 type EditorProps<TLogger extends LoggerBasic> = {
-  /** Scripture data in USJ form */
-  usj?: Usj;
+  /** Initial Scripture data in USJ form */
+  defaultUsj?: Usj;
   /** View options */
   viewOptions?: ViewOptions;
   /** Scripture reference */
@@ -44,17 +47,19 @@ type EditorProps<TLogger extends LoggerBasic> = {
   logger?: TLogger;
 };
 
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
+
 const editorConfig: Mutable<InitialConfigType> = {
   namespace: "platformEditor",
   theme: editorTheme,
   editable: true,
-  // Avoid the onChange handler being triggered initially.
-  editorState: null,
+  editorState: undefined,
   // Handling of errors during update
   onError(error) {
     throw error;
   },
-  // Any custom nodes go here
   nodes: [ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
 
@@ -66,7 +71,10 @@ function Placeholder(): JSX.Element {
  * Scripture Editor for USJ. Created for use in Platform.Bible.
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
- * @param props.usj - USJ Scripture data.
+ * @param props.defaultUsj - Default USJ Scripture data.
+ * @param props.ref - Forward reference for the editor.
+ * @param props.ref.focus - Method to focus the editor.
+ * @param props.ref.setUsj - Method to set the USJ Scripture data.
  * @param props.viewOptions - View options to select different view modes.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
  * @param props.setScrRef - Scripture reference set callback function when the reference changes in
@@ -80,24 +88,46 @@ function Placeholder(): JSX.Element {
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
-export default function Editor<TLogger extends LoggerBasic>({
-  usj,
-  viewOptions,
-  scrRef,
-  setScrRef,
-  nodeOptions,
-  isReadonly,
-  onChange,
-  logger,
-}: EditorProps<TLogger>): JSX.Element {
+const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
+  {
+    defaultUsj,
+    viewOptions,
+    scrRef,
+    setScrRef,
+    nodeOptions,
+    isReadonly,
+    onChange,
+    logger,
+  }: EditorProps<TLogger>,
+  ref: React.ForwardedRef<EditorRef>,
+): JSX.Element {
+  const editorRef = useRef<LexicalEditor>(null);
+  const [usj, setUsj] = useState(defaultUsj);
+  const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
   editorConfig.editable = !isReadonly;
+  editorConfig.editorState = (editor: LexicalEditor) => {
+    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, viewOptions));
+  };
   editorUsjAdaptor.initialize(logger);
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      editorRef.current?.focus();
+    },
+    setUsj(usj: Usj) {
+      setUsj(usj);
+    },
+  }));
+
   const handleChange = useCallback(
     (editorState: EditorState) => {
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      if (usj && onChange) onChange(usj);
+      if (usj) {
+        setEditedUsj(usj);
+        onChange?.(usj);
+      }
     },
-    [onChange],
+    [onChange, setEditedUsj],
   );
 
   return (
@@ -118,8 +148,9 @@ export default function Editor<TLogger extends LoggerBasic>({
               viewOptions={viewOptions}
             />
           )}
+          <EditorRefPlugin editorRef={editorRef} />
           <UpdateStatePlugin
-            scripture={usj}
+            scripture={loadedUsj}
             nodeOptions={nodeOptions}
             editorAdaptor={usjEditorAdaptor}
             viewOptions={viewOptions}
@@ -131,4 +162,6 @@ export default function Editor<TLogger extends LoggerBasic>({
       </div>
     </LexicalComposer>
   );
-}
+});
+
+export default Editor;

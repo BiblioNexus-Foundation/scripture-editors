@@ -24,7 +24,13 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../shared-react/plugins/OnChange"],
+  "include": [
+    "src",
+    "../shared/plugins/History/index.ts",
+    "../shared/plugins/History/HistoryManager.ts",
+    "../shared-react/plugins/History/HistoryPlugin.tsx",
+    "../shared-react/plugins/OnChange"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"
