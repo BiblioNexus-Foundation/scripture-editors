@@ -10,12 +10,11 @@ import {
   ElementNode,
   $createTextNode,
 } from "lexical";
-import { CHAPTER_CLASS_NAME } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node.utils";
 
 export const CHAPTER_MARKER = "c";
 export const CHAPTER_VERSION = 1;
-
-type ChapterMarker = typeof CHAPTER_MARKER;
+export type ChapterMarker = typeof CHAPTER_MARKER;
 
 export type SerializedChapterNode = Spread<
   {
@@ -26,6 +25,7 @@ export type SerializedChapterNode = Spread<
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
 >;
@@ -37,6 +37,7 @@ export class ChapterNode extends ElementNode {
   __sid?: string;
   __altnumber?: string;
   __pubnumber?: string;
+  __unknownAttributes?: UnknownAttributes;
 
   constructor(
     chapterNumber: string,
@@ -45,6 +46,7 @@ export class ChapterNode extends ElementNode {
     sid?: string,
     altnumber?: string,
     pubnumber?: string,
+    unknownAttributes?: UnknownAttributes,
     key?: NodeKey,
   ) {
     super(key);
@@ -54,6 +56,7 @@ export class ChapterNode extends ElementNode {
     this.__sid = sid;
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
+    this.__unknownAttributes = unknownAttributes;
     this.append($createTextNode(text ?? chapterNumber));
   }
 
@@ -62,29 +65,48 @@ export class ChapterNode extends ElementNode {
   }
 
   static clone(node: ChapterNode): ChapterNode {
-    const { __number, __classList, __sid, __altnumber, __pubnumber, __key } = node;
+    const { __number, __classList, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } =
+      node;
     const __text = node.getFirstChild<TextNode>()?.getTextContent();
-    return new ChapterNode(__number, __classList, __text, __sid, __altnumber, __pubnumber, __key);
+    return new ChapterNode(
+      __number,
+      __classList,
+      __text,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    );
   }
 
   static importJSON(serializedNode: SerializedChapterNode): ChapterNode {
     const {
+      marker,
       number,
       classList,
       text,
       sid,
       altnumber,
       pubnumber,
+      unknownAttributes,
       format,
       indent,
       direction,
-      marker,
     } = serializedNode;
-    const node = $createChapterNode(number, classList, text, sid, altnumber, pubnumber);
+    const node = $createChapterNode(
+      number,
+      classList,
+      text,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    );
+    node.setMarker(marker);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
-    node.setMarker(marker);
     return node;
   }
 
@@ -148,6 +170,16 @@ export class ChapterNode extends ElementNode {
     return self.__pubnumber;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
@@ -167,6 +199,7 @@ export class ChapterNode extends ElementNode {
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: CHAPTER_VERSION,
     };
   }
@@ -179,9 +212,10 @@ export function $createChapterNode(
   sid?: string,
   altnumber?: string,
   pubnumber?: string,
+  unknownAttributes?: UnknownAttributes,
 ): ChapterNode {
   return $applyNodeReplacement(
-    new ChapterNode(chapterNumber, classList, text, sid, altnumber, pubnumber),
+    new ChapterNode(chapterNumber, classList, text, sid, altnumber, pubnumber, unknownAttributes),
   );
 }
 

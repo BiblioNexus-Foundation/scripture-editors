@@ -24,11 +24,12 @@ export default function App() {
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
 
+  // Simulate USJ updating after the editor is loaded.
   setTimeout(() => {
     editorRef.current?.setUsj(usxStringToUsj(usx));
   }, 1000);
 
-  const onChange = useCallback((usj: Usj) => {
+  const handleChange = useCallback((usj: Usj) => {
     console.log({ usj });
     editorRef.current?.setUsj(usj);
   }, []);
@@ -46,7 +47,7 @@ export default function App() {
         scrRef={scrRef}
         setScrRef={setScrRef}
         nodeOptions={nodeOptions}
-        onChange={onChange}
+        onChange={handleChange}
         logger={console}
       />
     </>

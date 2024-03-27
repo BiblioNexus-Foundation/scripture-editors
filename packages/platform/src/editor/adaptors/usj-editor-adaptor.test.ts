@@ -3,13 +3,16 @@ import {
   NOTE_CALLER_INDEX,
   NOTE_INDEX,
   NOTE_PARA_INDEX,
+  NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX,
   editorStateEmpty,
   editorStateGen1v1,
   editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
+  editorStateWithUnknownItems,
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjWithUnknownItems,
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
@@ -23,10 +26,16 @@ import { serializeEditorState, reset } from "./usj-editor.adaptor";
  * Remove the `onClick` function because it can't be compared since it's anonymous.
  * @param serializedEditorState
  */
-function removeOnClick(serializedEditorState: SerializedEditorState) {
-  const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
-    .children[NOTE_INDEX] as SerializedNoteNode;
-  const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
+function removeOnClick(
+  serializedEditorState: SerializedEditorState,
+  noteParaIndex = NOTE_PARA_INDEX,
+  noteIndex = NOTE_INDEX,
+  noteCallerIndex = NOTE_CALLER_INDEX,
+) {
+  const note = (serializedEditorState.root.children[noteParaIndex] as SerializedParaNode).children[
+    noteIndex
+  ] as SerializedNoteNode;
+  const noteCaller = note.children[noteCallerIndex] as SerializedImmutableNoteCallerNode;
   delete noteCaller.onClick;
 }
 
@@ -128,5 +137,14 @@ describe("USJ Editor Adaptor", () => {
     noteCaller.caller = "-";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
+  });
+
+  it("should convert from USJ with unknown items to Lexical editor state JSON", () => {
+    reset();
+
+    const serializedEditorState = serializeEditorState(usjWithUnknownItems);
+
+    removeOnClick(serializedEditorState, NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX);
+    expect(serializedEditorState).toEqual(editorStateWithUnknownItems);
   });
 });

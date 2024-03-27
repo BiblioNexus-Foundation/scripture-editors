@@ -1,9 +1,33 @@
 import { SerializedEditorState } from "lexical";
-import { Usj } from "./usj.model";
+import { MarkerContent, Usj } from "./usj.model";
 import { NBSP } from "../../nodes/scripture/usj/node.utils";
 import { SerializedParaNode } from "../../nodes/scripture/usj/ParaNode";
 
 export const usxEmpty = '<usx version="3.0" />';
+
+export const usjEmpty: Usj = { type: "USJ", version: "0.2.1", content: [] };
+
+export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
+  root: {
+    type: "root",
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+    children: [
+      {
+        type: "para",
+        marker: "p",
+        classList: [],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [],
+      },
+    ],
+  },
+};
 
 /**
  * Reformatted from:
@@ -23,19 +47,6 @@ export const usxGen1v1 = `
   <chapter eid="GEN 1" />
 </usx>
 `;
-
-export const usxGen1v1ImpliedPara = `
-<usx version="3.0">
-  <book style="id" code="GEN" />
-  <chapter style="c" number="1" sid="GEN 1" />
-    <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
-    <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
-    <verse style="v" number="15" sid="GEN 1:15" />Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
-  <chapter eid="GEN 1" />
-</usx>
-`;
-
-export const usjEmpty: Usj = { type: "USJ", version: "0.2.1", content: [] };
 
 /** para index where the note exists */
 export const NOTE_PARA_INDEX = 4;
@@ -106,52 +117,13 @@ export const usjGen1v1: Usj = {
   ],
 };
 
-export const usjGen1v1ImpliedPara: Usj = {
-  type: "USJ",
-  version: "0.2.1",
-  content: [
-    { type: "book", marker: "id", code: "GEN" },
-    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
-    { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
-    "the first verse ",
-    { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
-    "the second verse ",
-    { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
-    "Tell the Israelites that I, the ",
-    { type: "char", marker: "nd", content: ["Lord"] },
-    ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
-  ],
-};
-
-export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
-  root: {
-    direction: null,
-    format: "",
-    indent: 0,
-    type: "root",
-    version: 1,
-    children: [
-      {
-        type: "para",
-        marker: "p",
-        classList: [],
-        direction: null,
-        format: "",
-        indent: 0,
-        version: 1,
-        children: [],
-      },
-    ],
-  },
-};
-
 /** Lexical editor state JSON (depends on nodes used). */
 export const editorStateGen1v1 = {
   root: {
+    type: "root",
     direction: null,
     format: "",
     indent: 0,
-    type: "root",
     version: 1,
     children: [
       {
@@ -685,6 +657,34 @@ export const editorStateGen1v1Editable = {
   },
 } as unknown as SerializedEditorState;
 
+export const usxGen1v1ImpliedPara = `
+<usx version="3.0">
+  <book style="id" code="GEN" />
+  <chapter style="c" number="1" sid="GEN 1" />
+    <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
+    <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
+    <verse style="v" number="15" sid="GEN 1:15" />Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
+  <chapter eid="GEN 1" />
+</usx>
+`;
+
+export const usjGen1v1ImpliedPara: Usj = {
+  type: "USJ",
+  version: "0.2.1",
+  content: [
+    { type: "book", marker: "id", code: "GEN" },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
+    { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
+    "the first verse ",
+    { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
+    "the second verse ",
+    { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
+    "Tell the Israelites that I, the ",
+    { type: "char", marker: "nd", content: ["Lord"] },
+    ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
+  ],
+};
+
 export const editorStateGen1v1ImpliedPara = {
   root: {
     type: "root",
@@ -760,6 +760,312 @@ export const editorStateGen1v1ImpliedPara = {
             mode: "normal",
             style: "",
             version: 1,
+          },
+        ],
+      },
+    ],
+  },
+} as unknown as SerializedEditorState;
+
+/** para index where the note exists */
+export const NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX = 2;
+
+export const usjWithUnknownItems = {
+  type: "USJ",
+  version: "0.2.1",
+  content: [
+    // unknown attributes
+    { type: "book", marker: "id", code: "GEN", "attr-unknown": "watAttr" },
+    { type: "chapter", marker: "c", number: "1", "attr-unknown": "watAttr" },
+    {
+      type: "para",
+      marker: "p",
+      "attr-unknown": "watAttr",
+      content: [
+        { type: "verse", marker: "v", number: "1", "attr-unknown": "watAttr" },
+        "First part of the first verse ",
+        {
+          type: "note",
+          marker: "f",
+          caller: "+",
+          "attr-unknown": "watAttr",
+          content: [{ type: "char", marker: "fr", "attr-unknown": "watAttr", content: ["3:2 "] }],
+        },
+        { type: "ms", marker: "ts", "attr-unknown": "watAttr" },
+        // unknown nodes
+        {
+          type: "wat",
+          marker: "z",
+          "attr-unknown": "watAttr",
+          content: ["wat content?"],
+        },
+      ],
+    } as MarkerContent,
+    { type: "optbreak", marker: undefined },
+    { type: "ref", marker: undefined, loc: "MRK 9:50", gen: "true", content: ["Mk 9.50"] },
+    { type: "sidebar", marker: "esb", content: ["sidebar content"] },
+    { type: "periph", marker: undefined, alt: "periph title", content: ["periph content"] },
+    {
+      type: "figure",
+      marker: "fig",
+      file: "file.jpg",
+      size: "span",
+      ref: "1.18",
+      content: ["figure content"],
+    },
+    {
+      type: "table",
+      marker: undefined,
+      content: [
+        {
+          type: "table:row",
+          marker: "tr",
+          content: [{ type: "table:cell", marker: "tc1", content: ["cell1"] }],
+        },
+      ],
+    },
+  ],
+} as Usj;
+
+export const editorStateWithUnknownItems = {
+  root: {
+    type: "root",
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+    children: [
+      {
+        type: "book",
+        marker: "id",
+        code: "GEN",
+        text: "",
+        unknownAttributes: { "attr-unknown": "watAttr" },
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [],
+      },
+      {
+        type: "immutable-chapter",
+        marker: "c",
+        number: "1",
+        unknownAttributes: { "attr-unknown": "watAttr" },
+        version: 1,
+      },
+      {
+        type: "para",
+        marker: "p",
+        classList: [],
+        unknownAttributes: { "attr-unknown": "watAttr" },
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "immutable-verse",
+            marker: "v",
+            number: "1",
+            unknownAttributes: { "attr-unknown": "watAttr" },
+            version: 1,
+          },
+          {
+            type: "text",
+            text: "First part of the first verse ",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "note",
+            marker: "f",
+            caller: "+",
+            unknownAttributes: { "attr-unknown": "watAttr" },
+            direction: null,
+            format: "",
+            indent: 0,
+            version: 1,
+            children: [
+              {
+                type: "immutable-note-caller",
+                caller: "a",
+                previewText: "3:2",
+                version: 1,
+              },
+              {
+                type: "char",
+                marker: "fr",
+                text: "3:2 ",
+                unknownAttributes: { "attr-unknown": "watAttr" },
+                style: "display: none",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                version: 1,
+              },
+            ],
+          },
+          {
+            type: "ms",
+            marker: "ts",
+            unknownAttributes: { "attr-unknown": "watAttr" },
+            version: 1,
+          },
+          {
+            type: "unknown",
+            tag: "wat",
+            marker: "z",
+            unknownAttributes: { "attr-unknown": "watAttr" },
+            direction: null,
+            format: "",
+            indent: 0,
+            version: 1,
+            children: [
+              {
+                type: "text",
+                text: "wat content?",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
+                version: 1,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "unknown",
+        tag: "optbreak",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [],
+      },
+      {
+        type: "unknown",
+        tag: "ref",
+        unknownAttributes: { loc: "MRK 9:50", gen: "true" },
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "Mk 9.50",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "unknown",
+        tag: "sidebar",
+        marker: "esb",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "sidebar content",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "unknown",
+        tag: "periph",
+        unknownAttributes: { alt: "periph title" },
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "periph content",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "unknown",
+        tag: "figure",
+        marker: "fig",
+        unknownAttributes: { file: "file.jpg", size: "span", ref: "1.18" },
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "figure content",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "unknown",
+        tag: "table",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "unknown",
+            tag: "table:row",
+            marker: "tr",
+            direction: null,
+            format: "",
+            indent: 0,
+            version: 1,
+            children: [
+              {
+                type: "unknown",
+                tag: "table:cell",
+                marker: "tc1",
+                direction: null,
+                format: "",
+                indent: 0,
+                version: 1,
+                children: [
+                  {
+                    type: "text",
+                    text: "cell1",
+                    detail: 0,
+                    format: 0,
+                    mode: "normal",
+                    style: "",
+                    version: 1,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },

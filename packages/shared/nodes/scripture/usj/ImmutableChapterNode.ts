@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, getVisibleOpenMarkerText } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes, getVisibleOpenMarkerText } from "./node.utils";
 
 export const CHAPTER_MARKER = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
@@ -23,6 +23,7 @@ export type SerializedImmutableChapterNode = Spread<
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedLexicalNode
 >;
@@ -34,6 +35,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   __sid?: string;
   __altnumber?: string;
   __pubnumber?: string;
+  __unknownAttributes?: UnknownAttributes;
 
   constructor(
     chapterNumber: string,
@@ -41,6 +43,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     sid?: string,
     altnumber?: string,
     pubnumber?: string,
+    unknownAttributes?: UnknownAttributes,
     key?: NodeKey,
   ) {
     super(key);
@@ -50,6 +53,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     this.__sid = sid;
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -57,13 +61,30 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 
   static clone(node: ImmutableChapterNode): ImmutableChapterNode {
-    const { __number, __showMarker, __sid, __altnumber, __pubnumber, __key } = node;
-    return new ImmutableChapterNode(__number, __showMarker, __sid, __altnumber, __pubnumber, __key);
+    const { __number, __showMarker, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } =
+      node;
+    return new ImmutableChapterNode(
+      __number,
+      __showMarker,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    );
   }
 
   static importJSON(serializedNode: SerializedImmutableChapterNode): ImmutableChapterNode {
-    const { number, showMarker, sid, altnumber, pubnumber, marker } = serializedNode;
-    const node = $createImmutableChapterNode(number, showMarker, sid, altnumber, pubnumber);
+    const { marker, number, showMarker, sid, altnumber, pubnumber, unknownAttributes } =
+      serializedNode;
+    const node = $createImmutableChapterNode(
+      number,
+      showMarker,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    );
     node.setMarker(marker);
     return node;
   }
@@ -128,6 +149,16 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     return self.__pubnumber;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
@@ -157,6 +188,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: IMMUTABLE_CHAPTER_VERSION,
     };
   }
@@ -168,9 +200,17 @@ export function $createImmutableChapterNode(
   sid?: string,
   altnumber?: string,
   pubnumber?: string,
+  unknownAttributes?: UnknownAttributes,
 ): ImmutableChapterNode {
   return $applyNodeReplacement(
-    new ImmutableChapterNode(chapterNumber, showMarker, sid, altnumber, pubnumber),
+    new ImmutableChapterNode(
+      chapterNumber,
+      showMarker,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    ),
   );
 }
 

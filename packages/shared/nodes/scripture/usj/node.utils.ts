@@ -1,11 +1,14 @@
 /** Utility functions for editor nodes */
 
-import { $isElementNode, LexicalNode, SerializedElementNode, SerializedTextNode } from "lexical";
+import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
 import { CharNode, SerializedCharNode } from "./CharNode";
+import { MARKER_OBJECT_PROPS, MarkerObject } from "../../../converters/usj/usj.model";
+
+export type UnknownAttributes = { [name: string]: string };
 
 // If you want use these utils with your own chapter node, add it to this list of types.
 type ChapterNodes = ChapterNode | ImmutableChapterNode;
@@ -28,8 +31,8 @@ const NUMBERED_MARKER_PLACEHOLDER = "#";
 
 /**
  * Check if the marker is valid and numbered.
- * @param marker - marker to check.
- * @param numberedMarkers - list of valid numbered markers.
+ * @param marker - Marker to check.
+ * @param numberedMarkers - List of valid numbered markers.
  * @returns true if the marker is a valid numbered marker, false otherwise.
  */
 export function isValidNumberedMarker(marker: string, numberedMarkers: string[]): boolean {
@@ -46,7 +49,7 @@ export function isValidNumberedMarker(marker: string, numberedMarkers: string[])
 
 /**
  * Extracts a list of numbered markers with the '#' removed.
- * @param markers - list of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
+ * @param markers - List of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
  * @returns list of numbered markers (non-numbered are filtered out) with the '#' removed,
  *   e.g. ['pi'].
  */
@@ -61,7 +64,7 @@ export function extractNumberedMarkers(markers: string[] | readonly string[]): s
 
 /**
  * Extracts a list of non-numbered markers.
- * @param markers - list of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
+ * @param markers - List of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
  * @returns list of non-numbered markers (numbered are filtered out), e.g. ['p'].
  */
 export function extractNonNumberedMarkers(markers: string[] | readonly string[]): string[] {
@@ -70,9 +73,9 @@ export function extractNonNumberedMarkers(markers: string[] | readonly string[])
 
 /**
  * Finds the chapter node with the given chapter number amongst the nodes.
- * @param nodes - nodes to look in.
- * @param chapterNum - chapter number to look for.
- * @param ChapterNodeClass - use a different chapter node class if needed.
+ * @param nodes - Nodes to look in.
+ * @param chapterNum - Chapter number to look for.
+ * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
 export function findChapter<T extends ChapterNodes = ImmutableChapterNode>(
@@ -89,9 +92,9 @@ export function findChapter<T extends ChapterNodes = ImmutableChapterNode>(
 
 /**
  * Finds the next chapter.
- * @param nodes - nodes to look in.
- * @param isCurrentChapterAtFirstNode - if `true` ignore the first node.
- * @param ChapterNodeClass - use a different chapter node class if needed.
+ * @param nodes - Nodes to look in.
+ * @param isCurrentChapterAtFirstNode - If `true` ignore the first node.
+ * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the next chapter node if found, `undefined` otherwise.
  */
 export function findNextChapter<T extends ChapterNodes = ImmutableChapterNode>(
@@ -107,8 +110,8 @@ export function findNextChapter<T extends ChapterNodes = ImmutableChapterNode>(
 
 /**
  * Find the chapter that this node is in.
- * @param node - node to find the chapter it's in.
- * @param ChapterNodeClass - use a different chapter node class if needed.
+ * @param node - Node to find the chapter it's in.
+ * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
 export function findThisChapter<T extends ChapterNodes = ImmutableChapterNode>(
@@ -131,9 +134,9 @@ export function findThisChapter<T extends ChapterNodes = ImmutableChapterNode>(
 
 /**
  * Find the given verse in the children of the node.
- * @param node - node with potential verses in children.
- * @param verseNum - verse number to look for.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param node - Node with potential verses in children.
+ * @param verseNum - Verse number to look for.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
@@ -154,9 +157,9 @@ export function findVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Finds the verse node with the given verse number amongst the children of nodes.
- * @param nodes - nodes to look in.
- * @param verseNum - verse number to look for.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param nodes - Nodes to look in.
+ * @param verseNum - Verse number to look for.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findVerse<T extends VerseNodes = ImmutableVerseNode>(
@@ -174,8 +177,8 @@ export function findVerse<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Find the next verse in the children of the node.
- * @param node - node with potential verses in children.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param node - Node with potential verses in children.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findNextVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
@@ -190,8 +193,8 @@ export function findNextVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Finds the next verse node amongst the children of nodes.
- * @param nodes - nodes to look in.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param nodes - Nodes to look in.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findNextVerse<T extends VerseNodes = ImmutableVerseNode>(
@@ -208,8 +211,8 @@ export function findNextVerse<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Find the last verse in the children of the node.
- * @param node - node with potential verses in children.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param node - Node with potential verses in children.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findLastVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
@@ -225,8 +228,8 @@ export function findLastVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Finds the last verse node amongst the children of nodes.
- * @param nodes - nodes to look in.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param nodes - Nodes to look in.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findLastVerse<T extends VerseNodes = ImmutableVerseNode>(
@@ -244,8 +247,8 @@ export function findLastVerse<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Find the verse that this node is in.
- * @param node - node to find the verse it's in.
- * @param VerseNodeClass - use a different verse node class if needed.
+ * @param node - Node to find the verse it's in.
+ * @param VerseNodeClass - Use a different verse node class if needed.
  * @returns the verse node if found, `undefined` otherwise.
  */
 export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
@@ -279,9 +282,9 @@ export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
 
 /**
  * Remove the given node and all the nodes after.
- * @param nodes - nodes to prune.
- * @param firstNode - first node in nodes.
- * @param pruneNode - node to prune and all nodes after.
+ * @param nodes - Nodes to prune.
+ * @param firstNode - First node in nodes.
+ * @param pruneNode - Node to prune and all nodes after.
  */
 export function removeNodeAndAfter(
   nodes: LexicalNode[],
@@ -296,8 +299,8 @@ export function removeNodeAndAfter(
 
 /**
  * Removes all the nodes that proceed the given node.
- * @param nodes - nodes to prune.
- * @param firstNode - node to prune before.
+ * @param nodes - Nodes to prune.
+ * @param firstNode - Node to prune before.
  * @returns the nodes from the node and after.
  */
 export function removeNodesBeforeNode(
@@ -342,12 +345,10 @@ export function getVisibleOpenMarkerText(marker: string, content: string | undef
 
 /**
  * Gets the preview text for a serialized note caller.
- * @param childNodes - child nodes of the NoteNode.
+ * @param childNodes - Child nodes of the NoteNode.
  * @returns the preview text.
  */
-export function getPreviewTextFromSerializedNodes(
-  childNodes: (SerializedElementNode | SerializedTextNode)[],
-): string {
+export function getPreviewTextFromSerializedNodes(childNodes: SerializedLexicalNode[]): string {
   const previewText = childNodes
     .reduce(
       (text, node) =>
@@ -369,7 +370,7 @@ export function getEditableCallerText(noteCaller: string): string {
 
 /**
  * Gets the preview text for a note caller.
- * @param childNodes - child nodes of the NoteNode.
+ * @param childNodes - Child nodes of the NoteNode.
  * @returns the preview text.
  */
 
@@ -382,4 +383,15 @@ export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
     )
     .trim();
   return previewText;
+}
+
+/**
+ * Remove all known properties of the `markerObject`.
+ * @param markerObject - Scripture marker and its contents.
+ * @returns all the unknown properties.
+ */
+export function getUnknownAttributes(markerObject: MarkerObject): UnknownAttributes | undefined {
+  const attributes: Partial<MarkerObject> = { ...markerObject };
+  MARKER_OBJECT_PROPS.forEach((property) => delete attributes[property]);
+  return Object.keys(attributes).length === 0 ? undefined : (attributes as UnknownAttributes);
 }

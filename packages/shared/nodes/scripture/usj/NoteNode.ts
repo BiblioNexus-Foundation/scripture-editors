@@ -8,6 +8,7 @@ import {
   $applyNodeReplacement,
   LexicalNode,
 } from "lexical";
+import { UnknownAttributes } from "./node.utils";
 
 /** @see https://ubsicap.github.io/usx/notes.html */
 const VALID_NOTE_MARKERS = [
@@ -27,6 +28,7 @@ export type SerializedNoteNode = Spread<
     marker: NoteMarker;
     caller: string;
     category?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
 >;
@@ -37,12 +39,20 @@ export class NoteNode extends ElementNode {
   __marker: NoteMarker;
   __caller: string;
   __category?: string;
+  __unknownAttributes?: UnknownAttributes;
 
-  constructor(marker: NoteMarker, caller: string, category?: string, key?: NodeKey) {
+  constructor(
+    marker: NoteMarker,
+    caller: string,
+    category?: string,
+    unknownAttributes?: UnknownAttributes,
+    key?: NodeKey,
+  ) {
     super(key);
     this.__marker = marker;
     this.__caller = caller;
     this.__category = category;
+    this.__unknownAttributes = unknownAttributes;
   }
 
   static getType(): string {
@@ -50,13 +60,13 @@ export class NoteNode extends ElementNode {
   }
 
   static clone(node: NoteNode): NoteNode {
-    const { __marker, __caller, __category, __key } = node;
-    return new NoteNode(__marker, __caller, __category, __key);
+    const { __marker, __caller, __category, __unknownAttributes, __key } = node;
+    return new NoteNode(__marker, __caller, __category, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedNoteNode): NoteNode {
-    const { marker, caller, category } = serializedNode;
-    const node = $createNoteNode(marker, caller, category);
+    const { marker, caller, category, unknownAttributes } = serializedNode;
+    const node = $createNoteNode(marker, caller, category, unknownAttributes);
     return node;
   }
 
@@ -94,6 +104,16 @@ export class NoteNode extends ElementNode {
     return self.__category;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
@@ -115,6 +135,7 @@ export class NoteNode extends ElementNode {
       marker: this.getMarker(),
       caller: this.getCaller(),
       category: this.getCategory(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: NOTE_VERSION,
     };
   }
@@ -122,8 +143,13 @@ export class NoteNode extends ElementNode {
 
 export const noteNodeName = Symbol.for(NoteNode.name);
 
-export function $createNoteNode(marker: NoteMarker, caller: string, category?: string): NoteNode {
-  return $applyNodeReplacement(new NoteNode(marker, caller, category));
+export function $createNoteNode(
+  marker: NoteMarker,
+  caller: string,
+  category?: string,
+  unknownAttributes?: UnknownAttributes,
+): NoteNode {
+  return $applyNodeReplacement(new NoteNode(marker, caller, category, unknownAttributes));
 }
 
 export function $isNoteNode(node: LexicalNode | null | undefined): node is NoteNode {

@@ -10,18 +10,19 @@ import {
   SerializedElementNode,
   TextNode,
 } from "lexical";
-import { BookCode } from "../../../converters/usj/usj.model";
+import { BookCode, isValidBookCode } from "../../../converters/usj/usj.model";
+import { UnknownAttributes } from "./node.utils";
 
 export const BOOK_MARKER = "id";
 export const BOOK_VERSION = 1;
-
-type BookMarker = typeof BOOK_MARKER;
+export type BookMarker = typeof BOOK_MARKER;
 
 export type SerializedBookNode = Spread<
   {
     marker: BookMarker;
     code: BookCode;
     text?: string;
+    unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
 >;
@@ -29,11 +30,13 @@ export type SerializedBookNode = Spread<
 export class BookNode extends ElementNode {
   __marker: BookMarker;
   __code: BookCode;
+  __unknownAttributes?: UnknownAttributes;
 
-  constructor(code: BookCode, text?: string, key?: NodeKey) {
+  constructor(code: BookCode, text?: string, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
     super(key);
     this.__marker = BOOK_MARKER;
     this.__code = code;
+    this.__unknownAttributes = unknownAttributes;
     this.append($createTextNode(text));
   }
 
@@ -42,18 +45,23 @@ export class BookNode extends ElementNode {
   }
 
   static clone(node: BookNode): BookNode {
+    const { __code, __unknownAttributes, __key } = node;
     const __text = node.getFirstChild<TextNode>()?.getTextContent();
-    return new BookNode(node.__code, __text, node.__key);
+    return new BookNode(__code, __text, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedBookNode): BookNode {
-    const { code, text, marker, format, indent, direction } = serializedNode;
-    const node = $createBookNode(code, text);
+    const { marker, code, text, unknownAttributes, format, indent, direction } = serializedNode;
+    const node = $createBookNode(code, text, unknownAttributes);
+    node.setMarker(marker);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
-    node.setMarker(marker);
     return node;
+  }
+
+  static isValidBookCode(code: string): boolean {
+    return isValidBookCode(code);
   }
 
   setMarker(marker: BookMarker): void {
@@ -80,6 +88,16 @@ export class BookNode extends ElementNode {
     return self.__code;
   }
 
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+    const self = this.getWritable();
+    self.__unknownAttributes = unknownAttributes;
+  }
+
+  getUnknownAttributes(): UnknownAttributes | undefined {
+    const self = this.getLatest();
+    return self.__unknownAttributes;
+  }
+
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
@@ -101,13 +119,18 @@ export class BookNode extends ElementNode {
       marker: this.getMarker(),
       code: this.getCode(),
       text: this.getFirstChild<TextNode>()?.getTextContent(),
+      unknownAttributes: this.getUnknownAttributes(),
       version: BOOK_VERSION,
     };
   }
 }
 
-export function $createBookNode(code: BookCode, text?: string): BookNode {
-  return $applyNodeReplacement(new BookNode(code, text));
+export function $createBookNode(
+  code: BookCode,
+  text?: string,
+  unknownAttributes?: UnknownAttributes,
+): BookNode {
+  return $applyNodeReplacement(new BookNode(code, text, unknownAttributes));
 }
 
 export function $isBookNode(node: LexicalNode | null | undefined): node is BookNode {
