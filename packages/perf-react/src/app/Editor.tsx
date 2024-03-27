@@ -7,7 +7,7 @@ import scriptureNodes from "shared/nodes";
 
 import { useLexicalState } from "./useLexicalState";
 import { UpdateListener } from "lexical/LexicalEditor";
-import { OnChangePlugin } from "../lexical/plugins/OnChange/OnChangePlugin";
+import { OnChangePlugin } from "shared-react/plugins/OnChange/OnChangePlugin";
 
 const theme = {
   // Theme styling goes here
