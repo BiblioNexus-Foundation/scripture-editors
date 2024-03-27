@@ -4,8 +4,8 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
 import { useLexicalState } from "./useLexicalState";
-import { HistoryPlugin } from "../lexical/plugins/History/HistoryPlugin";
-import { HistoryMergeListener } from "../lexical/plugins/History";
+import { HistoryMergeListener } from "shared/plugins/History";
+import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
 
 const theme = {
   // Theme styling goes here

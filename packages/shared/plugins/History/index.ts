@@ -6,7 +6,7 @@
 import type { EditorState, LexicalEditor, LexicalNode, NodeKey } from "lexical";
 
 import { mergeRegister } from "@lexical/utils";
-import { debounce } from "shared/utils";
+import { debounce } from "../../utils";
 import {
   $isRangeSelection,
   $isRootNode,
@@ -35,7 +35,7 @@ const DELETE_CHARACTER_AFTER_SELECTION = 4;
 
 type UpdateListenerArgs = Parameters<UpdateListener>[0];
 interface OnChangeArgs extends Omit<UpdateListenerArgs, "normalizedNodes"> {
-  historyManager: LexicalHistoryManager;
+  mergeHistory: LexicalHistoryManager["merge"];
 }
 
 export type HistoryMergeListener = ({
@@ -43,7 +43,7 @@ export type HistoryMergeListener = ({
   dirtyLeaves,
   editorState,
   prevEditorState,
-  historyManager,
+  mergeHistory,
   tags,
 }: OnChangeArgs) => void;
 
@@ -343,7 +343,7 @@ export function registerHistory(
     dirtyLeaves: Set<NodeKey>;
     tags: Set<string>;
   }): void => {
-    const current = historyManager.current;
+    const current = historyManager.getCurrent();
     const currentEditorState = current === null ? null : current.editorState;
 
     if (current !== null && editorState === currentEditorState) {
@@ -375,9 +375,8 @@ export function registerHistory(
       dirtyElements: dirtyNodes.getElements(),
       tags,
       editorState,
-      prevEditorState:
-        historyManager.undoStack[historyManager.undoStack.length]?.editorState || prevEditorState,
-      historyManager,
+      prevEditorState: historyManager.getPrevious()?.editorState || prevEditorState,
+      mergeHistory: historyManager.merge,
     });
   };
 

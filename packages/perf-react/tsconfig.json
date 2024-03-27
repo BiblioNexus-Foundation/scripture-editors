@@ -24,7 +24,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "../shared/plugins/History/index.ts",
+    "../shared/plugins/History/HistoryManager.ts",
+    "../shared-react/plugins/History/HistoryPlugin.tsx"
+  ],
   "references": [
     {
       "path": "./tsconfig.node.json"

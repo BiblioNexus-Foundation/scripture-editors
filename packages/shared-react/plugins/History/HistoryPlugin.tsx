@@ -3,10 +3,10 @@
  * Original source: https://github.com/facebook/lexical
  */
 
-import type { HistoryMergeListener } from "./";
+import type { HistoryMergeListener } from "shared/plugins/History";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useHistory } from "./useHistory";
-import { HistoryState } from "./HistoryManager";
+import { HistoryState } from "shared/plugins/History/HistoryManager";
 
 export function HistoryPlugin({
   externalHistoryState,
