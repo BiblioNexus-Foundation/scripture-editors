@@ -1,6 +1,7 @@
 import { $getNodeByKey, EditorState } from "lexical";
 import { SerializedUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { PerfOperation, PerfAction, PerfKind } from "./PerfOperation";
+import { transformLexicalStateToPerf } from "shared/converters/lexicalToPerf";
+import { PerfOperation, PerfAction, PerfKind, LexicalPerfNode } from "./PerfOperation";
 import {
   findClosestNonOrphanAncestorKey,
   getNodeJson,
@@ -40,16 +41,28 @@ export function getPerfOperation(
         // If the current node doesn't exist, it's a delete operation
         return buildDeleteOperation(commonOperationProps);
       }
-      const lexicalState = getNodeJson(nodeState.current);
+
+      const lexicalNode: LexicalPerfNode = buildLexicalNode(
+        getNodeJson(nodeState.current),
+        commonOperationProps.kind,
+      );
       const currentPath = recursiveGetNodePath(nodeState.current);
       if (currentPath.join() !== previousPath.join())
         // If the current path is different from the previous path, it's a move operation
-        return buildMoveOperation({ lexicalState, ...commonOperationProps }, currentPath);
+        return buildMoveOperation({ lexicalNode, ...commonOperationProps }, currentPath);
       // Otherwise, it's a replace operation
-      return buildReplaceOperation({ lexicalState, ...commonOperationProps });
+      return buildReplaceOperation({ lexicalNode, ...commonOperationProps });
     });
   });
 }
+
+const buildLexicalNode = (node: SerializedUsfmElementNode, kind: PerfKind): LexicalPerfNode => ({
+  node,
+  toPerf() {
+    console.log({ kind });
+    return transformLexicalStateToPerf(this.node, kind);
+  },
+});
 
 /**
  * Builds the common operation properties.
@@ -74,7 +87,7 @@ function buildReplaceOperation(commonOperationProps: {
   path: (string | number)[];
   kind: PerfKind;
   nodeKey: string;
-  lexicalState: SerializedUsfmElementNode;
+  lexicalNode: LexicalPerfNode;
 }): PerfOperation {
   return {
     action: PerfAction.Replace,
@@ -93,7 +106,7 @@ function buildMoveOperation(
     path: (string | number)[];
     kind: PerfKind;
     nodeKey: string;
-    lexicalState: SerializedUsfmElementNode;
+    lexicalNode: LexicalPerfNode;
   },
   currentPath: (string | number)[],
 ): PerfOperation {
@@ -140,12 +153,15 @@ function buildAddOperation(
     ...editorState.read(() => {
       nodeState.current = $getNodeByKey(nodeKey) as UsfmElementNode;
       const path = recursiveGetNodePath(nodeState.current);
-      const lexicalState = getNodeJson(nodeState.current);
+      const lexicalNode = buildLexicalNode(
+        getNodeJson(nodeState.current),
+        getPerfKindbyPathLength(path.length),
+      );
       const kind = getPerfKindbyPathLength(path.length);
       return {
         path,
         kind,
-        lexicalState,
+        lexicalNode,
         states: { current: nodeState.current },
       };
     }),

@@ -1,3 +1,4 @@
+import { Perf } from "shared/converters/lexicalToPerf";
 import { SerializedUsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 // Const enum for PerfAction action property
@@ -16,20 +17,26 @@ export const enum PerfKind {
 
 type PerfPath = Array<string | number>;
 
-interface BaseOperation {
+export interface LexicalPerfNode {
+  node: SerializedUsfmElementNode;
+  toPerf: () => Perf; //it can return a PERF sequence, block or contentElement, but there is currently no types for those.
+}
+
+export interface BaseOperation {
   nodeKey: string; // Key of the node
   action: PerfAction; // Action performed on the node
   path: PerfPath; // Array representing the path to the node
   kind: PerfKind; // Type of node (sequence, block, contentElement)
-  lexicalState: SerializedUsfmElementNode; // Serialized JSON representation of the node
+  lexicalNode: LexicalPerfNode; // Serialized JSON representation of the node
 }
 
 // Interface for the PerfOperation object
 export interface AddOperation extends BaseOperation {
   action: PerfAction.Add;
 }
-export interface DeleteOperation extends Omit<BaseOperation, "lexicalState"> {
+export interface DeleteOperation extends Omit<BaseOperation, "lexicalNode"> {
   action: PerfAction.Delete;
+  lexicalNode?: LexicalPerfNode;
 }
 export interface ReplaceOperation extends BaseOperation {
   action: PerfAction.Replace;
