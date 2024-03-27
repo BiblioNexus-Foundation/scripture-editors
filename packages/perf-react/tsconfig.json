@@ -24,7 +24,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../shared-react/plugins/OnChange"],
   "references": [
     {
       "path": "./tsconfig.node.json"
