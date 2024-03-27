@@ -12,10 +12,10 @@ export type HistoryState = {
 };
 
 export class LexicalHistoryManager {
-  current: HistoryState["current"];
-  redoStack: HistoryState["redoStack"];
-  undoStack: HistoryState["undoStack"];
-  editor: LexicalEditor;
+  private current: HistoryState["current"];
+  private redoStack: HistoryState["redoStack"];
+  private undoStack: HistoryState["undoStack"];
+  private editor: LexicalEditor;
 
   constructor(editor: LexicalEditor, historyState: HistoryState) {
     this.editor = editor;
@@ -24,11 +24,11 @@ export class LexicalHistoryManager {
     this.undoStack = historyState.undoStack ?? [];
   }
 
-  merge(historyEntry: HistoryStateEntry) {
+  public merge(historyEntry: HistoryStateEntry) {
     this.current = historyEntry;
   }
 
-  push() {
+  public push() {
     if (this.redoStack.length !== 0) {
       this.redoStack = [];
       this.editor.dispatchCommand(CAN_REDO_COMMAND, false);
@@ -42,7 +42,7 @@ export class LexicalHistoryManager {
     }
   }
 
-  redo(/* onRedo = () => null */) {
+  public redo(/* onRedo = () => null */) {
     const redoStack = this.redoStack;
     const undoStack = this.undoStack;
 
@@ -70,7 +70,19 @@ export class LexicalHistoryManager {
     }
   }
 
-  undo(/* onUndo = () => null */) {
+  public getPrevious() {
+    return this.undoStack[this.undoStack.length - 1];
+  }
+
+  public getNext() {
+    return this.redoStack[this.redoStack.length - 1];
+  }
+
+  public getCurrent() {
+    return this.current;
+  }
+
+  public undo(/* onUndo = () => null */) {
     const redoStack = this.redoStack;
     const undoStack = this.undoStack;
     const undoStackLength = undoStack.length;
@@ -98,14 +110,14 @@ export class LexicalHistoryManager {
     }
   }
 
-  reset(editor?: LexicalEditor) {
+  public reset(editor?: LexicalEditor) {
     this.clear();
     if (editor) this.editor = editor;
     this.editor.dispatchCommand(CAN_REDO_COMMAND, false);
     this.editor.dispatchCommand(CAN_UNDO_COMMAND, false);
   }
 
-  clear() {
+  public clear() {
     this.current = null;
     this.redoStack = [];
     this.undoStack = [];
