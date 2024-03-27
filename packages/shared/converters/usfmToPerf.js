@@ -46,6 +46,6 @@ export const usfm2perf = (
     console.error(e);
     perf = null;
   }
-  console.log({ perf });
+  // console.log({ perf });
   return perf;
 };

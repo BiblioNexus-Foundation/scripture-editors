@@ -235,7 +235,7 @@ export const createPerfMap = (perf) => ({
 
 const getAttributesFromPerfElementProps = (data) =>
   Object.keys(data).reduce((atts, dataKey) => {
-    if (["kind", "path", "metaContent"].includes(dataKey)) return atts;
+    if (["kind", "metaContent"].includes(dataKey)) return atts;
     atts[`data-${dataKey}`] = data[dataKey];
     return atts;
   }, {});
