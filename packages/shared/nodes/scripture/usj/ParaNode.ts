@@ -84,7 +84,7 @@ const VALID_PARA_MARKERS = [
   "li#",
   "lf",
   "lim#",
-  "litl",
+  "litl", // TODO remove in USX3.1
 ] as const;
 
 const VALID_PARA_MARKERS_NUMBERED = extractNumberedMarkers(VALID_PARA_MARKERS);

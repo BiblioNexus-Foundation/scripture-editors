@@ -9,7 +9,7 @@ import {
   Spread,
   EditorConfig,
 } from "lexical";
-import { PLAIN_FONT_CLASS_NAME, closingMarkerText, openingMarkerText } from "./node.utils";
+import { closingMarkerText, openingMarkerText } from "./node.utils";
 
 export const MARKER_VERSION = 1;
 
@@ -75,11 +75,7 @@ export class MarkerNode extends TextNode {
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(
-      this.getType(),
-      this.__isOpening ? "opening" : "closing",
-      PLAIN_FONT_CLASS_NAME,
-    );
+    dom.classList.add(this.getType(), this.__isOpening ? "opening" : "closing");
     return dom;
   }
 
