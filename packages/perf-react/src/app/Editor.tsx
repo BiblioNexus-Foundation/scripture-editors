@@ -4,9 +4,10 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
-import { OnChangePlugin } from "../lexical/plugins/OnChangePlugin";
+
 import { useLexicalState } from "./useLexicalState";
 import { UpdateListener } from "lexical/LexicalEditor";
+import { OnChangePlugin } from "../lexical/plugins/OnChange/OnChangePlugin";
 
 const theme = {
   // Theme styling goes here
