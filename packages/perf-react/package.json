@@ -19,7 +19,8 @@
     "@lexical/utils": "^0.13.1",
     "epitelete-html": "^0.2.21-beta.2",
     "lexical": "^0.13.1",
-    "shared": "*"
+    "shared": "*",
+    "shared-react": "*"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",

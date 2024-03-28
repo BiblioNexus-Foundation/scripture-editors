@@ -140,6 +140,9 @@ importers:
       shared:
         specifier: '*'
         version: link:../shared
+      shared-react:
+        specifier: '*'
+        version: link:../shared-react
     devDependencies:
       '@types/react':
         specifier: ^18.2.48
