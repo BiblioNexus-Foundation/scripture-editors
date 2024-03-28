@@ -19,7 +19,6 @@ export type SerializedVerseNode = Spread<
   {
     marker: VerseMarker;
     number: string;
-    classList: string[];
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
@@ -31,7 +30,6 @@ export type SerializedVerseNode = Spread<
 export class VerseNode extends TextNode {
   __marker: VerseMarker;
   __number: string;
-  __classList: string[];
   __sid?: string;
   __altnumber?: string;
   __pubnumber?: string;
@@ -39,7 +37,6 @@ export class VerseNode extends TextNode {
 
   constructor(
     verseNumber: string,
-    classList: string[] = [],
     text?: string,
     sid?: string,
     altnumber?: string,
@@ -50,7 +47,6 @@ export class VerseNode extends TextNode {
     super(text ?? verseNumber, key);
     this.__marker = VERSE_MARKER;
     this.__number = verseNumber;
-    this.__classList = classList;
     this.__sid = sid;
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
@@ -62,19 +58,9 @@ export class VerseNode extends TextNode {
   }
 
   static clone(node: VerseNode): VerseNode {
-    const {
-      __number,
-      __classList,
-      __text,
-      __sid,
-      __altnumber,
-      __pubnumber,
-      __unknownAttributes,
-      __key,
-    } = node;
+    const { __number, __text, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } = node;
     return new VerseNode(
       __number,
-      __classList,
       __text,
       __sid,
       __altnumber,
@@ -88,7 +74,6 @@ export class VerseNode extends TextNode {
     const {
       marker,
       number,
-      classList,
       text,
       sid,
       altnumber,
@@ -99,15 +84,7 @@ export class VerseNode extends TextNode {
       mode,
       style,
     } = serializedNode;
-    const node = $createVerseNode(
-      number,
-      classList,
-      text,
-      sid,
-      altnumber,
-      pubnumber,
-      unknownAttributes,
-    );
+    const node = $createVerseNode(number, text, sid, altnumber, pubnumber, unknownAttributes);
     node.setMarker(marker);
     node.setDetail(detail);
     node.setFormat(format);
@@ -134,16 +111,6 @@ export class VerseNode extends TextNode {
   getNumber(): string {
     const self = this.getLatest();
     return self.__number;
-  }
-
-  setClassList(classList: string[]): void {
-    const self = this.getWritable();
-    self.__classList = classList;
-  }
-
-  getClassList(): string[] {
-    const self = this.getLatest();
-    return self.__classList;
   }
 
   setSid(sid: string | undefined): void {
@@ -189,7 +156,7 @@ export class VerseNode extends TextNode {
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(VERSE_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
+    dom.classList.add(VERSE_CLASS_NAME, `usfm_${this.__marker}`);
     dom.setAttribute("data-number", this.__number);
     return dom;
   }
@@ -200,7 +167,6 @@ export class VerseNode extends TextNode {
       type: this.getType(),
       marker: this.getMarker(),
       number: this.getNumber(),
-      classList: this.getClassList(),
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
@@ -212,7 +178,6 @@ export class VerseNode extends TextNode {
 
 export function $createVerseNode(
   verseNumber: string,
-  classList?: string[],
   text?: string,
   sid?: string,
   altnumber?: string,
@@ -220,7 +185,7 @@ export function $createVerseNode(
   unknownAttributes?: UnknownAttributes,
 ): VerseNode {
   return $applyNodeReplacement(
-    new VerseNode(verseNumber, classList, text, sid, altnumber, pubnumber, unknownAttributes),
+    new VerseNode(verseNumber, text, sid, altnumber, pubnumber, unknownAttributes),
   );
 }
 

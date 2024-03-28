@@ -24,8 +24,8 @@ export const CHAR_NODE_TYPE = "char";
 export const NBSP = "\xa0";
 export const CHAPTER_CLASS_NAME = "chapter";
 export const VERSE_CLASS_NAME = "verse";
-export const NO_INDENT_CLASS_NAME = "no-indent";
-export const PLAIN_FONT_CLASS_NAME = "plain-font";
+export const TEXT_SPACING_CLASS_NAME = "text-spacing";
+export const FORMATTED_FONT_CLASS_NAME = "formatted-font";
 
 const NUMBERED_MARKER_PLACEHOLDER = "#";
 
