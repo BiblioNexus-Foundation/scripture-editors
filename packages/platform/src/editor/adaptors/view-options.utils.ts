@@ -8,10 +8,10 @@ import {
 export type ViewOptions = {
   /** USFM markers are visible, editable or hidden */
   markerMode: "visible" | "editable" | "hidden";
-  /** is the text indented */
-  isIndented: boolean;
-  /** is the text in a plain font */
-  isPlainFont: boolean;
+  /** does the text have spacing including indenting */
+  hasSpacing: boolean;
+  /** is the text in a formatted font */
+  isFormattedFont: boolean;
 };
 
 /**
@@ -26,15 +26,15 @@ export function getViewOptions(viewMode: string | undefined): ViewOptions | unde
     case formattedViewMode:
       viewOptions = {
         markerMode: "hidden",
-        isIndented: true,
-        isPlainFont: false,
+        hasSpacing: true,
+        isFormattedFont: true,
       };
       break;
     case unformattedViewMode:
       viewOptions = {
         markerMode: "editable",
-        isIndented: false,
-        isPlainFont: true,
+        hasSpacing: false,
+        isFormattedFont: false,
       };
       break;
     default:
@@ -51,8 +51,8 @@ export function getViewOptions(viewMode: string | undefined): ViewOptions | unde
 export function viewOptionsToMode(viewOptions: ViewOptions | undefined): ViewMode | undefined {
   if (!viewOptions) return undefined;
 
-  const { markerMode, isIndented, isPlainFont } = viewOptions;
-  if (markerMode === "hidden" && isIndented && !isPlainFont) return formattedViewMode;
-  if (markerMode === "editable" && !isIndented && isPlainFont) return unformattedViewMode;
+  const { markerMode, hasSpacing, isFormattedFont } = viewOptions;
+  if (markerMode === "hidden" && hasSpacing && isFormattedFont) return formattedViewMode;
+  if (markerMode === "editable" && !hasSpacing && !isFormattedFont) return unformattedViewMode;
   return undefined;
 }

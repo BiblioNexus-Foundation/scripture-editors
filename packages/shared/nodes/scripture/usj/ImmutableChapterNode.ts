@@ -19,6 +19,7 @@ export type SerializedImmutableChapterNode = Spread<
   {
     marker: ChapterMarker;
     number: string;
+    classList: string[];
     showMarker?: boolean;
     sid?: string;
     altnumber?: string;
@@ -31,6 +32,7 @@ export type SerializedImmutableChapterNode = Spread<
 export class ImmutableChapterNode extends DecoratorNode<void> {
   __marker: ChapterMarker;
   __number: string;
+  __classList: string[];
   __showMarker?: boolean;
   __sid?: string;
   __altnumber?: string;
@@ -39,6 +41,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
 
   constructor(
     chapterNumber: string,
+    classList: string[] = [],
     showMarker = false,
     sid?: string,
     altnumber?: string,
@@ -49,6 +52,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     super(key);
     this.__marker = CHAPTER_MARKER;
     this.__number = chapterNumber;
+    this.__classList = classList;
     this.__showMarker = showMarker;
     this.__sid = sid;
     this.__altnumber = altnumber;
@@ -61,10 +65,19 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 
   static clone(node: ImmutableChapterNode): ImmutableChapterNode {
-    const { __number, __showMarker, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } =
-      node;
+    const {
+      __number,
+      __classList,
+      __showMarker,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    } = node;
     return new ImmutableChapterNode(
       __number,
+      __classList,
       __showMarker,
       __sid,
       __altnumber,
@@ -75,10 +88,11 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 
   static importJSON(serializedNode: SerializedImmutableChapterNode): ImmutableChapterNode {
-    const { marker, number, showMarker, sid, altnumber, pubnumber, unknownAttributes } =
+    const { marker, number, classList, showMarker, sid, altnumber, pubnumber, unknownAttributes } =
       serializedNode;
     const node = $createImmutableChapterNode(
       number,
+      classList,
       showMarker,
       sid,
       altnumber,
@@ -107,6 +121,16 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   getNumber(): string {
     const self = this.getLatest();
     return self.__number;
+  }
+
+  setClassList(classList: string[]): void {
+    const self = this.getWritable();
+    self.__classList = classList;
+  }
+
+  getClassList(): string[] {
+    const self = this.getLatest();
+    return self.__classList;
   }
 
   setShowMarker(showMarker = false): void {
@@ -162,7 +186,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`);
+    dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
     dom.setAttribute("data-number", this.__number);
     return dom;
   }
@@ -184,6 +208,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
       type: this.getType(),
       marker: this.getMarker(),
       number: this.getNumber(),
+      classList: this.getClassList(),
       showMarker: this.getShowMarker(),
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
@@ -196,6 +221,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
 
 export function $createImmutableChapterNode(
   chapterNumber: string,
+  classList?: string[],
   showMarker?: boolean,
   sid?: string,
   altnumber?: string,
@@ -205,6 +231,7 @@ export function $createImmutableChapterNode(
   return $applyNodeReplacement(
     new ImmutableChapterNode(
       chapterNumber,
+      classList,
       showMarker,
       sid,
       altnumber,

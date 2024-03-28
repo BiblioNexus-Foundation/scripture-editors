@@ -11,7 +11,6 @@ import {
 } from "lexical";
 import {
   CHAR_NODE_TYPE,
-  PLAIN_FONT_CLASS_NAME,
   UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
@@ -172,11 +171,6 @@ export class CharNode extends TextNode {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
     dom.classList.add(this.getType(), `usfm_${this.__marker}`);
-    if (
-      CharNode.isValidFootnoteMarker(this.__marker) ||
-      CharNode.isValidCrossReferenceMarker(this.__marker)
-    )
-      dom.classList.add(PLAIN_FONT_CLASS_NAME);
     return dom;
   }
 
