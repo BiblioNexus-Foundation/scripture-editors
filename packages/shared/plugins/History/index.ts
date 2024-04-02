@@ -3,6 +3,8 @@
  * Original source: https://github.com/facebook/lexical
  */
 
+// TODO: Resolve the issue of an infinite loop occurring when updating the editor state if the user clicks the same position twice in a row. This issue is suspected to be caused by the "updateEditor" function in the lexical module.
+
 import type { EditorState, LexicalEditor, LexicalNode, NodeKey } from "lexical";
 
 import { mergeRegister } from "@lexical/utils";
@@ -35,7 +37,12 @@ const DELETE_CHARACTER_AFTER_SELECTION = 4;
 
 type UpdateListenerArgs = Parameters<UpdateListener>[0];
 interface OnChangeArgs extends Omit<UpdateListenerArgs, "normalizedNodes"> {
-  mergeHistory: LexicalHistoryManager["merge"];
+  history: {
+    canRedo: boolean;
+    canUndo: boolean;
+    mergeHistory: <T extends Record<string, unknown>>(mergeableData: T) => void;
+    currentEntry: Record<string, unknown>;
+  };
 }
 
 export type HistoryMergeListener = ({
@@ -43,8 +50,8 @@ export type HistoryMergeListener = ({
   dirtyLeaves,
   editorState,
   prevEditorState,
-  mergeHistory,
   tags,
+  history,
 }: OnChangeArgs) => void;
 
 type IntentionallyMarkedAsDirtyElement = boolean;
@@ -324,7 +331,6 @@ export function registerHistory(
   onChange: HistoryMergeListener = () => null, // Update the type of the onChange parameter
   delay: number,
 ): () => void {
-  console.log("registerHistory");
   const getMergeAction = createMergeActionGetter(editor, delay);
   const triggerOnChange = debounce(onChange, delay);
   const historyManager = new LexicalHistoryManager(editor, historyState);
@@ -362,6 +368,7 @@ export function registerHistory(
       dirtyNodes.reset();
       historyManager.push();
     } else if (mergeAction === DISCARD_HISTORY_CANDIDATE) {
+      dirtyNodes.reset();
       return;
     }
 
@@ -369,14 +376,24 @@ export function registerHistory(
       editor,
       editorState,
     });
+    //TODO: reset dirtyNodes after undo and redo, because the nodes are not dirty anymore
     dirtyNodes.merge(dirtyLeaves, dirtyElements);
-    triggerOnChange({
+    console.log({ dirtyNodes: dirtyNodes.getAll() });
+
+    (() => (!current ? onChange : triggerOnChange))()({
+      editorState,
+      prevEditorState: historyManager.getPrevious()?.editorState || prevEditorState,
       dirtyLeaves: dirtyNodes.getLeaves(),
       dirtyElements: dirtyNodes.getElements(),
       tags,
-      editorState,
-      prevEditorState: historyManager.getPrevious()?.editorState || prevEditorState,
-      mergeHistory: historyManager.merge,
+      history: {
+        canUndo: historyManager.canUndo(),
+        canRedo: historyManager.canRedo(),
+        mergeHistory(historyEntry) {
+          historyManager.merge({ ...historyEntry, editor, editorState });
+        },
+        currentEntry: historyManager.getCurrentEntryData(),
+      },
     });
   };
 

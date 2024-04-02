@@ -2,8 +2,7 @@ import Epitelete from "epitelete";
 import { transformPerfToLexicalState } from "../converters/perfToLexical";
 import { usfm2perf } from "../converters/usfmToPerf";
 
-export const getLexicalState = (usfmText) => {
-  //Lots of hardcoded data here.
+export const getPerf = async (usfmText) => {
   const perf = usfm2perf(usfmText, {
     serverName: "door43",
     organizationId: "unfoldingWord",
@@ -13,17 +12,15 @@ export const getLexicalState = (usfmText) => {
   const bibleStore = new BibleStore();
   const bibleHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,
-    options: { historySize: 100 },
+    options: { historySize: 1 },
   });
-
   const readOptions = { readPipeline: "stripAlignmentPipeline" };
+  return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions });
+};
 
-  return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions }).then((perf) => {
-    console.log({ perf });
-    const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
-    // console.log("Perf to Lexical", { perf, lexicalState: _lexicalState });
-    return JSON.stringify(_lexicalState);
-  });
+export const getLexicalState = (perf) => {
+  const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
+  return JSON.stringify(_lexicalState);
 };
 
 // export const lexicalState = getTestLexicalState();

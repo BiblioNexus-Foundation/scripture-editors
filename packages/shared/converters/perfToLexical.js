@@ -14,6 +14,8 @@ export const transformPerfToLexicalState = (perf, sequenceId, perfMapper) => ({
 });
 export default transformPerfToLexicalState;
 
+export const DATA_PREFIX = "perf";
+
 /**
  * Converts a PERF element to a different format
  */
@@ -29,9 +31,9 @@ export const buildLexicalNodeFromPerfNode = ({ props, children, path, kind, perf
 /** Maps types and subtypes of a PERF element (sequence,block, contentElement)
  * given map object (perfMap) and returns a transformation of that element.
  */
-export const mapPerf = ({ props, path, children, kind, defaults, perfMap }) => {
+export const mapPerf = ({ props, children, kind, defaults, perfMap }) => {
   const { type, subtype } = props;
-  const _props = { ...props, kind, path };
+  const _props = { ...props, kind };
   const _defaults = defaults ?? { props: _props, children };
 
   if (!perfMap) return _defaults;
@@ -208,10 +210,11 @@ export const createPerfMap = (perf) => ({
     }))(({ props: perfElementProps }) => ({
       // data: perfElementProps,
       attributes: {
-        "data-atts-number": perfElementProps.atts.number,
-        "data-type": perfElementProps.type,
-        "data-subtype": perfElementProps.subtype,
+        [`${DATA_PREFIX}-atts-number`]: perfElementProps.atts.number,
+        [`${DATA_PREFIX}-type`]: perfElementProps.type,
+        [`${DATA_PREFIX}-subtype`]: perfElementProps.subtype,
         class: `${perfElementProps.subtype}`,
+        tabindex: 0,
       },
       children: [
         {
@@ -236,7 +239,8 @@ export const createPerfMap = (perf) => ({
 const getAttributesFromPerfElementProps = (data) =>
   Object.keys(data).reduce((atts, dataKey) => {
     if (["kind", "metaContent"].includes(dataKey)) return atts;
-    atts[`data-${dataKey}`] = data[dataKey];
+    atts[`${DATA_PREFIX}-${dataKey}`] = data[dataKey];
+    atts.tabindex = 0;
     return atts;
   }, {});
 

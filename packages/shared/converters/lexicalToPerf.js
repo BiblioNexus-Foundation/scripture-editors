@@ -1,4 +1,5 @@
 import { convertLexicalStateNode } from "./lexicalToX";
+import { DATA_PREFIX } from "./perfToLexical";
 
 export const transformLexicalStateToPerf = (lexicalStateNode, kind) => {
   const perf = { sequences: {} };
@@ -12,28 +13,27 @@ export const transformLexicalStateToPerf = (lexicalStateNode, kind) => {
 export default transformLexicalStateToPerf;
 
 const getDatafromAttributes = (attributes) => {
-  const {
-    "data-type": type,
-    "data-subtype": subtypeRaw,
-    "data-subtype-ns": subtypeNs,
-    ...extraAttributes
-  } = attributes;
-  const data = Object.keys(extraAttributes).reduce((data, attribute) => {
+  let nameSpace;
+  const data = Object.keys(attributes).reduce((data, attribute) => {
     const [prefix, key, subKey] = attribute.split("-");
-    if (prefix !== "data") {
+    if (prefix !== DATA_PREFIX || !key) {
       console.warn(`Invalid attribute: ${attribute}`);
+      return data;
+    }
+    if (subKey === "ns") {
+      nameSpace = attributes[attribute];
       return data;
     }
     if (subKey) {
       if (!data[key]) data[key] = {};
-      data[key][subKey] = extraAttributes[attribute];
+      data[key][subKey] = attributes[attribute];
       return data;
     }
-    data[key] = extraAttributes[attribute];
+    data[key] = attributes[attribute];
     return data;
   }, {});
-  const subtype = subtypeNs ? subtypeRaw + ":" + subtypeNs : subtypeRaw;
-  return { type, subtype, ...data };
+  data.subtype = data.subtype + (nameSpace ? ":" + nameSpace : "");
+  return data;
 };
 
 const customNodeBuilder = ({ node, kind, children, perf }) =>

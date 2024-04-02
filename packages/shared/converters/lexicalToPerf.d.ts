@@ -1,14 +1,15 @@
 declare module "shared/converters/lexicalToPerf" {
+  import { SerializedUsfmElementNode } from "../nodes/UsfmElementNode";
   export interface LexicalStateNode {
-    [key: string]: unknown;
+    [key: string]: Perf;
   }
   export interface Perf {
-    sequences: { [key: string]: unknown };
-    targetSequence?: unknown;
+    sequences: { [key: string]: Perf };
+    targetNode?: Perf;
   }
 
   export interface NodeBuilderProps {
-    [key: string]: unknown;
+    [key: string]: Perf;
   }
 
   export interface CustomNodeBuilderProps extends NodeBuilderProps {
@@ -16,7 +17,7 @@ declare module "shared/converters/lexicalToPerf" {
   }
 
   export function transformLexicalStateToPerf(
-    lexicalStateNode: LexicalStateNode,
+    lexicalStateNode: SerializedUsfmElementNode,
     kind: string,
   ): Perf;
 

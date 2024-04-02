@@ -34,4 +34,8 @@ export class DirtyNodes {
   public getElements(): ElementsMap {
     return this.elements;
   }
+
+  public getAll(): { elements: ElementsMap; leaves: LeavesSet } {
+    return { elements: this.elements, leaves: this.leaves };
+  }
 }
