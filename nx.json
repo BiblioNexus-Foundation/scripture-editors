@@ -10,9 +10,7 @@
   },
   "extends": "nx/presets/npm.json",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "affected": {
-    "defaultBase": "main"
-  },
+  "defaultBase": "main",
   "targetDefaults": {
     "build": {
       "inputs": ["production", "^production"],
@@ -27,9 +25,13 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p tsconfig.json --noEmit",
-        "cwd": "{projectRoot}",
-        "forwardAllArgs": false
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "{projectRoot}"
       }
     },
     "test": {

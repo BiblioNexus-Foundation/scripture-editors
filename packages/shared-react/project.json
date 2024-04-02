@@ -7,9 +7,13 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p tsconfig.json",
-        "cwd": "{projectRoot}",
-        "forwardAllArgs": false
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "{projectRoot}"
       }
     },
     "typecheck": {},
