@@ -1,39 +1,10 @@
 import { $getNodeByKey, EditorState, ElementNode, LexicalNode } from "lexical";
-import { PerfAction, PerfKind } from "./PerfOperation";
+import { PerfKind } from "./types";
 import { SerializedUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
 /**
  * this module provides utility functions for the Perf plugin.
  * @module
  */
-
-/**
- * Checks if a node has moved within the lexical tree.
- * @param previousNode - The previous node.
- * @param currentNode - The current node.
- * @returns A boolean indicating whether the node has moved.
- */
-export const didNodeMove = (previousNode: LexicalNode, currentNode: LexicalNode): boolean => {
-  //TODO: Check if this is the correct way to compare the nodes, the correct way should be to compare the keys and not the nodes themselves
-  return !(
-    previousNode.__parent === currentNode.__parent &&
-    previousNode.__prev === currentNode.__prev &&
-    previousNode.__next === currentNode.__next
-  );
-};
-
-/**
- * Determines the action performed on a lexical node based on its previous and current state.
- * @param previousNode The previous state of the lexical node.
- * @param currentNode The current state of the lexical node.
- * @returns The action performed on the lexical node.
- */
-export function getNodeAction(previousNode?: LexicalNode, currentNode?: LexicalNode): PerfAction {
-  if (previousNode && currentNode) {
-    return didNodeMove(previousNode, currentNode) ? PerfAction.Move : PerfAction.Replace;
-  } else {
-    return previousNode ? PerfAction.Delete : PerfAction.Add;
-  }
-}
 
 /**
  * Finds the closest non-orphan ancestor node and returns its key.
@@ -106,7 +77,7 @@ export function getPerfKindbyPathLength(len: number): PerfKind {
  * @param parent - The parent node of the given node.
  * @returns The kind of the node.
  */
-export function getPerfKindFromNode(node: UsfmElementNode | ElementNode) {
+export function getPerfKindFromNode(node: LexicalNode | ElementNode) {
   if (node && checkIsSequence(node)) return PerfKind.Sequence; // If the node is a sequence, return "sequence"
   const parent = node.getParent();
   if (parent && checkIsSequence(parent)) return PerfKind.Block; // If the parent is a sequence, return PerfKind.Block
@@ -118,7 +89,7 @@ export function getPerfKindFromNode(node: UsfmElementNode | ElementNode) {
  * @param node - The node to check.
  * @returns A boolean indicating whether the node is a sequence.
  */
-export function checkIsSequence(node: UsfmElementNode | ElementNode) {
+export function checkIsSequence(node: LexicalNode | ElementNode) {
   return ["root", "graft"].includes(node.getType() || "");
 }
 

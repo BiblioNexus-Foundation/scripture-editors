@@ -25,7 +25,7 @@ export class LexicalHistoryManager {
   }
 
   public merge(historyEntry: HistoryStateEntry) {
-    this.current = historyEntry;
+    this.current = { ...this.current, ...historyEntry };
   }
 
   public push() {
@@ -40,6 +40,14 @@ export class LexicalHistoryManager {
       });
       this.editor.dispatchCommand(CAN_UNDO_COMMAND, true);
     }
+  }
+
+  public canUndo(): boolean {
+    return this.undoStack.length > 0;
+  }
+
+  public canRedo(): boolean {
+    return this.redoStack.length > 0;
   }
 
   public redo(/* onRedo = () => null */) {
@@ -80,6 +88,13 @@ export class LexicalHistoryManager {
 
   public getCurrent() {
     return this.current;
+  }
+
+  public getCurrentEntryData() {
+    const currentEntryData = { ...this.current };
+    delete currentEntryData.editor;
+    delete currentEntryData.editorState;
+    return currentEntryData;
   }
 
   public undo(/* onUndo = () => null */) {

@@ -18,7 +18,10 @@
     "@lexical/selection": "^0.14.5",
     "@lexical/utils": "^0.14.5",
     "epitelete-html": "^0.2.21-beta.2",
-    "lexical": "^0.14.5"
+    "lexical": "^0.14.5",
+    "open-patcher": "1.0.0-beta.1",
+    "shared": "*",
+    "shared-react": "*"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

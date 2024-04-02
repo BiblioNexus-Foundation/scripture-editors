@@ -53,6 +53,7 @@ export class UsfmElementNode extends ElementNode {
   exportJSON(): SerializedUsfmElementNode {
     return {
       ...super.exportJSON(),
+      children: this.getChildren<UsfmElementNode>().map((node) => node.exportJSON()),
       data: this.getData(),
       attributes: this.getAttributes(),
       tag: this.getTag(),
