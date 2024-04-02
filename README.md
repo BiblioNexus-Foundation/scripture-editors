@@ -15,15 +15,15 @@ Sharing in this monorepo is a commitment to maintain and organize it. Each appli
 ## Developer Quick Start
 
 1. Install [Volta](https://docs.volta.sh/guide/getting-started).
-2. Install [Nx](https://nx.dev/) globally (note we intentionally use `npm` rather than `pnpm` for global installs, see [JavaScript Tool Manager](#javascript-tool-manager)):
-   ```bash
-   npm i -g nx
-   ```
-3. Clone the monorepo:
+2. Clone the monorepo:
    ```bash
    git clone https://github.com/BiblioNexus-Foundation/scripture-editors.git
    cd scripture-editors
    pnpm install
+   ```
+3. Install [Nx](https://nx.dev/) globally (note we intentionally use `npm` rather than `pnpm` for global installs, see [JavaScript Tool Manager](#javascript-tool-manager)):
+   ```bash
+   npm i -g nx
    ```
 4. Run one of the top level developer environments (see the **Nx Graph** below), e.g.:
    ```bash
