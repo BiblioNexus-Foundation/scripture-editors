@@ -17,7 +17,7 @@ const getDatafromAttributes = (attributes) => {
   const data = Object.keys(attributes).reduce((data, attribute) => {
     const [prefix, key, subKey] = attribute.split("-");
     if (prefix !== DATA_PREFIX || !key) {
-      console.warn(`Invalid attribute: ${attribute}`);
+      // console.info(`Ignoring non perf attribute: ${attribute}`);
       return data;
     }
     if (subKey === "ns") {
@@ -32,7 +32,7 @@ const getDatafromAttributes = (attributes) => {
     data[key] = attributes[attribute];
     return data;
   }, {});
-  data.subtype = data.subtype + (nameSpace ? ":" + nameSpace : "");
+  data.subtype = (nameSpace ? nameSpace + ":" : "") + data.subtype;
   return data;
 };
 
@@ -62,9 +62,16 @@ const mapLexical = ({ node, children, data, kind, defaults, lexicalMap }) => {
 
 const createLexicalMap = (perf) => ({
   default: ({ node, children, kind }) => {
+    console.log({ node, children, kind });
     if (node?.type === "root") return { type: "main", blocks: children };
     if (node?.type === "text") return node.text;
     throw new Error(`unhandled kind: ${kind}`);
+  },
+  sequence: ({ children, data }) => {
+    return {
+      type: data.subtype ?? "main",
+      blocks: children,
+    };
   },
   block: ({ node, children, data }) => {
     const { type } = data || {};

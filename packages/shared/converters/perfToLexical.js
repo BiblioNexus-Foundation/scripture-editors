@@ -6,7 +6,7 @@ export const transformPerfToLexicalState = (perf, sequenceId, perfMapper) => ({
     sequenceId,
     nodeBuilder: (props) =>
       buildLexicalNodeFromPerfNode({
-        ...props,
+        props,
         perfDocument: perf,
         perfMapper,
       }),
@@ -19,22 +19,19 @@ export const DATA_PREFIX = "perf";
 /**
  * Converts a PERF element to a different format
  */
-export const buildLexicalNodeFromPerfNode = ({ props, children, path, kind, perfDocument }) =>
-  mapPerf({
-    props,
-    kind,
-    path,
-    children,
+export const buildLexicalNodeFromPerfNode = ({ props, perfDocument, perfMapper }) =>
+  (perfMapper || mapPerf)({
+    ...props,
     perfMap: createPerfMap(perfDocument),
   });
 
 /** Maps types and subtypes of a PERF element (sequence,block, contentElement)
  * given map object (perfMap) and returns a transformation of that element.
  */
-export const mapPerf = ({ props, children, kind, defaults, perfMap }) => {
+export const mapPerf = ({ kind, props, children, direction, perfMap, defaults }) => {
   const { type, subtype } = props;
   const _props = { ...props, kind };
-  const _defaults = defaults ?? { props: _props, children };
+  const _defaults = defaults ?? { props: _props, children, direction };
 
   if (!perfMap) return _defaults;
 
@@ -118,7 +115,7 @@ export const createPerfMap = (perf) => ({
     },
     sequence: ({ children }) => ({
       children: children,
-      direction: "ltr",
+      direction: null,
       format: "",
       indent: 0,
       type: "root",
@@ -141,61 +138,62 @@ export const createPerfMap = (perf) => ({
       children: ((lexicalState) => lexicalState.root.children)(
         transformPerfToLexicalState(perf, perfElementProps.target),
       ),
-      // data: perfElementProps,
-      tag: ((subtypeMap) => subtypeMap[perfElementProps.subtype])({
-        title: "h1",
-        introduction: "section",
-        heading: "div",
-      }),
-      attributes: getAttributesFromPerfElementProps(perfElementProps),
-      direction: "ltr",
+      direction: null,
       format: "",
       indent: 0,
       type: "graft",
       version: 1,
+      attributes: getAttributesFromPerfElementProps(perfElementProps),
+      ...getTagFromSubtype({
+        subtype: perfElementProps.subtype,
+        replacementMap: {
+          title: "h1",
+          introduction: "section",
+          heading: "div",
+        },
+      }),
     }),
   },
   paragraph: {
-    "*": ({ props: perfElementProps, children }) => ({
-      children: children,
-      // data: perfElementProps,
-      tag: getTagFromSubtype({
-        subtype: perfElementProps.subtype,
-        replacementMap: {
-          "\\w?mt(\\d*)$": "span",
-          s: "h3",
-          r: "strong",
-          f: "span",
-        },
-      }),
-      attributes: getAttributesFromPerfElementProps(perfElementProps),
-      direction: "ltr",
-      format: "",
-      indent: 0,
-      type: "usfmparagraph",
-      version: 1,
-    }),
-    x: ({ children, props: perfElementProps }) => ({
+    "*": ({ props: perfElementProps, children, direction }) => {
+      return {
+        children: children,
+        direction: direction.value,
+        format: "",
+        indent: 0,
+        type: "usfmparagraph",
+        version: 1,
+        attributes: getAttributesFromPerfElementProps(perfElementProps),
+        ...getTagFromSubtype({
+          subtype: perfElementProps.subtype,
+          replacementMap: {
+            "\\w?mt(\\d*)$": "span",
+            s: "h3",
+            r: "strong",
+            f: "span",
+          },
+        }),
+      };
+    },
+    x: ({ children, props: perfElementProps, direction }) => ({
       children,
-      // data: perfElementProps,
-      attributes: getAttributesFromPerfElementProps(perfElementProps),
-      direction: "ltr",
+      direction: direction.value,
       format: "",
       indent: 0,
       type: "inline",
       version: 1,
+      attributes: getAttributesFromPerfElementProps(perfElementProps),
     }),
   },
   wrapper: {
-    "*": ({ children, props: perfElementProps }) => ({
+    "*": ({ children, props: perfElementProps, direction }) => ({
       children,
-      // data: perfElementProps,
-      attributes: getAttributesFromPerfElementProps(perfElementProps),
-      direction: "ltr",
+      direction: direction.value,
       format: "",
       indent: 0,
       type: "inline",
       version: 1,
+      attributes: getAttributesFromPerfElementProps(perfElementProps),
     }),
   },
   mark: {
@@ -209,13 +207,6 @@ export const createPerfMap = (perf) => ({
       chapter: divisionMark,
     }))(({ props: perfElementProps }) => ({
       // data: perfElementProps,
-      attributes: {
-        [`${DATA_PREFIX}-atts-number`]: perfElementProps.atts.number,
-        [`${DATA_PREFIX}-type`]: perfElementProps.type,
-        [`${DATA_PREFIX}-subtype`]: perfElementProps.subtype,
-        class: `${perfElementProps.subtype}`,
-        tabindex: 0,
-      },
       children: [
         {
           detail: 0,
@@ -227,11 +218,18 @@ export const createPerfMap = (perf) => ({
           version: 1,
         },
       ],
-      direction: "ltr",
+      direction: null,
       format: "",
       indent: 0,
       type: "divisionmark",
       version: 1,
+      attributes: {
+        [`${DATA_PREFIX}-atts-number`]: perfElementProps.atts.number,
+        [`${DATA_PREFIX}-type`]: perfElementProps.type,
+        [`${DATA_PREFIX}-subtype`]: perfElementProps.subtype,
+        class: `${perfElementProps.subtype}`,
+        tabindex: 0,
+      },
     })),
   },
 });
@@ -244,9 +242,19 @@ const getAttributesFromPerfElementProps = (data) =>
     return atts;
   }, {});
 
-const getTagFromSubtype = ({ subtype, replacementMap }) =>
-  replacementMap[subtype] ??
-  ((matchedSubtype) =>
-    matchedSubtype
-      ? subtype.replace(new RegExp(matchedSubtype), replacementMap[matchedSubtype])
-      : undefined)(Object.keys(replacementMap).find((key) => subtype.match(key)));
+const getTagFromSubtype = ({ subtype, replacementMap }) => {
+  // Try to find a direct replacement for the subtype
+  let replacement = replacementMap[subtype];
+  // If no direct replacement is found, try to find a match in the keys
+  if (!replacement) {
+    const matchedKey = Object.keys(replacementMap).find((key) =>
+      subtype.match(new RegExp(`^${key}$`)),
+    );
+    if (matchedKey) {
+      replacement = replacementMap[matchedKey];
+    }
+  }
+  // If a replacement is found, return an object with a tag property
+  // Otherwise, return undefined
+  return replacement ? { tag: replacement } : undefined;
+};

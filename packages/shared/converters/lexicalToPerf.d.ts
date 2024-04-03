@@ -1,5 +1,4 @@
 declare module "shared/converters/lexicalToPerf" {
-  import { SerializedUsfmElementNode } from "../nodes/UsfmElementNode";
   export interface LexicalStateNode {
     [key: string]: Perf;
   }
@@ -17,7 +16,7 @@ declare module "shared/converters/lexicalToPerf" {
   }
 
   export function transformLexicalStateToPerf(
-    lexicalStateNode: SerializedUsfmElementNode,
+    lexicalStateNode: import("../nodes/UsfmElementNode").SerializedUsfmElementNode,
     kind: string,
   ): Perf;
 
