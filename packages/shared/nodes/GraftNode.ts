@@ -5,8 +5,8 @@ import { addClassNamesToElement } from "@lexical/utils";
 export type SerializedGraftNode = SerializedUsfmElementNode;
 
 export class GraftNode extends UsfmElementNode {
-  constructor(attributes: Attributes, data: unknown, tag?: string, key?: NodeKey) {
-    super(attributes, data, tag, key);
+  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
+    super(attributes, tag, key);
   }
 
   static getType(): string {
@@ -14,7 +14,7 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static clone(node: GraftNode): GraftNode {
-    return new GraftNode(node.__attributes, node.__data, node.__tag, node.__key);
+    return new GraftNode(node.__attributes, node.__tag, node.__key);
   }
 
   isInline(): boolean {
@@ -32,8 +32,8 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
-    const { attributes, data, format, indent, direction, tag } = serializedNode;
-    const node = $createGraftNode(attributes, data, tag);
+    const { attributes, format, indent, direction, tag } = serializedNode;
+    const node = $createGraftNode(attributes, tag);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -55,6 +55,6 @@ export class GraftNode extends UsfmElementNode {
   }
 }
 
-function $createGraftNode(attributes: Attributes, data: unknown, tag?: string): GraftNode {
-  return $applyNodeReplacement(new GraftNode(attributes, data, tag));
+function $createGraftNode(attributes: Attributes, tag?: string): GraftNode {
+  return $applyNodeReplacement(new GraftNode(attributes, tag));
 }

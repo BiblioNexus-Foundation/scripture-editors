@@ -5,31 +5,19 @@ export type Attributes = { [key: string]: string };
 export type SerializedUsfmElementNode = Spread<
   {
     attributes: Attributes;
-    data: unknown;
     tag?: string;
   },
   SerializedElementNode
 >;
 
 export class UsfmElementNode extends ElementNode {
-  __data: unknown;
   __attributes: Attributes;
   __tag?: string;
 
-  constructor(attributes: Attributes, data: unknown, tag?: string, key?: NodeKey) {
+  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
     super(key);
-    this.__data = data;
     this.__attributes = attributes;
     this.__tag = tag;
-  }
-
-  getData(): unknown {
-    return this.getLatest().__data;
-  }
-
-  setData(data: unknown) {
-    const writable = this.getWritable();
-    writable.__data = data;
   }
 
   getAttributes(): Attributes {
@@ -53,8 +41,6 @@ export class UsfmElementNode extends ElementNode {
   exportJSON(): SerializedUsfmElementNode {
     return {
       ...super.exportJSON(),
-      children: this.getChildren<UsfmElementNode>().map((node) => node.exportJSON()),
-      data: this.getData(),
       attributes: this.getAttributes(),
       tag: this.getTag(),
       type: "usfmelement",
