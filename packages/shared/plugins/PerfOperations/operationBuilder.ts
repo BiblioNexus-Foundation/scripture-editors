@@ -11,7 +11,7 @@ import {
   OperationType,
   Path,
 } from "../History/operations/index.d";
-import { Perf, transformLexicalStateToPerf } from "shared/converters/lexicalToPerf";
+import { Perf, transformLexicalStateToPerf } from "../../converters/lexicalToPerf";
 
 export const operationBuilder: Mapper = ({
   node,

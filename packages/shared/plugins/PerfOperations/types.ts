@@ -1,4 +1,4 @@
-import { Perf } from "shared/converters/lexicalToPerf";
+import { Perf } from "../../converters/lexicalToPerf";
 
 // Const enum for PerfAction action property
 export const enum PerfKind {
