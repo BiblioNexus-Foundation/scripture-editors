@@ -20,7 +20,7 @@ export const getPerf = async (usfmText) => {
 
 export const getLexicalState = (perf) => {
   const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
-  return JSON.stringify(_lexicalState);
+  return _lexicalState;
 };
 
 // export const lexicalState = getTestLexicalState();
