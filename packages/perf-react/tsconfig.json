@@ -30,7 +30,8 @@
     "../shared/plugins/History/HistoryManager.ts",
     "../shared-react/plugins/History/HistoryPlugin.tsx",
     "../shared-react/plugins/OnChange/OnChangePlugin.tsx",
-    "../shared/plugins/History/operations"
+    "../shared/plugins/History/operations",
+    "../shared/plugins/PerfOperations"
   ],
   "references": [
     {

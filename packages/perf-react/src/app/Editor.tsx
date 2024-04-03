@@ -9,8 +9,13 @@ import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
 import { OnChangePlugin } from "shared-react/plugins/OnChange/OnChangePlugin";
 import { applyPatch } from "open-patcher";
 import { getOperations } from "shared/plugins/History/operations";
-import { getPathBuilder } from "../lexical/plugins/Perf/pathBuilder";
-import { operationBuilder } from "../lexical/plugins/Perf/operationBuilder";
+import { getPathBuilder } from "shared/plugins/PerfOperations/pathBuilder";
+import { operationBuilder } from "shared/plugins/PerfOperations/operationBuilder";
+import { devLog } from "../utils";
+import { getLexicalState } from "shared/contentManager";
+import { transformLexicalStateToPerf } from "shared/converters/lexicalToPerf";
+import equal from "deep-equal";
+import { SerializedUsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 const theme = {
   // Theme styling goes here
@@ -37,6 +42,7 @@ export default function Editor() {
   };
 
   const handleChange: HistoryMergeListener = ({
+    dirtyLeaves,
     dirtyElements,
     editorState,
     prevEditorState,
@@ -46,7 +52,7 @@ export default function Editor() {
     const { perfDocument: prevPerfDocument } = currentEntry as {
       perfDocument: { sequences: { [sequenceId: string]: unknown }; ["main_sequence_id"]: string };
     };
-    console.log({ prevPerfDocument });
+    console.log({ dirtyElements, dirtyLeaves });
 
     if (!canUndo && !prevPerfDocument) {
       //History initialization
@@ -69,6 +75,43 @@ export default function Editor() {
     });
 
     const patchedDocument = { ...prevPerfDocument, sequences: patchedSequences };
+    devLog({ editorState });
+
+    const editorLexicalState = editorState.toJSON();
+    const _lexicalPerfState = transformLexicalStateToPerf(
+      editorLexicalState.root as SerializedUsfmElementNode,
+      "sequence",
+    );
+    const lexicalPerfState = {
+      ...patchedDocument,
+      sequences: {
+        [patchedDocument["main_sequence_id"]]: _lexicalPerfState.targetNode,
+        ..._lexicalPerfState.sequences,
+      },
+    };
+    const isPerfDeepEqual =
+      JSON.stringify(patchedDocument, null, 2) === JSON.stringify(lexicalPerfState, null, 2);
+    devLog("Is perf deep equal:", isPerfDeepEqual, equal(patchedDocument, lexicalPerfState));
+    devLog({
+      a: JSON.stringify(patchedDocument, null, 2),
+      b: JSON.stringify(lexicalPerfState, null, 2),
+    });
+
+    const perfLexicalState = getLexicalState(patchedDocument);
+
+    const isLexicalDeepEqual =
+      JSON.stringify(editorLexicalState, null, 2) === JSON.stringify(perfLexicalState, null, 2);
+    devLog(
+      "Is lexical deep equal:",
+      isLexicalDeepEqual,
+      equal(editorLexicalState, perfLexicalState),
+    );
+
+    devLog({ editorLexicalState, perfLexicalState });
+    devLog({
+      a: JSON.stringify(editorLexicalState, null, 2),
+      b: JSON.stringify(perfLexicalState, null, 2),
+    });
 
     mergeHistory({
       actions: { elementOperations },
