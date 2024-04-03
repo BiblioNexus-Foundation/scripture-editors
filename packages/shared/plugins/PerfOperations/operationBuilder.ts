@@ -1,15 +1,17 @@
-import { UsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { Mapper } from "shared/plugins/History/operations/defaults";
 import { LexicalNode } from "lexical";
-import { Path } from "shared/plugins/History/operations/index.d";
-import { getPerfKindFromNode } from "./utils";
-import { Perf, transformLexicalStateToPerf } from "shared/converters/lexicalToPerf";
+
+import { exportNodeToJSON, getPerfKindFromNode } from "./utils";
+
+import { Mapper } from "../History/operations/defaults";
+import { UsfmElementNode } from "../../nodes/UsfmElementNode";
 import {
   OperationAdd,
   OperationRemove,
   OperationReplace,
   OperationType,
-} from "open-patcher/dist/types";
+  Path,
+} from "../History/operations/index.d";
+import { Perf, transformLexicalStateToPerf } from "shared/converters/lexicalToPerf";
 
 export const operationBuilder: Mapper = ({
   node,
@@ -46,7 +48,7 @@ const buildAddOperation = (node: UsfmElementNode, path: Path): OperationAdd => {
   const kind = getPerfKindFromNode(node);
   return {
     path,
-    value: transformLexicalStateToPerf(node.exportJSON(), kind).targetNode as Perf,
+    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind).targetNode as Perf,
     type: OperationType.Add,
   };
 };
@@ -62,7 +64,7 @@ const buildReplaceOperation = (node: UsfmElementNode, path: Path): OperationRepl
   const kind = getPerfKindFromNode(node);
   return {
     path,
-    value: transformLexicalStateToPerf(node.exportJSON(), kind).targetNode as Perf,
+    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind).targetNode as Perf,
     type: OperationType.Replace,
   };
 };
