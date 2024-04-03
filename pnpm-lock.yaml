@@ -316,9 +316,18 @@ importers:
         specifier: ^0.2.20
         version: 0.2.20
       lexical:
-        specifier: ^0.14.5
-        version: 0.14.5
+        specifier: ^0.13.1
+        version: 0.13.1
+      open-patcher:
+        specifier: 1.0.0-beta.1
+        version: 1.0.0-beta.1
     devDependencies:
+      '@types/deep-equal':
+        specifier: ^1.0.4
+        version: 1.0.4
+      deep-equal:
+        specifier: ^2.2.3
+        version: 2.2.3
       proskomma-core:
         specifier: ^0.10.4
         version: 0.10.4(@babel/core@7.23.2)

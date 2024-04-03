@@ -1,22 +1,9 @@
-export interface LexicalStateNode {
-  [key: string]: Perf;
-}
-export interface Perf {
-  sequences: { [key: string]: Perf };
-  targetNode?: Perf;
-}
-
-export interface NodeBuilderProps {
-  [key: string]: Perf;
-}
-
-export interface CustomNodeBuilderProps extends NodeBuilderProps {
-  perf: Perf;
-}
+import { SerializedUsfmElementNode } from "../nodes/UsfmElementNode";
+import { PerfBlock, PerfContentElement, PerfSequence } from "../plugins/PerfOperations/types";
 
 export function transformLexicalStateToPerf(
-  lexicalStateNode: import("../nodes/UsfmElementNode").SerializedUsfmElementNode,
+  lexicalStateNode: SerializedUsfmElementNode,
   kind: string,
-): Perf;
+): { targetNode: PerfSequence | PerfBlock | PerfContentElement; sequences: PerfSequence[] };
 
 export function getDatafromAttributes(attributes: { [key: string]: unknown }): unknown;

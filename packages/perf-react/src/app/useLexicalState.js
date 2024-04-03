@@ -15,7 +15,6 @@ export function useLexicalPerfState() {
       bookCode: "tit",
     }).then(async (usfm) => {
       const perf = await getPerf(usfm);
-      console.log({ perf });
       setPerfDocument(perf);
       setLexicalState(JSON.stringify(getLexicalState(perf)));
     });
