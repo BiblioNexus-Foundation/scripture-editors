@@ -11,7 +11,8 @@ import {
   OperationType,
   Path,
 } from "../History/operations/index.d";
-import { Perf, transformLexicalStateToPerf } from "../../converters/lexicalToPerf";
+import { transformLexicalStateToPerf } from "../../converters/lexicalToPerf";
+import { PerfKind, PerfKindMap } from "./types";
 
 export const operationBuilder: Mapper = ({
   node,
@@ -27,7 +28,7 @@ export const operationBuilder: Mapper = ({
   const { "perf-type": perfType } = node.getAttributes?.() ?? {};
   const kind = getPerfKindFromNode(node);
 
-  if (perfType === "graft" || kind === "block") {
+  if (perfType === "graft" || kind === PerfKind.Block) {
     switch (operationType) {
       case OperationType.Add:
         return buildAddOperation(node, path);
@@ -48,7 +49,7 @@ const buildAddOperation = (node: UsfmElementNode, path: Path): OperationAdd => {
   const kind = getPerfKindFromNode(node);
   return {
     path,
-    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind).targetNode as Perf,
+    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind).targetNode,
     type: OperationType.Add,
   };
 };
@@ -64,7 +65,8 @@ const buildReplaceOperation = (node: UsfmElementNode, path: Path): OperationRepl
   const kind = getPerfKindFromNode(node);
   return {
     path,
-    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind).targetNode as Perf,
+    value: transformLexicalStateToPerf(exportNodeToJSON(node), kind)
+      .targetNode as PerfKindMap[typeof kind],
     type: OperationType.Replace,
   };
 };
