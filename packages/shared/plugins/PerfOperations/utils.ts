@@ -1,6 +1,14 @@
-import { $getNodeByKey, EditorState, ElementNode, LexicalNode } from "lexical";
+import {
+  $getNodeByKey,
+  $isElementNode,
+  EditorState,
+  ElementNode,
+  LexicalNode,
+  SerializedElementNode,
+  SerializedLexicalNode,
+} from "lexical";
 import { PerfKind } from "./types";
-import { SerializedUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
+import { SerializedUsfmElementNode, UsfmElementNode } from "../../nodes/UsfmElementNode";
 /**
  * this module provides utility functions for the Perf plugin.
  * @module
@@ -99,66 +107,38 @@ export function checkIsSequence(node: LexicalNode | ElementNode) {
  * @returns The JSON representation of the node and its children.
  */
 export const getNodeJson = (node: UsfmElementNode) => {
-  const _nodeJson: SerializedUsfmElementNode = node.exportJSON();
+  const _nodeJson: SerializedUsfmElementNode = exportNodeToJSON(node);
   if (_nodeJson?.children) {
     _nodeJson.children = node.getChildren<UsfmElementNode>().map((node) => getNodeJson(node));
   }
   return _nodeJson;
 };
 
-/**
- * Retrieves the common path from the dirty elements based on the provided editor state.
- * @param dirtyElements - A map of dirty elements.
- * @param editorState - The editor state.
- * @returns An array representing the path from the dirty elements.
- */
-export function getPathFromElements(dirtyElements: Map<string, boolean>, editorState: EditorState) {
-  const perfPathArray = [];
-  for (const [nodeKey] of dirtyElements) {
-    const { index, kind, target } = getNodeInfo(editorState, nodeKey);
-    if (kind === "sequence") {
-      perfPathArray.unshift(target ?? "main"); // Add target to the path array if it's a sequence
-      break;
+export function exportNodeToJSON<SerializedNode extends SerializedLexicalNode>(
+  node: LexicalNode,
+): SerializedNode {
+  const serializedNode = node.exportJSON();
+  const nodeClass = node.constructor;
+
+  if (serializedNode.type !== nodeClass.getType()) {
+    throw new Error("Serialized node type does not match node type");
+  }
+
+  if ($isElementNode(node)) {
+    const serializedChildren = (serializedNode as SerializedElementNode).children;
+    if (!Array.isArray(serializedChildren)) {
+      throw new Error("Children must be an array");
     }
-    perfPathArray.unshift(index); // Add index to the path array
-    if (kind === "content") {
-      perfPathArray.unshift("content"); // Add "content" to the path array if it's a content element
-    }
-    if (kind === "block") {
-      perfPathArray.unshift("blocks"); // Add "blocks" to the path array if it's a block
+
+    const children = node.getChildren();
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const serializedChildNode = exportNodeToJSON(child);
+      serializedChildren.push(serializedChildNode);
     }
   }
-  return perfPathArray;
-}
 
-// Function to get information about a node in the editor state
-/**
- * Retrieves information about a node in the editor state.
- * @param editorState - The current editor state.
- * @param nodeKey - The key of the node to retrieve information for.
- * @returns An object containing information about the node.
- */
-function getNodeInfo(
-  editorState: EditorState,
-  nodeKey: string,
-): {
-  node?: UsfmElementNode;
-  index?: number;
-  kind?: string;
-  children?: LexicalNode[];
-  type?: string;
-  target?: string;
-} {
-  return editorState.read(() => {
-    const node: UsfmElementNode | null = $getNodeByKey(nodeKey);
-    if (!node) return {}; // If the node doesn't exist, return an empty object
-    const parent = node.getParent();
-    const atts = node.getAttributes?.() || {};
-    const type = atts["data-type"];
-    const target = atts["data-target"];
-    const kind = getPerfKindFromNode(node); // Get the kind of the node
-    const index = parent ? parent.getChildrenKeys?.().findIndex((key) => nodeKey === key) : 0; // Get the index of the node in its parent's children
-    const children = node.getChildren?.(); // Get the children of the node
-    return { node, index, kind, children, type, target };
-  });
+  // @ts-expect-error - This is a private method
+  return serializedNode;
 }

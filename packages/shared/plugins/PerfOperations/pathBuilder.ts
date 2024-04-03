@@ -1,18 +1,18 @@
 import { LexicalNode } from "lexical";
-import { UsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { getPerfKindFromNode } from "./utils";
 import { PerfKind } from "./types";
+import { UsfmElementNode } from "../../nodes/UsfmElementNode";
 
 export const getPathBuilder = (MainSequenceId: string) => (node: UsfmElementNode | LexicalNode) => {
   const pathArray: Array<string | number> = [];
   let currentNode: typeof node | null = node;
+  const nodeKind = getPerfKindFromNode(currentNode);
+  if (nodeKind === PerfKind.Sequence) return false;
 
   while (currentNode) {
     const parent: UsfmElementNode | null = currentNode.getParent();
     const nodeKey = currentNode.getKey();
     const kind = getPerfKindFromNode(currentNode);
-
-    // console.log({ kind, currentNode, parent });
 
     if (kind === PerfKind.Sequence && currentNode instanceof UsfmElementNode) {
       const target = currentNode.getAttributes?.()?.["perf-target"];
