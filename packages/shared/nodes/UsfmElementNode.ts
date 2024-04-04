@@ -1,4 +1,4 @@
-import { ElementNode, NodeKey, SerializedElementNode, Spread } from "lexical";
+import { ElementNode, LexicalNode, NodeKey, SerializedElementNode, Spread } from "lexical";
 
 export type Attributes = { [key: string]: string };
 
@@ -47,4 +47,8 @@ export class UsfmElementNode extends ElementNode {
       version: 1,
     };
   }
+}
+
+export function $isUsfmElementNode(node: LexicalNode | null | undefined): node is UsfmElementNode {
+  return node instanceof UsfmElementNode;
 }

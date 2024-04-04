@@ -3,7 +3,7 @@ import { LexicalNode } from "lexical";
 import { exportNodeToJSON, getPerfKindFromNode } from "./utils";
 
 import { Mapper } from "../History/operations/defaults";
-import { UsfmElementNode } from "../../nodes/UsfmElementNode";
+import { $isUsfmElementNode, UsfmElementNode } from "../../nodes/UsfmElementNode";
 import {
   OperationAdd,
   OperationRemove,
@@ -28,7 +28,7 @@ export const operationBuilder: Mapper = ({
     console.log("SKIPPED MOVE OPERATION");
     return undefined;
   }
-  if (!isUsfmElementNode(node)) return undefined;
+  if (!$isUsfmElementNode(node)) return undefined;
   const { "perf-type": perfType } = node.getAttributes?.() ?? {};
   const kind = getPerfKindFromNode(node);
 
@@ -44,10 +44,6 @@ export const operationBuilder: Mapper = ({
   }
   return undefined;
 };
-
-function isUsfmElementNode(node: LexicalNode): node is UsfmElementNode {
-  return node instanceof UsfmElementNode;
-}
 
 const buildAddOperation = (node: UsfmElementNode, path: Path): OperationAdd => {
   const kind = getPerfKindFromNode(node);
