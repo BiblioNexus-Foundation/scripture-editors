@@ -5,7 +5,7 @@ import { EmoticonNode } from "shared/nodes/EmoticonNode";
 import { getLexicalState, getPerf } from "shared/contentManager";
 import { fetchUsfm } from "shared/contentManager/mockup/fetchUsfm";
 import { createEmptyHistoryState, registerHistory } from "shared/plugins/History";
-import { updatePerfHistory } from "shared/plugins/PerfOperations/updatePerfHistory";
+import { getPerfHistoryUpdater } from "shared/plugins/PerfOperations/updatePerfHistory";
 
 (async () => {
   // Configuration for the editor
@@ -32,6 +32,6 @@ import { updatePerfHistory } from "shared/plugins/PerfOperations/updatePerfHisto
     tag: "history-merge",
   });
 
-  registerHistory(editor, createEmptyHistoryState(), updatePerfHistory(perfSource), 1000);
+  registerHistory(editor, createEmptyHistoryState(), getPerfHistoryUpdater(perfSource), 1000);
   editor.setRootElement(document.getElementById("editor"));
 })();

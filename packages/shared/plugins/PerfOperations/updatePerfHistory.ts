@@ -11,26 +11,47 @@ import { PerfDocument } from "./perfTypes";
 import { EditorState } from "lexical";
 import { Operation } from "open-patcher/dist/types";
 
+/**
+ * Reparses an object by converting it to JSON and then parsing it back to an object.
+ * This is used to create a deep copy of the object.
+ * @param x - The object to reparse.
+ * @returns A deep copy of the object.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const reparse = (x: any): any => JSON.parse(JSON.stringify(x));
 
-export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListener =
+/**
+ * Returns a history merge listener function that updates the perf history.
+ * @param perfSource - The initial perf document.
+ * @returns A history merge listener function.
+ */
+export const getPerfHistoryUpdater: (perfSource: PerfDocument) => HistoryMergeListener =
   (perfSource) =>
+  /**
+   * Updates the perf history based on editor changes.
+   * @param editorChanged - Indicates whether the editor has changed.
+   * @param dirtyElements - The dirty elements in the editor.
+   * @param editorState - The current editor state.
+   * @param prevEditorState - The previous editor state.
+   * @param history - The history object.
+   */
   ({ editorChanged, dirtyElements, editorState, prevEditorState, history }) => {
     const { canUndo, mergeHistory, currentEntry } = history;
     const { perfDocument: prevPerfDocument } = currentEntry as {
       perfDocument: PerfDocument;
     };
 
+    // History initialization
     if (!canUndo && !prevPerfDocument) {
-      //History initialization
       console.log("Initializing Perf History");
       mergeHistory({ perfDocument: perfSource });
       return;
     }
 
+    // If the editor has not changed, return
     if (!editorChanged) return;
 
+    // Get the operations (add, remove, replace) for the dirty elements
     const elementOperations = getOperations({
       dirtyNodes: dirtyElements,
       editorState,
@@ -39,24 +60,32 @@ export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListen
       operationBuilder: operationBuilder,
     });
 
-    console.log({ elementOperations });
-
+    // Apply the operations to the previous perf document sequences
     const patchedSequences = applyPatch({
       source: prevPerfDocument.sequences ?? {},
       operations: [...elementOperations] as Operation[],
     });
 
+    // Patch the sequences in the previous perf document
     const patchedPerfDocument = { ...prevPerfDocument, sequences: patchedSequences };
 
+    // Check the roundtrip of the patched document (should remove this in production)
     checkRoundtrip({ editorState, perfSource, patchedPerfDocument, show: true });
 
+    // Merge the history with the patched perf document
     mergeHistory({
-      actions: { elementOperations },
       perfDocument: patchedPerfDocument,
     });
     console.log("=================================");
   };
 
+/**
+ * Checks the roundtrip of the patched perf document and logs any differences.
+ * @param editorState - The current editor state.
+ * @param perfSource - The initial perf document.
+ * @param patchedPerfDocument - The patched perf document.
+ * @param show - Indicates whether to show the roundtrip check results.
+ */
 const checkRoundtrip = ({
   editorState,
   perfSource,
