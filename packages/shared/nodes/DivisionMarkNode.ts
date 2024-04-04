@@ -51,7 +51,10 @@ export class DivisionMarkNode extends UsfmElementNode {
     };
   }
 
-  updateDOM(): boolean {
+  updateDOM(_prevNode: DivisionMarkNode, element: HTMLElement): boolean {
+    const newNumber = element.innerText;
+    this.__attributes["perf-atts-number"] = newNumber;
+    element.setAttribute("perf-atts-number", newNumber);
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
     return false;

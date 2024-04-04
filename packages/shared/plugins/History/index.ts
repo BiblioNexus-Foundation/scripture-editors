@@ -37,6 +37,7 @@ const DELETE_CHARACTER_AFTER_SELECTION = 4;
 
 type UpdateListenerArgs = Parameters<UpdateListener>[0];
 interface OnChangeArgs extends Omit<UpdateListenerArgs, "normalizedNodes"> {
+  editorChanged: boolean;
   history: {
     canRedo: boolean;
     canUndo: boolean;
@@ -49,6 +50,7 @@ export type HistoryMergeListener = ({
   dirtyElements,
   dirtyLeaves,
   editorState,
+  editorChanged,
   prevEditorState,
   tags,
   history,
@@ -331,10 +333,10 @@ export function registerHistory(
   onChange: HistoryMergeListener = () => null, // Update the type of the onChange parameter
   delay: number,
 ): () => void {
+  const dirtyNodes = new DirtyNodes();
+  const historyManager = new LexicalHistoryManager(editor, historyState);
   const getMergeAction = createMergeActionGetter(editor, delay);
   const triggerOnChange = debounce(onChange, delay);
-  const historyManager = new LexicalHistoryManager(editor, historyState);
-  const dirtyNodes = new DirtyNodes();
 
   const applyChange = ({
     editorState,
@@ -378,10 +380,19 @@ export function registerHistory(
     });
     //TODO: reset dirtyNodes after undo and redo, because the nodes are not dirty anymore
     dirtyNodes.merge(dirtyLeaves, dirtyElements);
-    console.log({ dirtyNodes: dirtyNodes.getAll() });
+
+    console.log(
+      "dirtyLeaves: ",
+      [...dirtyNodes.getLeaves()].length,
+      ", dirtyElements: ",
+      [...dirtyNodes.getElements()].length,
+    );
+
+    const editorChanged = dirtyElements.size > 0 || dirtyLeaves.size > 0;
 
     (() => (!current ? onChange : triggerOnChange))()({
       editorState,
+      editorChanged,
       prevEditorState: historyManager.getPrevious()?.editorState || prevEditorState,
       dirtyLeaves: dirtyNodes.getLeaves(),
       dirtyElements: dirtyNodes.getElements(),

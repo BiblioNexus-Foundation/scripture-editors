@@ -7,6 +7,7 @@ export enum OperationType {
   Add = "add",
   Replace = "replace",
   Remove = "remove",
+  Move = "move",
 }
 type PlainObject<T> = Record<string | number, T>;
 type ArrayKey<T> = keyof T[];
