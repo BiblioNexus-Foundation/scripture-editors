@@ -1,4 +1,5 @@
 import { $isAtNodeEnd } from "@lexical/selection";
+
 export function getSelectedNode(selection) {
   const anchor = selection.anchor;
   const focus = selection.focus;
