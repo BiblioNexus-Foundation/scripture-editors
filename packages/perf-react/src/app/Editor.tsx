@@ -6,7 +6,7 @@ import scriptureNodes from "shared/nodes";
 import { useLexicalPerfState } from "./useLexicalState";
 import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
 import { useMemo } from "react";
-import { updatePerfHistory } from "shared/plugins/PerfOperations/updatePerfHistory";
+import { getPerfHistoryUpdater } from "shared/plugins/PerfOperations/updatePerfHistory";
 import { HistoryMergeListener } from "shared/plugins/History";
 
 const theme = {
@@ -34,7 +34,7 @@ export default function Editor() {
   };
 
   const handlePerfHistory = useMemo(
-    () => (perfDocument ? updatePerfHistory(perfDocument) : null),
+    () => (perfDocument ? getPerfHistoryUpdater(perfDocument) : null),
     [perfDocument],
   );
 
