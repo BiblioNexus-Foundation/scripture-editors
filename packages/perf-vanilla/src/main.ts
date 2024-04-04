@@ -8,22 +8,24 @@ import { createEmptyHistoryState, registerHistory } from "shared/plugins/History
 import { updatePerfHistory } from "shared/plugins/PerfOperations/updatePerfHistory";
 
 (async () => {
+  // Configuration for the editor
   const config = {
-    namespace: "MyEditor",
+    namespace: "PerfVanillaEditor",
     theme: {},
     nodes: [...scriptureNodes, EmoticonNode],
     onError: console.error,
   };
-  const { lexicalState, perfSource } = await fetchUsfm({
+
+  const usfm = await fetchUsfm({
     serverName: "dbl",
     organizationId: "bfbs",
     languageCode: "fra",
     versionId: "lsg",
     bookCode: "tit",
-  }).then(async (usfm) => {
-    const perfSource = await getPerf(usfm);
-    return { perfSource, lexicalState: JSON.stringify(getLexicalState(perfSource)) };
   });
+  const perfSource = await getPerf(usfm);
+  const lexicalState = JSON.stringify(getLexicalState(perfSource));
+
   //Initialize editor
   const editor = createEditor(config);
   editor.setEditorState(editor.parseEditorState(lexicalState), {
