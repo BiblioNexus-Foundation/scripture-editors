@@ -24,6 +24,10 @@ export const operationBuilder: Mapper = ({
   from?: Path;
   operationType: OperationType;
 }) => {
+  if (operationType === OperationType.Move) {
+    console.log("SKIPPED MOVE OPERATION");
+    return undefined;
+  }
   if (!isUsfmElementNode(node)) return undefined;
   const { "perf-type": perfType } = node.getAttributes?.() ?? {};
   const kind = getPerfKindFromNode(node);

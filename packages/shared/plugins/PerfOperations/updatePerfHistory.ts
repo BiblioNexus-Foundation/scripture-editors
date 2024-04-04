@@ -9,18 +9,18 @@ import { applyPatch } from "open-patcher";
 import equal from "deep-equal";
 import { PerfDocument } from "./perfTypes";
 import { EditorState } from "lexical";
+import { Operation } from "open-patcher/dist/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const reparse = (x: any): any => JSON.parse(JSON.stringify(x));
 
 export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListener =
   (perfSource) =>
-  ({ dirtyLeaves, dirtyElements, editorState, prevEditorState, history }) => {
+  ({ editorChanged, dirtyElements, editorState, prevEditorState, history }) => {
     const { canUndo, mergeHistory, currentEntry } = history;
     const { perfDocument: prevPerfDocument } = currentEntry as {
       perfDocument: PerfDocument;
     };
-    console.log({ dirtyElements, dirtyLeaves, currentEntry });
 
     if (!canUndo && !prevPerfDocument) {
       //History initialization
@@ -29,7 +29,8 @@ export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListen
       return;
     }
 
-    //TODO: MAKE SURE MODIFICATIONS TO CONTENT ELEMENTS OF KIND GRAFT ARE ALSO CONVERTED INTO SEQUENCE ACTIONS IF THEY ARE DELETED OR REPLACED WITH A DIFFERENT GRAFT (OTHER TARGET).
+    if (!editorChanged) return;
+
     const elementOperations = getOperations({
       dirtyNodes: dirtyElements,
       editorState,
@@ -38,9 +39,11 @@ export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListen
       operationBuilder: operationBuilder,
     });
 
+    console.log({ elementOperations });
+
     const patchedSequences = applyPatch({
       source: prevPerfDocument.sequences ?? {},
-      operations: [...elementOperations],
+      operations: [...elementOperations] as Operation[],
     });
 
     const patchedPerfDocument = { ...prevPerfDocument, sequences: patchedSequences };
@@ -51,6 +54,7 @@ export const updatePerfHistory: (perfSource: PerfDocument) => HistoryMergeListen
       actions: { elementOperations },
       perfDocument: patchedPerfDocument,
     });
+    console.log("=================================");
   };
 
 const checkRoundtrip = ({

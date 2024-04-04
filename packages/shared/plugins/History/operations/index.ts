@@ -121,19 +121,13 @@ export const getOperation = ({
       if (previousPath === false || currentPath === false) return undefined;
 
       // If the current path is different from the previous path, it's a move operation
-      if (currentPath.join("/") !== previousPath.join("/"))
-        return [
-          operationBuilder({
-            node: currentNode,
-            path: currentPath,
-            operationType: OperationType.Add,
-          }),
-          operationBuilder({
-            node: currentNode,
-            path: previousPath,
-            operationType: OperationType.Remove,
-          }),
-        ];
+      if (currentPath.join("/") !== previousPath.join("/")) return;
+      operationBuilder({
+        node: currentNode,
+        from: previousPath,
+        path: currentPath,
+        operationType: OperationType.Move,
+      });
 
       // Otherwise, it's a replace operation
       return operationBuilder({

@@ -86,7 +86,9 @@ const createLexicalMap = (perf) => ({
     const { type, subtype } = data || {};
     if (type === "graft") return buildGraft({ perf, node, data, children });
     if (node?.type === "text") return node.text;
-    if (["verses", "chapter"].includes(subtype)) return { ...data };
+    if (["verses", "chapter"].includes(subtype)) {
+      return { ...data, atts: { ...data.atts, number: children[0] } };
+    }
     return {
       ...data,
       ...(children?.length ? { content: children } : undefined),
