@@ -1,6 +1,7 @@
 import { LexicalNode } from "lexical";
 
-import { exportNodeToJSON, getPerfKindFromNode } from "./utils";
+import { getPerfKindFromNode } from "./utils";
+import { exportNodeToJSON } from "../../lexical/exportNodeToJSON";
 
 import { Mapper } from "../History/operations/defaults";
 import { $isUsfmElementNode, UsfmElementNode } from "../../nodes/UsfmElementNode";

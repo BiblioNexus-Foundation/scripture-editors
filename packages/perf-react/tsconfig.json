@@ -31,7 +31,8 @@
     "../shared-react/plugins/History/HistoryPlugin.tsx",
     "../shared-react/plugins/OnChange/OnChangePlugin.tsx",
     "../shared/plugins/History/operations",
-    "../shared/plugins/PerfOperations"
+    "../shared/plugins/PerfOperations",
+    "../shared/lexical/exportNodeToJSON.ts"
   ],
   "references": [
     {
