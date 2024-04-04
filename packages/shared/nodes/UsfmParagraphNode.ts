@@ -56,7 +56,6 @@ export class UsfmParagraphNode extends UsfmElementNode {
   }
 
   updateDOM(): boolean {
-    // console.log({ updateDOMProps });
     return false;
   }
 

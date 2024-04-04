@@ -17,7 +17,6 @@ const getDatafromAttributes = (attributes) => {
   const data = Object.keys(attributes).reduce((data, attribute) => {
     const [prefix, key, subKey] = attribute.split("-");
     if (prefix !== DATA_PREFIX || !key) {
-      // console.info(`Ignoring non perf attribute: ${attribute}`);
       return data;
     }
     if (subKey === "ns") {
