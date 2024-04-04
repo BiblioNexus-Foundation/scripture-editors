@@ -4,7 +4,6 @@ import {
   $isTextNode,
   EditorConfig,
   LexicalNode,
-  NodeKey,
   RangeSelection,
 } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
@@ -18,10 +17,6 @@ export class UsfmParagraphNode extends UsfmElementNode {
 
   static clone(node: UsfmParagraphNode): UsfmParagraphNode {
     return new UsfmParagraphNode(node.__attributes, node.__tag, node.__key);
-  }
-
-  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
-    super(attributes, tag, key);
   }
 
   static importJSON(serializedNode: SerializedUsfmParagraphNode): UsfmParagraphNode {
