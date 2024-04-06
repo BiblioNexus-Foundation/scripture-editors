@@ -8,6 +8,8 @@ import {
 } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
 
+const DEFAULT_TAG = "p";
+
 export type SerializedUsfmParagraphNode = SerializedUsfmElementNode;
 
 export class UsfmParagraphNode extends UsfmElementNode {
@@ -21,7 +23,7 @@ export class UsfmParagraphNode extends UsfmElementNode {
 
   static importJSON(serializedNode: SerializedUsfmParagraphNode): UsfmParagraphNode {
     const { attributes, tag, format, indent, direction } = serializedNode;
-    const node = $createUsfmParagraphNode(attributes, tag);
+    const node = $createUsfmParagraphNode(attributes, tag ?? DEFAULT_TAG);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -29,11 +31,12 @@ export class UsfmParagraphNode extends UsfmElementNode {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const attributes = this.getAttributes() || {};
-    const element = document.createElement(this.getTag() || "p");
+    const attributes = this.getAttributes() ?? {};
+    const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     Object.keys(attributes).forEach((attKey) => {
       element.setAttribute(attKey, attributes[attKey]);
     });
+
     addClassNamesToElement(element, config.theme.sectionmark);
     return element;
   }

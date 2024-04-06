@@ -90,7 +90,7 @@ const createLexicalMap = (perf) => ({
     }
     return {
       ...data,
-      ...(children?.length ? { content: children } : undefined),
+      content: children?.length ? children : [],
     };
   },
 });

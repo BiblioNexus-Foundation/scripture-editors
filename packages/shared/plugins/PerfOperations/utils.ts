@@ -26,3 +26,34 @@ export function getPerfKindFromNode(node: LexicalNode | ElementNode) {
 export function checkIsSequence(node: LexicalNode | ElementNode) {
   return ["root", "graft"].includes(node.getType() || "");
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function deepEqual(objA: any, objB: any, keysToExclude: string[] = []): boolean {
+  // If both objects are the same object or are equal primitives, return true
+  if (objA === objB) return true;
+
+  // If either object is null or not an object, they're not deeply equal
+  if (objA === null || typeof objA !== "object" || objB === null || typeof objB !== "object")
+    return false;
+
+  // Get the keys of each object
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
+
+  // If they have a different number of keys, they're not deeply equal
+  if (keysA.length !== keysB.length) {
+    if (keysToExclude.length === 0) return false;
+    // If the number of keys is different, check if the keys that are unique to one object are in the keysToExclude array
+    const uniqueKeys = keysA.filter((key) => !keysB.includes(key));
+    if (uniqueKeys.length > keysToExclude.length) return false;
+    if (!uniqueKeys.every((key) => keysToExclude.includes(key))) return false;
+  }
+
+  // Check if every key in objA also exists in objB and if the values are deeply equal
+  return keysA.every((key) => {
+    if (keysToExclude.includes(key)) return true;
+    const areEqual = keysB.includes(key) && deepEqual(objA[key], objB[key], keysToExclude);
+    if (!areEqual) console.log(key);
+    return areEqual;
+  });
+}

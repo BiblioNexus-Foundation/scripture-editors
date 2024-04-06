@@ -6,7 +6,6 @@ export type SerializedInlineNode = SerializedUsfmElementNode;
 
 export class InlineNode extends UsfmElementNode {
   constructor(attributes: Attributes, key?: NodeKey) {
-    // TODO: Check default tag is correct. "span" was added to `super` because `key` was being passed to `tag`.
     super(attributes, "span", key);
   }
 

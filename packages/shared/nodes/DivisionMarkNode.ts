@@ -2,6 +2,8 @@ import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, EditorConfig, LexicalNode, NodeKey } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
 
+const DEFAULT_TAG = "span";
+
 export type SerializedDivisionMarkNode = SerializedUsfmElementNode;
 
 export class DivisionMarkNode extends UsfmElementNode {
@@ -20,7 +22,7 @@ export class DivisionMarkNode extends UsfmElementNode {
 
   static importJSON(serializedNode: SerializedDivisionMarkNode) {
     const { attributes, format, indent, direction, tag } = serializedNode;
-    const node = $createDivisionMarkNode(attributes, tag);
+    const node = $createDivisionMarkNode(attributes, tag ?? DEFAULT_TAG);
     node.setAttributes(attributes);
     node.setFormat(format);
     node.setIndent(indent);
@@ -29,7 +31,7 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 
   createDOM(config: EditorConfig): HTMLSpanElement {
-    const element = document.createElement(this.getTag() || "span");
+    const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     const attributes = this.getAttributes();
 
     Object.keys(attributes).forEach((attKey) => {

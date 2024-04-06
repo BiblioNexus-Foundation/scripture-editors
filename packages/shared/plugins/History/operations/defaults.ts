@@ -1,7 +1,7 @@
 import { ElementNode, LexicalNode } from "lexical";
 import { Operation, OperationType, Path } from "./index.d";
 
-type MapperArgs = {
+export type MapperArgs = {
   node: LexicalNode;
   path: Path;
   from?: Path;
@@ -42,15 +42,24 @@ export const buildOperation: Mapper = ({ node, path, operationType }) => {
  * @param {LexicalNode} node - The lexical node for which to build paths.
  * @returns {string[]} An array of paths built from the lexical node. If the array is empty or `false`, the operation is not added.
  */
-export type PathBuilder = <T extends LexicalNode>(node: T) => Array<string | number> | false;
+export type PathBuilder = <T extends LexicalNode>(
+  node: T,
+  rootNode?: T | null,
+) => Array<string | number> | false;
 
-export const getNodePath: PathBuilder = (node) => {
+export const getNodePath: PathBuilder = (node, rootNode = null) => {
   const pathArray: Array<string | number> = [];
   let currentNode: ElementNode | LexicalNode | null = node;
 
   while (currentNode) {
+    // Check if the current node is the root node
+
     const parent: ElementNode | null = currentNode.getParent();
     const nodeKey = currentNode.getKey();
+    if (currentNode === rootNode) {
+      pathArray.unshift(nodeKey);
+      break; // Exit the loop if it is the root node
+    }
     const index = parent ? parent.getChildrenKeys().findIndex((key) => nodeKey === key) : "root";
     pathArray.unshift(index); // Add the index to the path array
     currentNode = parent; // Move up to the parent node

@@ -29,4 +29,4 @@ interface OperationRemove extends Omit<OperationBase, "value"> {
   type: OperationType.Remove;
   value?: any;
 }
-export type Operation = OperationAdd | OperationReplace | OperationRemove;
+export type Operation = OperationAdd | OperationReplace | OperationRemove | { [string]: unknown };

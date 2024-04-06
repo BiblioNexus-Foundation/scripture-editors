@@ -29,6 +29,32 @@ export class UsfmElementNode extends ElementNode {
     writable.__attributes = attributes;
   }
 
+  getAttribute(key: string): string | undefined {
+    return this.getLatest().__attributes[key];
+  }
+
+  setAttribute(key: string, value: string) {
+    const writable = this.getWritable();
+    writable.__attributes[key] = value;
+  }
+
+  removeAttribute(key: string) {
+    const writable = this.getWritable();
+    delete writable.__attributes[key];
+  }
+
+  setUIAttribute(key: string, value: string) {
+    this.setAttribute(`data-ui-${key}`, value);
+  }
+
+  getUIAttribute(key: string): string | undefined {
+    return this.getAttribute(`data-ui-${key}`);
+  }
+
+  removeUIAttribute(key: string) {
+    this.removeAttribute(`data-ui-${key}`);
+  }
+
   getTag(): string | undefined {
     return this.getLatest().__tag;
   }
@@ -39,9 +65,17 @@ export class UsfmElementNode extends ElementNode {
   }
 
   exportJSON(): SerializedUsfmElementNode {
+    const attributes = this.getAttributes();
+    const nonUiAttributes: Attributes = Object.keys(attributes).reduce((acc: Attributes, key) => {
+      if (!key.startsWith("data-ui-")) {
+        acc[key] = attributes[key];
+      }
+      return acc;
+    }, {});
+
     return {
       ...super.exportJSON(),
-      attributes: this.getAttributes(),
+      attributes: nonUiAttributes,
       tag: this.getTag(),
       type: "usfmelement",
       version: 1,

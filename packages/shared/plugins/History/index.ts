@@ -42,7 +42,7 @@ interface OnChangeArgs extends Omit<UpdateListenerArgs, "normalizedNodes"> {
     canRedo: boolean;
     canUndo: boolean;
     mergeHistory: <T extends Record<string, unknown>>(mergeableData: T) => void;
-    currentEntry: Record<string, unknown>;
+    currentEntry: Record<string, unknown> | null;
   };
 }
 
@@ -368,6 +368,7 @@ export function registerHistory(
     console.log("MERGE ACTION: ", ["MERGE", "PUSH", "DISCARD"][mergeAction]);
     if (mergeAction === HISTORY_PUSH) {
       dirtyNodes.reset();
+      console.log("pushing");
       historyManager.push();
     } else if (mergeAction === DISCARD_HISTORY_CANDIDATE) {
       dirtyNodes.reset();
@@ -378,18 +379,9 @@ export function registerHistory(
       editor,
       editorState,
     });
-    //TODO: reset dirtyNodes after undo and redo, because the nodes are not dirty anymore
+
     dirtyNodes.merge(dirtyLeaves, dirtyElements);
-
-    console.log(
-      "dirtyLeaves: ",
-      [...dirtyNodes.getLeaves()].length,
-      ", dirtyElements: ",
-      [...dirtyNodes.getElements()].length,
-    );
-
     const editorChanged = dirtyElements.size > 0 || dirtyLeaves.size > 0;
-
     (() => (!current ? onChange : triggerOnChange))()({
       editorState,
       editorChanged,
@@ -403,7 +395,7 @@ export function registerHistory(
         mergeHistory(historyEntry) {
           historyManager.merge({ ...historyEntry, editor, editorState });
         },
-        currentEntry: historyManager.getCurrentEntryData(),
+        currentEntry: historyManager.getCurrent(),
       },
     });
   };

@@ -2,6 +2,8 @@ import { $applyNodeReplacement, EditorConfig, NodeKey } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
 import { addClassNamesToElement } from "@lexical/utils";
 
+const DEFAULT_TAG = "span";
+
 export type SerializedGraftNode = SerializedUsfmElementNode;
 
 export class GraftNode extends UsfmElementNode {
@@ -22,7 +24,7 @@ export class GraftNode extends UsfmElementNode {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const element = document.createElement(this.getTag() || "span");
+    const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     const attributes = this.getAttributes() ?? {};
     Object.keys(attributes).forEach((attKey) => {
       element.setAttribute(attKey, attributes[attKey]);
@@ -33,7 +35,7 @@ export class GraftNode extends UsfmElementNode {
 
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
     const { attributes, format, indent, direction, tag } = serializedNode;
-    const node = $createGraftNode(attributes, tag);
+    const node = $createGraftNode(attributes, tag ?? DEFAULT_TAG);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -51,7 +53,7 @@ export class GraftNode extends UsfmElementNode {
   updateDOM(): boolean {
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
-    return false;
+    return true;
   }
 }
 

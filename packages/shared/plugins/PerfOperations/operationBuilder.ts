@@ -1,5 +1,3 @@
-import { LexicalNode } from "lexical";
-
 import { getPerfKindFromNode } from "./utils";
 import { exportNodeToJSON } from "../../lexical/exportNodeToJSON";
 
@@ -15,36 +13,30 @@ import {
 import { transformLexicalStateToPerf } from "../../converters/lexicalToPerf";
 import { PerfKind, PerfKindMap } from "./types";
 
-export const operationBuilder: Mapper = ({
-  node,
-  operationType,
-  path,
-}: {
-  node: UsfmElementNode | LexicalNode;
-  path: Path;
-  from?: Path;
-  operationType: OperationType;
-}) => {
-  if (operationType === OperationType.Move) {
-    console.log("SKIPPED MOVE OPERATION");
-    return undefined;
-  }
-  if (!$isUsfmElementNode(node)) return undefined;
-  const { "perf-type": perfType } = node.getAttributes?.() ?? {};
-  const kind = getPerfKindFromNode(node);
-
-  if (perfType === "graft" || kind === PerfKind.Block) {
-    switch (operationType) {
-      case OperationType.Add:
-        return buildAddOperation(node, path);
-      case OperationType.Remove:
-        return buildRemoveOperation(path);
-      case OperationType.Replace:
-        return buildReplaceOperation(node, path);
+export const getOperationBuilder =
+  (extendedOperations: Array<Record<string, unknown>> = []): Mapper =>
+  ({ node, operationType, path }) => {
+    if (operationType === OperationType.Move) {
+      console.log("SKIPPED MOVE OPERATION");
+      return undefined;
     }
-  }
-  return undefined;
-};
+    if (!$isUsfmElementNode(node)) return undefined;
+    const { "perf-type": perfType } = node.getAttributes?.() ?? {};
+    const kind = getPerfKindFromNode(node);
+
+    if (perfType === "graft" || kind === PerfKind.Block) {
+      extendedOperations.push({ lexicalNode: node, operationType, perfPath: path, perfKind: kind });
+      switch (operationType) {
+        case OperationType.Add:
+          return buildAddOperation(node, path);
+        case OperationType.Remove:
+          return buildRemoveOperation(path);
+        case OperationType.Replace:
+          return buildReplaceOperation(node, path);
+      }
+    }
+    return undefined;
+  };
 
 const buildAddOperation = (node: UsfmElementNode, path: Path): OperationAdd => {
   const kind = getPerfKindFromNode(node);

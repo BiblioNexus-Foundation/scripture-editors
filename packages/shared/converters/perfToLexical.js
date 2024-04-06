@@ -1,29 +1,74 @@
-import { convertSequence } from "./perfToX";
+import { convertBlock, convertContentElement, convertSequence } from "./perfToX";
 
-export const transformPerfToLexicalState = (perf, sequenceId, perfMapper) => ({
+export const transformPerfDocumentToLexicalState = (perfDocument, sequenceId, perfMapper) => ({
   root: convertSequence({
-    sequence: perf.sequences[sequenceId],
+    sequence: perfDocument.sequences[sequenceId],
     sequenceId,
     nodeBuilder: (props) =>
       buildLexicalNodeFromPerfNode({
         props,
-        perfDocument: perf,
+        perfSequences: perfDocument.sequences,
         perfMapper,
       }),
   }),
 });
-export default transformPerfToLexicalState;
+export default transformPerfDocumentToLexicalState;
 
 export const DATA_PREFIX = "perf";
+
+export const transformPerfNodeToLexicalNode = ({
+  node,
+  kind,
+  sequenceId = "",
+  perfSequences,
+  perfMapper = mapPerf,
+}) => {
+  if (kind === "sequence") {
+    return convertSequence({
+      sequence: node,
+      sequenceId,
+      nodeBuilder: (props) =>
+        buildLexicalNodeFromPerfNode({
+          props,
+          perfSequences,
+          perfMapper,
+        }),
+    });
+  }
+  if (kind === "block") {
+    return convertBlock({
+      block: node,
+      nodeBuilder: (props) =>
+        buildLexicalNodeFromPerfNode({
+          props,
+          perfSequences,
+          perfMapper,
+        }),
+    });
+  }
+  if (kind === "contentElement") {
+    return convertContentElement({
+      contentElement: node,
+      nodeBuilder: (props) =>
+        buildLexicalNodeFromPerfNode({
+          props,
+          perfSequences,
+          perfMapper,
+        }),
+    });
+  }
+  throw new Error(`Unsupported kind: ${kind}`);
+};
 
 /**
  * Converts a PERF element to a different format
  */
-export const buildLexicalNodeFromPerfNode = ({ props, perfDocument, perfMapper }) =>
-  (perfMapper || mapPerf)({
+export const buildLexicalNodeFromPerfNode = ({ props, perfSequences, perfMapper = mapPerf }) => {
+  return perfMapper({
     ...props,
-    perfMap: createPerfMap(perfDocument),
+    perfMap: createPerfMap(perfSequences),
   });
+};
 
 /** Maps types and subtypes of a PERF element (sequence,block, contentElement)
  * given map object (perfMap) and returns a transformation of that element.
@@ -54,7 +99,7 @@ export const mapPerf = ({ kind, props, children, direction, perfMap, defaults })
  * this is needed for mapPerf() to assign a transformation
  * to a type/subtype combination.
  */
-export const createPerfMap = (perf) => ({
+export const createPerfMap = (perfSequences) => ({
   "*": {
     "*": ({ children, props: perfElementProps }) => {
       console.log("NOT SUPPORTED", { perfElementProps, children });
@@ -135,9 +180,11 @@ export const createPerfMap = (perf) => ({
   },
   graft: {
     "*": ({ props: perfElementProps }) => ({
-      children: ((lexicalState) => lexicalState.root.children)(
-        transformPerfToLexicalState(perf, perfElementProps.target),
-      ),
+      children: transformPerfNodeToLexicalNode({
+        node: perfSequences[perfElementProps.target],
+        kind: "sequence",
+        perfSequences,
+      }).children,
       direction: null,
       format: "",
       indent: 0,
@@ -150,6 +197,7 @@ export const createPerfMap = (perf) => ({
           title: "h1",
           introduction: "section",
           heading: "div",
+          default: "span",
         },
       }),
     }),
@@ -171,6 +219,7 @@ export const createPerfMap = (perf) => ({
             s: "h3",
             r: "strong",
             f: "span",
+            default: "p",
           },
         }),
       };
@@ -183,6 +232,7 @@ export const createPerfMap = (perf) => ({
       type: "inline",
       version: 1,
       attributes: getAttributesFromPerfElementProps(perfElementProps),
+      tag: "span",
     }),
   },
   wrapper: {
@@ -194,6 +244,7 @@ export const createPerfMap = (perf) => ({
       type: "inline",
       version: 1,
       attributes: getAttributesFromPerfElementProps(perfElementProps),
+      tag: "span",
     }),
   },
   mark: {
@@ -228,8 +279,8 @@ export const createPerfMap = (perf) => ({
         [`${DATA_PREFIX}-type`]: perfElementProps.type,
         [`${DATA_PREFIX}-subtype`]: perfElementProps.subtype,
         class: `${perfElementProps.subtype}`,
-        tabindex: 0,
       },
+      tag: "span",
     })),
   },
 });
@@ -238,7 +289,6 @@ const getAttributesFromPerfElementProps = (data) =>
   Object.keys(data).reduce((atts, dataKey) => {
     if (["kind", "metaContent"].includes(dataKey)) return atts;
     atts[`${DATA_PREFIX}-${dataKey}`] = data[dataKey];
-    atts.tabindex = 0;
     return atts;
   }, {});
 
@@ -250,9 +300,7 @@ const getTagFromSubtype = ({ subtype, replacementMap }) => {
     const matchedKey = Object.keys(replacementMap).find((key) =>
       subtype.match(new RegExp(`^${key}$`)),
     );
-    if (matchedKey) {
-      replacement = replacementMap[matchedKey];
-    }
+    replacement = matchedKey ? replacementMap[matchedKey] : replacementMap.default;
   }
   // If a replacement is found, return an object with a tag property
   // Otherwise, return undefined

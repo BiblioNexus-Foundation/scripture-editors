@@ -137,15 +137,6 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
-      open-patcher:
-        specifier: 1.0.0-beta.1
-        version: 1.0.0-beta.1
-      shared:
-        specifier: '*'
-        version: link:../shared
-      shared-react:
-        specifier: '*'
-        version: link:../shared-react
     devDependencies:
       '@types/deep-equal':
         specifier: ^1.0.4
@@ -196,6 +187,12 @@ importers:
       deep-equal:
         specifier: ^2.2.3
         version: 2.2.3
+      open-patcher:
+        specifier: 1.0.0-beta.1
+        version: 1.0.0-beta.1
+      shared:
+        specifier: '*'
+        version: link:../shared
 
   packages/platform:
     dependencies:
@@ -328,6 +325,9 @@ importers:
       deep-equal:
         specifier: ^2.2.3
         version: 2.2.3
+      json-difference:
+        specifier: ^1.16.1
+        version: 1.16.1
       proskomma-core:
         specifier: ^0.10.4
         version: 0.10.4(@babel/core@7.23.2)
@@ -12310,7 +12310,6 @@ snapshots:
   /open-patcher@1.0.0-beta.1:
     resolution: {integrity: sha512-EnH0Q+vOCZoJSS1w/MPKc5yoqrFF2Y+G8TrN/sbk4uKwI0wQ4MEyTxooK29qi9Q8Byt0wAUnT/E44zbmMtlKRg==}
     engines: {node: '>=12.0.0'}
-    dev: false
 
   /open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}

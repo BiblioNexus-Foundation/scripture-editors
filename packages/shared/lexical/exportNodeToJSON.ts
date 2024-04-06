@@ -13,7 +13,9 @@ export function exportNodeToJSON<SerializedNode extends SerializedLexicalNode>(
   const nodeClass = node.constructor;
 
   if (serializedNode.type !== nodeClass.getType()) {
-    throw new Error("Serialized node type does not match node type");
+    throw new Error(
+      `Serialized node type '${serializedNode.type}' does not match node type '${nodeClass.getType()}'`,
+    );
   }
 
   if ($isElementNode(node)) {
