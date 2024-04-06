@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@lexical/utils": "^0.13.1",
-    "lexical": "^0.13.1"
+    "lexical": "^0.13.1",
+    "@lexical/rich-text": "^0.13.1"
   },
   "devDependencies": {
     "shared": "*",

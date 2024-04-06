@@ -12,50 +12,48 @@ export type HistoryState = {
 };
 
 export class LexicalHistoryManager {
-  private current: HistoryState["current"];
-  private redoStack: HistoryState["redoStack"];
-  private undoStack: HistoryState["undoStack"];
+  private state: HistoryState;
   private editor: LexicalEditor;
 
   constructor(editor: LexicalEditor, historyState: HistoryState) {
     this.editor = editor;
-    this.current = historyState.current ?? null;
-    this.redoStack = historyState.redoStack ?? [];
-    this.undoStack = historyState.undoStack ?? [];
+    this.state = historyState;
+    this.state.redoStack = historyState.redoStack ?? [];
+    this.state.undoStack = historyState.undoStack ?? [];
   }
 
   public merge(historyEntry: HistoryStateEntry) {
-    this.current = { ...this.current, ...historyEntry };
+    this.state.current = { ...this.state.current, ...historyEntry };
   }
 
   public push() {
-    if (this.redoStack.length !== 0) {
-      this.redoStack = [];
+    if (this.state.redoStack.length !== 0) {
+      this.state.redoStack = [];
       this.editor.dispatchCommand(CAN_REDO_COMMAND, false);
     }
 
-    if (this.current !== null) {
-      this.undoStack.push({
-        ...this.current,
+    if (this.state.current !== null) {
+      this.state.undoStack.push({
+        ...this.state.current,
       });
       this.editor.dispatchCommand(CAN_UNDO_COMMAND, true);
     }
   }
 
   public canUndo(): boolean {
-    return this.undoStack.length > 0;
+    return this.state.undoStack.length > 0;
   }
 
   public canRedo(): boolean {
-    return this.redoStack.length > 0;
+    return this.state.redoStack.length > 0;
   }
 
   public redo(/* onRedo = () => null */) {
-    const redoStack = this.redoStack;
-    const undoStack = this.undoStack;
+    const redoStack = this.state.redoStack;
+    const undoStack = this.state.undoStack;
 
     if (redoStack.length !== 0) {
-      const current = this.current;
+      const current = this.state.current;
 
       if (current !== null) {
         undoStack.push(current);
@@ -68,7 +66,7 @@ export class LexicalHistoryManager {
         this.editor.dispatchCommand(CAN_REDO_COMMAND, false);
       }
 
-      this.current = historyStateEntry || null;
+      this.state.current = historyStateEntry || null;
 
       if (historyStateEntry) {
         historyStateEntry.editor.setEditorState(historyStateEntry.editorState, {
@@ -79,31 +77,31 @@ export class LexicalHistoryManager {
   }
 
   public getPrevious() {
-    return this.undoStack[this.undoStack.length - 1];
+    return this.state.undoStack[this.state.undoStack.length - 1];
   }
 
   public getNext() {
-    return this.redoStack[this.redoStack.length - 1];
+    return this.state.redoStack[this.state.redoStack.length - 1];
   }
 
   public getCurrent() {
-    return this.current;
+    return this.state.current;
   }
 
   public getCurrentEntryData() {
-    const currentEntryData = { ...this.current };
+    const currentEntryData = { ...this.state.current };
     delete currentEntryData.editor;
     delete currentEntryData.editorState;
     return currentEntryData;
   }
 
   public undo(/* onUndo = () => null */) {
-    const redoStack = this.redoStack;
-    const undoStack = this.undoStack;
+    const redoStack = this.state.redoStack;
+    const undoStack = this.state.undoStack;
     const undoStackLength = undoStack.length;
 
     if (undoStackLength !== 0) {
-      const current = this.current;
+      const current = this.state.current;
       const historyStateEntry = undoStack.pop();
 
       if (current !== null) {
@@ -115,7 +113,7 @@ export class LexicalHistoryManager {
         this.editor.dispatchCommand(CAN_UNDO_COMMAND, false);
       }
 
-      this.current = historyStateEntry || null;
+      this.state.current = historyStateEntry || null;
 
       if (historyStateEntry) {
         historyStateEntry.editor.setEditorState(historyStateEntry.editorState, {
@@ -133,8 +131,8 @@ export class LexicalHistoryManager {
   }
 
   public clear() {
-    this.current = null;
-    this.redoStack = [];
-    this.undoStack = [];
+    this.state.current = null;
+    this.state.redoStack = [];
+    this.state.undoStack = [];
   }
 }

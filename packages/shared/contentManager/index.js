@@ -1,25 +1,47 @@
 import Epitelete from "epitelete";
-import { transformPerfToLexicalState } from "../converters/perfToLexical";
+import { transformPerfDocumentToLexicalState } from "../converters/perfToLexical";
 import { usfm2perf } from "../converters/usfmToPerf";
 
-export const getPerf = async (usfmText) => {
-  const perf = usfm2perf(usfmText, {
-    serverName: "door43",
-    organizationId: "unfoldingWord",
-    languageCode: "en",
-    versionId: "ult",
+const readOptions = { readPipeline: "stripAlignmentPipeline" };
+const writeOptions = { writePipeline: "mergeAlignmentPipeline", ...readOptions };
+
+export class BookStore extends Epitelete {
+  read(bookCode) {
+    return this.readPerf(bookCode, readOptions);
+  }
+  write(bookCode) {
+    return this.writePerf(bookCode, writeOptions);
+  }
+  sideload(bookCode, perf) {
+    return this.sideloadPerf(bookCode, perf, readOptions);
+  }
+}
+
+export const getBookHandler = async ({
+  usfm,
+  serverName,
+  organizationId,
+  languageCode,
+  versionId,
+  bookCode,
+}) => {
+  const perf = usfm2perf(usfm, {
+    serverName,
+    organizationId,
+    languageCode,
+    versionId,
   });
   const bibleStore = new BibleStore();
-  const bibleHandler = bibleStore.create({
+  const bookHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,
     options: { historySize: 1 },
   });
-  const readOptions = { readPipeline: "stripAlignmentPipeline" };
-  return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions });
+  await bookHandler.sideload(bookCode, perf);
+  return bookHandler;
 };
 
 export const getLexicalState = (perf) => {
-  const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
+  const _lexicalState = transformPerfDocumentToLexicalState(perf, perf.main_sequence_id);
   return _lexicalState;
 };
 
@@ -41,7 +63,7 @@ class BibleStore {
    * and params for Epitelete's constructor
    */
   create(epiteleteParams) {
-    const epitelete = new Epitelete(epiteleteParams);
+    const epitelete = new BookStore(epiteleteParams);
     this.store.set(epiteleteParams.docSetId, epitelete);
     return epitelete;
   }

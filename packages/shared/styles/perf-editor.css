@@ -1,69 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap");
-:root {
-  font-family: "Lora", serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
 .editor-oce {
   position: relative;
   text-align: left;
@@ -74,16 +8,6 @@ button:focus-visible {
   min-height: 40em;
   padding: 0 8px;
   outline: none;
-}
-
-.placeholder {
-  color: #999;
-  overflow: hidden;
-  position: absolute;
-  top: 0px;
-  padding-left: 8px;
-  user-select: none;
-  pointer-events: none;
 }
 
 .editor-paragraph {
@@ -186,16 +110,16 @@ p[perf-type="paragraph"] {
   display: none;
 }
 
-[perf-type="graft"][data-active="true"] {
+[perf-type="graft"][data-ui-active="true"] {
   border: none;
   text-decoration: wavy;
 }
 
-[perf-type="graft"][data-active="true"] span {
+[perf-type="graft"][data-ui-active="true"] span {
   text-decoration: solid wavy #646cff;
 }
 
-[perf-subtype="footnote"][data-active="true"]
+[perf-subtype="footnote"][data-ui-active="true"]
   [perf-subtype="f"]
   > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
   display: inline-block;
@@ -207,7 +131,7 @@ p[perf-type="paragraph"] {
   display: none;
 }
 
-[perf-subtype="xref"][data-active="true"]
+[perf-subtype="xref"][data-ui-active="true"]
   [perf-subtype="x"]
   > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
   display: inline-block;

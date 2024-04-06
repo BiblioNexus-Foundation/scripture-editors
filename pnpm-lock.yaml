@@ -137,15 +137,6 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
-      open-patcher:
-        specifier: 1.0.0-beta.1
-        version: 1.0.0-beta.1
-      shared:
-        specifier: '*'
-        version: link:../shared
-      shared-react:
-        specifier: '*'
-        version: link:../shared-react
     devDependencies:
       '@types/deep-equal':
         specifier: ^1.0.4
@@ -165,6 +156,12 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      shared:
+        specifier: '*'
+        version: link:../shared
+      shared-react:
+        specifier: '*'
+        version: link:../shared-react
 
   packages/perf-vanilla:
     dependencies:
@@ -177,12 +174,6 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
-      open-patcher:
-        specifier: 1.0.0-beta.1
-        version: 1.0.0-beta.1
-      shared:
-        specifier: '*'
-        version: link:../shared
     devDependencies:
       '@types/deep-equal':
         specifier: ^1.0.4
@@ -190,6 +181,12 @@ importers:
       deep-equal:
         specifier: ^2.2.3
         version: 2.2.3
+      open-patcher:
+        specifier: 1.0.0-beta.1
+        version: 1.0.0-beta.1
+      shared:
+        specifier: '*'
+        version: link:../shared
 
   packages/platform:
     dependencies:
@@ -267,6 +264,9 @@ importers:
       deep-equal:
         specifier: ^2.2.3
         version: 2.2.3
+      json-difference:
+        specifier: ^1.16.1
+        version: 1.16.1
       proskomma-core:
         specifier: ^0.10.4
         version: 0.10.4(@babel/core@7.23.2)
@@ -7669,6 +7669,11 @@ packages:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
     dev: true
 
+  /json-difference@1.16.1:
+    resolution: {integrity: sha512-tNVUzBKn2I4BB4Cjn+j+Kq/BfLNwqtEvxhnlyuX5XJmKn9VlfV5MvaTbB/ure/toFgLaD6XglOUt+dd4iMQ3dA==}
+    engines: {node: '>=18.17.x'}
+    dev: true
+
   /json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
     dev: true
@@ -8384,7 +8389,6 @@ packages:
   /open-patcher@1.0.0-beta.1:
     resolution: {integrity: sha512-EnH0Q+vOCZoJSS1w/MPKc5yoqrFF2Y+G8TrN/sbk4uKwI0wQ4MEyTxooK29qi9Q8Byt0wAUnT/E44zbmMtlKRg==}
     engines: {node: '>=12.0.0'}
-    dev: false
 
   /open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}

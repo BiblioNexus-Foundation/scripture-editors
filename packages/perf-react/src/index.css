@@ -87,8 +87,8 @@ span.chapter {
 
 span.verses {
   color: #fff;
-  font-size: 0.8em;
-  vertical-align: sup;
+  font-size: 0.65em;
+  vertical-align: super;
   font-weight: 600;
   margin-inline-end: 0.1em;
 }
@@ -176,4 +176,27 @@ p[perf-type="paragraph"] {
 .contentEditable:hover > [perf-type="graft"] {
   border: 1px dashed #747bff;
   background-color: #0000001a;
+}
+
+[perf-subtype="f"] > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="f"]:focus-within
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline-block;
+}
+
+[perf-subtype="x"] > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="x"]:focus-within
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline-block;
+}
+
+[perf-type="mark"] span {
+  color: #e7ff5f;
+  padding: 0.2rem;
 }
