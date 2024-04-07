@@ -25,6 +25,7 @@ import AnnotationPlugin, {
   AnnotationRef,
 } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
+import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
@@ -226,6 +227,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           />
           <AnnotationPlugin ref={annotationRef} logger={logger} />
           <NoteNodePlugin />
+          <ContextMenuPlugin />
           {children}
         </div>
       </div>

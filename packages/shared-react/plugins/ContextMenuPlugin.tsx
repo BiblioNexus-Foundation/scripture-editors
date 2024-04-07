@@ -174,6 +174,7 @@ export default function ContextMenuPlugin(): JSX.Element {
       onSelectOption={onSelectOption}
       menuRenderFn={(
         anchorElementRef,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         { selectedIndex, options: _options, selectOptionAndCleanUp, setHighlightedIndex },
         { setMenuRef },
       ) =>
