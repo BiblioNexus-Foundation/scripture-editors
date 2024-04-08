@@ -6,9 +6,7 @@ import {
   $applyNodeReplacement,
   Spread,
   ElementNode,
-  $createTextNode,
   SerializedElementNode,
-  TextNode,
 } from "lexical";
 import { BookCode, isValidBookCode } from "../../../converters/usj/usj.model";
 import { UnknownAttributes } from "./node.utils";
@@ -21,7 +19,6 @@ export type SerializedBookNode = Spread<
   {
     marker: BookMarker;
     code: BookCode;
-    text?: string;
     unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
@@ -32,12 +29,11 @@ export class BookNode extends ElementNode {
   __code: BookCode;
   __unknownAttributes?: UnknownAttributes;
 
-  constructor(code: BookCode, text?: string, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
+  constructor(code: BookCode, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
     super(key);
     this.__marker = BOOK_MARKER;
     this.__code = code;
     this.__unknownAttributes = unknownAttributes;
-    this.append($createTextNode(text));
   }
 
   static getType(): string {
@@ -46,13 +42,12 @@ export class BookNode extends ElementNode {
 
   static clone(node: BookNode): BookNode {
     const { __code, __unknownAttributes, __key } = node;
-    const __text = node.getFirstChild<TextNode>()?.getTextContent();
-    return new BookNode(__code, __text, __unknownAttributes, __key);
+    return new BookNode(__code, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedBookNode): BookNode {
-    const { marker, code, text, unknownAttributes, format, indent, direction } = serializedNode;
-    const node = $createBookNode(code, text, unknownAttributes);
+    const { marker, code, unknownAttributes, format, indent, direction } = serializedNode;
+    const node = $createBookNode(code, unknownAttributes);
     node.setMarker(marker);
     node.setFormat(format);
     node.setIndent(indent);
@@ -118,19 +113,14 @@ export class BookNode extends ElementNode {
       type: this.getType(),
       marker: this.getMarker(),
       code: this.getCode(),
-      text: this.getFirstChild<TextNode>()?.getTextContent(),
       unknownAttributes: this.getUnknownAttributes(),
       version: BOOK_VERSION,
     };
   }
 }
 
-export function $createBookNode(
-  code: BookCode,
-  text?: string,
-  unknownAttributes?: UnknownAttributes,
-): BookNode {
-  return $applyNodeReplacement(new BookNode(code, text, unknownAttributes));
+export function $createBookNode(code: BookCode, unknownAttributes?: UnknownAttributes): BookNode {
+  return $applyNodeReplacement(new BookNode(code, unknownAttributes));
 }
 
 export function $isBookNode(node: LexicalNode | null | undefined): node is BookNode {

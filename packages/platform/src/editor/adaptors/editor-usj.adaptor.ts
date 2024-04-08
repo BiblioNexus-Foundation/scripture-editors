@@ -84,10 +84,11 @@ function removeUndefinedProperties<T>(obj: T): T {
   ) as T;
 }
 
-function createBookMarker(node: SerializedBookNode): MarkerObject {
-  const { type, marker, code, text, unknownAttributes } = node;
-  let content: MarkerContent[] | undefined;
-  if (text) content = [text];
+function createBookMarker(
+  node: SerializedBookNode,
+  content: MarkerContent[] | undefined,
+): MarkerObject {
+  const { type, marker, code, unknownAttributes } = node;
   return removeUndefinedProperties({
     type,
     marker,
@@ -157,13 +158,11 @@ function createParaMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, unknownAttributes } = node;
-  // Ensure empty arrays are removed.
-  const _content = content && content.length > 0 ? content : undefined;
   return removeUndefinedProperties({
     type,
     marker,
     ...unknownAttributes,
-    content: _content,
+    content,
   });
 }
 
@@ -172,15 +171,13 @@ function createNoteMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category, unknownAttributes } = node;
-  // Ensure empty arrays are removed.
-  const _content = content && content.length > 0 ? content : undefined;
   return removeUndefinedProperties({
     type,
     marker,
     caller,
     category,
     ...unknownAttributes,
-    content: _content,
+    content,
   });
 }
 
@@ -204,13 +201,11 @@ function createUnknownMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { tag, marker, unknownAttributes } = node;
-  // Ensure empty arrays are removed.
-  const _content = content && content.length > 0 ? content : undefined;
   return removeUndefinedProperties({
     type: tag,
     marker,
     ...unknownAttributes,
-    content: _content,
+    content,
   });
 }
 
@@ -220,13 +215,16 @@ function recurseNodes(
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
   nodes.forEach((node) => {
+    const serializedBookNode = node as SerializedBookNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
     const serializedUnknownNode = node as SerializedUnknownNode;
     switch (node.type) {
       case BookNode.getType():
-        markers.push(createBookMarker(node as SerializedBookNode));
+        markers.push(
+          createBookMarker(serializedBookNode, recurseNodes(serializedBookNode.children)),
+        );
         break;
       case ImmutableChapterNode.getType():
       case ChapterNode.getType():
@@ -264,6 +262,7 @@ function recurseNodes(
         break;
       case TextNode.getType():
         if (
+          serializedTextNode.text &&
           serializedTextNode.text !== NBSP &&
           (!noteCaller || serializedTextNode.text !== getEditableCallerText(noteCaller))
         ) {
@@ -279,7 +278,8 @@ function recurseNodes(
         _logger?.error(`Unexpected node type '${node.type}'!`);
     }
   });
-  return markers;
+  // Ensure empty arrays are removed.
+  return markers && markers.length > 0 ? markers : undefined;
 }
 
 /**
