@@ -1,9 +1,5 @@
 /**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
+ * Adapted from https://github.com/facebook/lexical/blob/main/packages/lexical-playground/src/plugins/ContextMenuPlugin/index.tsx
  */
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -95,18 +91,18 @@ export default function ContextMenuPlugin(): JSX.Element {
 
   const options = useMemo(() => {
     return [
-      new ContextMenuOption(`Copy`, {
-        onSelect: (_node) => {
-          editor.dispatchCommand(COPY_COMMAND, null);
-        },
-      }),
       new ContextMenuOption(`Cut`, {
-        onSelect: (_node) => {
+        onSelect: () => {
           editor.dispatchCommand(CUT_COMMAND, null);
         },
       }),
+      new ContextMenuOption(`Copy`, {
+        onSelect: () => {
+          editor.dispatchCommand(COPY_COMMAND, null);
+        },
+      }),
       new ContextMenuOption(`Paste`, {
-        onSelect: (_node) => {
+        onSelect: () => {
           navigator.clipboard.read().then(async () => {
             const data = new DataTransfer();
 
@@ -131,6 +127,30 @@ export default function ContextMenuPlugin(): JSX.Element {
               clipboardData: data,
             });
 
+            editor.dispatchCommand(PASTE_COMMAND, event);
+          });
+        },
+      }),
+      new ContextMenuOption(`Paste as Plain Text`, {
+        onSelect: () => {
+          navigator.clipboard.read().then(async () => {
+            const permission = await navigator.permissions.query({
+              // @ts-expect-error These types are incorrect.
+              name: "clipboard-read",
+            });
+
+            if (permission.state === "denied") {
+              alert("Not allowed to paste from clipboard.");
+              return;
+            }
+
+            const data = new DataTransfer();
+            const items = await navigator.clipboard.readText();
+            data.setData("text/plain", items);
+
+            const event = new ClipboardEvent("paste", {
+              clipboardData: data,
+            });
             editor.dispatchCommand(PASTE_COMMAND, event);
           });
         },
