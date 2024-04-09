@@ -35,7 +35,7 @@ export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
  */
 export const usxGen1v1 = `
 <usx version="3.0">
-  <book style="id" code="GEN" />
+  <book style="id" code="GEN">Some Scripture Version</book>
   <chapter style="c" number="1" sid="GEN 1" />
     <para style="p">
       <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
@@ -74,7 +74,7 @@ export const usjGen1v1: Usj = {
   type: "USJ",
   version: "0.2.1",
   content: [
-    { type: "book", marker: "id", code: "GEN" },
+    { type: "book", marker: "id", code: "GEN", content: ["Some Scripture Version"] },
     { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
     {
       type: "para",
@@ -130,12 +130,21 @@ export const editorStateGen1v1 = {
         type: "book",
         marker: "id",
         code: "GEN",
-        text: "",
         direction: null,
         format: "",
         indent: 0,
         version: 1,
-        children: [],
+        children: [
+          {
+            type: "text",
+            text: "Some Scripture Version",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "immutable-chapter",
@@ -312,9 +321,18 @@ export const editorStateGen1v1Editable = {
         direction: null,
         format: "",
         indent: 0,
-        text: "",
         version: 1,
-        children: [],
+        children: [
+          {
+            type: "text",
+            text: "Some Scripture Version",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "chapter",
@@ -700,12 +718,21 @@ export const editorStateGen1v1ImpliedPara = {
         type: "book",
         code: "GEN",
         marker: "id",
-        text: "",
         direction: null,
         format: "",
         indent: 0,
         version: 1,
-        children: [],
+        children: [
+          {
+            type: "text",
+            text: "",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "implied-para",
@@ -849,13 +876,22 @@ export const editorStateWithUnknownItems = {
         type: "book",
         marker: "id",
         code: "GEN",
-        text: "",
         unknownAttributes: { "attr-unknown": "watAttr" },
         direction: null,
         format: "",
         indent: 0,
         version: 1,
-        children: [],
+        children: [
+          {
+            type: "text",
+            text: "",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "immutable-chapter",
