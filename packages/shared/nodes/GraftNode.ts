@@ -7,7 +7,7 @@ const DEFAULT_TAG = "span";
 export type SerializedGraftNode = SerializedUsfmElementNode;
 
 export class GraftNode extends UsfmElementNode {
-  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
     super(attributes, tag, key);
   }
 
@@ -57,6 +57,6 @@ export class GraftNode extends UsfmElementNode {
   }
 }
 
-function $createGraftNode(attributes: Attributes, tag?: string): GraftNode {
+function $createGraftNode(attributes?: Attributes, tag?: string): GraftNode {
   return $applyNodeReplacement(new GraftNode(attributes, tag));
 }

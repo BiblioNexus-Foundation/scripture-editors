@@ -114,16 +114,19 @@ export const getPerfHistoryUpdater: (
             );
 
             // Convert the patched perf node to a Serialized Element Node
-            const patchedLexicalNode = transformPerfNodeToLexicalNode<SerializedElementNode>({
-              node: perfElementOperations[index].value,
-              kind: getPerfKindFromNode(operation.lexicalNode),
+            const patchedLexicalNode = transformPerfNodeToLexicalNode({
+              source: {
+                node: perfElementOperations[index].value,
+                kind: getPerfKindFromNode(operation.lexicalNode),
+              },
               perfSequences: patchedPerfDocument.sequences,
             });
 
             // Check both nodes have the same type and structure
             if (
               editorLexicalNode.type !== patchedLexicalNode.type ||
-              editorLexicalNode?.children?.length !== patchedLexicalNode.children?.length
+              editorLexicalNode?.children?.length !==
+                (patchedLexicalNode as SerializedElementNode).children?.length
             )
               throw new Error(
                 "Current node and converted node have different types, or different structure. Unable to merge.",
