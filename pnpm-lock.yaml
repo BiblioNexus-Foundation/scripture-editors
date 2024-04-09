@@ -137,9 +137,6 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
-      shared:
-        specifier: '*'
-        version: link:../shared
     devDependencies:
       '@types/react':
         specifier: ^18.2.48
@@ -153,6 +150,12 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      shared:
+        specifier: '*'
+        version: link:../shared
+      shared-react:
+        specifier: '*'
+        version: link:../shared-react
 
   packages/perf-vanilla:
     dependencies:
@@ -165,6 +168,7 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
+    devDependencies:
       shared:
         specifier: '*'
         version: link:../shared
@@ -242,9 +246,6 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
-      shared:
-        specifier: '*'
-        version: link:../shared
     devDependencies:
       '@types/react':
         specifier: ^18.2.48
@@ -258,6 +259,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      shared:
+        specifier: '*'
+        version: link:../shared
 
 packages:
 

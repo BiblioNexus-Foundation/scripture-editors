@@ -26,5 +26,8 @@
     "type": "git",
     "url": "https://github.com/BiblioNexus-Foundation/scripture-editors",
     "directory": "packages/shared"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

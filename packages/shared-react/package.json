@@ -17,18 +17,21 @@
   "dependencies": {
     "@lexical/react": "^0.13.1",
     "@lexical/utils": "^0.13.1",
-    "lexical": "^0.13.1",
-    "shared": "*"
+    "lexical": "^0.13.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "shared": "*"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/BiblioNexus-Foundation/scripture-editors",
     "directory": "packages/shared-react"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }
