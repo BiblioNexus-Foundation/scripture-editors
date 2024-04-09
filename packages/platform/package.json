@@ -43,5 +43,8 @@
     "react-dom": "^18.2.0",
     "shared": "*",
     "shared-react": "*"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }
