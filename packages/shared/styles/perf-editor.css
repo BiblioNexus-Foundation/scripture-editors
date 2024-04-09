@@ -170,3 +170,24 @@ p[perf-type="paragraph"] {
   color: #fff;
   opacity: 0.5;
 }
+
+.unsupported {
+  color: #ffffff2b;
+  text-decoration: underline wavy;
+  text-decoration-thickness: 0.08rem;
+}
+
+.unsupported:hover:after {
+  font-size: 0.8rem;
+  content: attr(perf-type) "/" attr(perf-subtype) " not supported";
+  position: absolute;
+  padding: 0 0.4em;
+  border-radius: 0.5em;
+  width: max-content;
+  background-color: #c50000;
+  color: #ffc0c0;
+  top: -1.4rem;
+  right: 0;
+  border: 1px solid #6b2f2f;
+  opacity: 1;
+}

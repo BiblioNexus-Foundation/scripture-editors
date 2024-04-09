@@ -5,7 +5,7 @@ import { addClassNamesToElement } from "@lexical/utils";
 export type SerializedInlineNode = SerializedUsfmElementNode;
 
 export class InlineNode extends UsfmElementNode {
-  constructor(attributes: Attributes, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, key?: NodeKey) {
     super(attributes, "span", key);
   }
 
@@ -55,6 +55,6 @@ export class InlineNode extends UsfmElementNode {
   }
 }
 
-function $createInlineNode(attributes: Attributes): InlineNode {
+function $createInlineNode(attributes?: Attributes): InlineNode {
   return $applyNodeReplacement(new InlineNode(attributes));
 }

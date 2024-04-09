@@ -90,7 +90,7 @@ export class UsfmParagraphNode extends UsfmElementNode {
   }
 }
 
-export function $createUsfmParagraphNode(attributes: Attributes, tag?: string): UsfmParagraphNode {
+export function $createUsfmParagraphNode(attributes?: Attributes, tag?: string): UsfmParagraphNode {
   return $applyNodeReplacement(new UsfmParagraphNode(attributes, tag));
 }
 

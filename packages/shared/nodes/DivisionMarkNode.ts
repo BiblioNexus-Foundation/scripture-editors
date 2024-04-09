@@ -15,7 +15,7 @@ export class DivisionMarkNode extends UsfmElementNode {
     return new DivisionMarkNode(node.__attributes, node.__tag, node.__key);
   }
 
-  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
     // TODO: define this value. This was added because previously `super` was passed `key` as `tag`.
     super(attributes, tag, key);
   }
@@ -23,7 +23,7 @@ export class DivisionMarkNode extends UsfmElementNode {
   static importJSON(serializedNode: SerializedDivisionMarkNode) {
     const { attributes, format, indent, direction, tag } = serializedNode;
     const node = $createDivisionMarkNode(attributes, tag ?? DEFAULT_TAG);
-    node.setAttributes(attributes);
+    node.setAttributes(attributes ?? {});
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -63,7 +63,7 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 }
 
-export function $createDivisionMarkNode(attributes: Attributes, tag?: string): DivisionMarkNode {
+export function $createDivisionMarkNode(attributes?: Attributes, tag?: string): DivisionMarkNode {
   return $applyNodeReplacement(new DivisionMarkNode(attributes, tag));
 }
 

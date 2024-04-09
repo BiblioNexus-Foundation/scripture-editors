@@ -4,7 +4,7 @@ export type Attributes = { [key: string]: string };
 
 export type SerializedUsfmElementNode = Spread<
   {
-    attributes: Attributes;
+    attributes?: Attributes;
     tag?: string;
   },
   SerializedElementNode
@@ -14,7 +14,7 @@ export class UsfmElementNode extends ElementNode {
   __attributes: Attributes;
   __tag?: string;
 
-  constructor(attributes: Attributes, tag?: string, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
     super(key);
     this.__attributes = attributes;
     this.__tag = tag;
