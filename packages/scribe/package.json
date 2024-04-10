@@ -1,0 +1,54 @@
+{
+  "name": "scribe-editor",
+  "version": "0.0.1",
+  "description": "Scripture editor used in Scribe",
+  "license": "MIT",
+  "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/scribe#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BiblioNexus-Foundation/scripture-editors.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BiblioNexus-Foundation/scripture-editors/issues"
+  },
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/index.ts",
+    "src/editor"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "prepublish": "cd ../.. && nx build scribe"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1"
+  },
+  "dependencies": {
+    "@lexical/mark": "^0.14.5",
+    "@lexical/react": "^0.14.5",
+    "@lexical/selection": "^0.14.5",
+    "@lexical/utils": "^0.14.5",
+    "fast-equals": "^5.0.1",
+    "lexical": "^0.14.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "postcss": "^8.4.35",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "platform": "link:../platform",
+    "shared": "link:../shared",
+    "shared-react": "link:../shared-react",
+    "sj-usfm-grammar": "^3.0.0",
+    "tailwindcss": "^3.4.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
