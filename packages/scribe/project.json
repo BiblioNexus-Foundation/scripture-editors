@@ -1,0 +1,60 @@
+{
+  "name": "scribe",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "package",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/{projectRoot}"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "scribe:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "scribe:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "scribe:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "scribe:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "scribe:build:development"
+        },
+        "production": {
+          "buildTarget": "scribe:build:production"
+        }
+      }
+    },
+    "typecheck": {},
+    "test": {},
+    "lint": {}
+  },
+  "tags": []
+}
