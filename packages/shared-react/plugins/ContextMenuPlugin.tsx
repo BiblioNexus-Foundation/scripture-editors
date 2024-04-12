@@ -4,9 +4,10 @@
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
-import { type LexicalNode, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND } from "lexical";
+import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { useCallback, useMemo } from "react";
 import * as ReactDOM from "react-dom";
+import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 
 function ContextMenuItem({
   index,
@@ -103,56 +104,12 @@ export default function ContextMenuPlugin(): JSX.Element {
       }),
       new ContextMenuOption(`Paste`, {
         onSelect: () => {
-          navigator.clipboard.read().then(async () => {
-            const data = new DataTransfer();
-
-            const items = await navigator.clipboard.read();
-            const item = items[0];
-
-            const permission = await navigator.permissions.query({
-              // @ts-expect-error These types are incorrect.
-              name: "clipboard-read",
-            });
-            if (permission.state === "denied") {
-              alert("Not allowed to paste from clipboard.");
-              return;
-            }
-
-            for (const type of item.types) {
-              const dataString = await (await item.getType(type)).text();
-              data.setData(type, dataString);
-            }
-
-            const event = new ClipboardEvent("paste", {
-              clipboardData: data,
-            });
-
-            editor.dispatchCommand(PASTE_COMMAND, event);
-          });
+          pasteSelection(editor);
         },
       }),
       new ContextMenuOption(`Paste as Plain Text`, {
         onSelect: () => {
-          navigator.clipboard.read().then(async () => {
-            const permission = await navigator.permissions.query({
-              // @ts-expect-error These types are incorrect.
-              name: "clipboard-read",
-            });
-
-            if (permission.state === "denied") {
-              alert("Not allowed to paste from clipboard.");
-              return;
-            }
-
-            const data = new DataTransfer();
-            const items = await navigator.clipboard.readText();
-            data.setData("text/plain", items);
-
-            const event = new ClipboardEvent("paste", {
-              clipboardData: data,
-            });
-            editor.dispatchCommand(PASTE_COMMAND, event);
-          });
+          pasteSelectionAsPlainText(editor);
         },
       }),
     ];
