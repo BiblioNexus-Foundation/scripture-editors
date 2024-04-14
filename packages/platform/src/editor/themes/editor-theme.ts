@@ -5,6 +5,8 @@ const editorTheme = {
   para: "para",
   ltr: "ltr",
   rtl: "rtl",
+  mark: "editor-mark",
+  markOverlap: "editor-markOverlap",
   placeholder: "editor-placeholder",
   paragraph: "editor-paragraph",
   quote: "editor-quote",

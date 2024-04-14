@@ -175,6 +175,9 @@ importers:
 
   packages/platform:
     dependencies:
+      '@lexical/mark':
+        specifier: ^0.14.3
+        version: 0.14.3
       '@lexical/react':
         specifier: ^0.14.3
         version: 0.14.3(react-dom@18.2.0)(react@18.2.0)(yjs@13.6.8)

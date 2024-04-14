@@ -1,4 +1,6 @@
-// Modified from original: unknown items (wat:z) added in first para:q1.
+// Modified from original:
+//   unknown items (wat:z) added in first para:q1;
+//   custom annotation milestones in first para:q2.
 export const WEB_PSA_USX = `
 <?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
@@ -15,7 +17,7 @@ export const WEB_PSA_USX = `
   <para style="q1">
     <wat style="z" attr-unknown="watAttr">wat content?</wat>
     <verse number="1" style="v" sid="PSA 1:1" />Blessed is the man who doesn’t walk in the counsel of the wicked,</para>
-  <para style="q2" vid="PSA 1:1">nor stand on the path of sinners,</para>
+  <para style="q2" vid="PSA 1:1">nor <ms style="zmsa-s" sid="1" />stand<ms style="zmsa-s" sid="2" /> on <ms style="zmsa-e" eid="1" />the<ms style="zmsa-e" eid="2" /> path of sinners,</para>
   <para style="q2" vid="PSA 1:1">nor sit in the seat of scoffers;<verse eid="PSA 1:1" /></para>
   <para style="q1">
     <verse number="2" style="v" sid="PSA 1:2" />but his delight is in Yahweh’s<note caller="+" style="f"><char style="fr" closed="false">1:2 </char><char style="ft" closed="false">“Yahweh” is God’s proper Name, sometimes rendered “LORD” (all caps) in other translations.</char></note> law.</para>

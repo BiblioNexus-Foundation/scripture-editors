@@ -1,3 +1,4 @@
+import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   EditorState,
   LineBreakNode,
@@ -214,11 +215,13 @@ function recurseNodes(
   noteCaller?: string,
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
+  let childMarkers: MarkerContent[] | undefined;
   nodes.forEach((node) => {
     const serializedBookNode = node as SerializedBookNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
+    const serializedMarkNode = node as SerializedMarkNode;
     const serializedUnknownNode = node as SerializedUnknownNode;
     switch (node.type) {
       case BookNode.getType():
@@ -253,9 +256,14 @@ function recurseNodes(
         );
         break;
       case ImmutableNoteCallerNode.getType():
-      case MarkerNode.getType():
       case LineBreakNode.getType():
+      case MarkerNode.getType():
         // These nodes are for presentation only so they don't go into the USJ.
+        break;
+      case MarkNode.getType():
+        // Strip the mark and insert its children.
+        childMarkers = recurseNodes(serializedMarkNode.children);
+        if (childMarkers) markers.push(...childMarkers);
         break;
       case MilestoneNode.getType():
         markers.push(createMilestoneMarker(node as SerializedMilestoneNode));

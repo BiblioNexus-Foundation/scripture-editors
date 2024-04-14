@@ -8,10 +8,12 @@ import {
   editorStateGen1v1,
   editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
+  editorStateMarks,
   editorStateWithUnknownItems,
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjMarks,
   usjWithUnknownItems,
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
@@ -137,6 +139,12 @@ describe("USJ Editor Adaptor", () => {
     noteCaller.caller = "-";
     removeOnClick(serializedEditorState);
     expect(serializedEditorState).toEqual(editorStateCallerUpdated);
+  });
+
+  it("should convert from USJ with Marks to Lexical editor state JSON", () => {
+    const serializedEditorState = serializeEditorState(usjMarks);
+
+    expect(serializedEditorState).toEqual(editorStateMarks);
   });
 
   it("should convert from USJ with unknown items to Lexical editor state JSON", () => {
