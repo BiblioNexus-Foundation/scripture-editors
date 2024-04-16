@@ -1,3 +1,4 @@
+import { MarkNode } from "@lexical/mark";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -60,7 +61,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [ImmutableNoteCallerNode, ...scriptureUsjNodes],
+  nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
 
 function Placeholder(): JSX.Element {

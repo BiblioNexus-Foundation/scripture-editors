@@ -1,3 +1,4 @@
+import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   LineBreakNode,
   SerializedEditorState,
@@ -39,6 +40,8 @@ import {
   MilestoneNode,
   MilestoneMarker,
   SerializedMilestoneNode,
+  STARTING_MS_MARK_MARKER,
+  ENDING_MS_MARK_MARKER,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -101,6 +104,9 @@ interface UsjEditorAdaptor extends EditorAdaptor {
   reset: typeof reset;
   serializeEditorState: typeof serializeEditorState;
 }
+
+/** Milestone markers used to mark an annotation */
+const milestoneMarkMarkers = [STARTING_MS_MARK_MARKER, ENDING_MS_MARK_MARKER];
 
 const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
@@ -518,6 +524,18 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
   };
 }
 
+function createMark(children: SerializedLexicalNode[], ids: string[] = []): SerializedMarkNode {
+  return {
+    type: MarkNode.getType(),
+    ids,
+    children,
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+  };
+}
+
 function createUnknown(
   markerObject: MarkerObject,
   childNodes: SerializedLexicalNode[],
@@ -580,7 +598,65 @@ function addClosingMarker(marker: string, nodes: SerializedLexicalNode[]) {
   }
 }
 
+function isMilestoneMarkMarker(markerContent: MarkerObject) {
+  return milestoneMarkMarkers.includes(markerContent.marker);
+}
+
+function reIndex(indexes: number[], offset: number): number[] {
+  if (indexes.length <= 0 || offset === 0) return indexes;
+
+  return indexes.map((index) => index - offset);
+}
+
+function removeValueFromArray<T>(arr: T[], value: T) {
+  const index = arr.indexOf(value, 0);
+  if (index > -1) {
+    arr.splice(index, 1);
+  }
+}
+
+function updateSids(sids: string[], msMarkNode: SerializedMilestoneNode) {
+  if (msMarkNode.marker === STARTING_MS_MARK_MARKER && msMarkNode.sid) sids.push(msMarkNode.sid);
+  if (msMarkNode.marker === ENDING_MS_MARK_MARKER && msMarkNode.eid)
+    removeValueFromArray(sids, msMarkNode.eid);
+}
+
+function insertMilestoneMarksRecurse(
+  nodes: SerializedLexicalNode[],
+  msMarkIndexes: number[],
+  isPreviousMsStarting = false,
+  sids: string[] = [],
+): SerializedLexicalNode[] {
+  if (msMarkIndexes.length <= 0 || msMarkIndexes[0] >= nodes.length) return nodes;
+
+  const firstIndex = msMarkIndexes.shift();
+  const secondIndex = msMarkIndexes.length > 0 ? msMarkIndexes.shift() : nodes.length - 1;
+  if (!firstIndex || !secondIndex) return nodes;
+
+  const startNodes = nodes.slice(0, firstIndex);
+  const nodesBefore = isPreviousMsStarting ? [createMark(startNodes, [...sids])] : startNodes;
+  const firstMSMarkNode = nodes[firstIndex] as SerializedMilestoneNode;
+  updateSids(sids, firstMSMarkNode);
+  const markedNodes = insertMilestoneMarksRecurse(
+    nodes.slice(firstIndex + 1, secondIndex),
+    reIndex(msMarkIndexes, firstIndex + 1),
+    firstMSMarkNode.marker === STARTING_MS_MARK_MARKER,
+    sids,
+  );
+  const markNode = createMark(markedNodes, [...sids]);
+  const secondMSMarkNode = nodes[secondIndex] as SerializedMilestoneNode;
+  updateSids(sids, secondMSMarkNode);
+  const nodesAfter = insertMilestoneMarksRecurse(
+    nodes.slice(secondIndex + 1),
+    reIndex(msMarkIndexes, secondIndex + 1),
+    secondMSMarkNode.marker === STARTING_MS_MARK_MARKER,
+    sids,
+  );
+  return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
+}
+
 function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNode[] {
+  const msMarkIndexes: number[] = [];
   const nodes: SerializedLexicalNode[] = [];
   markers?.forEach((markerContent) => {
     if (typeof markerContent === "string") {
@@ -611,6 +687,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           nodes.push(createNote(markerContent, recurseNodes(markerContent.content)));
           break;
         case MilestoneNode.getType():
+          if (isMilestoneMarkMarker(markerContent)) msMarkIndexes.push(nodes.length);
           nodes.push(createMilestone(markerContent));
           break;
         default:
@@ -619,7 +696,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
       }
     }
   });
-  return nodes;
+  return insertMilestoneMarksRecurse(nodes, msMarkIndexes);
 }
 
 /**
@@ -636,15 +713,15 @@ function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLe
     const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, bookNodeIndex));
     const bookNode = nodes[bookNodeIndex];
     const nodesAfter = insertImpliedParasRecurse(nodes.slice(bookNodeIndex + 1));
-    nodes = [...nodesBefore, bookNode, ...nodesAfter];
+    return [...nodesBefore, bookNode, ...nodesAfter];
   } else if (isChapterNodeFound) {
     const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, chapterNodeIndex));
     const chapterNode = nodes[chapterNodeIndex];
     const nodesAfter = insertImpliedParasRecurse(nodes.slice(chapterNodeIndex + 1));
-    nodes = [...nodesBefore, chapterNode, ...nodesAfter];
+    return [...nodesBefore, chapterNode, ...nodesAfter];
   } else if (nodes.some((node) => "text" in node && "mode" in node)) {
     // If there are any text nodes as a child of this root, enclose in an implied para node.
-    nodes = [createImpliedPara(nodes)];
+    return [createImpliedPara(nodes)];
   }
   return nodes;
 }

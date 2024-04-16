@@ -10,6 +10,9 @@ import {
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
+export const STARTING_MS_MARK_MARKER = "zmsa-s";
+export const ENDING_MS_MARK_MARKER = "zmsa-e";
+
 /** @see https://ubsicap.github.io/usx/msstyles.html */
 const VALID_MILESTONE_MARKERS = [
   "ts-s",
@@ -31,6 +34,9 @@ const VALID_MILESTONE_MARKERS = [
   "qte",
   "qt-s",
   "qt-e",
+  // custom markers used for annotations
+  STARTING_MS_MARK_MARKER,
+  ENDING_MS_MARK_MARKER,
 ] as const;
 
 export const MILESTONE_VERSION = 1;
