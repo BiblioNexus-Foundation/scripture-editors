@@ -1,7 +1,7 @@
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection, $isRangeSelection, LexicalEditor } from "lexical";
 import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import DropDown, { DropDownItem } from "../../ui/DropDown";
+import DropDown, { DropDownItem } from "./DropDown";
 
 type BlockMarkerToBlockNames = typeof blockMarkerToBlockNames;
 

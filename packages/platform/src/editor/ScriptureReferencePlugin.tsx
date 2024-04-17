@@ -18,8 +18,8 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { ViewOptions } from "../adaptors/view-options.utils";
-import { getChapterNodeClass, getVerseNodeClass } from "../adaptors/usj-editor.adaptor";
+import { ViewOptions } from "./adaptors/view-options.utils";
+import { getChapterNodeClass, getVerseNodeClass } from "./adaptors/usj-editor.adaptor";
 
 /** Prevents the cursor being moved again after a selection has changed. */
 let hasSelectionChanged = false;

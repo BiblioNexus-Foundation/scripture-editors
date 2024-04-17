@@ -7,8 +7,8 @@ import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { getViewOptions } from "./editor/adaptors/view-options.utils";
-import { formattedViewMode as defaultViewMode } from "./editor/plugins/toolbar/view-mode.model";
-import ViewModeDropDown from "./editor/plugins/toolbar/ViewModeDropDown";
+import { formattedViewMode as defaultViewMode } from "./editor/toolbar/view-mode.model";
+import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
 import Editor, { EditorRef } from "./editor/Editor";
 import "./App.css";
 

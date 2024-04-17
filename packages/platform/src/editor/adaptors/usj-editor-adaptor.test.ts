@@ -20,9 +20,9 @@ import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { unformattedViewMode } from "../plugins/toolbar/view-mode.model";
-import { getViewOptions } from "./view-options.utils";
+import { unformattedViewMode } from "../toolbar/view-mode.model";
 import { serializeEditorState, reset } from "./usj-editor.adaptor";
+import { getViewOptions } from "./view-options.utils";
 
 /**
  * Remove the `onClick` function because it can't be compared since it's anonymous.

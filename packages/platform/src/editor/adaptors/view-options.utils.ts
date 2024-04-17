@@ -3,7 +3,7 @@ import {
   formattedViewMode as defaultViewMode,
   formattedViewMode,
   unformattedViewMode,
-} from "../plugins/toolbar/view-mode.model";
+} from "../toolbar/view-mode.model";
 
 export type ViewOptions = {
   /** USFM markers are visible, editable or hidden */

@@ -9,4 +9,4 @@ export {
   getViewOptions,
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
-export { type ViewMode } from "./editor/plugins/toolbar/view-mode.model";
+export { type ViewMode } from "./editor/toolbar/view-mode.model";

@@ -1,6 +1,6 @@
 import { JSX } from "react";
+import DropDown, { DropDownItem } from "./DropDown";
 import { viewModeToViewNames, ViewNameKey } from "./view-mode.model";
-import DropDown, { DropDownItem } from "../../ui/DropDown";
 
 function viewModeToClassName(viewMode: string): string {
   return viewMode in viewModeToViewNames ? viewMode : "";
