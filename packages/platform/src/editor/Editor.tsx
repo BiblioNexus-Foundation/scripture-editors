@@ -19,9 +19,9 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { ViewOptions } from "./adaptors/view-options.utils";
-import ScriptureReferencePlugin from "./plugins/ScriptureReferencePlugin";
-import ToolbarPlugin from "./plugins/toolbar/ToolbarPlugin";
-import editorTheme from "./themes/editor-theme";
+import editorTheme from "./editor-theme";
+import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
+import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import useDeferredState from "./use-deferred-state.hook";
 
 export type EditorRef = {
