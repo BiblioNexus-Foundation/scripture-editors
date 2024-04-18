@@ -1,27 +1,27 @@
 import { useLayoutEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { COPY_COMMAND, CUT_COMMAND, LexicalCommand, createCommand } from "lexical";
+import { IS_APPLE } from "@lexical/utils";
+import { COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
-
-export const SAVE_COMMAND: LexicalCommand<KeyboardEvent> = createCommand("SAVE_COMMAND");
 
 const ClipboardPlugin = () => {
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === "c") {
+      const { key, shiftKey, metaKey, ctrlKey, altKey } = event;
+      if (!(IS_APPLE ? metaKey : ctrlKey) || altKey) return;
+
+      if (!shiftKey && key.toLowerCase() === "c") {
         event.preventDefault();
         editor.dispatchCommand(COPY_COMMAND, null);
-      } else if ((event.ctrlKey || event.metaKey) && event.key === "x") {
+      } else if (!shiftKey && key.toLowerCase() === "x") {
         event.preventDefault();
         editor.dispatchCommand(CUT_COMMAND, null);
-      } else if (event.shiftKey && (event.ctrlKey || event.metaKey) && event.key === "v") {
+      } else if (key.toLowerCase() === "v") {
         event.preventDefault();
-        pasteSelectionAsPlainText(editor);
-      } else if ((event.ctrlKey || event.metaKey) && event.key === "v") {
-        event.preventDefault();
-        pasteSelection(editor);
+        if (shiftKey) pasteSelectionAsPlainText(editor);
+        else pasteSelection(editor);
       }
     };
 
