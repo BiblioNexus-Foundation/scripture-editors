@@ -788,6 +788,7 @@ button.toolbar-item.active i {
   background: #fff;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
+  position: fixed;
 }
 
 .typeahead-popover ul {
@@ -797,15 +798,12 @@ button.toolbar-item.active i {
   border-radius: 8px;
   max-height: 200px;
   overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .typeahead-popover ul::-webkit-scrollbar {
   display: none;
-}
-
-.typeahead-popover ul {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
 .typeahead-popover ul li {
