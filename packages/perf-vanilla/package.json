@@ -13,7 +13,7 @@
     "lexical": "^0.14.3"
   },
   "devDependencies": {
-    "shared": "*"
+    "shared": "link:../shared"
   },
   "volta": {
     "extends": "../../package.json"

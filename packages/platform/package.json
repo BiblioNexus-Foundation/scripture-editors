@@ -41,8 +41,8 @@
     "papi-components": "file:./lib/papi-components",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "shared": "*",
-    "shared-react": "*"
+    "shared": "link:../shared",
+    "shared-react": "link:../shared-react"
   },
   "volta": {
     "extends": "../../package.json"
