@@ -1,9 +1,4 @@
-import {
-  ViewMode,
-  formattedViewMode as defaultViewMode,
-  formattedViewMode,
-  unformattedViewMode,
-} from "../toolbar/view-mode.model";
+import { ViewMode, FORMATTED_VIEW_MODE, UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
 
 export type ViewOptions = {
   /** USFM markers are visible, editable or hidden */
@@ -14,23 +9,25 @@ export type ViewOptions = {
   isFormattedFont: boolean;
 };
 
+export const DEFAULT_VIEW_MODE = FORMATTED_VIEW_MODE;
+
 /**
  * Get view option properties based on the view mode.
  * @param viewMode - View mode of the editor.
  * @returns the view options if the view exists, the default options if the viewMode is undefined,
  *   `undefined` otherwise.
  */
-export function getViewOptions(viewMode: string | undefined): ViewOptions | undefined {
+export function getViewOptions(viewMode?: string | undefined): ViewOptions | undefined {
   let viewOptions: ViewOptions | undefined;
-  switch (viewMode ?? defaultViewMode) {
-    case formattedViewMode:
+  switch (viewMode ?? DEFAULT_VIEW_MODE) {
+    case FORMATTED_VIEW_MODE:
       viewOptions = {
         markerMode: "hidden",
         hasSpacing: true,
         isFormattedFont: true,
       };
       break;
-    case unformattedViewMode:
+    case UNFORMATTED_VIEW_MODE:
       viewOptions = {
         markerMode: "editable",
         hasSpacing: false,
@@ -52,7 +49,7 @@ export function viewOptionsToMode(viewOptions: ViewOptions | undefined): ViewMod
   if (!viewOptions) return undefined;
 
   const { markerMode, hasSpacing, isFormattedFont } = viewOptions;
-  if (markerMode === "hidden" && hasSpacing && isFormattedFont) return formattedViewMode;
-  if (markerMode === "editable" && !hasSpacing && !isFormattedFont) return unformattedViewMode;
+  if (markerMode === "hidden" && hasSpacing && isFormattedFont) return FORMATTED_VIEW_MODE;
+  if (markerMode === "editable" && !hasSpacing && !isFormattedFont) return UNFORMATTED_VIEW_MODE;
   return undefined;
 }

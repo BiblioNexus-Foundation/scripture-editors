@@ -20,7 +20,7 @@ import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { unformattedViewMode } from "../toolbar/view-mode.model";
+import { UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
 import { serializeEditorState, reset } from "./usj-editor.adaptor";
 import { getViewOptions } from "./view-options.utils";
 
@@ -68,7 +68,7 @@ describe("USJ Editor Adaptor", () => {
   it("should convert from USJ to Lexical editor state JSON with editable view", () => {
     const serializedEditorState = serializeEditorState(
       usjGen1v1,
-      getViewOptions(unformattedViewMode),
+      getViewOptions(UNFORMATTED_VIEW_MODE),
     );
 
     expect(serializedEditorState).toEqual(editorStateGen1v1Editable);
