@@ -1,9 +1,9 @@
 export type ViewNameKey = keyof typeof viewModeToViewNames;
 export type ViewMode = ViewNameKey;
 
-export const formattedViewMode = "formatted";
-export const unformattedViewMode = "unformatted";
+export const FORMATTED_VIEW_MODE = "formatted";
+export const UNFORMATTED_VIEW_MODE = "unformatted";
 export const viewModeToViewNames = {
-  [formattedViewMode]: "Formatted",
-  [unformattedViewMode]: "Unformatted",
+  [FORMATTED_VIEW_MODE]: "Formatted",
+  [UNFORMATTED_VIEW_MODE]: "Unformatted",
 };

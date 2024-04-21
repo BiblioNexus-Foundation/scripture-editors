@@ -6,8 +6,7 @@ import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { getViewOptions } from "./editor/adaptors/view-options.utils";
-import { formattedViewMode as defaultViewMode } from "./editor/toolbar/view-mode.model";
+import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
 import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
 import Editor, { EditorRef } from "./editor/Editor";
 import "./App.css";
@@ -20,7 +19,7 @@ export default function App() {
   // This ref becomes defined when passed to the editor.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const editorRef = useRef<EditorRef>(null!);
-  const [viewMode, setViewMode] = useState(defaultViewMode);
+  const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
 

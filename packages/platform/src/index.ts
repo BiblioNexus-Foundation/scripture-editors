@@ -6,6 +6,7 @@ export { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/Im
 export { type UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 export {
   type ViewOptions,
+  DEFAULT_VIEW_MODE,
   getViewOptions,
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
