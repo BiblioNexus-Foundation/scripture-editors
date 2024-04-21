@@ -20,7 +20,7 @@ export type ViewOptions = {
  * @returns the view options if the view exists, the default options if the viewMode is undefined,
  *   `undefined` otherwise.
  */
-export function getViewOptions(viewMode: string | undefined): ViewOptions | undefined {
+export function getViewOptions(viewMode?: string | undefined): ViewOptions | undefined {
   let viewOptions: ViewOptions | undefined;
   switch (viewMode ?? defaultViewMode) {
     case formattedViewMode:
