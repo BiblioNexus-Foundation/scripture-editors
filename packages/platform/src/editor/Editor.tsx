@@ -29,21 +29,26 @@ export type EditorRef = {
   setUsj(usj: Usj): void;
 };
 
-type EditorProps<TLogger extends LoggerBasic> = {
-  /** Initial Scripture data in USJ form */
-  defaultUsj?: Usj;
-  /** View options */
-  viewOptions?: ViewOptions;
-  /** Scripture reference */
-  scrRef?: ScriptureReference;
-  /** Set Scripture reference callback function */
-  setScrRef?: (scrRef: ScriptureReference) => void;
-  /** Options for each node */
-  nodeOptions?: UsjNodeOptions;
+export type EditorOptions = {
   /** Is the editor readonly or editable */
   isReadonly?: boolean;
   /** Is the editor enabled for spell checking */
   hasSpellCheck?: boolean;
+  /** View options */
+  view?: ViewOptions;
+  /** Options for each node */
+  nodes?: UsjNodeOptions;
+};
+
+type EditorProps<TLogger extends LoggerBasic> = {
+  /** Initial Scripture data in USJ form */
+  defaultUsj?: Usj;
+  /** Scripture reference */
+  scrRef?: ScriptureReference;
+  /** Set Scripture reference callback function */
+  setScrRef?: (scrRef: ScriptureReference) => void;
+  /** Editor options */
+  options?: EditorOptions;
   /** Callback function when USJ Scripture data has changed */
   onChange?: (usj: Usj) => void;
   /** Logger instance */
@@ -78,40 +83,30 @@ function Placeholder(): JSX.Element {
  * @param props.ref - Forward reference for the editor.
  * @param props.ref.focus - Method to focus the editor.
  * @param props.ref.setUsj - Method to set the USJ Scripture data.
- * @param props.viewOptions - View options to select different view modes.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
  * @param props.setScrRef - Scripture reference set callback function when the reference changes in
  *   the editor as the cursor moves.
- * @param props.nodeOptions - Options for each node.
- * @param props.nodeOptions[].noteCallers - Possible note callers to use when caller is
- *   '+' for NoteNode.
- * @param props.nodeOptions[].onClick - Click handler for NoteCallerNode.
- * @param props.isReadonly - Is the editor readonly or editable (default).
- * @param props.hasSpellCheck - Is the editor enabled for spell checking (default `true`).
+ * @param props.options.isReadonly - Is the editor readonly or editable (default).
+ * @param props.options.hasSpellCheck - Is the editor enabled for spell checking (default `true`).
+ * @param props.options.view - View options to select different view modes.
+ * @param props.options.nodes - Options for each node.
+ * @param props.options.nodes[].noteCallers - Possible note callers to use when caller is '+' for
+ *   NoteNode.
+ * @param props.options.nodes[].onClick - Click handler for NoteCallerNode.
  * @param props.onChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
 const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
-  {
-    defaultUsj,
-    viewOptions,
-    scrRef,
-    setScrRef,
-    nodeOptions,
-    isReadonly,
-    hasSpellCheck = true,
-    onChange,
-    logger,
-  }: EditorProps<TLogger>,
+  { defaultUsj, scrRef, setScrRef, options, onChange, logger }: EditorProps<TLogger>,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
-  editorConfig.editable = !isReadonly;
+  editorConfig.editable = !options?.isReadonly;
   editorConfig.editorState = (editor: LexicalEditor) => {
-    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, viewOptions));
+    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, options?.view));
   };
   editorUsjAdaptor.initialize(logger);
 
@@ -142,7 +137,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
         <div className="editor-inner">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="editor-input" spellCheck={hasSpellCheck} />
+              <ContentEditable className="editor-input" spellCheck={options?.hasSpellCheck} />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
@@ -152,15 +147,15 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             <ScriptureReferencePlugin
               scrRef={scrRef}
               setScrRef={setScrRef}
-              viewOptions={viewOptions}
+              viewOptions={options?.view}
             />
           )}
           <EditorRefPlugin editorRef={editorRef} />
           <UpdateStatePlugin
             scripture={loadedUsj}
-            nodeOptions={nodeOptions}
+            nodeOptions={options?.nodes}
             editorAdaptor={usjEditorAdaptor}
-            viewOptions={viewOptions}
+            viewOptions={options?.view}
             logger={logger}
           />
           <NoteNodePlugin />
