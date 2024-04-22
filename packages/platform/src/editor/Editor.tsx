@@ -42,6 +42,8 @@ type EditorProps<TLogger extends LoggerBasic> = {
   nodeOptions?: UsjNodeOptions;
   /** Is the editor readonly or editable */
   isReadonly?: boolean;
+  /** Is the editor enabled for spell checking */
+  hasSpellCheck?: boolean;
   /** Callback function when USJ Scripture data has changed */
   onChange?: (usj: Usj) => void;
   /** Logger instance */
@@ -85,6 +87,7 @@ function Placeholder(): JSX.Element {
  *   '+' for NoteNode.
  * @param props.nodeOptions[].onClick - Click handler for NoteCallerNode.
  * @param props.isReadonly - Is the editor readonly or editable (default).
+ * @param props.hasSpellCheck - Is the editor enabled for spell checking (default `true`).
  * @param props.onChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
@@ -97,6 +100,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     setScrRef,
     nodeOptions,
     isReadonly,
+    hasSpellCheck = true,
     onChange,
     logger,
   }: EditorProps<TLogger>,
@@ -137,7 +141,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
         <ToolbarPlugin />
         <div className="editor-inner">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="editor-input" />}
+            contentEditable={
+              <ContentEditable className="editor-input" spellCheck={hasSpellCheck} />
+            }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
