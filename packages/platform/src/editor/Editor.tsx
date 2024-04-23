@@ -24,34 +24,42 @@ import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import useDeferredState from "./use-deferred-state.hook";
 
+/** Forward reference for the editor. */
 export type EditorRef = {
+  /** Method to focus the editor. */
   focus(): void;
+  /** Method to set the USJ Scripture data. */
   setUsj(usj: Usj): void;
 };
 
+/** Options to configure the editor. */
 export type EditorOptions = {
-  /** Is the editor readonly or editable */
+  /** Is the editor readonly or editable. */
   isReadonly?: boolean;
-  /** Is the editor enabled for spell checking */
+  /** Is the editor enabled for spell checking. */
   hasSpellCheck?: boolean;
-  /** View options */
+  /** View options. */
   view?: ViewOptions;
-  /** Options for each node */
+  /** Options for each editor node:
+   * @param nodes[].noteCallers - Possible note callers to use when caller is '+' for
+   *   ImmutableNoteCallerNode.
+   * @param nodes[].onClick - Click handler method for ImmutableNoteCallerNode.
+   */
   nodes?: UsjNodeOptions;
 };
 
 type EditorProps<TLogger extends LoggerBasic> = {
-  /** Initial Scripture data in USJ form */
+  /** Initial Scripture data in USJ form. */
   defaultUsj?: Usj;
-  /** Scripture reference */
+  /** Scripture reference. */
   scrRef?: ScriptureReference;
-  /** Set Scripture reference callback function */
+  /** Set Scripture reference callback function. */
   setScrRef?: (scrRef: ScriptureReference) => void;
-  /** Editor options */
+  /** Options to configure the editor. */
   options?: EditorOptions;
-  /** Callback function when USJ Scripture data has changed */
+  /** Callback function when USJ Scripture data has changed. */
   onChange?: (usj: Usj) => void;
-  /** Logger instance */
+  /** Logger instance. */
   logger?: TLogger;
 };
 
@@ -81,18 +89,10 @@ function Placeholder(): JSX.Element {
  *
  * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.ref - Forward reference for the editor.
- * @param props.ref.focus - Method to focus the editor.
- * @param props.ref.setUsj - Method to set the USJ Scripture data.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
  * @param props.setScrRef - Scripture reference set callback function when the reference changes in
  *   the editor as the cursor moves.
- * @param props.options.isReadonly - Is the editor readonly or editable (default).
- * @param props.options.hasSpellCheck - Is the editor enabled for spell checking (default `true`).
- * @param props.options.view - View options to select different view modes.
- * @param props.options.nodes - Options for each node.
- * @param props.options.nodes[].noteCallers - Possible note callers to use when caller is '+' for
- *   NoteNode.
- * @param props.options.nodes[].onClick - Click handler for NoteCallerNode.
+ * @param props.options - Options to configure the editor.
  * @param props.onChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
