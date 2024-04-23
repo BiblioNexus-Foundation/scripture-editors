@@ -8,7 +8,7 @@ import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/Im
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
 import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
-import Editor, { EditorRef } from "./editor/Editor";
+import Editor, { EditorOptions, EditorRef } from "./editor/Editor";
 import "./App.css";
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
@@ -21,7 +21,10 @@ export default function App() {
   const editorRef = useRef<EditorRef>(null!);
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
-  const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
+  const options = useMemo<EditorOptions>(
+    () => ({ view: getViewOptions(viewMode), nodes: nodeOptions }),
+    [viewMode],
+  );
 
   // Simulate USJ updating after the editor is loaded.
   setTimeout(() => {
@@ -42,10 +45,9 @@ export default function App() {
       <Editor
         defaultUsj={defaultUsj}
         ref={editorRef}
-        viewOptions={viewOptions}
         scrRef={scrRef}
         setScrRef={setScrRef}
-        nodeOptions={nodeOptions}
+        options={options}
         onChange={handleChange}
         logger={console}
       />

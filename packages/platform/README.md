@@ -31,7 +31,7 @@ npm install @biblionexus-foundation/platform-editor
 **Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
 
 ```typescript
-import { Editor, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
+import { Editor, EditorOptions, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
 import { RefSelector } from 'platform-bible-react';
 
 const emptyUsx = '<usx version="3.0" />';
@@ -51,6 +51,7 @@ const usx = `
 const defaultUsj = usxStringToUsj(emptyUsx);
 const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => console.log('Note was clicked!') } };
+const options: EditorOptions = { nodes: nodeOptions };
 
 export default function App() {
   const editorRef = useRef<EditorRef>(null!);
@@ -73,7 +74,7 @@ export default function App() {
         ref={editorRef}
         scrRef={scrRef}
         setScrRef={setScrRef}
-        nodeOptions={nodeOptions}
+        options={options}
         onChange={handleChange}
         logger={console}
       />

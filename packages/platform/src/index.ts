@@ -1,4 +1,4 @@
-export { default as Editor, type EditorRef } from "./editor/Editor";
+export { default as Editor, type EditorRef, type EditorOptions } from "./editor/Editor";
 export { type Usj } from "shared/converters/usj/usj.model";
 export { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 export { usjToUsxString } from "shared/converters/usj/usj-to-usx";
