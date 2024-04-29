@@ -7,6 +7,10 @@ import {
   ParagraphNode,
   Spread,
   SerializedElementNode,
+  RangeSelection,
+  DOMConversionMap,
+  DOMConversionOutput,
+  ElementFormatType,
 } from "lexical";
 import {
   UnknownAttributes,
@@ -142,6 +146,15 @@ export class ParaNode extends ParagraphNode {
     return node;
   }
 
+  static importDOM(): DOMConversionMap | null {
+    return {
+      p: () => ({
+        conversion: convertParaElement,
+        priority: 0,
+      }),
+    };
+  }
+
   static isValidMarker(marker: string): boolean {
     return (
       VALID_PARA_MARKERS_NON_NUMBERED.includes(marker) ||
@@ -187,12 +200,6 @@ export class ParaNode extends ParagraphNode {
     return dom;
   }
 
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
-    return false;
-  }
-
   exportJSON(): SerializedParaNode {
     return {
       ...super.exportJSON(),
@@ -203,6 +210,29 @@ export class ParaNode extends ParagraphNode {
       version: PARA_VERSION,
     };
   }
+
+  // Mutation
+
+  insertNewAfter(_selection: RangeSelection, restoreSelection: boolean): ParagraphNode {
+    const newElement = $createParaNode(this.getMarker(), this.getClassList());
+    newElement.setFormat(this.getFormatType());
+    newElement.setIndent(this.getIndent());
+    newElement.setDirection(this.getDirection());
+    this.insertAfter(newElement, restoreSelection);
+    return newElement;
+  }
+}
+
+function convertParaElement(element: HTMLElement): DOMConversionOutput {
+  const node = $createParaNode();
+  if (element.style) {
+    node.setFormat(element.style.textAlign as ElementFormatType);
+    const indent = parseInt(element.style.textIndent, 10) / 20;
+    if (indent > 0) {
+      node.setIndent(indent);
+    }
+  }
+  return { node };
 }
 
 export function $createParaNode(
