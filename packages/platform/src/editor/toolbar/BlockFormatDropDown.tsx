@@ -1,6 +1,12 @@
 import { $setBlocksType } from "@lexical/selection";
-import { $getSelection, $isRangeSelection, LexicalEditor } from "lexical";
-import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import {
+  $getSelection,
+  $isRangeSelection,
+  LexicalEditor,
+  LexicalNode,
+  RangeSelection,
+} from "lexical";
+import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import DropDown, { DropDownItem } from "./DropDown";
 
 type BlockMarkerToBlockNames = typeof blockMarkerToBlockNames;
@@ -54,6 +60,14 @@ function dropDownActiveClass(active: boolean) {
   return active ? "active dropdown-item-active" : "";
 }
 
+function getClassList(selection: RangeSelection): string[] | undefined {
+  let node: LexicalNode | null = selection.getNodes()[0];
+  while (node && node.getType() !== ParaNode.getType()) node = node.getParent();
+  if (!node || node.getType() !== ParaNode.getType()) return;
+
+  return (node as ParaNode).getClassList();
+}
+
 export default function BlockFormatDropDown({
   editor,
   blockMarker,
@@ -67,7 +81,8 @@ export default function BlockFormatDropDown({
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createParaNode(selectedBlockMarker));
+        const classList = getClassList(selection);
+        $setBlocksType(selection, () => $createParaNode(selectedBlockMarker, classList));
       }
     });
   };
