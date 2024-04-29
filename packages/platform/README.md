@@ -58,9 +58,12 @@ export default function App() {
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
   // Simulate USJ updating after the editor is loaded.
-  setTimeout(() => {
-    editorRef.current?.setUsj(usxStringToUsj(usx));
-  }, 1000);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      editorRef.current?.setUsj(usxStringToUsj(usx));
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleChange = useCallback((usj: Usj) => console.log({ usj }), []);
 
