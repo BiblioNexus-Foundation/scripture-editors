@@ -133,7 +133,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
-        <ToolbarPlugin />
+        {!options?.isReadonly && <ToolbarPlugin />}
         <div className="editor-inner">
           <RichTextPlugin
             contentEditable={
