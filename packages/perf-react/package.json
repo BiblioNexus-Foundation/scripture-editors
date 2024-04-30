@@ -8,8 +8,8 @@
     "dev": "vite"
   },
   "peerDependencies": {
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1"
   },
   "dependencies": {
     "@lexical/headless": "^0.14.3",
@@ -21,10 +21,10 @@
     "lexical": "^0.14.3"
   },
   "devDependencies": {
-    "@types/react": "^18.2.78",
-    "@types/react-dom": "^18.2.25",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "shared": "link:../shared",
     "shared-react": "link:../shared-react"
   },
