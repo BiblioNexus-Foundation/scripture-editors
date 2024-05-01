@@ -22,6 +22,7 @@ export const editorStateEmpty: SerializedEditorState<SerializedParaNode> = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [],
       },
@@ -161,6 +162,7 @@ export const editorStateGen1v1 = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
@@ -221,6 +223,7 @@ export const editorStateGen1v1 = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [],
       },
@@ -231,6 +234,7 @@ export const editorStateGen1v1 = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           { type: "immutable-verse", marker: "v", number: "16", sid: "GEN 1:16", version: 1 },
@@ -350,6 +354,7 @@ export const editorStateGen1v1Editable = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -476,6 +481,7 @@ export const editorStateGen1v1Editable = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -507,6 +513,7 @@ export const editorStateGen1v1Editable = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -739,6 +746,7 @@ export const editorStateGen1v1ImpliedPara = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -865,6 +873,7 @@ export const editorStateMarks = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -915,6 +924,7 @@ export const editorStateMarks = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {
@@ -997,6 +1007,7 @@ export const editorStateMarks = {
         format: "",
         indent: 0,
         version: 1,
+        textFormat: 0,
         children: [
           {
             type: "text",
@@ -1179,6 +1190,7 @@ export const editorStateWithUnknownItems = {
         direction: null,
         format: "",
         indent: 0,
+        textFormat: 0,
         version: 1,
         children: [
           {

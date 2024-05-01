@@ -4,12 +4,13 @@ import {
   type LexicalNode,
   $applyNodeReplacement,
   ParagraphNode,
-  SerializedElementNode,
+  SerializedParagraphNode,
+  RangeSelection,
 } from "lexical";
 
 export const IMPLIED_PARA_VERSION = 1;
 
-export type SerializedImpliedParaNode = SerializedElementNode;
+export type SerializedImpliedParaNode = SerializedParagraphNode;
 
 export class ImpliedParaNode extends ParagraphNode {
   static getType(): string {
@@ -21,10 +22,12 @@ export class ImpliedParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedImpliedParaNode): ImpliedParaNode {
+    const { format, indent, direction, textFormat } = serializedNode;
     const node = $createImpliedParaNode();
-    node.setFormat(serializedNode.format);
-    node.setIndent(serializedNode.indent);
-    node.setDirection(serializedNode.direction);
+    node.setFormat(format);
+    node.setIndent(indent);
+    node.setDirection(direction);
+    node.setTextFormat(textFormat);
     return node;
   }
 
@@ -34,18 +37,24 @@ export class ImpliedParaNode extends ParagraphNode {
     return dom;
   }
 
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
-    return false;
-  }
-
   exportJSON(): SerializedImpliedParaNode {
     return {
       ...super.exportJSON(),
       type: this.getType(),
       version: IMPLIED_PARA_VERSION,
     };
+  }
+
+  // Mutation
+
+  insertNewAfter(rangeSelection: RangeSelection, restoreSelection: boolean): ParagraphNode {
+    const newElement = $createImpliedParaNode();
+    newElement.setFormat(this.getFormatType());
+    newElement.setIndent(this.getIndent());
+    newElement.setDirection(this.getDirection());
+    newElement.setTextFormat(rangeSelection.format);
+    this.insertAfter(newElement, restoreSelection);
+    return newElement;
   }
 }
 

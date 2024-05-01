@@ -12,13 +12,13 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/headless": "^0.14.3",
-    "@lexical/html": "^0.14.3",
-    "@lexical/react": "^0.14.3",
-    "@lexical/selection": "^0.14.3",
-    "@lexical/utils": "^0.14.3",
+    "@lexical/headless": "^0.14.5",
+    "@lexical/html": "^0.14.5",
+    "@lexical/react": "^0.14.5",
+    "@lexical/selection": "^0.14.5",
+    "@lexical/utils": "^0.14.5",
     "epitelete-html": "^0.2.21-beta.2",
-    "lexical": "^0.14.3"
+    "lexical": "^0.14.5"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
