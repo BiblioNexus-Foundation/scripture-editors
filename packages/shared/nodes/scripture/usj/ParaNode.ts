@@ -6,7 +6,7 @@ import {
   $applyNodeReplacement,
   ParagraphNode,
   Spread,
-  SerializedElementNode,
+  SerializedParagraphNode,
   RangeSelection,
   DOMConversionMap,
   DOMConversionOutput,
@@ -106,7 +106,7 @@ export type SerializedParaNode = Spread<
     classList: string[];
     unknownAttributes?: UnknownAttributes;
   },
-  SerializedElementNode
+  SerializedParagraphNode
 >;
 
 type ParaMarker = string;
@@ -138,11 +138,13 @@ export class ParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const { marker, classList, unknownAttributes, format, indent, direction } = serializedNode;
+    const { marker, classList, unknownAttributes, format, indent, direction, textFormat } =
+      serializedNode;
     const node = $createParaNode(marker, classList, unknownAttributes);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
+    node.setTextFormat(textFormat);
     return node;
   }
 
@@ -213,11 +215,12 @@ export class ParaNode extends ParagraphNode {
 
   // Mutation
 
-  insertNewAfter(_selection: RangeSelection, restoreSelection: boolean): ParagraphNode {
+  insertNewAfter(rangeSelection: RangeSelection, restoreSelection: boolean): ParagraphNode {
     const newElement = $createParaNode(this.getMarker(), this.getClassList());
     newElement.setFormat(this.getFormatType());
     newElement.setIndent(this.getIndent());
     newElement.setDirection(this.getDirection());
+    newElement.setTextFormat(rangeSelection.format);
     this.insertAfter(newElement, restoreSelection);
     return newElement;
   }

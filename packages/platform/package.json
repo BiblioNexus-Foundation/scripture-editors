@@ -24,23 +24,23 @@
     "prepublish": "cd ../.. && nx build platform"
   },
   "peerDependencies": {
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/mark": "^0.14.3",
-    "@lexical/react": "^0.14.3",
-    "@lexical/selection": "^0.14.3",
-    "@lexical/utils": "^0.14.3",
+    "@lexical/mark": "^0.14.5",
+    "@lexical/react": "^0.14.5",
+    "@lexical/selection": "^0.14.5",
+    "@lexical/utils": "^0.14.5",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.14.3"
+    "lexical": "^0.14.5"
   },
   "devDependencies": {
-    "@types/react": "^18.2.78",
-    "@types/react-dom": "^18.2.25",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
     "papi-components": "file:./lib/papi-components",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "shared": "link:../shared",
     "shared-react": "link:../shared-react"
   },

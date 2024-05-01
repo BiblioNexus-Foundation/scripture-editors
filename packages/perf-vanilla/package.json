@@ -8,9 +8,9 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@lexical/rich-text": "^0.14.3",
-    "@lexical/utils": "^0.14.3",
-    "lexical": "^0.14.3"
+    "@lexical/rich-text": "^0.14.5",
+    "@lexical/utils": "^0.14.5",
+    "lexical": "^0.14.5"
   },
   "devDependencies": {
     "shared": "link:../shared"
