@@ -1,4 +1,4 @@
-import { RefSelector, ScriptureReference } from "papi-components";
+import { BookChapterControl, ScriptureReference } from "platform-bible-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 import { Usj } from "shared/converters/usj/usj.model";
@@ -41,10 +41,10 @@ export default function App() {
 
   return (
     <>
-      <div className="ref-selector">
-        <RefSelector handleSubmit={setScrRef} scrRef={scrRef} />
+      <div className="controls">
+        <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
+        <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       </div>
-      <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       <Editor
         defaultUsj={defaultUsj}
         ref={editorRef}

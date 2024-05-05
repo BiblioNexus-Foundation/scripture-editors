@@ -8,7 +8,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { EditorState, LexicalEditor } from "lexical";
 import React, { JSX, forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
-import { ScriptureReference } from "papi-components";
+import { ScriptureReference } from "platform-bible-react";
 import { Usj } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";

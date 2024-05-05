@@ -61,6 +61,8 @@ button:hover {
   border-color: #646cff;
 }
 
-.ref-selector {
+.controls {
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 30px;
 }

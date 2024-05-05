@@ -6,7 +6,7 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { ScriptureReference } from "papi-components";
+import { ScriptureReference } from "platform-bible-react";
 import { useEffect } from "react";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
