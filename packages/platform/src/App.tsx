@@ -1,4 +1,4 @@
-import { RefSelector, ScriptureReference } from "papi-components";
+import { RefSelector, ScriptureReference } from "platform-bible-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 import { Usj } from "shared/converters/usj/usj.model";
