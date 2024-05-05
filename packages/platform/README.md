@@ -32,7 +32,7 @@ npm install @biblionexus-foundation/platform-editor
 
 ```typescript
 import { Editor, EditorOptions, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
-import { RefSelector } from 'platform-bible-react';
+import { BookChapterControl } from 'platform-bible-react';
 
 const emptyUsx = '<usx version="3.0" />';
 const usx = `
@@ -69,8 +69,8 @@ export default function App() {
 
   return (
     <>
-      <div className="ref-selector">
-        <RefSelector handleSubmit={setScrRef} scrRef={scrRef} />
+      <div className="controls">
+        <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
       </div>
       <Editor
         defaultUsj={defaultUsj}
