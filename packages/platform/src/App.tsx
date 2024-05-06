@@ -42,7 +42,7 @@ export default function App() {
   return (
     <>
       <div className="controls">
-        <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
+        <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
         <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       </div>
       <Editor

@@ -51,7 +51,7 @@ export default function ScriptureReferencePlugin({
           for (const [nodeKey, mutation] of nodeMutations) {
             const bookNode = $getNodeByKey<BookNode>(nodeKey);
             if (bookNode && $isBookNode(bookNode) && mutation === "created") {
-              moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+              $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
             }
           }
         });
@@ -62,7 +62,7 @@ export default function ScriptureReferencePlugin({
   // Scripture Ref changed
   useEffect(() => {
     editor.update(() => {
-      if (!hasSelectionChanged) moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+      if (!hasSelectionChanged) $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
       else hasSelectionChanged = false;
     });
   }, [editor, chapterNum, verseNum, viewOptions]);
@@ -72,7 +72,7 @@ export default function ScriptureReferencePlugin({
     () =>
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
-        () => findAndSetChapterAndVerse(bookNum, chapterNum, verseNum, setScrRef, viewOptions),
+        () => $findAndSetChapterAndVerse(bookNum, chapterNum, verseNum, setScrRef, viewOptions),
         COMMAND_PRIORITY_LOW,
       ),
     [editor, bookNum, chapterNum, verseNum, setScrRef, viewOptions],
@@ -81,7 +81,7 @@ export default function ScriptureReferencePlugin({
   return null;
 }
 
-function moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOptions?: ViewOptions) {
+function $moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOptions?: ViewOptions) {
   const ChapterNodeClass = getChapterNodeClass(viewOptions);
   const VerseNodeClass = getVerseNodeClass(viewOptions);
   if (!ChapterNodeClass || !VerseNodeClass) return;
@@ -99,7 +99,7 @@ function moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOption
   verseNode.selectNext(0, 0);
 }
 
-function findAndSetChapterAndVerse(
+function $findAndSetChapterAndVerse(
   bookNum: number,
   chapterNum: number,
   verseNum: number,
