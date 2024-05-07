@@ -1,4 +1,4 @@
-import { transformLexicalStateToPerf } from "../../converters/lexicalToPerf";
+import { transformLexicalStateToPerf } from "../../converters/perf/lexicalToPerf";
 import { SerializedUsfmElementNode } from "../../nodes/UsfmElementNode";
 import { HistoryMergeListener } from "../History";
 import { getOperations } from "../History/operations";
@@ -6,7 +6,7 @@ import { getOperationBuilder } from "./operationBuilder";
 import { getPathBuilder } from "./pathBuilder";
 import { getLexicalState } from "../../contentManager";
 import { applyPatch } from "open-patcher";
-import { PerfDocument } from "./perfTypes";
+
 import {
   $createRangeSelection,
   $getNodeByKey,
@@ -24,13 +24,14 @@ import {
 import { Operation } from "open-patcher/dist/types";
 import { HistoryStateEntry } from "../History/HistoryManager";
 
-import { transformPerfNodeToLexicalNode } from "../../converters/perfToLexical";
 import { deepEqual, getPerfKindFromNode } from "./utils";
 import { getNodePath } from "../History/operations/defaults";
 import { exportNodeToJSON } from "../../lexical/exportNodeToJSON";
 import { getDiff } from "json-difference";
 import { PerfKind } from "./types";
 import { OperationType } from "../History/operations/index.d";
+import { FlatDocument as PerfDocument } from "./Types/Document";
+import { transformPerfNodeToLexicalNode } from "../../converters/perf/perfToLexical";
 
 const DEFAULT_ROUNDTRIP_EXCEPTIONS = ["direction"];
 
@@ -65,7 +66,7 @@ export const getPerfHistoryUpdater: (
       mergeHistory({ perfDocument: perfSource });
       return;
     }
-
+    console.log("Updating Perf History", { tags, editorChanged, dirtyElements });
     // If the editor has not changed, return
     if (!editorChanged) return;
 
@@ -153,7 +154,7 @@ export const getPerfHistoryUpdater: (
           });
         });
         // Check the roundtrip of the patched document (should remove this in production)
-        checkRoundtrip({
+        const roundtripped = checkRoundtrip({
           editorState,
           patchedPerfState: patchedPerfDocument,
           roundtripExcludedKeys,
@@ -162,6 +163,7 @@ export const getPerfHistoryUpdater: (
         const end = performance.now();
         const duration = end - start;
         console.log(`Function Execution Time: ${duration / 1000} seconds`);
+        if (!roundtripped) throw new Error("File roundtrip failed.");
       }
     } catch (e) {
       console.error(e);
@@ -236,12 +238,12 @@ const checkRoundtrip = ({
   const editorLexicalState = editorState.toJSON();
   const _editorPerfState = transformLexicalStateToPerf(
     editorLexicalState.root as SerializedUsfmElementNode,
-    "sequence",
+    PerfKind.Sequence,
   );
   const editorPerfState = {
     ...patchedPerfState,
     sequences: {
-      [patchedPerfState["main_sequence_id"] ?? "main_sequence"]: _editorPerfState.targetNode,
+      [patchedPerfState["main_sequence_id"] ?? "main_sequence"]: _editorPerfState.result,
       ..._editorPerfState.sequences,
     },
   };
@@ -271,7 +273,9 @@ const checkRoundtrip = ({
 
   if (!isLexicalEqual && !isPerfEqual) {
     console.warn("Roundtrip failed");
+    return false;
   } else {
     console.log("%cRoundtrip successful", "color: white;background-color:#46b46b;padding:4px;");
+    return true;
   }
 };

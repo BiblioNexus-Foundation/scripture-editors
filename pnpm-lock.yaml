@@ -270,6 +270,9 @@ importers:
       proskomma-core:
         specifier: ^0.10.4
         version: 0.10.4(@babel/core@7.23.2)
+      proskomma-json-tools:
+        specifier: ^0.8.8
+        version: 0.8.8
 
   packages/shared-react:
     dependencies:
@@ -4971,7 +4974,6 @@ packages:
       domelementtype: 2.3.0
       domhandler: 5.0.3
       domutils: 3.1.0
-    dev: false
 
   /cheerio@1.0.0-rc.12:
     resolution: {integrity: sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==}
@@ -4984,7 +4986,6 @@ packages:
       htmlparser2: 8.0.2
       parse5: 7.1.2
       parse5-htmlparser2-tree-adapter: 7.0.0
-    dev: false
 
   /chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
@@ -6652,7 +6653,6 @@ packages:
       domhandler: 5.0.3
       domutils: 3.1.0
       entities: 4.5.0
-    dev: false
 
   /http-proxy-agent@5.0.0:
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
@@ -7868,6 +7868,10 @@ packages:
       p-locate: 5.0.0
     dev: true
 
+  /lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
+    dev: true
+
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
     dev: true
@@ -8492,7 +8496,6 @@ packages:
     dependencies:
       domhandler: 5.0.3
       parse5: 7.1.2
-    dev: false
 
   /parse5@7.1.2:
     resolution: {integrity: sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==}
@@ -8694,6 +8697,20 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: false
+
+  /proskomma-json-tools@0.8.8:
+    resolution: {integrity: sha512-S+Lc+o0PQSb7qCb8eLSn/xho2e+KftKUoQ6axge8bDlfGPJ7/Lk3GdaOMEne50KRnVSkevO0TcneBZVrN6vL0A==}
+    dependencies:
+      '@babel/core': 7.23.2
+      '@babel/plugin-proposal-throw-expressions': 7.22.5(@babel/core@7.23.2)
+      ajv: 8.12.0
+      cheerio: 1.0.0-rc.12
+      deep-equal: 2.2.3
+      usfm-js: 3.4.2
+      xregexp: 5.1.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
 
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
@@ -9847,6 +9864,12 @@ packages:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
+    dev: true
+
+  /usfm-js@3.4.2:
+    resolution: {integrity: sha512-i5nGxGwFhkOWd7xgfVWQ6GTkCpksfy5AUIwNJcwanTn3ua5J1nwl3pjApCDA6x1B++8ICkcQMUt0FB/bkKdE2g==}
+    dependencies:
+      lodash.clonedeep: 4.5.0
     dev: true
 
   /utf8-string-bytes@1.0.3:

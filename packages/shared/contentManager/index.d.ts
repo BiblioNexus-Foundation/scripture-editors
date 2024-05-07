@@ -1,8 +1,16 @@
 // TODO: remove this file when `packages\shared\contentManager\index.js` is converted to TS.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare module "epitelete" {
+  export default class Epitelete {
+    constructor(options: { docSetId: string });
+
+    validator: any;
+  }
+}
 
 import { SerializedEditorState } from "lexical";
 import { PerfDocument } from "../plugins/PerfOperations/perfTypes";
-import { Epitelete } from "epitelete";
+import Epitelete from "epitelete";
 
 export function getLexicalState(perf: PerfDocument): SerializedEditorState | SerializedLexicalNode;
 

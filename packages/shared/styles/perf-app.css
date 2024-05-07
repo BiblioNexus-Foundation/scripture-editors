@@ -74,3 +74,9 @@ button:focus-visible {
   user-select: none;
   pointer-events: none;
 }
+
+@media print {
+  .noprint {
+    display: none;
+  }
+}

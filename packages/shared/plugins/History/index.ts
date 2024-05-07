@@ -265,6 +265,17 @@ function createMergeActionGetter(
       editor.isComposing(),
     );
 
+    console.log(
+      [
+        "OTHER",
+        "COMPOSING_CHARACTER",
+        "INSERT_CHARACTER_AFTER_SELECTION",
+        "DELETE_CHARACTER_BEFORE_SELECTION",
+        "DELETE_CHARACTER_AFTER_SELECTION",
+      ][changeType],
+      tags,
+    );
+
     const mergeAction = (() => {
       const isSameEditor = currentHistoryEntry === null || currentHistoryEntry.editor === editor;
       const shouldPushHistory = tags.has("history-push");
@@ -275,6 +286,7 @@ function createMergeActionGetter(
       }
 
       if (prevEditorState === null) {
+        console.log("PUSH SET");
         return HISTORY_PUSH;
       }
 
@@ -307,7 +319,7 @@ function createMergeActionGetter(
           return HISTORY_MERGE;
         }
       }
-
+      console.log("PUSH SET");
       return HISTORY_PUSH;
     })();
 
@@ -336,7 +348,7 @@ export function registerHistory(
   const dirtyNodes = new DirtyNodes();
   const historyManager = new LexicalHistoryManager(editor, historyState);
   const getMergeAction = createMergeActionGetter(editor, delay);
-  const triggerOnChange = debounce(onChange, delay);
+  const triggerOnChange = debounce(onChange, delay, ({ editorChanged }) => editorChanged);
 
   const applyChange = ({
     editorState,
@@ -368,7 +380,7 @@ export function registerHistory(
     console.log("MERGE ACTION: ", ["MERGE", "PUSH", "DISCARD"][mergeAction]);
     if (mergeAction === HISTORY_PUSH) {
       dirtyNodes.reset();
-      console.log("pushing");
+      console.log("PUSHING");
       historyManager.push();
     } else if (mergeAction === DISCARD_HISTORY_CANDIDATE) {
       dirtyNodes.reset();

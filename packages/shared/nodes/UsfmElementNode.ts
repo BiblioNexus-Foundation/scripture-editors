@@ -51,6 +51,15 @@ export class UsfmElementNode extends ElementNode {
     return this.getAttribute(`data-ui-${key}`);
   }
 
+  getUIAttributes(): Attributes {
+    return Object.keys(this.getAttributes()).reduce((acc: Attributes, key) => {
+      if (key.startsWith("data-ui-")) {
+        acc[key] = this.getAttribute(key) as string;
+      }
+      return acc;
+    }, {});
+  }
+
   removeUIAttribute(key: string) {
     this.removeAttribute(`data-ui-${key}`);
   }
@@ -80,6 +89,13 @@ export class UsfmElementNode extends ElementNode {
       type: "usfmelement",
       version: 1,
     };
+  }
+
+  updateDOM(_: UsfmElementNode, element: HTMLElement): boolean {
+    const elementAttributes = element.attributes;
+    const nodeAttributes = this.getAttributes();
+    if (Object.keys(elementAttributes).length !== Object.keys(nodeAttributes).length) return true;
+    return false;
   }
 }
 

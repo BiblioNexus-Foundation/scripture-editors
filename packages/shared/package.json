@@ -21,7 +21,8 @@
     "proskomma-core": "^0.10.4",
     "deep-equal": "^2.2.3",
     "@types/deep-equal": "^1.0.4",
-    "json-difference": "^1.16.1"
+    "json-difference": "^1.16.1",
+    "proskomma-json-tools": "^0.8.8"
   },
   "peerDependencies": {
     "proskomma-core": ">=0.10.4"

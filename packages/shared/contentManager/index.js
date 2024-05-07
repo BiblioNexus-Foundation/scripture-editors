@@ -1,6 +1,7 @@
 import Epitelete from "epitelete";
-import { transformPerfDocumentToLexicalState } from "../converters/perfToLexical";
-import { usfm2perf } from "../converters/usfmToPerf";
+import { usfm2perf } from "../converters/perf/usfmToPerf";
+import transformPerfDocumentToLexicalState from "../converters/perf/perfToLexical";
+//TODO: import { Validator, PipelineHandler } from "proskomma-json-tools";
 
 const readOptions = { readPipeline: "stripAlignmentPipeline" };
 const writeOptions = { writePipeline: "mergeAlignmentPipeline", ...readOptions };
@@ -17,6 +18,26 @@ export class BookStore extends Epitelete {
   }
 }
 
+// export const getPerf = async ({
+//   usfm,
+//   serverName,
+//   organizationId,
+//   languageCode,
+//   versionId,
+//   bookCode,
+// }) => {
+//   const perf = usfm2perf(usfm, {
+//     serverName,
+//     organizationId,
+//     languageCode,
+//     versionId,
+//   });
+
+//   const markup = undefined; //TODO: Define markup
+
+//   return { perf, markup };
+// };
+
 export const getBookHandler = async ({
   usfm,
   serverName,
@@ -31,6 +52,7 @@ export const getBookHandler = async ({
     languageCode,
     versionId,
   });
+
   const bibleStore = new BibleStore();
   const bookHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,

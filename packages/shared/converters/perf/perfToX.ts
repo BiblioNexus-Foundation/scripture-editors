@@ -1,50 +1,43 @@
-import {
-  BlockStructure,
-  ContentElementStructure,
-  PerfBlockConstraint,
-  PerfDocument,
-  PerfSequenceConstraint,
-  SequenceStructure,
-} from "../plugins/PerfOperations/perfTypes";
-import { pushToArray, handleSubtypeNS } from "./utils";
-import {
-  PerfBlock,
-  PerfContentElement,
-  PerfKind,
-  PerfSequence,
-} from "../plugins/PerfOperations/types";
-
-/**
- * Structure of nodes in PERF
- * @link https://github.com/Proskomma/proskomma-json-tools/tree/main/src/schema/structure/0_4_0
- */
+import Block, { BlockTypeMap } from "../../plugins/PerfOperations/Types/Block";
+import ContentElement, {
+  Content,
+  ContentElementTypeMap,
+} from "../../plugins/PerfOperations/Types/ContentElement";
+import { FlatDocument as PerfDocument } from "../../plugins/PerfOperations/Types/Document";
+import Sequence from "../../plugins/PerfOperations/Types/Sequence";
+import { PerfKind } from "../../plugins/PerfOperations/types";
+import { pushToArray } from "./utils";
 
 export type TypeKey = NonNullable<
-  | PerfSequenceConstraint["type"]
-  | PerfBlockConstraint["type"]
-  | ContentElementStructure["type"]
-  | "text"
+  Sequence["type"] | Block["type"] | ContentElement["type"] | "text"
 >;
+
+export type SubtypeKey = NonNullable<"sequence" | Block["subtype"] | ContentElement["subtype"]>;
 
 export type SequenceBuildSource<T> = {
   metadata: { kind: PerfKind.Sequence; path: string; sequenceId: string };
-  props: Omit<SequenceStructure, "blocks"> & { subtype: "sequence" };
+  node: Sequence & { subtype: "sequence" };
   children?: T[];
 };
 
-export type BlockBuildSource<T> = {
+export type BlockBuildSource<T, BlockType extends Block = Block> = {
   metadata: { kind: PerfKind.Block; path: string; direction: { value: "ltr" | "rtl" | null } };
-  props: Omit<BlockStructure, "content">;
+  node: BlockType;
+  metaChildren: T[];
   children?: T[];
 };
 
-export type ContentElementBuildSource<T> = {
+export type ContentElementBuildSource<
+  T,
+  ContentElementType extends ContentElement = ContentElement,
+> = {
   metadata: {
     kind: PerfKind.ContentElement;
     path: string;
     direction: { value: "ltr" | "rtl" | null };
   };
-  props: Omit<ContentElementStructure, "content" | "meta_content">;
+  node: ContentElementType;
+  metaChildren: T[];
   children?: T[];
 };
 
@@ -54,21 +47,26 @@ export type ContentTextBuildSource = {
     path: string;
     direction: { value: "ltr" | "rtl" | null };
   };
-  props: Omit<ContentElementStructure, "content" | "meta_content" | "type"> & {
+  node: {
     type: "text";
-    text?: string;
+    text: string;
   };
 };
 
-export type NodeBuildSource<SourceType, NodeType> = SourceType extends PerfKind.Sequence
-  ? SequenceBuildSource<NodeType>
+export type NodeBuildSource<
+  SourceType extends PerfKind,
+  TargetType,
+  PerfNodeType extends string = string,
+  PerfNodeSubType extends string = string,
+> = SourceType extends PerfKind.Sequence
+  ? SequenceBuildSource<TargetType>
   : SourceType extends PerfKind.Block
-    ? BlockBuildSource<NodeType>
+    ? BlockBuildSource<TargetType, BlockTypeMap<PerfNodeType>>
     : SourceType extends PerfKind.ContentElement
-      ? ContentElementBuildSource<NodeType>
+      ? ContentElementBuildSource<TargetType, ContentElementTypeMap<PerfNodeType, PerfNodeSubType>>
       : ContentTextBuildSource;
 
-export type NodeBuilder<SourceType, NodeType> = (
+export type NodeBuilder<NodeType> = <SourceType extends PerfKind>(
   props: NodeBuildSource<SourceType, NodeType>,
 ) => NodeType;
 
@@ -77,7 +75,7 @@ export const convertPerf = <TargetType>({
   nodeBuilder,
 }: {
   perfDocument: PerfDocument;
-  nodeBuilder: NodeBuilder<PerfKind.Sequence, TargetType>;
+  nodeBuilder: NodeBuilder<TargetType>;
 }) => {
   if (!perfDocument.sequences) throw new Error("No sequences found in the PERF document");
   const sequences = perfDocument.sequences;
@@ -102,18 +100,15 @@ export const convertSequence = <TargetType>({
   sequenceId,
   nodeBuilder: buildNode,
 }: {
-  sequence: PerfSequence;
+  sequence: Sequence;
   sequenceId: string;
-  nodeBuilder: NodeBuilder<
-    PerfKind.Sequence | PerfKind.Block | PerfKind.ContentElement | PerfKind.ContentText,
-    TargetType
-  >;
+  nodeBuilder: NodeBuilder<TargetType>;
 }) => {
   if (!sequence.blocks) throw new Error("Sequence must have blocks??");
-  const { blocks, ...props } = sequence;
+  const { blocks } = sequence;
   const path = `$.sequences.${sequenceId}`;
   const convertedBlocks: TargetType[] = [];
-  const children = (blocks as PerfBlock[])?.reduce(
+  const children = blocks?.reduce(
     (convertedBlocks, block, index) =>
       ((convertedBlock) =>
         convertedBlock ? pushToArray(convertedBlocks, convertedBlock) : convertedBlocks)(
@@ -125,13 +120,13 @@ export const convertSequence = <TargetType>({
       ),
     convertedBlocks,
   );
-  return buildNode({
+  return buildNode<PerfKind.Sequence>({
     metadata: {
       path,
       kind: PerfKind.Sequence,
       sequenceId,
     },
-    props: { ...props, subtype: "sequence" },
+    node: { ...sequence, subtype: "sequence" },
     children,
   });
 };
@@ -141,28 +136,30 @@ export const convertBlock = <TargetType>({
   nodeBuilder: buildNode,
   path = "",
 }: {
-  block: PerfBlock;
-  nodeBuilder: NodeBuilder<
-    PerfKind.Block | PerfKind.ContentElement | PerfKind.ContentText,
-    TargetType
-  >;
+  block: Block;
+  nodeBuilder: NodeBuilder<TargetType>;
   path?: string;
 }) => {
-  const { type, subtype, content, ...props } = block;
-
-  const subtypes = subtype ? handleSubtypeNS(subtype) : "";
-  const { convertedContentNodes, direction } = getContents({
-    content: content as PerfContentElement[],
+  const { convertedContentNodes, direction } = getContents<TargetType>({
+    content: "content" in block && block.content ? block.content : [],
     nodeBuilder: buildNode,
     path,
   });
-  return buildNode({
+
+  const { convertedContentNodes: metaContent } = getContents<TargetType>({
+    content: "meta_content" in block && block.meta_content ? block.meta_content : [],
+    nodeBuilder: buildNode,
+    path,
+  });
+
+  return buildNode<PerfKind.Block>({
     metadata: {
       path: path,
       kind: PerfKind.Block,
       direction,
     },
-    props: { type, ...subtypes, ...props },
+    metaChildren: metaContent,
+    node: block,
     children: convertedContentNodes,
   });
 };
@@ -173,19 +170,19 @@ const setTextDirection = (dir: { value: "rtl" | "ltr" | null }, contentItem: str
 };
 
 function convertContentItem<TargetType>(
-  contentItem: string | PerfContentElement,
-  buildNode: NodeBuilder<PerfKind.ContentText | PerfKind.ContentElement, TargetType>,
+  contentItem: string | ContentElement,
+  buildNode: NodeBuilder<TargetType>,
   contentPath: string,
   direction: { value: null | "rtl" | "ltr" },
 ): TargetType | undefined {
   if (typeof contentItem === "string") {
-    return buildNode({
+    return buildNode<PerfKind.ContentText>({
       metadata: {
         path: contentPath,
         kind: PerfKind.ContentText,
         direction: setTextDirection(direction, contentItem),
       },
-      props: { text: contentItem, type: "text" },
+      node: { text: contentItem, type: "text" },
     });
   } else {
     return convertContentElement({
@@ -201,8 +198,8 @@ export const getContents = <TargetType>({
   nodeBuilder: buildNode,
   path = "",
 }: {
-  content: PerfContentElement[];
-  nodeBuilder: NodeBuilder<PerfKind.ContentText | PerfKind.ContentElement, TargetType>;
+  content: Content;
+  nodeBuilder: NodeBuilder<TargetType>;
   path?: string;
 }): {
   convertedContentNodes: TargetType[];
@@ -214,22 +211,25 @@ export const getContents = <TargetType>({
     return { convertedContentNodes: [], direction: { value: null } };
   }
 
-  const initialAccumulator: {
-    convertedContentNodes: NonNullable<TargetType>[];
-    direction: { value: null | "rtl" | "ltr" };
-  } = { convertedContentNodes: [], direction: { value: null } };
+  const convertedContentNodes: TargetType[] = [];
+  const direction = { value: null as null | "rtl" | "ltr" };
 
-  return content.reduce(({ convertedContentNodes, direction }, contentItem, index) => {
+  for (let index = 0; index < content.length; index++) {
+    const contentItem = content[index];
     const contentPath = `${path}.content[${index}]`;
-    const convertedContentNode = convertContentItem(contentItem, buildNode, contentPath, direction);
-
-    return {
-      convertedContentNodes: convertedContentNode
-        ? [...convertedContentNodes, convertedContentNode]
-        : convertedContentNodes,
+    const convertedContentNode = convertContentItem<TargetType>(
+      contentItem,
+      buildNode,
+      contentPath,
       direction,
-    };
-  }, initialAccumulator);
+    );
+
+    if (convertedContentNode) {
+      convertedContentNodes.push(convertedContentNode);
+    }
+  }
+
+  return { convertedContentNodes, direction };
 };
 
 export const convertContentElement = <TargetType>({
@@ -237,52 +237,31 @@ export const convertContentElement = <TargetType>({
   nodeBuilder: buildNode,
   path = "",
 }: {
-  element: PerfContentElement;
-  nodeBuilder: NodeBuilder<PerfKind.ContentElement | PerfKind.ContentText, TargetType>;
+  element: ContentElement;
+  nodeBuilder: NodeBuilder<TargetType>;
   path?: string;
 }) => {
-  const { type, subtype, content, meta_content, ...props } = element as PerfContentElement & {
-    content: PerfContentElement[];
-    meta_content?: PerfContentElement[];
-  };
-  const subtypes = subtype ? handleSubtypeNS(subtype) : "";
-  const { convertedContentNodes, direction } = getContents({
-    content,
+  const { convertedContentNodes, direction } = getContents<TargetType>({
+    content: "content" in element && element.content ? element.content : [],
     nodeBuilder: buildNode,
     path,
   });
 
-  const converters = {
-    wrapper: () => convertedContentNodes,
-    //extend if new content types converters are needed. e.g:
-    //mark: ...,
-    //graft: ...,
-  };
+  const { convertedContentNodes: metaContent } = getContents<TargetType>({
+    content: "meta_content" in element && element.meta_content ? element.meta_content : [],
+    nodeBuilder: buildNode,
+    path,
+  });
 
-  const convertContents = converters[type as keyof typeof converters];
-  const children = convertContents ? convertContents() : [];
-
-  return buildNode({
+  return buildNode<PerfKind.ContentElement>({
     metadata: {
       path,
       kind: PerfKind.ContentElement,
       direction,
     },
-    props: {
-      type,
-      ...subtypes,
-      ...props,
-      ...(meta_content
-        ? {
-            metaContent: getContents({
-              content: meta_content,
-              nodeBuilder: buildNode,
-              path,
-            }),
-          }
-        : undefined),
-    },
-    children,
+    node: element,
+    metaChildren: metaContent,
+    children: convertedContentNodes,
   });
 };
 
