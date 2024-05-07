@@ -331,6 +331,9 @@ importers:
       proskomma-core:
         specifier: ^0.10.4
         version: 0.10.4(@babel/core@7.23.2)
+      proskomma-json-tools:
+        specifier: ^0.8.8
+        version: 0.8.8
 
   packages/shared-react:
     dependencies:

@@ -9,6 +9,47 @@
   <body>
     <div id="app">
       <div class="editor-oce">
+        <div id="text-selection" class="noprint">
+          <div class="book-form">
+            <h4>Source</h4>
+            <div class="inputs">
+              <select id="book-select">
+                <option value="" disabled selected>select book</option>
+              </select>
+            </div>
+          </div>
+          <div class="source-form">
+            <h4>Source</h4>
+            <div class="inputs">
+              <div class="input-group">
+                <label for="source-language">Language</label>
+                <input type="text" id="source-language" value="es-419_gl" />
+              </div>
+              <div class="input-group">
+                <label for="source-project">Project</label>
+                <select id="source-project">
+                  <option value="" disabled selected>select book</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="source-form">
+            <h4>Target</h4>
+            <div class="inputs">
+              <div class="input-group">
+                <label for="target-language">Language</label>
+                <input type="text" id="target-language" value="es-419_gl" />
+              </div>
+              <div class="input-group">
+                <label for="target-project">Project</label>
+                <select id="target-project">
+                  <option value="" disabled selected>select book</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button>load</button>
+        </div>
         <div class="editor">
           <div id="editor" class="contentEditable" contenteditable="true"></div>
         </div>

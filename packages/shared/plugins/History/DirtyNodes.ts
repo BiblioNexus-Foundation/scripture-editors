@@ -14,6 +14,7 @@ export class DirtyNodes {
   }
 
   public reset(): void {
+    console.warn("resetting dirty nodes");
     this.leaves.clear();
     this.elements.clear();
   }

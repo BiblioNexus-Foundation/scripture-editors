@@ -19,5 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["packages"]
+  "include": ["packages", "packages/shared/plugins/PerfOperations/epitelete.d.ts"]
 }

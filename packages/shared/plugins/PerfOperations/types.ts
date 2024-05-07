@@ -1,14 +1,8 @@
-import {
-  BlockStructure,
-  PerfBlockConstraint,
-  SequenceStructure,
-  PerfSequenceConstraint,
-  ContentElementStructure,
-  PerfContentElementConstraint,
-  PerfDocument,
-} from "./perfTypes";
+import Block from "./Types/Block";
+import ContentElement from "./Types/ContentElement";
+import PerfDocument from "./Types/Document";
+import Sequence from "./Types/Sequence";
 
-// Const enum for PerfAction action property
 export const enum PerfKind {
   Sequence = "sequence",
   Block = "block",
@@ -16,13 +10,9 @@ export const enum PerfKind {
   ContentText = "contentText",
 }
 
-export type PerfSequence = SequenceStructure & PerfSequenceConstraint;
-export type PerfBlock = BlockStructure & PerfBlockConstraint;
-export type PerfContentElement = ContentElementStructure & PerfContentElementConstraint;
-export type PerfSequences = PerfDocument["sequences"];
-
 export type PerfKindMap = {
-  sequence: PerfSequence;
-  block: PerfBlock;
-  contentElement: PerfContentElement;
+  document: PerfDocument;
+  sequence: Sequence;
+  block: Block;
+  contentElement: ContentElement;
 };

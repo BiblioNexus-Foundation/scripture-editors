@@ -48,6 +48,7 @@ import { registerDefaultPerfHandlers } from "shared/plugins/PerfHandlers";
 
 const infoBar = document.createElement("div");
 infoBar.classList.add("info-bar");
+infoBar.classList.add("noprint");
 
 const info = document.createElement("span");
 info.classList.add("info");

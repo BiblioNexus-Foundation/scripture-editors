@@ -49,12 +49,6 @@ export class GraftNode extends UsfmElementNode {
       version: 1,
     };
   }
-
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
-    return true;
-  }
 }
 
 function $createGraftNode(attributes?: Attributes, tag?: string): GraftNode {
