@@ -104,8 +104,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const editorRef = useRef<LexicalEditor>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
-  console.log({defaultUsj,usj,loadedUsj})
-
   editorConfig.editable = !options?.isReadonly;
   editorConfig.editorState = (editor: LexicalEditor) => {
     editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, options?.view));
