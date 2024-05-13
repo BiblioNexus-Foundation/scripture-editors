@@ -61,8 +61,6 @@ const Editor = forwardRef(function Editor(
   const [usj, setUsj] = useState(usjInput);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
 
-
-console.log({usjInput,usj,loadedUsj})
   const initialConfig = {
     namespace: "ScribeEditor",
     editable: true,
@@ -91,7 +89,7 @@ console.log({usjInput,usj,loadedUsj})
         setEditedUsj(usj);
       }
     },
-    [onChange,setEditedUsj]
+    [onChange, setEditedUsj]
   );
 
   return (

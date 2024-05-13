@@ -11,7 +11,6 @@ export const Usj2Usfm = (usj: Usj) => {
   };
   (async () => {
     usfm = usj && (await parseUsj(usj));
-    console.log(">>>",{ usfm})
     return usfm;
   })();
 };
