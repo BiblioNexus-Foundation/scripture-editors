@@ -1,6 +1,6 @@
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
 import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
-import Editor , { EditorRef} from "./components/Editor";
+import Editor, { EditorRef } from "./components/Editor";
 import { Usj } from "shared/converters/usj/usj.model";
 import { getViewOptions } from "./adaptors/view-options.utils";
 import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model";
@@ -8,28 +8,24 @@ import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-option
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { NoteEditor } from "./components/NoteEditor";
 
-const defaultUsj: Usj ={
+const defaultUsj: Usj = {
   type: "USJ",
   version: "0.2.1",
-  content: []
+  content: [],
 };
-
 
 function App() {
   const editorRef = useRef<EditorRef>(null!);
   const [stateX, setStateX] = useState<boolean>(false);
   const [text, setText] = useState<string>();
   const { usj } = useUsfm2Usj();
-  console.log("3",{ usj });
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      console.log("timeout",{ usj });
       usj && editorRef.current?.setUsj(usj);
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [usj]);
-
 
   const [viewMode] = useState(defaultViewMode);
   const nodeOptions: UsjNodeOptions = {
@@ -45,8 +41,6 @@ function App() {
   // const noteViewOptions = useMemo(() => getViewOptions(noteViewMode), [noteViewMode]);
   const onChange = (usj: Usj) => {
     console.log({ usj });
-    // const usfm = Usj2Usfm(usj );
-    // console.log({ usfm });
   };
 
   return (
