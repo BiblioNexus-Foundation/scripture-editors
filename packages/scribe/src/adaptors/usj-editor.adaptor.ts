@@ -153,7 +153,7 @@ let _logger: LoggerBasic;
 
 export function initialize(
   nodeOptions: UsjNodeOptions | undefined,
-  logger: LoggerBasic | undefined,
+  logger: LoggerBasic | undefined
 ) {
   setNodeOptions(nodeOptions);
   setLogger(logger);
@@ -165,7 +165,7 @@ export function reset(callerCountValue = 0) {
 
 export function serializeEditorState(
   usj: Usj | undefined,
-  viewOptions?: ViewOptions,
+  viewOptions?: ViewOptions
 ): SerializedEditorState {
   if (viewOptions) _viewOptions = viewOptions;
   // use default view mode
@@ -181,7 +181,7 @@ export function serializeEditorState(
       _logger?.warn(`This USJ type '${usj.type}' didn't match the expected type '${USJ_TYPE}'.`);
     if (usj.version !== USJ_VERSION)
       _logger?.warn(
-        `This USJ version '${usj.version}' didn't match the expected version '${USJ_VERSION}'.`,
+        `This USJ version '${usj.version}' didn't match the expected version '${USJ_VERSION}'.`
       );
 
     if (usj.content.length > 0) children = insertImpliedParasRecurse(recurseNodes(usj.content));
@@ -321,7 +321,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
 }
 
 function createChapter(
-  markerObject: MarkerObject,
+  markerObject: MarkerObject
 ): SerializedChapterNode | SerializedImmutableChapterNode {
   const { marker, number, sid, altnumber, pubnumber } = markerObject;
   if (marker !== CHAPTER_MARKER) {
@@ -354,7 +354,7 @@ function createChapter(
 }
 
 function createVerse(
-  markerObject: MarkerObject,
+  markerObject: MarkerObject
 ): SerializedVerseNode | SerializedImmutableVerseNode {
   const { marker, number, sid, altnumber, pubnumber } = markerObject;
   if (marker !== VERSE_MARKER) {
@@ -420,7 +420,7 @@ function createImpliedPara(children: SerializedLexicalNode[]): SerializedImplied
 
 function createPara(
   markerObject: MarkerObject,
-  childNodes: SerializedLexicalNode[] = [],
+  childNodes: SerializedLexicalNode[] = []
 ): SerializedParaNode {
   const { marker } = markerObject;
   if (!ParaNode.isValidMarker(marker)) {
@@ -449,7 +449,7 @@ function createPara(
 
 function createNoteCaller(
   caller: string,
-  childNodes: SerializedLexicalNode[],
+  childNodes: SerializedLexicalNode[]
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
@@ -467,7 +467,7 @@ function createNoteCaller(
 
 function createNote(
   markerObject: MarkerObject,
-  childNodes: SerializedLexicalNode[],
+  childNodes: SerializedLexicalNode[]
 ): SerializedNoteNode {
   const { marker, category } = markerObject;
   if (!NoteNode.isValidMarker(marker)) {
@@ -540,7 +540,7 @@ function createMark(children: SerializedLexicalNode[], ids: string[] = []): Seri
 
 function createUnknown(
   markerObject: MarkerObject,
-  childNodes: SerializedLexicalNode[],
+  childNodes: SerializedLexicalNode[]
 ): SerializedUnknownNode {
   const { marker } = markerObject;
   const tag = markerObject.type;
@@ -627,7 +627,7 @@ function insertMilestoneMarksRecurse(
   nodes: SerializedLexicalNode[],
   msMarkIndexes: number[],
   isPreviousMsStarting = false,
-  sids: string[] = [],
+  sids: string[] = []
 ): SerializedLexicalNode[] {
   if (msMarkIndexes.length <= 0 || msMarkIndexes[0] >= nodes.length) return nodes;
 
@@ -643,7 +643,7 @@ function insertMilestoneMarksRecurse(
     nodes.slice(firstIndex + 1, secondIndex),
     reIndex(msMarkIndexes, firstIndex + 1),
     firstMSMarkNode.marker === STARTING_MS_MARK_MARKER,
-    sids,
+    sids
   );
   const markNode = createMark(markedNodes, [...sids]);
   const secondMSMarkNode = nodes[secondIndex] as SerializedMilestoneNode;
@@ -652,7 +652,7 @@ function insertMilestoneMarksRecurse(
     nodes.slice(secondIndex + 1),
     reIndex(msMarkIndexes, secondIndex + 1),
     secondMSMarkNode.marker === STARTING_MS_MARK_MARKER,
-    sids,
+    sids
   );
   return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
 }
