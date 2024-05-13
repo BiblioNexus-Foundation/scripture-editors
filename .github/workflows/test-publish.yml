@@ -49,7 +49,7 @@ jobs:
       - name: Check formatting
         run: |
           pnpm prettier --check .
-          pnpm nx format:check --base=main --head=HEAD
+          pnpm nx format:check
 
       - name: Check linting
         run: pnpm nx run-many -t lint
