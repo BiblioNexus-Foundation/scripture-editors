@@ -43,9 +43,9 @@ export const Editor = ({ usj, onChange, viewOptions, nodeOptions }: EditorProps)
   const handleChange = useCallback(
     (editorState: EditorState) => {
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+      console.log("desrialized usj", usj);
       if (usj && onChange) {
         onChange(usj);
-        Usj2Usfm({ usj });
       }
     },
     [onChange]

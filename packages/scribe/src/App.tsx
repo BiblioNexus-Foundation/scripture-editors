@@ -29,9 +29,9 @@ function App() {
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
   // const noteViewOptions = useMemo(() => getViewOptions(noteViewMode), [noteViewMode]);
   const onChange = (usj: Usj) => {
-    console.log({ usj });
-    const usfm = Usj2Usfm({ usj });
-    console.log({ usfm });
+    console.log("onchange", { usj });
+    const usfm = Usj2Usfm(usj);
+    console.log("onchange", usfm);
   };
   useEffect(() => {
     console.log({ stateX });
