@@ -31,8 +31,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install PNPM
         uses: pnpm/action-setup@v3
@@ -50,8 +48,8 @@ jobs:
 
       - name: Check formatting
         run: |
-          pnpm nx format:check
           pnpm prettier --check .
+          pnpm nx format:check
 
       - name: Check linting
         run: pnpm nx run-many -t lint
