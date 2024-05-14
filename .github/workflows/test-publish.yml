@@ -47,7 +47,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: pnpm nx format:check
+        run: |
+          pnpm prettier --check .
+          pnpm nx format:check
 
       - name: Check linting
         run: pnpm nx run-many -t lint
