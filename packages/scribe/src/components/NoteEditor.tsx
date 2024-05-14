@@ -52,7 +52,7 @@ export const NoteEditor = ({
         onChange(usj);
       }
     },
-    [onChange]
+    [onChange],
   );
   useEffect(() => {
     const noteEditor = document.getElementById("noteEditor");

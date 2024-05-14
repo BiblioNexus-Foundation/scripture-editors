@@ -80,13 +80,13 @@ export function deserializeEditorState(editorState: EditorState): Usj | undefine
 
 function removeUndefinedProperties<T>(obj: T): T {
   return Object.fromEntries(
-    Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined)
+    Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined),
   ) as T;
 }
 
 function createBookMarker(
   node: SerializedBookNode,
-  content: MarkerContent[] | undefined
+  content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, code, unknownAttributes } = node;
   return removeUndefinedProperties({
@@ -108,7 +108,7 @@ function parseNumberFromText(marker: string, text: string | undefined, number: s
 }
 
 function createChapterMarker(
-  node: SerializedImmutableChapterNode | SerializedChapterNode
+  node: SerializedImmutableChapterNode | SerializedChapterNode,
 ): MarkerObject {
   const { marker, sid, altnumber, pubnumber, unknownAttributes } = node;
   const { text } = node as SerializedChapterNode;
@@ -155,7 +155,7 @@ function createCharMarker(node: SerializedCharNode): MarkerObject {
 
 function createParaMarker(
   node: SerializedParaNode,
-  content: MarkerContent[] | undefined
+  content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, unknownAttributes } = node;
   return removeUndefinedProperties({
@@ -168,7 +168,7 @@ function createParaMarker(
 
 function createNoteMarker(
   node: SerializedNoteNode,
-  content: MarkerContent[] | undefined
+  content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category, unknownAttributes } = node;
   return removeUndefinedProperties({
@@ -198,7 +198,7 @@ function createTextMarker(node: SerializedTextNode): string {
 
 function createUnknownMarker(
   node: SerializedUnknownNode,
-  content: MarkerContent[] | undefined
+  content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { tag, marker, unknownAttributes } = node;
   return removeUndefinedProperties({
@@ -211,7 +211,7 @@ function createUnknownMarker(
 
 function recurseNodes(
   nodes: SerializedLexicalNode[],
-  noteCaller?: string
+  noteCaller?: string,
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
   nodes.forEach((node) => {
@@ -223,13 +223,13 @@ function recurseNodes(
     switch (node.type) {
       case BookNode.getType():
         markers.push(
-          createBookMarker(serializedBookNode, recurseNodes(serializedBookNode.children))
+          createBookMarker(serializedBookNode, recurseNodes(serializedBookNode.children)),
         );
         break;
       case ImmutableChapterNode.getType():
       case ChapterNode.getType():
         markers.push(
-          createChapterMarker(node as SerializedImmutableChapterNode | SerializedChapterNode)
+          createChapterMarker(node as SerializedImmutableChapterNode | SerializedChapterNode),
         );
         break;
       case ImmutableVerseNode.getType():
@@ -241,15 +241,15 @@ function recurseNodes(
         break;
       case ParaNode.getType():
         markers.push(
-          createParaMarker(serializedParaNode, recurseNodes(serializedParaNode.children))
+          createParaMarker(serializedParaNode, recurseNodes(serializedParaNode.children)),
         );
         break;
       case NoteNode.getType():
         markers.push(
           createNoteMarker(
             serializedNoteNode,
-            recurseNodes(serializedNoteNode.children, serializedNoteNode.caller)
-          )
+            recurseNodes(serializedNoteNode.children, serializedNoteNode.caller),
+          ),
         );
         break;
       case ImmutableNoteCallerNode.getType():
@@ -271,7 +271,7 @@ function recurseNodes(
         break;
       case UnknownNode.getType():
         markers.push(
-          createUnknownMarker(serializedUnknownNode, recurseNodes(serializedUnknownNode.children))
+          createUnknownMarker(serializedUnknownNode, recurseNodes(serializedUnknownNode.children)),
         );
         break;
       default:
