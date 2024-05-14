@@ -55,7 +55,7 @@ type EditorProps = {
 
 const Editor = forwardRef(function Editor(
   { usjInput, onChange, viewOptions, nodeOptions }: EditorProps,
-  ref: React.ForwardedRef<EditorRef>
+  ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
   const [usj, setUsj] = useState(usjInput);
@@ -89,7 +89,7 @@ const Editor = forwardRef(function Editor(
         setEditedUsj(usj);
       }
     },
-    [onChange, setEditedUsj]
+    [onChange, setEditedUsj],
   );
 
   return (
