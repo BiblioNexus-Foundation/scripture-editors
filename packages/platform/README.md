@@ -31,7 +31,7 @@ npm install @biblionexus-foundation/platform-editor
 **Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
 
 ```typescript
-import { Editor, EditorOptions, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
+import { Editorial, EditorOptions, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
 import { BookChapterControl } from 'platform-bible-react';
 
 const emptyUsx = '<usx version="3.0" />';
@@ -72,9 +72,9 @@ export default function App() {
       <div className="controls">
         <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
       </div>
-      <Editor
-        defaultUsj={defaultUsj}
+      <Editorial
         ref={editorRef}
+        defaultUsj={defaultUsj}
         scrRef={scrRef}
         setScrRef={setScrRef}
         options={options}

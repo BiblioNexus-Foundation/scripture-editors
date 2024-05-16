@@ -1,0 +1,8 @@
+/**
+ * Copied from https://github.com/facebook/lexical/blob/93cf85e12033b114ad347dcccf508c846a833731/packages/lexical-playground/src/themes/CommentEditorTheme.css
+ */
+
+.CommentEditorTheme__paragraph {
+  margin: 0;
+  position: "relative";
+}

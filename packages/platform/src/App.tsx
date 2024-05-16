@@ -8,7 +8,8 @@ import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/Im
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
 import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
-import Editor, { EditorOptions, EditorRef } from "./editor/Editor";
+import { EditorOptions, EditorRef } from "./editor/Editor";
+import Marginal from "./marginal/Marginal";
 import "./App.css";
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
@@ -45,9 +46,9 @@ export default function App() {
         <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
         <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       </div>
-      <Editor
-        defaultUsj={defaultUsj}
+      <Marginal
         ref={editorRef}
+        defaultUsj={defaultUsj}
         scrRef={scrRef}
         setScrRef={setScrRef}
         options={options}
