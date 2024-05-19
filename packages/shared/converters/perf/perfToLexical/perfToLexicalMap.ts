@@ -21,6 +21,11 @@ type PerfToLexicalMapCreator = (
   perfSequences: PerfDocument["sequences"],
 ) => PerfMap<PerfLexicalNode>;
 
+// const lexicalSections = {
+//   unhandled: [],
+//   sections: [],
+// };
+
 export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) => ({
   "*": {
     "*": ({ metadata, node, children }): SerializedUsfmElementNode => {
@@ -45,6 +50,9 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
       };
     },
     sequence: function ({ metadata, node, children = [] }): SerializedUsfmElementNode {
+      // if (metadata.kind === PerfKind.Block) {
+      //   lexicalSections.sections.push(node);
+      // }
       return {
         children,
         format: "",
@@ -174,13 +182,19 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
     },
   },
   mark: {
-    "usfm:ts": (): SerializedUsfmElementNode => ({
+    "usfm:ts": ({ node }): SerializedUsfmElementNode => ({
       indent: 0,
       direction: null,
       children: [],
       format: "",
-      type: "usfmparagraph",
+      type: "divisionmark",
+      attributes: {
+        [`${DATA_PREFIX}-type`]: node.type,
+        [`${DATA_PREFIX}-subtype`]: node.subtype ?? "",
+        class: `${node.subtype}`,
+      },
       version: 1,
+      tag: "span",
     }),
     chapter: ({ node }): SerializedUsfmElementNode => {
       if (!node.atts) throw new Error("No attributes found for chapter mark");

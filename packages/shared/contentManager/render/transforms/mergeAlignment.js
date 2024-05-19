@@ -1,8 +1,6 @@
-import PerfRenderFromJson from "../../renderers/PerfRenderFromJson";
-import mergeActions from "../../renderers/mergeActions";
+import { PerfRenderFromJson, mergeActions, render } from "proskomma-json-tools";
 
-const { identityActions } = require("../../perfToPerf/renderActions/identity");
-const { mergeAlignmentActions } = require("../renderActions/mergeAlignement");
+const { identityActions, mergeAlignmentActions } = render.perfToPerf.renderActions;
 
 const mergeAlignmentCode = function ({ perf, verseWords: totalOccurrences, strippedAlignment }) {
   const cl = new PerfRenderFromJson({

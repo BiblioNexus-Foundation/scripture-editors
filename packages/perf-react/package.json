@@ -17,16 +17,20 @@
     "@lexical/react": "^0.14.5",
     "@lexical/selection": "^0.14.5",
     "@lexical/utils": "^0.14.5",
+    "@lexical/mark": "^0.14.5",
     "epitelete-html": "^0.2.21-beta.2",
     "lexical": "^0.14.5",
     "open-patcher": "1.0.0-beta.1",
     "shared": "*",
-    "shared-react": "*"
+    "shared-react": "*",
+    "pure-uuid": "^1.8.1",
+    "base-64": "^1.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@types/deep-equal": "^1.0.4",
+    "@types/base-64": "^1.0.2",
     "deep-equal": "^2.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

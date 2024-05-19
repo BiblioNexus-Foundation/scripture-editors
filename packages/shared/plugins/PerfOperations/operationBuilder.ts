@@ -24,20 +24,33 @@ const epi = new Epitelete({ docSetId: "bible" });
 const validator = epi.validator;
 
 export const getOperationBuilder =
-  (extendedOperations: Array<Record<string, unknown>> = []): Mapper =>
+  (
+    extraData: {
+      sequences: Record<string, Sequence>;
+      extendedOperations: Array<Record<string, unknown>>;
+    } = { sequences: {}, extendedOperations: [] },
+  ): Mapper =>
   ({ node, operationType, path }) => {
+    console.log(node);
     if (operationType === OperationType.Move) {
-      console.log("SKIPPED MOVE OPERATION");
+      console.log("SKIPPED MOVE OPERATION", node);
       return undefined;
     }
     if (!$isUsfmElementNode(node)) return undefined;
     const { "perf-type": perfType } = node.getAttributes?.() ?? {};
+    console.log("GRAFT NODE?", perfType);
     const kind = getPerfKindFromNode(node);
-
-    if (perfType === "graft" || kind === PerfKind.Block) {
-      extendedOperations.push({ lexicalNode: node, operationType, perfPath: path, perfKind: kind });
+    if (kind === PerfKind.Block) {
+      if (perfType === "graft") console.log("GRAFT NODE", node);
+      extraData.extendedOperations.push({
+        lexicalNode: node,
+        operationType,
+        perfPath: path,
+        perfKind: kind,
+      });
       if (operationType === OperationType.Remove) return buildRemoveOperation(path);
       const serializedNode = exportNodeToJSON(node);
+      if (perfType === "graft") console.log("SERIALIZED NODE", serializedNode);
       const { result: perfNode, sequences: sideSequences } = transformLexicalStateToPerf(
         serializedNode as SerializedElementNode,
         kind,
@@ -45,7 +58,13 @@ export const getOperationBuilder =
       if (!perfNode) throw new Error("Failed to transform lexical node to perf node");
       const sequences: PerfDocument["sequences"] = {
         ...sideSequences,
-        main: { blocks: [perfNode as Block], type: "main" },
+        main: {
+          blocks:
+            kind === PerfKind.Block
+              ? [perfNode as Block]
+              : [{ type: "paragraph", subtype: "usfm:p", content: [perfNode as ContentElement] }],
+          type: "main",
+        },
       };
       const perfDocument: PerfDocument = {
         schema: {
@@ -62,6 +81,18 @@ export const getOperationBuilder =
         console.error(perfDocument, validation.errors);
         throw new Error("Validation failed");
       }
+      extraData.sequences = {
+        ...Object.keys(extraData.sequences).reduce(
+          (sequences, sequenceKey) => {
+            const sequence = extraData.sequences[sequenceKey];
+            sequences[sequenceKey] = { ...sequence, blocks: [] };
+            return sequences;
+          },
+          {} as Record<string, Sequence>,
+        ),
+        ...sideSequences,
+      };
+
       switch (operationType) {
         case OperationType.Add:
           return buildAddOperation(perfNode, path);

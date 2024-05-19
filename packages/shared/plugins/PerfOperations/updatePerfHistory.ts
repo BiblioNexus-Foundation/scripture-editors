@@ -71,13 +71,15 @@ export const getPerfHistoryUpdater: (
     if (!editorChanged) return;
 
     try {
-      if (!tags.has("history-merge")) {
+      if (editorChanged || !tags.has("history-merge")) {
         const extendedOperations: Array<{
           lexicalNode: LexicalNode;
           operationType: OperationType;
           perfPath: Array<string>;
           perfKind: PerfKind;
         }> = [];
+        const sideSequences = {};
+        const extraData = { sequences: sideSequences, extendedOperations };
 
         // Get the operations (add, remove, replace) for the dirty elements
         const perfElementOperations = getOperations({
@@ -85,12 +87,12 @@ export const getPerfHistoryUpdater: (
           editorState,
           prevEditorState,
           pathBuilder: getPathBuilder(prevPerfDocument["main_sequence_id"] ?? "main_sequence"),
-          operationBuilder: getOperationBuilder(extendedOperations),
+          operationBuilder: getOperationBuilder(extraData),
         }) as Operation[];
 
         // Apply the operations to the previous perf document sequences
         const patchedSequences = applyPatch({
-          source: prevPerfDocument.sequences ?? {},
+          source: { ...extraData.sequences, ...prevPerfDocument.sequences } ?? {},
           operations: [...perfElementOperations],
         });
 
@@ -105,7 +107,7 @@ export const getPerfHistoryUpdater: (
         // Patch editor state with the patched perf document if the editor state is not in sync with the perf document
         const start = performance.now();
         editorState.read(() => {
-          extendedOperations.forEach((operation, index) => {
+          extraData.extendedOperations.forEach((operation, index) => {
             // Skip remove operations
             if (operation.operationType === "remove") return;
 
@@ -150,6 +152,12 @@ export const getPerfHistoryUpdater: (
                 },
                 { tag: "history-merge" },
               );
+            } else {
+              console.log(
+                "%cNode roundtrip successful",
+                "color: white;background-color:#46b46b;padding:4px;",
+              );
+              return true;
             }
           });
         });
@@ -275,7 +283,10 @@ const checkRoundtrip = ({
     console.warn("Roundtrip failed");
     return false;
   } else {
-    console.log("%cRoundtrip successful", "color: white;background-color:#46b46b;padding:4px;");
+    console.log(
+      "%cFile roundtrip successful",
+      "color: white;background-color:#46b46b;padding:4px;",
+    );
     return true;
   }
 };

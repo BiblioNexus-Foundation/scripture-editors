@@ -4,7 +4,7 @@
 }
 
 .contentEditable {
-  width: 80vw;
+  /* width: 80vw; */
   min-height: 40em;
   padding: 0 8px;
   outline: none;
@@ -113,6 +113,8 @@ p[perf-type="paragraph"] {
 [perf-type="graft"][data-ui-active="true"] {
   border: none;
   text-decoration: wavy;
+  background: #ffffff1c;
+  border-radius: 0.4em;
 }
 
 [perf-type="graft"][data-ui-active="true"] span {
@@ -137,6 +139,12 @@ p[perf-type="paragraph"] {
   display: inline-block;
 }
 
+[perf-subtype="xref"],
+[perf-subtype="footnote"] {
+  display: inline-flex;
+  margin-inline-end: 0.2em;
+}
+
 [perf-type="mark"] span {
   color: #e7ff5f;
   padding: 0.2rem;
@@ -158,7 +166,7 @@ p[perf-type="paragraph"] {
 }
 
 [perf-subtype="note_caller"] {
-  background: #00000042;
+  background: #181818;
   padding: 0.2rem 0.3rem;
   border-radius: 0.4rem;
   font-size: 0.8rem;
@@ -198,4 +206,12 @@ p[perf-type="paragraph"] {
     color: #070707 !important;
     background-color: #c50000 !important;
   }
+}
+
+[perf-subtype="usfm:xo"]:empty::before {
+  content: "origin reference";
+}
+
+[perf-subtype="usfm:xt"]:empty::before {
+  content: "target references";
 }

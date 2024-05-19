@@ -51,6 +51,6 @@ export class GraftNode extends UsfmElementNode {
   }
 }
 
-function $createGraftNode(attributes?: Attributes, tag?: string): GraftNode {
+export function $createGraftNode(attributes?: Attributes, tag?: string): GraftNode {
   return $applyNodeReplacement(new GraftNode(attributes, tag));
 }

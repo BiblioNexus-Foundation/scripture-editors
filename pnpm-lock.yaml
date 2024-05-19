@@ -137,7 +137,13 @@ importers:
       lexical:
         specifier: ^0.13.1
         version: 0.13.1
+      pure-uuid:
+        specifier: ^1.8.1
+        version: 1.8.1
     devDependencies:
+      '@types/base-64':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@types/deep-equal':
         specifier: ^1.0.4
         version: 1.0.4

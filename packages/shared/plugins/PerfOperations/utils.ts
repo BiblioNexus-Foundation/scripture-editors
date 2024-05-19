@@ -14,7 +14,7 @@ import { PerfKind } from "./types";
 export function getPerfKindFromNode(node: LexicalNode | ElementNode) {
   if (node && checkIsSequence(node)) return PerfKind.Sequence; // If the node is a sequence, return "sequence"
   const parent = node.getParent();
-  if (parent && checkIsSequence(parent)) return PerfKind.Block; // If the parent is a sequence, return PerfKind.Block
+  if (parent && (checkIsSequence(parent) || parent.getType() === "graft")) return PerfKind.Block; // If the parent is a sequence, return PerfKind.Block
   return PerfKind.ContentElement; // Otherwise, return "content"
 }
 
@@ -24,7 +24,7 @@ export function getPerfKindFromNode(node: LexicalNode | ElementNode) {
  * @returns A boolean indicating whether the node is a sequence.
  */
 export function checkIsSequence(node: LexicalNode | ElementNode) {
-  return ["root", "graft"].includes(node.getType() || "");
+  return ["root"].includes(node.getType() || "");
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
