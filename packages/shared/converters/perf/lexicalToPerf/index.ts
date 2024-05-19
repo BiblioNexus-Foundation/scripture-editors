@@ -212,9 +212,10 @@ const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
       content: perfChildren,
     };
   },
-  contentElement: ({ perfChildren, perfProps }) => {
+  contentElement: ({ perfChildren, perfProps, lexicalNode, metadata }) => {
     const element = getContentElementifValid(perfProps);
     if (!element) {
+      console.log({ lexicalNode, metadata });
       throw new Error("ContentElement is not valid");
     }
     if (isContentElementGraft(element))

@@ -12,6 +12,13 @@ import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandle
 import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
 
+import Button from "./Components/Button";
+import { $parseSerializedNode, $insertNodes, $isRootOrShadowRoot } from "lexical";
+
+import { $wrapNodeInElement } from "@lexical/utils";
+import { $createGraftNode } from "shared/nodes/GraftNode";
+import { emptyCrossRefence } from "./emptyNodes/crossReference";
+
 const theme = {
   // Theme styling goes here
 };
@@ -20,14 +27,26 @@ function onError(error: Error) {
   console.error(error);
 }
 
-const bookCode = "tit";
-
-export default function Editor({ editable = true }) {
+export default function Editor({
+  serverName,
+  organizationId,
+  languageCode,
+  versionId,
+  bookCode,
+  editable = true,
+}: {
+  serverName: string;
+  organizationId: string;
+  languageCode: string;
+  versionId: string;
+  bookCode: string;
+  editable?: boolean;
+}) {
   const bookHandler = useBibleBook({
-    serverName: "dbl",
-    organizationId: "bfbs",
-    languageCode: "fra",
-    versionId: "lsg",
+    serverName,
+    organizationId,
+    languageCode,
+    versionId,
     bookCode,
   }) as BookStore | null;
   const [lexicalState, setLexicalState] = useState("");
@@ -38,11 +57,11 @@ export default function Editor({ editable = true }) {
       if (bookHandler) {
         const perf = await bookHandler.read(bookCode);
         const alignmentData = bookHandler;
-        console.log(alignmentData);
+        console.log({ alignmentData });
         setPerfDocument(perf);
         console.log(perf);
         const lexicalState = getLexicalState(perf);
-        console.log(lexicalState);
+        console.log({ lexicalState });
         setLexicalState(JSON.stringify(lexicalState));
       }
     })();
@@ -66,7 +85,7 @@ export default function Editor({ editable = true }) {
 
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className="noprint">
+      <div className="toolbar noprint">
         <button
           onClick={() => {
             async function getUsfmFromPerf() {
@@ -95,6 +114,19 @@ export default function Editor({ editable = true }) {
         >
           Download USFM
         </button>
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              const newNode = $parseSerializedNode(emptyCrossRefence);
+              $insertNodes([newNode]);
+              if ($isRootOrShadowRoot(newNode.getParentOrThrow())) {
+                $wrapNodeInElement(newNode, $createGraftNode).selectEnd();
+              }
+            });
+          }}
+        >
+          Add Cross Reference
+        </Button>
       </div>
       <div className={"editor-oce"}>
         <RichTextPlugin

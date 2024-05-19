@@ -36,6 +36,7 @@ export const getOperations = ({
   operationBuilder = buildOperation,
   pathBuilder = getNodePath,
 }: GetOperationsParams): Operation[] => {
+  console.log({ dirtyNodes });
   const operations = [];
   for (const dirtyNode of dirtyNodes) {
     const nodeKey = Array.isArray(dirtyNode) ? dirtyNode[0] : dirtyNode;
@@ -79,7 +80,7 @@ export const getOperation = ({
 }: GetOperationParams) => {
   const previousNode = $getNodeByKey(nodeKey, prevEditorState);
   const currentNode = $getNodeByKey(nodeKey, editorState);
-
+  // debugger;
   if (!currentNode && !previousNode)
     throw new Error(
       `Failed to generate operation for nodeKey ${nodeKey}: Dirty node not found in current or previous editor state. Please verify the dirty nodes list.`,

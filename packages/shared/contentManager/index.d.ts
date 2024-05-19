@@ -11,6 +11,7 @@ declare module "epitelete" {
 import { SerializedEditorState } from "lexical";
 import { PerfDocument } from "../plugins/PerfOperations/perfTypes";
 import Epitelete from "epitelete";
+import { PipelineHandler } from "proskomma-json-tools";
 
 export function getLexicalState(perf: PerfDocument): SerializedEditorState | SerializedLexicalNode;
 
@@ -29,6 +30,18 @@ export function getBookHandler({
   versionId: string;
   bookCode: string;
 }): BookStore;
+
+export const pipelineHandler = new PipelineHandler({
+  pipelines:
+    pipelines || options.pipelines
+      ? { ...pipelines, ...options.pipelines, ...fnr.pipelines }
+      : null,
+  transforms:
+    transformActions || options.transforms
+      ? { ...transformActions, ...options.transforms, ...fnr.transforms }
+      : null,
+  proskomma: proskomma,
+});
 
 export class BookStore extends Epitelete {
   read(bookCode: string): Promise<PerfDocument>;
