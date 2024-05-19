@@ -8,8 +8,10 @@ import React, {
 } from "react";
 import { Usj } from "shared/converters/usj/usj.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { CommentStore, Comments } from "./comments/commenting";
+import { Comments } from "./comments/commenting";
 import CommentPlugin from "./comments/CommentPlugin";
+import useCommentStoreRef from "./comments/use-comment-store-ref.hook";
+import useMissingCommentsProps from "./comments/use-missing-comments-props.hook";
 import Editor, { EditorProps, EditorRef } from "../editor/Editor";
 
 /** Forward reference for the editor. */
@@ -43,35 +45,32 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
 ): JSX.Element {
   const editorRef = useRef<EditorRef>(null);
   const { children, onChange, ...editorProps } = props as PropsWithChildren<MarginalProps<TLogger>>;
-  const commentStore = useRef<CommentStore>();
+  const [commentStoreRef, setCommentStoreRef] = useCommentStoreRef();
+  useMissingCommentsProps(editorProps, commentStoreRef);
 
   useImperativeHandle(ref, () => ({
     focus() {
       editorRef.current?.focus();
     },
-    setUsj(usj: Usj) {
+    setUsj(usj) {
       editorRef.current?.setUsj(usj);
     },
     setComments(comments) {
-      commentStore.current?.setComments(comments);
+      commentStoreRef.current?.setComments(comments);
     },
   }));
 
   const handleChange = useCallback(
     (usj: Usj) => {
-      const comments = commentStore.current?.getComments();
+      const comments = commentStoreRef.current?.getComments();
       onChange?.(usj, comments);
     },
-    [onChange],
+    [commentStoreRef, onChange],
   );
-
-  const setCommentStore = useCallback((cs: CommentStore) => {
-    commentStore.current = cs;
-  }, []);
 
   return (
     <Editor ref={editorRef} onChange={handleChange} {...editorProps}>
-      <CommentPlugin setCommentStore={setCommentStore} logger={editorProps.logger} />
+      <CommentPlugin setCommentStore={setCommentStoreRef} logger={editorProps.logger} />
     </Editor>
   );
 });

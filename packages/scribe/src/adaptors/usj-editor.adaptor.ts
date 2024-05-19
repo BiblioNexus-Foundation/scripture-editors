@@ -266,7 +266,7 @@ function getClassList(viewOptions: ViewOptions | undefined) {
  */
 function getNoteCaller(markerCaller: string | undefined): string {
   let noteCallers = defaultNoteCallers;
-  if (_nodeOptions) {
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
     const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
     if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
   }
@@ -451,7 +451,11 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName].onClick)
+  if (
+    _nodeOptions &&
+    _nodeOptions[immutableNoteCallerNodeName] &&
+    _nodeOptions[immutableNoteCallerNodeName].onClick
+  )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return {

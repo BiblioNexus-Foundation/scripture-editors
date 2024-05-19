@@ -96,7 +96,11 @@ import {
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import {
+  AddMissingComments,
+  MarkNodeName,
+  UsjNodeOptions,
+} from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getViewOptions } from "./view-options.utils";
 
@@ -140,12 +144,16 @@ const defaultNoteCallers = [
   "z",
 ];
 
+/** Comment IDs in the USJ. */
+let commentIds: string[] = [];
 /** View options - view mode parameters. */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node. */
 let _nodeOptions: UsjNodeOptions | undefined;
 /** Count used for note callers. */
 let callerCount = 0;
+/** Method to add missing comments. */
+let addMissingComments: AddMissingComments;
 /** Logger instance. */
 let _logger: LoggerBasic;
 
@@ -153,6 +161,7 @@ export function initialize(
   nodeOptions: UsjNodeOptions | undefined,
   logger: LoggerBasic | undefined,
 ) {
+  commentIds = [];
   setNodeOptions(nodeOptions);
   setLogger(logger);
 }
@@ -188,6 +197,7 @@ export function serializeEditorState(
     children = [emptyParaNode];
   }
 
+  addMissingComments?.(commentIds);
   return {
     root: {
       children,
@@ -206,6 +216,11 @@ export function serializeEditorState(
  */
 function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
+
+  // Set the `addMissingComments` method.
+  if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
+    addMissingComments = nodeOptions[MarkNodeName].addMissingComments as AddMissingComments;
+  }
 }
 
 /**
@@ -266,7 +281,7 @@ function getClassList(viewOptions: ViewOptions | undefined) {
  */
 function getNoteCaller(markerCaller: string | undefined): string {
   let noteCallers = defaultNoteCallers;
-  if (_nodeOptions) {
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
     const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
     if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
   }
@@ -451,7 +466,11 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName].onClick)
+  if (
+    _nodeOptions &&
+    _nodeOptions[immutableNoteCallerNodeName] &&
+    _nodeOptions[immutableNoteCallerNodeName].onClick
+  )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return {
@@ -695,7 +714,10 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           nodes.push(createNote(markerContent, recurseNodes(markerContent.content)));
           break;
         case MilestoneNode.getType():
-          if (isMilestoneCommentMarker(markerContent.marker)) msCommentIndexes.push(nodes.length);
+          if (isMilestoneCommentMarker(markerContent.marker)) {
+            msCommentIndexes.push(nodes.length);
+            if (markerContent.sid !== undefined) commentIds?.push(markerContent.sid);
+          }
           nodes.push(createMilestone(markerContent));
           break;
         default:

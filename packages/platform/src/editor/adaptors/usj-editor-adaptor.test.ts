@@ -20,8 +20,9 @@ import { MarkerObject } from "shared/converters/usj/usj.model";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
-import { serializeEditorState, reset } from "./usj-editor.adaptor";
+import { serializeEditorState, reset, initialize } from "./usj-editor.adaptor";
 import { getViewOptions } from "./view-options.utils";
 
 /**
@@ -145,6 +146,19 @@ describe("USJ Editor Adaptor", () => {
     const serializedEditorState = serializeEditorState(usjMarks);
 
     expect(serializedEditorState).toEqual(editorStateMarks);
+  });
+
+  it("should call `addMissingComments` if it's set", () => {
+    const mockAddMissingComments = jest.fn();
+    const nodeOptions = { [MarkNodeName]: { addMissingComments: mockAddMissingComments } };
+    initialize(nodeOptions, console);
+
+    const serializedEditorState = serializeEditorState(usjMarks);
+
+    expect(serializedEditorState).toEqual(editorStateMarks);
+    expect(mockAddMissingComments.mock.calls).toHaveLength(1); // called once
+    // Called with `sid` array argument from `usjMarks`.
+    expect(mockAddMissingComments.mock.calls[0][0]).toEqual(["1", "1", "2", "1", "2", "1", "2"]);
   });
 
   it("should convert from USJ with unknown items to Lexical editor state JSON", () => {
