@@ -13,11 +13,10 @@ import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
 
 import Button from "./Components/Button";
-import { $parseSerializedNode, $insertNodes, $isRootOrShadowRoot } from "lexical";
 
-import { $wrapNodeInElement } from "@lexical/utils";
-import { $createGraftNode } from "shared/nodes/GraftNode";
 import { emptyCrossRefence } from "./emptyNodes/crossReference";
+import { createEmptyDivisionMark } from "./emptyNodes/emptyVerse";
+import { $insertUsfmNode } from "./emptyNodes/emptyUsfmNodes";
 
 const theme = {
   // Theme styling goes here
@@ -65,7 +64,7 @@ export default function Editor({
         setLexicalState(JSON.stringify(lexicalState));
       }
     })();
-  }, [bookHandler]);
+  }, [bookHandler, bookCode]);
 
   const initialConfig = {
     namespace: "ScriptureEditor",
@@ -117,15 +116,38 @@ export default function Editor({
         <Button
           onClick={(_, editor) => {
             editor.update(() => {
-              const newNode = $parseSerializedNode(emptyCrossRefence);
-              $insertNodes([newNode]);
-              if ($isRootOrShadowRoot(newNode.getParentOrThrow())) {
-                $wrapNodeInElement(newNode, $createGraftNode).selectEnd();
-              }
+              $insertUsfmNode(emptyCrossRefence);
             });
           }}
         >
           Add Cross Reference
+        </Button>
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              $insertUsfmNode(createEmptyDivisionMark("chapter", "1"));
+            });
+          }}
+        >
+          Add Chapter
+        </Button>
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              $insertUsfmNode(createEmptyDivisionMark("verses", "1"));
+            });
+          }}
+        >
+          Add Verse
+        </Button>
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              console.log("button clicked");
+            });
+          }}
+        >
+          Add Button
         </Button>
       </div>
       <div className={"editor-oce"}>

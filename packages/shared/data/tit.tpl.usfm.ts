@@ -3,12 +3,8 @@ export default String.raw`\id TIT TITFLS1910.PTX, Louis Segond 1910, French, 31-
 \h TITE
 \toc1 Épître de Paul à Tite
 \toc2 Tite
-\mt
-Titus
-\c 1
+\mt1 Tito
 \p
-\v 1
-
 `;
 
 // export default String.raw`\id TIT TITFLS1910.PTX, Louis Segond 1910, French, 31-10-2011, Moon Sun Kim. Updated for DBL by E. Canales, September 2012.

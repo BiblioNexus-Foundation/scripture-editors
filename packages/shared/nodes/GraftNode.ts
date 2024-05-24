@@ -1,4 +1,11 @@
-import { $applyNodeReplacement, EditorConfig, NodeKey } from "lexical";
+import {
+  $applyNodeReplacement,
+  DOMExportOutput,
+  EditorConfig,
+  LexicalEditor,
+  NodeKey,
+  isHTMLElement,
+} from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
 import { addClassNamesToElement } from "@lexical/utils";
 
@@ -30,7 +37,37 @@ export class GraftNode extends UsfmElementNode {
       element.setAttribute(attKey, attributes[attKey]);
     });
     addClassNamesToElement(element, config.theme.sectionmark);
+    // Setting contenteditable to false is the trick Lexical uses for decorator nodes so you can place the cursor after a span that contains editable content.
+    // element.setAttribute("contenteditable", "false");
     return element;
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+
+    if (element && isHTMLElement(element)) {
+      if (this.isEmpty()) {
+        element.append(document.createElement("br"));
+      }
+
+      const formatType = this.getFormatType();
+      element.style.textAlign = formatType;
+
+      const direction = this.getDirection();
+      if (direction) {
+        element.dir = direction;
+      }
+      const indent = this.getIndent();
+      if (indent > 0) {
+        // padding-inline-start is not widely supported in email HTML, but
+        // Lexical Reconciler uses padding-inline-start. Using text-indent instead.
+        element.style.textIndent = `${indent * 20}px`;
+      }
+    }
+
+    return {
+      element,
+    };
   }
 
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
@@ -48,6 +85,10 @@ export class GraftNode extends UsfmElementNode {
       type: this.getType(),
       version: 1,
     };
+  }
+
+  isShadowRoot(): boolean {
+    return true;
   }
 }
 
