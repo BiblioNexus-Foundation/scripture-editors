@@ -110,6 +110,11 @@ p[perf-type="paragraph"] {
   display: none;
 }
 
+[perf-subtype="note_caller"] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 [perf-type="graft"][data-ui-active="true"] {
   border: none;
   text-decoration: wavy;

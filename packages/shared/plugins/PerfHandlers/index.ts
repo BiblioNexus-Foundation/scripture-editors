@@ -1,4 +1,11 @@
-import { $getNodeByKey, $getSelection, LexicalEditor, NodeKey } from "lexical";
+import {
+  $createTextNode,
+  $getNodeByKey,
+  $getSelection,
+  KEY_ARROW_RIGHT_COMMAND,
+  LexicalEditor,
+  NodeKey,
+} from "lexical";
 import { GraftNode } from "../../nodes/GraftNode";
 import { $findMatchingParent } from "@lexical/utils";
 
@@ -62,6 +69,26 @@ export function registerFocusableGrafts(
           focusedGrafts.push(graft.getKey());
         },
         { tag: "history-merge" },
+      );
+
+      editor.registerCommand(
+        KEY_ARROW_RIGHT_COMMAND,
+        () => {
+          const selection = $getSelection();
+          const nodes = selection?.getNodes();
+          const lastNode = nodes?.[nodes.length - 1];
+          if (!lastNode?.getNextSibling()) {
+            editor.update(() => {
+              const textNode = $createTextNode(" ");
+              console.log({ textNode });
+              lastNode?.insertAfter(textNode);
+              textNode.selectStart();
+            });
+          }
+          console.log({ selection, nodes });
+          return false;
+        },
+        4,
       );
     });
   });
