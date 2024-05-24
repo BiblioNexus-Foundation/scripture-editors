@@ -5,7 +5,7 @@ export default {
   transform: {
     "^.+\\.[tj]sx?$": ["ts-jest", { tsconfig: "<rootDir>/tsconfig.spec.json" }],
   },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "html"],
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "html"],
   modulePathIgnorePatterns: ["<rootDir>/dist/"],
   coverageDirectory: "../../coverage/packages/shared",
 };

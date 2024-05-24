@@ -1,0 +1,106 @@
+[
+  {
+    "id": 0,
+    "type": "Inputs",
+    "inputs": {
+      "perf": "json"
+    }
+  },
+  {
+    "id": 1,
+    "title": "Count stripped perf words",
+    "name": "verseWords",
+    "type": "Transform",
+    "transformName": "verseWords",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Input perf"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "verseWords",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>JSON: Counts words occurrences"
+  },
+  {
+    "id": 2,
+    "title": "Strip Alignment",
+    "name": "stripAlignment",
+    "type": "Transform",
+    "transformName": "stripAlignment",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Input perf"
+      },
+      {
+        "name": "verseWords",
+        "type": "json",
+        "source": "Transform 1 verseWords"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json"
+      },
+      {
+        "name": "strippedAlignment",
+        "type": "json"
+      },
+      {
+        "name": "unalignedWords",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>PERF: Strips alignment markup"
+  },
+  {
+    "id": 3,
+    "title": "Merge stripped perf",
+    "name": "mergePerfText",
+    "type": "Transform",
+    "transformName": "mergePerfText",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Transform 2 perf"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>PERF: Merge consecutive text strings"
+  },
+  {
+    "id": 999,
+    "type": "Outputs",
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Transform 3 perf"
+      },
+      {
+        "name": "strippedAlignment",
+        "type": "json",
+        "source": "Transform 2 strippedAlignment"
+      },
+      {
+        "name": "unalignedWords",
+        "type": "json",
+        "source": "Transform 2 unalignedWords"
+      }
+    ]
+  }
+]

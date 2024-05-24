@@ -1,0 +1,222 @@
+.editor-oce {
+  position: relative;
+  text-align: left;
+}
+
+.contentEditable {
+  /* width: 80vw; */
+  min-height: 40em;
+  padding: 0 8px;
+  outline: none;
+}
+
+.editor-paragraph {
+  margin: 0 0 15px 0;
+  position: relative;
+}
+
+span.verses,
+span.chapter {
+  position: relative;
+  visibility: visible;
+  display: inline-flex;
+  color: rgb(242 242 242);
+}
+
+span.chapter {
+  font-size: 1.7rem;
+  vertical-align: text-top;
+  font-weight: 700;
+  margin-inline-end: 0.1em;
+}
+
+span.verses {
+  color: #fff;
+  font-size: 0.8em;
+  vertical-align: sup;
+  font-weight: 600;
+  margin-inline-end: 0.1em;
+}
+
+/* Styles for inspecting nodes */
+[perf-type] {
+  position: relative;
+  color: #f4ff93;
+  box-sizing: border-box;
+  border: 1px dashed transparent;
+}
+
+[perf-type]:hover {
+  border-color: rgb(80, 80, 80);
+}
+
+[perf-type="graft"] {
+  padding: 0.1em;
+  margin: 0.25em 0em;
+}
+
+[perf-type="graft"][perf-subtype="title"] {
+  width: 100%;
+  text-align: center;
+}
+
+[perf-type="graft"][perf-subtype="heading"] {
+  width: 100%;
+  text-align: center;
+}
+
+[perf-type="paragraph"] {
+  color: #faffca;
+  /* text-decoration: underline 2px wavy #f4ff93; */
+}
+
+[perf-subtype="mt2"] {
+  font-style: italic;
+  font-size: 0.6em;
+  font-weight: 400;
+}
+
+[perf-subtype="mt"],
+[perf-subtype="mt1"] {
+  font-weight: 700;
+}
+
+h1 span[perf-type="paragraph"] {
+  display: block;
+}
+
+p[perf-type="paragraph"] {
+  color: rgba(255, 255, 255, 0.87);
+  text-align: left;
+}
+
+[perf-subtype="introduction"] [perf-subtype="title"] {
+  font-size: 1.5rem;
+}
+
+[perf-subtype="imt3"] {
+  font-size: 0.8em;
+}
+
+/* [perf-type]:hover [perf-type="graft"],
+.contentEditable:hover > [perf-type="graft"] {
+  border: 1px dashed #747bff;
+  background-color: #0000001a;
+} */
+
+[perf-subtype="footnote"]
+  [perf-subtype="usfm:f"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="note_caller"] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+[perf-type="graft"][data-ui-active="true"] {
+  border: none;
+  text-decoration: wavy;
+  background: #ffffff1c;
+  border-radius: 0.4em;
+}
+
+[perf-type="graft"][data-ui-active="true"] span {
+  text-decoration: solid wavy #646cff;
+}
+
+[perf-subtype="footnote"][data-ui-active="true"]
+  [perf-subtype="usfm:f"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline-block;
+}
+
+[perf-subtype="xref"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="xref"][data-ui-active="true"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline-block;
+}
+
+[perf-subtype="xref"],
+[perf-subtype="footnote"] {
+  display: inline-flex;
+  margin-inline-end: 0.2em;
+}
+
+[perf-type="mark"] span {
+  color: #e7ff5f;
+  padding: 0.2rem;
+}
+
+.info-bar {
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  background: #070707;
+  padding: 0.2em 0.6em;
+  border: 1px solid #353535;
+  border-radius: 0.4em;
+}
+
+.info-bar span {
+  color: #fff;
+  font-size: 0.75em;
+}
+
+[perf-subtype="note_caller"] {
+  background: #181818;
+  padding: 0.2rem 0.3rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+[perf-type]:empty::before {
+  content: "·";
+  padding: 2px;
+  color: #fff;
+  opacity: 0.5;
+}
+
+.unsupported {
+  color: #ffffff2b;
+  text-decoration: underline wavy;
+  text-decoration-thickness: 0.08rem;
+}
+
+.unsupported:hover:after {
+  font-size: 0.8rem;
+  content: attr(perf-type) "/" attr(perf-subtype) " not supported";
+  position: absolute;
+  padding: 0 0.4em;
+  border-radius: 0.5em;
+  width: max-content;
+  background-color: #c50000;
+  color: #ffc0c0;
+  top: -1.4rem;
+  right: 0;
+  border: 1px solid #6b2f2f;
+  opacity: 1;
+}
+
+@media print {
+  body * {
+    color: #070707 !important;
+    background-color: #c50000 !important;
+  }
+}
+
+[perf-subtype="usfm:xo"]:empty::before {
+  content: "origin reference";
+}
+
+[perf-subtype="usfm:xt"]:empty::before {
+  content: "target references";
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "id": 0,
+    "type": "Inputs",
+    "inputs": {
+      "perf": "json",
+      "strippedAlignment": "json"
+    }
+  },
+  {
+    "id": 1,
+    "title": "Count stripped perf words",
+    "name": "verseWords",
+    "transformName": "verseWords",
+    "type": "Transform",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Input perf"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "verseWords",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>JSON: Counts words occurrences"
+  },
+  {
+    "id": 2,
+    "title": "Merge Back Into Stripped (roundtrip)",
+    "name": "mergeAlignment",
+    "transformName": "mergeAlignment",
+    "type": "Transform",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Input perf"
+      },
+      {
+        "name": "strippedAlignment",
+        "type": "json",
+        "source": "Input strippedAlignment"
+      },
+      {
+        "name": "verseWords",
+        "type": "json",
+        "source": "Transform 1 verseWords"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json"
+      },
+      {
+        "name": "unalignedWords",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>PERF adds report to verses"
+  },
+  {
+    "id": 3,
+    "title": "Merge Merged PERF Text",
+    "name": "mergePerfText",
+    "transformName": "mergePerfText",
+    "type": "Transform",
+    "inputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Transform 2 perf"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json"
+      }
+    ],
+    "description": "PERF=>PERF: Merge consecutive text strings"
+  },
+  {
+    "id": 999,
+    "type": "Outputs",
+    "outputs": [
+      {
+        "name": "perf",
+        "type": "json",
+        "source": "Transform 3 perf"
+      },
+      {
+        "name": "unalignedWords",
+        "type": "json",
+        "source": "Transform 2 unalignedWords"
+      }
+    ]
+  }
+]

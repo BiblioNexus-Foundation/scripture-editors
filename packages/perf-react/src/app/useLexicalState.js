@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
-import { getLexicalState } from "shared/contentManager";
+import { getBookHandler } from "shared/contentManager";
 import { fetchUsfm } from "shared/contentManager/mockup/fetchUsfm";
 
-export function useLexicalState() {
-  const [lexicalState, setLexicalState] = useState(null);
-  useEffect(() => {
-    fetchUsfm({
-      serverName: "dbl",
-      organizationId: "bfbs",
-      languageCode: "fra",
-      versionId: "lsg",
-      bookCode: "tit",
-    }).then(async (usfm) => {
-      setLexicalState(await getLexicalState(usfm));
-    });
-  }, []);
+export function useBibleBook({ serverName, organizationId, languageCode, versionId, bookCode }) {
+  const [bookHandler, setBookHandler] = useState(null);
 
-  return lexicalState;
+  useEffect(() => {
+    async function updateBookHandler() {
+      const usfm = await fetchUsfm({
+        serverName,
+        organizationId,
+        languageCode,
+        versionId,
+        bookCode,
+      });
+      setBookHandler(
+        await getBookHandler({
+          usfm,
+          serverName,
+          organizationId,
+          languageCode,
+          versionId,
+          bookCode,
+        }),
+      );
+    }
+    updateBookHandler();
+  }, [serverName, organizationId, languageCode, versionId, bookCode]);
+
+  return bookHandler;
 }

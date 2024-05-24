@@ -2,6 +2,8 @@ import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, EditorConfig, LexicalNode, NodeKey } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
 
+const DEFAULT_TAG = "span";
+
 export type SerializedDivisionMarkNode = SerializedUsfmElementNode;
 
 export class DivisionMarkNode extends UsfmElementNode {
@@ -10,20 +12,18 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 
   static clone(node: DivisionMarkNode): DivisionMarkNode {
-    return new DivisionMarkNode(node.__attributes, node.__data, node.__key);
+    return new DivisionMarkNode(node.__attributes, node.__tag, node.__key);
   }
 
-  constructor(attributes: Attributes, data: unknown, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
     // TODO: define this value. This was added because previously `super` was passed `key` as `tag`.
-    const tag = "";
-    super(attributes, data, tag, key);
+    super(attributes, tag, key);
   }
 
   static importJSON(serializedNode: SerializedDivisionMarkNode) {
-    const { data, attributes, format, indent, direction } = serializedNode;
-    const node = $createDivisionMarkNode(attributes, data);
-    node.setData(data);
-    node.setAttributes(attributes);
+    const { attributes, format, indent, direction, tag } = serializedNode;
+    const node = $createDivisionMarkNode(attributes, tag ?? DEFAULT_TAG);
+    node.setAttributes(attributes ?? {});
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -31,7 +31,7 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 
   createDOM(config: EditorConfig): HTMLSpanElement {
-    const element = document.createElement("span");
+    const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     const attributes = this.getAttributes();
 
     Object.keys(attributes).forEach((attKey) => {
@@ -53,15 +53,18 @@ export class DivisionMarkNode extends UsfmElementNode {
     };
   }
 
-  updateDOM(): boolean {
+  updateDOM(_prevNode: DivisionMarkNode, element: HTMLElement): boolean {
+    const newNumber = element.innerText;
+    this.__attributes["perf-atts-number"] = newNumber;
+    element.setAttribute("perf-atts-number", newNumber);
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
     return false;
   }
 }
 
-export function $createDivisionMarkNode(attributes: Attributes, data: unknown): DivisionMarkNode {
-  return $applyNodeReplacement(new DivisionMarkNode(attributes, data));
+export function $createDivisionMarkNode(attributes?: Attributes, tag?: string): DivisionMarkNode {
+  return $applyNodeReplacement(new DivisionMarkNode(attributes, tag));
 }
 
 export function $isDivisionMarkNode(

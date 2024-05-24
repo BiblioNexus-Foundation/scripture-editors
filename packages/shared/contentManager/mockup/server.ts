@@ -38,6 +38,11 @@ export const serverMap: ServerMap = {
             file: import("../../data/tit.usfm").then((data) => data.default),
           },
         },
+        tpl: {
+          tit: {
+            file: import("../../data/tit.tpl.usfm").then((data) => data.default),
+          },
+        },
       },
     },
   },
