@@ -4,12 +4,14 @@ import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 import { Usj } from "shared/converters/usj/usj.model";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
+import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
 import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
-import { EditorOptions, EditorRef } from "./editor/Editor";
-import Marginal from "./marginal/Marginal";
+import { EditorOptions } from "./editor/Editor";
+import { Comments } from "./marginal/comments/commenting";
+import Marginal, { MarginalRef } from "./marginal/Marginal";
 import "./App.css";
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
@@ -17,9 +19,7 @@ const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
 
 export default function App() {
-  // This ref becomes defined when passed to the editor.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const editorRef = useRef<EditorRef>(null!);
+  const marginalRef = useRef<MarginalRef | null>(null);
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const options = useMemo<EditorOptions>(
@@ -30,14 +30,15 @@ export default function App() {
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      editorRef.current?.setUsj(usxStringToUsj(usx));
+      marginalRef.current?.setComments?.(comments as Comments);
+      marginalRef.current?.setUsj(usxStringToUsj(usx));
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleChange = useCallback((usj: Usj) => {
-    console.log({ usj });
-    editorRef.current?.setUsj(usj);
+  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => {
+    console.log({ usj, comments });
+    marginalRef.current?.setUsj(usj);
   }, []);
 
   return (
@@ -47,7 +48,7 @@ export default function App() {
         <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
       </div>
       <Marginal
-        ref={editorRef}
+        ref={marginalRef}
         defaultUsj={defaultUsj}
         scrRef={scrRef}
         setScrRef={setScrRef}

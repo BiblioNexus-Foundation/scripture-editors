@@ -35,7 +35,13 @@ import {
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import { MarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
-import { MilestoneNode, SerializedMilestoneNode } from "shared/nodes/scripture/usj/MilestoneNode";
+import {
+  ENDING_MS_COMMENT_MARKER,
+  MILESTONE_VERSION,
+  MilestoneNode,
+  STARTING_MS_COMMENT_MARKER,
+  SerializedMilestoneNode,
+} from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
@@ -210,13 +216,85 @@ function createUnknownMarker(
   });
 }
 
+/**
+ * Strip the mark and insert its children enclosed in milestone mark markers.
+ * @param childMarkers - Children markers of the mark.
+ * @param ids - IDs from the current mark.
+ * @param pids - IDs from the previous mark.
+ * @param nextNode - Next serialized node.
+ * @param markers - Markers accumulated so far.
+ */
+function replaceMarkWithMilestones(
+  childMarkers: MarkerContent[],
+  ids: string[],
+  pids: string[],
+  nextNode: SerializedLexicalNode | undefined,
+  markers: MarkerContent[],
+) {
+  // add the milestones in front of the children
+  const type = MilestoneNode.getType();
+  const sids = ids.filter((id) => !pids.includes(id));
+  const eids = pids.filter((id) => !ids.includes(id));
+  eids.forEach((eid) => {
+    const milestone = createMilestoneMarker({
+      type,
+      marker: ENDING_MS_COMMENT_MARKER,
+      eid,
+      version: MILESTONE_VERSION,
+    });
+    markers.push(milestone);
+  });
+  sids.forEach((sid) => {
+    const milestone = createMilestoneMarker({
+      type,
+      marker: STARTING_MS_COMMENT_MARKER,
+      sid,
+      version: MILESTONE_VERSION,
+    });
+    markers.push(milestone);
+  });
+  if (ids.length === 0) {
+    const milestone = createMilestoneMarker({
+      type,
+      marker: STARTING_MS_COMMENT_MARKER,
+      version: MILESTONE_VERSION,
+    });
+    markers.push(milestone);
+  }
+  // add the children
+  markers.push(...childMarkers);
+  // add any milestones needed after the children
+  if (ids.length === 0) {
+    const milestone = createMilestoneMarker({
+      type,
+      marker: ENDING_MS_COMMENT_MARKER,
+      version: MILESTONE_VERSION,
+    });
+    markers.push(milestone);
+  }
+  const isLastEnd = !nextNode || nextNode.type !== MarkNode.getType();
+  if (isLastEnd) {
+    ids.forEach((eid) => {
+      const milestone = createMilestoneMarker({
+        type,
+        marker: ENDING_MS_COMMENT_MARKER,
+        eid,
+        version: MILESTONE_VERSION,
+      });
+      markers.push(milestone);
+    });
+  }
+}
+
 function recurseNodes(
   nodes: SerializedLexicalNode[],
   noteCaller?: string,
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
   let childMarkers: MarkerContent[] | undefined;
-  nodes.forEach((node) => {
+  /** Previous IDs from MarkNodes. */
+  let pids: string[] = [];
+  nodes.forEach((node, index) => {
     const serializedBookNode = node as SerializedBookNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
@@ -261,9 +339,17 @@ function recurseNodes(
         // These nodes are for presentation only so they don't go into the USJ.
         break;
       case MarkNode.getType():
-        // Strip the mark and insert its children.
         childMarkers = recurseNodes(serializedMarkNode.children);
-        if (childMarkers) markers.push(...childMarkers);
+        if (childMarkers) {
+          replaceMarkWithMilestones(
+            childMarkers,
+            serializedMarkNode.ids,
+            pids,
+            nodes[index + 1],
+            markers,
+          );
+          pids = serializedMarkNode.ids;
+        }
         break;
       case MilestoneNode.getType():
         markers.push(createMilestoneMarker(node as SerializedMilestoneNode));

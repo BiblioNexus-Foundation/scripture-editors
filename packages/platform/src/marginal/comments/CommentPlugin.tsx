@@ -56,6 +56,7 @@ import ContentEditable from "./ui/ContentEditable";
 import Placeholder from "./ui/Placeholder";
 
 import "./CommentPlugin.css";
+import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand("INSERT_INLINE_COMMAND");
 
@@ -668,14 +669,22 @@ function useCollabAuthorName(): string {
   return yjsDocMap.has("comments") ? name : "Scripture User";
 }
 
-export default function CommentPlugin({
+export default function CommentPlugin<TLogger extends LoggerBasic>({
   providerFactory,
+  setCommentStore,
+  logger,
 }: {
   providerFactory?: (id: string, yjsDocMap: Map<string, Doc>) => Provider;
+  setCommentStore?: (commentStore: CommentStore) => void;
+  logger?: TLogger;
 }): JSX.Element {
   const collabContext = useCollaborationContext();
   const [editor] = useLexicalComposerContext();
-  const commentStore = useMemo(() => new CommentStore(editor), [editor]);
+  const commentStore = useMemo(() => {
+    const cs = new CommentStore(editor, logger);
+    setCommentStore?.(cs);
+    return cs;
+  }, [editor, logger, setCommentStore]);
   const comments = useCommentStore(commentStore);
   const markNodeMap = useMemo<Map<string, Set<NodeKey>>>(() => {
     return new Map();
@@ -685,6 +694,12 @@ export default function CommentPlugin({
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const { yjsDocMap } = collabContext;
+
+  useEffect(() => {
+    if (!editor.hasNodes([MarkNode])) {
+      throw new Error("CommentPlugin: MarkNode not registered on editor!");
+    }
+  }, [editor]);
 
   useEffect(() => {
     if (providerFactory) {

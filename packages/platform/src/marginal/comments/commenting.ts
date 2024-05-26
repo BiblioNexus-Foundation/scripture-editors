@@ -6,6 +6,7 @@ import { Provider, TOGGLE_CONNECT_COMMAND } from "@lexical/yjs";
 import { COMMAND_PRIORITY_LOW, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
 import { Array as YArray, Map as YMap, Transaction, YArrayEvent, YEvent } from "yjs";
+import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 export type Comment = {
   author: string;
@@ -85,15 +86,17 @@ function triggerOnChange(commentStore: CommentStore): void {
   }
 }
 
-export class CommentStore {
+export class CommentStore<TLogger extends LoggerBasic = LoggerBasic> {
   _editor: LexicalEditor;
   _comments: Comments;
   _changeListeners: Set<() => void>;
   _collabProvider: null | Provider;
+  private logger: TLogger | undefined;
 
-  constructor(editor: LexicalEditor) {
+  constructor(editor: LexicalEditor, logger?: TLogger) {
     this._comments = [];
     this._editor = editor;
+    this.logger = logger;
     this._collabProvider = null;
     this._changeListeners = new Set();
   }
@@ -104,6 +107,11 @@ export class CommentStore {
 
   getComments(): Comments {
     return this._comments;
+  }
+
+  setComments(comments: Comments) {
+    this._comments = comments;
+    triggerOnChange(this);
   }
 
   addComment(commentOrThread: Comment | Thread, thread?: Thread, offset?: number): void {
@@ -281,12 +289,10 @@ export class CommentStore {
           const shouldConnect = payload;
 
           if (shouldConnect) {
-            // eslint-disable-next-line no-console
-            console.log("Comments connected!");
+            this.logger?.info("Comments connected!");
             connect();
           } else {
-            // eslint-disable-next-line no-console
-            console.log("Comments disconnected!");
+            this.logger?.info("Comments disconnected!");
             disconnect();
           }
         }

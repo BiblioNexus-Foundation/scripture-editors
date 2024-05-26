@@ -54,7 +54,7 @@ const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: 
 const options: EditorOptions = { nodes: nodeOptions };
 
 export default function App() {
-  const editorRef = useRef<EditorRef>(null!);
+  const editorRef = useRef<EditorRef | null>(null);
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
   // Simulate USJ updating after the editor is loaded.

@@ -117,7 +117,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   }: PropsWithChildren<EditorProps<TLogger>>,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
-  const editorRef = useRef<LexicalEditor>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
   editorConfig.editable = !options?.isReadonly;
@@ -151,6 +151,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       <div className="editor-container">
         {!options?.isReadonly && <ToolbarPlugin />}
         <div className="editor-inner">
+          <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
             contentEditable={
               <ContentEditable className="editor-input" spellCheck={options?.hasSpellCheck} />
@@ -166,7 +167,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               viewOptions={options?.view}
             />
           )}
-          <EditorRefPlugin editorRef={editorRef} />
           <UpdateStatePlugin
             scripture={loadedUsj}
             nodeOptions={options?.nodes}
@@ -174,8 +174,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             viewOptions={options?.view}
             logger={logger}
           />
-          <NoteNodePlugin />
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
+          <NoteNodePlugin />
           {children}
         </div>
       </div>

@@ -1,5 +1,5 @@
 export { default as Editorial } from "./Editorial";
-export { default as Marginal } from "./marginal/Marginal";
+export { default as Marginal, type MarginalRef } from "./marginal/Marginal";
 export { type Usj } from "shared/converters/usj/usj.model";
 export { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
 export { usjToUsxString } from "shared/converters/usj/usj-to-usx";
@@ -13,3 +13,4 @@ export {
 } from "./editor/adaptors/view-options.utils";
 export { type EditorOptions, type EditorRef } from "./editor/Editor";
 export { type ViewMode } from "./editor/toolbar/view-mode.model";
+export { type Comments } from "./marginal/comments/commenting";

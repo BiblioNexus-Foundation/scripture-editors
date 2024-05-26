@@ -18,7 +18,7 @@ import Editor, { EditorRef, EditorProps } from "./editor/Editor";
  */
 const Editorial = forwardRef(function Editorial<TLogger extends LoggerBasic>(
   props: EditorProps<TLogger>,
-  ref: React.ForwardedRef<EditorRef>,
+  ref: React.ForwardedRef<EditorRef | null>,
 ): JSX.Element {
   const { children, ...propsWithoutChildren } = props as PropsWithChildren<EditorProps<TLogger>>;
   return <Editor ref={ref} {...propsWithoutChildren} />;
