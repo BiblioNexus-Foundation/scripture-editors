@@ -7,6 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { EditorState, LexicalEditor } from "lexical";
+import { deepEqual } from "fast-equals";
 import React, {
   JSX,
   PropsWithChildren,
@@ -18,7 +19,10 @@ import React, {
 } from "react";
 import { ScriptureReference } from "platform-bible-react";
 import { Usj } from "shared/converters/usj/usj.model";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { AnnotationRange } from "shared-react/annotation/annotation.model";
+import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
@@ -34,10 +38,23 @@ import useDeferredState from "./use-deferred-state.hook";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
-  /** Method to focus the editor. */
+  /** Focus the editor. */
   focus(): void;
-  /** Method to set the USJ Scripture data. */
+  /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
+  /**
+   * Add an ephemeral annotation.
+   * @param selection - An annotation range containing the start and end location.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  addAnnotation(selection: AnnotationRange, type: string, id: string): void;
+  /**
+   * Remove an ephemeral annotation.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  removeAnnotation(type: string, id: string): void;
 };
 
 /** Options to configure the editor. */
@@ -84,7 +101,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
+  nodes: [MarkNode, TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
 
 function Placeholder(): JSX.Element {
@@ -118,8 +135,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor | null>(null);
+  const annotationRef = useRef<AnnotationRef | null>(null);
   const [usj, setUsj] = useState(defaultUsj);
-  const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
+  const [loadedUsj, editedUsj, setEditedUsj] = useDeferredState(usj);
   editorConfig.editable = !options?.isReadonly;
   editorConfig.editorState = (editor: LexicalEditor) => {
     editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, options?.view));
@@ -130,20 +148,27 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     focus() {
       editorRef.current?.focus();
     },
-    setUsj(usj: Usj) {
+    setUsj(usj) {
       setUsj(usj);
+    },
+    addAnnotation(selection, type, id) {
+      annotationRef.current?.addAnnotation(selection, type, id);
+    },
+    removeAnnotation(type, id) {
+      annotationRef.current?.removeAnnotation(type, id);
     },
   }));
 
   const handleChange = useCallback(
     (editorState: EditorState) => {
-      const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      if (usj) {
-        setEditedUsj(usj);
-        onChange?.(usj);
+      const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
+      if (newUsj) {
+        const isEdited = !deepEqual(editedUsj, newUsj);
+        if (isEdited) setEditedUsj(newUsj);
+        if (isEdited || !deepEqual(loadedUsj, newUsj)) onChange?.(newUsj);
       }
     },
-    [onChange, setEditedUsj],
+    [editedUsj, loadedUsj, onChange, setEditedUsj],
   );
 
   return (
@@ -174,7 +199,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             viewOptions={options?.view}
             logger={logger}
           />
-          <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
+          <OnChangePlugin
+            onChange={handleChange}
+            ignoreSelectionChange
+            ignoreHistoryMergeTagChange
+          />
+          <AnnotationPlugin ref={annotationRef} logger={logger} />
           <NoteNodePlugin />
           {children}
         </div>

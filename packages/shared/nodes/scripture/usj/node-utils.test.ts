@@ -1,26 +1,14 @@
-import {
-  $createTextNode,
-  $getNodeByKey,
-  $getRoot,
-  CreateEditorArgs,
-  LexicalEditor,
-  createEditor,
-} from "lexical";
+import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
 import { findLastVerse, findThisVerse } from "./node.utils";
 import { $createImmutableVerseNode } from "./ImmutableVerseNode";
 import { $createVerseNode, VerseNode } from "./VerseNode";
 import { $createParaNode } from "./ParaNode";
-import scriptureUsjNodes from ".";
-
-type TestEnv = {
-  editor: LexicalEditor;
-  container?: HTMLElement;
-};
+import { createBasicTestEnvironment } from "../../test.utils";
 
 describe("Editor Node Utilities", () => {
   describe("findLastVerse()", () => {
     it("should find the last verse in node", async () => {
-      const { editor } = initializeUnitTest();
+      const { editor } = createBasicTestEnvironment();
       await editor.update(() => {
         const root = $getRoot();
         const p1 = $createParaNode();
@@ -42,7 +30,7 @@ describe("Editor Node Utilities", () => {
     });
 
     it("should find the last immutable verse in node", async () => {
-      const { editor } = initializeUnitTest();
+      const { editor } = createBasicTestEnvironment();
       await editor.update(() => {
         const root = $getRoot();
         const p1 = $createParaNode();
@@ -67,7 +55,7 @@ describe("Editor Node Utilities", () => {
   describe("findThisVerse()", () => {
     it("should find the last verse in node", async () => {
       let t2Key: string;
-      const { editor } = initializeUnitTest();
+      const { editor } = createBasicTestEnvironment();
       await editor.update(() => {
         const root = $getRoot();
         const p1 = $createParaNode();
@@ -91,7 +79,7 @@ describe("Editor Node Utilities", () => {
 
     it("should find the verse in a previous parent node", async () => {
       let t3Key: string;
-      const { editor } = initializeUnitTest();
+      const { editor } = createBasicTestEnvironment();
       /**
        *          R
        *   p1     p2     p3
@@ -124,7 +112,7 @@ describe("Editor Node Utilities", () => {
 
     it("should find the last verse in the previous parent node", async () => {
       let t2Key: string;
-      const { editor } = initializeUnitTest();
+      const { editor } = createBasicTestEnvironment();
       /**
        *         R
        *    p1       p2
@@ -154,25 +142,3 @@ describe("Editor Node Utilities", () => {
     });
   });
 });
-
-function initializeUnitTest(): TestEnv {
-  const container = document.createElement("div");
-  document.body.appendChild(container);
-
-  const config: CreateEditorArgs = {
-    namespace: "TestEditor",
-    onError(error) {
-      throw error;
-    },
-    nodes: scriptureUsjNodes,
-  };
-  const editor = createEditor(config);
-  editor.setRootElement(container);
-
-  const testEnv: TestEnv = {
-    container,
-    editor,
-  };
-
-  return testEnv;
-}

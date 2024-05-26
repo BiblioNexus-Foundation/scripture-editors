@@ -13,6 +13,7 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import {
   NBSP,
   getEditableCallerText,
@@ -44,9 +45,9 @@ import {
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;
@@ -217,6 +218,19 @@ function createUnknownMarker(
 }
 
 /**
+ * If the last added content is text then combine the new text content to it, otherwise add the new
+ * text content.
+ * @param markers - Markers accumulated so far.
+ * @param textContent - New text content.
+ */
+function combineTextContentOrAdd(markers: MarkerContent[], textContent: string) {
+  const lastContent: MarkerContent | undefined = markers[markers.length - 1];
+  if (lastContent && typeof lastContent === "string")
+    markers[markers.length - 1] = lastContent + textContent;
+  else markers.push(textContent);
+}
+
+/**
  * Strip the mark and insert its children enclosed in milestone mark markers.
  * @param childMarkers - Children markers of the mark.
  * @param ids - IDs from the current mark.
@@ -338,6 +352,18 @@ function recurseNodes(
       case MarkerNode.getType():
         // These nodes are for presentation only so they don't go into the USJ.
         break;
+      case TypedMarkNode.getType():
+        // Strip the mark and insert its children.
+        childMarkers = recurseNodes(serializedMarkNode.children);
+        if (childMarkers) {
+          const firstChild = childMarkers.shift();
+          if (firstChild) {
+            if (typeof firstChild === "string") combineTextContentOrAdd(markers, firstChild);
+            else markers.push(firstChild);
+          }
+          if (childMarkers) markers.push(...childMarkers);
+        }
+        break;
       case MarkNode.getType():
         childMarkers = recurseNodes(serializedMarkNode.children);
         if (childMarkers) {
@@ -360,7 +386,7 @@ function recurseNodes(
           serializedTextNode.text !== NBSP &&
           (!noteCaller || serializedTextNode.text !== getEditableCallerText(noteCaller))
         ) {
-          markers.push(createTextMarker(serializedTextNode));
+          combineTextContentOrAdd(markers, createTextMarker(serializedTextNode));
         }
         break;
       case UnknownNode.getType():
