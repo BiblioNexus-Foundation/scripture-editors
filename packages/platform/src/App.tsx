@@ -27,6 +27,11 @@ const annotationRange2 = {
   start: { jsonPath: "$.content[10].content[2]", offset: 15 },
   end: { jsonPath: "$.content[10].content[2]", offset: 22 },
 };
+// Phrase "stand on " inside first q2 of PSA 1:1.
+const annotationRange3 = {
+  start: { jsonPath: "$.content[11].content[0]", offset: 4 },
+  end: { jsonPath: "$.content[11].content[0]", offset: 9 },
+};
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
@@ -56,6 +61,7 @@ export default function App() {
     const timeoutId = setTimeout(() => {
       marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
       marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
+      marginalRef.current?.addAnnotation(annotationRange3, "other", "bcd567");
       marginalRef.current?.addAnnotation(annotationRange1, "other", "bcd234");
     }, 3000);
     return () => clearTimeout(timeoutId);
@@ -64,7 +70,6 @@ export default function App() {
   // Remove some annotations after they were added.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      marginalRef.current?.removeAnnotation("spelling", "annotationId");
       marginalRef.current?.removeAnnotation("other", "bcd234");
     }, 4000);
     return () => clearTimeout(timeoutId);

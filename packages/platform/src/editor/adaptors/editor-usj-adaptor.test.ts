@@ -1,6 +1,4 @@
-import { MarkNode } from "@lexical/mark";
 import { deepEqual } from "fast-equals";
-import { createEditor } from "lexical";
 import {
   CHAPTER_1_INDEX,
   VERSE_2_EDITABLE_INDEX,
@@ -19,22 +17,19 @@ import {
   usjWithUnknownItems,
 } from "shared/converters/usj/converter-test.data";
 import { MarkerObject } from "shared/converters/usj/usj.model";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
 import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
+import { createBasicTestEnvironment } from "shared/nodes/test.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
-const testConfig = {
-  namespace: "TestEditor",
-  theme: {},
-  nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
-  onError: console.error,
-};
-const editor = createEditor(testConfig);
+const nodes = [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes];
+const { editor } = createBasicTestEnvironment(nodes);
 
 describe("Editor USJ Adaptor", () => {
   it("should convert to USJ from empty Lexical editor state JSON", () => {

@@ -1,4 +1,3 @@
-import { MarkNode } from "@lexical/mark";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -44,7 +43,8 @@ export type EditorRef = {
   setUsj(usj: Usj): void;
   /**
    * Add an ephemeral annotation.
-   * @param selection - An annotation range containing the start and end location.
+   * @param selection - An annotation range containing the start and end location. The json-path in
+   *   an annotation location assumes no comment Milestone nodes are present in the USJ.
    * @param type - Type of the annotation.
    * @param id - ID of the annotation.
    */
@@ -101,7 +101,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [MarkNode, TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
+  nodes: [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
 
 function Placeholder(): JSX.Element {

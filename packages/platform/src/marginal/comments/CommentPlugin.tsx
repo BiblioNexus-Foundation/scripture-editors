@@ -6,14 +6,6 @@ import type { Provider } from "@lexical/yjs";
 import type { EditorState, LexicalCommand, LexicalEditor, NodeKey, RangeSelection } from "lexical";
 import type { Doc } from "yjs";
 
-import {
-  $createMarkNode,
-  $getMarkIDs,
-  $isMarkNode,
-  $unwrapMarkNode,
-  $wrapSelectionInMarkNode,
-  MarkNode,
-} from "@lexical/mark";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ClearEditorPlugin } from "@lexical/react/LexicalClearEditorPlugin";
 import { useCollaborationContext } from "@lexical/react/LexicalCollaborationContext";
@@ -41,6 +33,16 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { createPortal } from "react-dom";
 
 import {
+  $createTypedMarkNode,
+  $getMarkIDs,
+  $isTypedMarkNode,
+  $unwrapTypedMarkNode,
+  $wrapSelectionInTypedMarkNode,
+  COMMENT_MARK_TYPE,
+  TypedMarkNode,
+} from "shared/nodes/features/TypedMarkNode";
+import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import {
   Comment,
   Comments,
   CommentStore,
@@ -56,7 +58,6 @@ import ContentEditable from "./ui/ContentEditable";
 import Placeholder from "./ui/Placeholder";
 
 import "./CommentPlugin.css";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand("INSERT_INLINE_COMMAND");
 
@@ -542,8 +543,8 @@ function CommentsPanelList({
               editor.update(
                 () => {
                   const markNodeKey = Array.from(markNodeKeys)[0];
-                  const markNode = $getNodeByKey<MarkNode>(markNodeKey);
-                  if ($isMarkNode(markNode)) {
+                  const markNode = $getNodeByKey<TypedMarkNode>(markNodeKey);
+                  if ($isTypedMarkNode(markNode)) {
                     markNode.selectStart();
                   }
                 },
@@ -696,8 +697,8 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   const { yjsDocMap } = collabContext;
 
   useEffect(() => {
-    if (!editor.hasNodes([MarkNode])) {
-      throw new Error("CommentPlugin: MarkNode not registered on editor!");
+    if (!editor.hasNodes([TypedMarkNode])) {
+      throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
     }
   }, [editor]);
 
@@ -738,11 +739,11 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
           setTimeout(() => {
             editor.update(() => {
               for (const key of markNodeKeys) {
-                const node: null | MarkNode = $getNodeByKey(key);
-                if ($isMarkNode(node)) {
-                  node.deleteID(id);
-                  if (node.getIDs().length === 0) {
-                    $unwrapMarkNode(node);
+                const node: TypedMarkNode | null = $getNodeByKey(key);
+                if ($isTypedMarkNode(node)) {
+                  node.deleteID(COMMENT_MARK_TYPE, id);
+                  if (node.hasNoIDsForEveryType()) {
+                    $unwrapTypedMarkNode(node);
                   }
                 }
               }
@@ -768,8 +769,8 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
             const isBackward = selection.isBackward();
             const id = commentOrThread.id;
 
-            // Wrap content in a MarkNode
-            $wrapSelectionInMarkNode(selection, isBackward, id);
+            // Wrap content in a TypedMarkNode
+            $wrapSelectionInTypedMarkNode(selection, isBackward, COMMENT_MARK_TYPE, id);
           }
         });
         setShowCommentInput(false);
@@ -803,33 +804,38 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   }, [activeIDs, editor, markNodeMap]);
 
   useEffect(() => {
+    if (!editor.hasNodes([TypedMarkNode])) {
+      throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
+    }
+
     const markNodeKeysToIDs: Map<NodeKey, Array<string>> = new Map();
 
     return mergeRegister(
-      registerNestedElementResolver<MarkNode>(
+      registerNestedElementResolver<TypedMarkNode>(
         editor,
-        MarkNode,
-        (from: MarkNode) => {
-          return $createMarkNode(from.getIDs());
+        TypedMarkNode,
+        (from: TypedMarkNode) => {
+          return $createTypedMarkNode(from.getTypedIDs());
         },
-        (from: MarkNode, to: MarkNode) => {
+        (from: TypedMarkNode, to: TypedMarkNode) => {
           // Merge the IDs
-          const ids = from.getIDs();
-          ids.forEach((id) => {
-            to.addID(id);
-          });
+          for (const [type, ids] of Object.entries(from.getTypedIDs())) {
+            ids.forEach((id) => {
+              to.addID(type, id);
+            });
+          }
         },
       ),
-      editor.registerMutationListener(MarkNode, (mutations) => {
+      editor.registerMutationListener(TypedMarkNode, (mutations) => {
         editor.getEditorState().read(() => {
           for (const [key, mutation] of mutations) {
-            const node: null | MarkNode = $getNodeByKey(key);
+            const node: TypedMarkNode | null = $getNodeByKey(key);
             let ids: NodeKey[] = [];
 
             if (mutation === "destroyed") {
-              ids = markNodeKeysToIDs.get(key) || [];
-            } else if ($isMarkNode(node)) {
-              ids = node.getIDs();
+              ids = markNodeKeysToIDs.get(key) ?? [];
+            } else if ($isTypedMarkNode(node)) {
+              ids = node.getTypedIDs()[COMMENT_MARK_TYPE] ?? [];
             }
 
             for (let i = 0; i < ids.length; i++) {
@@ -867,7 +873,8 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
             const anchorNode = selection.anchor.getNode();
 
             if ($isTextNode(anchorNode)) {
-              const commentIDs = $getMarkIDs(anchorNode, selection.anchor.offset);
+              const commentIDs =
+                $getMarkIDs(anchorNode, COMMENT_MARK_TYPE, selection.anchor.offset) ?? [];
               if (commentIDs !== null) {
                 setActiveIDs(commentIDs);
                 hasActiveIds = true;

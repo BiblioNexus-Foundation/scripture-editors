@@ -1,4 +1,3 @@
-import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   LineBreakNode,
   SerializedEditorState,
@@ -15,6 +14,11 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
+import {
+  COMMENT_MARK_TYPE,
+  SerializedTypedMarkNode,
+  TypedMarkNode,
+} from "shared/nodes/features/TypedMarkNode";
 import {
   BOOK_MARKER,
   BOOK_VERSION,
@@ -543,10 +547,13 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
   };
 }
 
-function createMark(children: SerializedLexicalNode[], ids: string[] = []): SerializedMarkNode {
+function createCommentMark(
+  children: SerializedLexicalNode[],
+  ids: string[] = [],
+): SerializedTypedMarkNode {
   return {
-    type: MarkNode.getType(),
-    ids,
+    type: TypedMarkNode.getType(),
+    typedIDs: { [COMMENT_MARK_TYPE]: ids },
     children,
     direction: null,
     format: "",
@@ -659,7 +666,7 @@ function replaceMilestonesWithMarkRecurse(
 
   // get the nodes before the mark
   const startNodes = nodes.slice(0, firstIndex);
-  const nodesBefore = isPreviousMsStarting ? [createMark(startNodes, [...ids])] : startNodes;
+  const nodesBefore = isPreviousMsStarting ? [createCommentMark(startNodes, [...ids])] : startNodes;
   // get the nodes inside the mark
   const firstMSCommentNode = nodes[firstIndex] as SerializedMilestoneNode;
   updateIds(ids, firstMSCommentNode);
@@ -669,7 +676,7 @@ function replaceMilestonesWithMarkRecurse(
     firstMSCommentNode.marker === STARTING_MS_COMMENT_MARKER,
     ids,
   );
-  const markNode = createMark(markedNodes, [...ids]);
+  const markNode = createCommentMark(markedNodes, [...ids]);
   // get the nodes after the mark
   const secondMSCommentNode = nodes[secondIndex] as SerializedMilestoneNode;
   updateIds(ids, secondMSCommentNode);

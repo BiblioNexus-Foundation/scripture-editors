@@ -13,6 +13,7 @@ import type {
   RangeSelection,
   SerializedElementNode,
   Spread,
+  TextNode,
 } from "lexical";
 import {
   $applyNodeReplacement,
@@ -33,6 +34,9 @@ export type SerializedTypedMarkNode = Spread<
   SerializedElementNode
 >;
 
+/** Reserved type for CommentPlugin. */
+export const COMMENT_MARK_TYPE = "comment";
+const reservedTypes = [COMMENT_MARK_TYPE];
 const TYPED_MARK_VERSION = 1;
 
 export class TypedMarkNode extends ElementNode {
@@ -51,6 +55,10 @@ export class TypedMarkNode extends ElementNode {
   static clone(node: TypedMarkNode): TypedMarkNode {
     const __typedIDs = JSON.parse(JSON.stringify(node.__typedIDs));
     return new TypedMarkNode(__typedIDs, node.__key);
+  }
+
+  static isReservedType(type: string): boolean {
+    return reservedTypes.includes(type);
   }
 
   static importJSON(serializedNode: SerializedTypedMarkNode): TypedMarkNode {
@@ -332,4 +340,20 @@ export function $wrapSelectionInTypedMarkNode(
     // eslint-disable-next-line no-unused-expressions
     isBackward ? lastCreatedMarkNode.selectStart() : lastCreatedMarkNode.selectEnd();
   }
+}
+
+export function $getMarkIDs(node: TextNode, type: string, offset: number): string[] | undefined {
+  let currentNode: LexicalNode | null = node;
+  while (currentNode !== null) {
+    if ($isTypedMarkNode(currentNode)) {
+      return currentNode.getTypedIDs()[type];
+    } else if ($isTextNode(currentNode) && offset === currentNode.getTextContentSize()) {
+      const nextSibling = currentNode.getNextSibling();
+      if ($isTypedMarkNode(nextSibling)) {
+        return nextSibling.getTypedIDs()[type];
+      }
+    }
+    currentNode = currentNode.getParent();
+  }
+  return undefined;
 }

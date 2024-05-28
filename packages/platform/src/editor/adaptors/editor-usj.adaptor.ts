@@ -1,4 +1,3 @@
-import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   EditorState,
   LineBreakNode,
@@ -13,7 +12,11 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
-import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import {
+  COMMENT_MARK_TYPE,
+  SerializedTypedMarkNode,
+  TypedMarkNode,
+} from "shared/nodes/features/TypedMarkNode";
 import {
   NBSP,
   getEditableCallerText,
@@ -232,9 +235,9 @@ function combineTextContentOrAdd(markers: MarkerContent[], textContent: string) 
 
 /**
  * Strip the mark and insert its children enclosed in milestone mark markers.
- * @param childMarkers - Children markers of the mark.
- * @param ids - IDs from the current mark.
- * @param pids - IDs from the previous mark.
+ * @param childMarkers - Children of the mark.
+ * @param ids - Comment IDs from the current mark.
+ * @param pids - Comment IDs from the previous mark.
  * @param nextNode - Next serialized node.
  * @param markers - Markers accumulated so far.
  */
@@ -286,7 +289,7 @@ function replaceMarkWithMilestones(
     });
     markers.push(milestone);
   }
-  const isLastEnd = !nextNode || nextNode.type !== MarkNode.getType();
+  const isLastEnd = !nextNode || nextNode.type !== TypedMarkNode.getType();
   if (isLastEnd) {
     ids.forEach((eid) => {
       const milestone = createMilestoneMarker({
@@ -306,14 +309,14 @@ function recurseNodes(
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
   let childMarkers: MarkerContent[] | undefined;
-  /** Previous IDs from MarkNodes. */
+  /** Previous comment IDs from TypedMarkNodes. */
   let pids: string[] = [];
   nodes.forEach((node, index) => {
     const serializedBookNode = node as SerializedBookNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
-    const serializedMarkNode = node as SerializedMarkNode;
+    const serializedMarkNode = node as SerializedTypedMarkNode;
     const serializedUnknownNode = node as SerializedUnknownNode;
     switch (node.type) {
       case BookNode.getType():
@@ -353,28 +356,21 @@ function recurseNodes(
         // These nodes are for presentation only so they don't go into the USJ.
         break;
       case TypedMarkNode.getType():
-        // Strip the mark and insert its children.
         childMarkers = recurseNodes(serializedMarkNode.children);
         if (childMarkers) {
-          const firstChild = childMarkers.shift();
-          if (firstChild) {
-            if (typeof firstChild === "string") combineTextContentOrAdd(markers, firstChild);
-            else markers.push(firstChild);
+          const commentIDs = serializedMarkNode.typedIDs[COMMENT_MARK_TYPE];
+          if (commentIDs && commentIDs.length >= 0) {
+            replaceMarkWithMilestones(childMarkers, commentIDs, pids, nodes[index + 1], markers);
+            pids = commentIDs;
+          } else {
+            // Strip the mark and insert its children.
+            const firstChild = childMarkers.shift();
+            if (firstChild) {
+              if (typeof firstChild === "string") combineTextContentOrAdd(markers, firstChild);
+              else markers.push(firstChild);
+            }
+            if (childMarkers) markers.push(...childMarkers);
           }
-          if (childMarkers) markers.push(...childMarkers);
-        }
-        break;
-      case MarkNode.getType():
-        childMarkers = recurseNodes(serializedMarkNode.children);
-        if (childMarkers) {
-          replaceMarkWithMilestones(
-            childMarkers,
-            serializedMarkNode.ids,
-            pids,
-            nodes[index + 1],
-            markers,
-          );
-          pids = serializedMarkNode.ids;
         }
         break;
       case MilestoneNode.getType():

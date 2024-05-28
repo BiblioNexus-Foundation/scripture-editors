@@ -69,12 +69,15 @@ function useAnnotations(editor: LexicalEditor, markNodeMap: Map<string, Set<Node
             let typedIDs: TypedIDs = {};
 
             if (mutation === "destroyed") {
-              typedIDs = markNodeKeysToTypedIDs.get(key) || {};
+              typedIDs = markNodeKeysToTypedIDs.get(key) ?? {};
             } else if ($isTypedMarkNode(node)) {
               typedIDs = node.getTypedIDs();
             }
 
             for (const [type, ids] of Object.entries(typedIDs)) {
+              // Skip reserved types as they will handle their own keys.
+              if (TypedMarkNode.isReservedType(type)) continue;
+
               for (let i = 0; i < ids.length; i++) {
                 const id = ids[i];
                 let markNodeKeys = markNodeMap.get(getTypeIDMapKey(type, id));
@@ -176,6 +179,12 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
 
   useImperativeHandle(ref, () => ({
     addAnnotation(selection, type, id) {
+      if (TypedMarkNode.isReservedType(type))
+        throw new Error(
+          `addAnnotation: Can't directly add this reserved annotation type '${type}'.` +
+            " Use the appropriate plugin instead.",
+        );
+
       const { start, end } = selection;
       editor.update(() => {
         // Find the start and end nodes with offsets based on the location.
@@ -194,7 +203,14 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
         $wrapSelectionInTypedMarkNode(selection, isBackward, type, id);
       });
     },
+
     removeAnnotation(type, id) {
+      if (TypedMarkNode.isReservedType(type))
+        throw new Error(
+          `removeAnnotation: Can't directly remove this reserved annotation type '${type}'.` +
+            " Use the appropriate plugin instead.",
+        );
+
       const markNodeKeys = markNodeMap.get(getTypeIDMapKey(type, id));
       if (markNodeKeys !== undefined) {
         // Do async to avoid causing a React infinite loop
