@@ -31,7 +31,7 @@ npm install @biblionexus-foundation/platform-editor
 **Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
 
 ```typescript
-import { Editor, EditorOptions, EditorRef, immutableNoteCallerNodeName, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
+import { EditorOptions, immutableNoteCallerNodeName, Marginal, MarginalRef, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
 import { BookChapterControl } from 'platform-bible-react';
 
 const emptyUsx = '<usx version="3.0" />';
@@ -54,27 +54,28 @@ const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: 
 const options: EditorOptions = { nodes: nodeOptions };
 
 export default function App() {
-  const editorRef = useRef<EditorRef>(null!);
+  const marginalRef = useRef<MarginalRef | null>(null);
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      editorRef.current?.setUsj(usxStringToUsj(usx));
+      marginalRef.current?.setComments?.([]);
+      marginalRef.current?.setUsj(usxStringToUsj(usx));
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleChange = useCallback((usj: Usj) => console.log({ usj }), []);
+  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => console.log({ usj, comments }), []);
 
   return (
     <>
       <div className="controls">
         <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
       </div>
-      <Editor
+      <Marginal
+        ref={marginalRef}
         defaultUsj={defaultUsj}
-        ref={editorRef}
         scrRef={scrRef}
         setScrRef={setScrRef}
         options={options}
@@ -92,6 +93,9 @@ export default function App() {
 - Read-only and edit mode
 - History - undo & redo
 - Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
+- Add comments to selected text, reply in comment threads, delete comments and threads.
+  - To enable comments use the `<Marginal>` editor component (comments appear in the margin).
+  - To use the editor without comments use the `<Editorial>` component.
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`

@@ -2,7 +2,7 @@ import { SerializedEditorState } from "lexical";
 import { LoggerBasic } from "../plugins/logger-basic.model";
 
 /** Option properties to use with each node. */
-export type NodeOptions = { [nodeClassName: string]: { [prop: string]: unknown } };
+export type NodeOptions = { [nodeClassName: string]: { [prop: string]: unknown } | undefined };
 
 export interface EditorAdaptor {
   /**

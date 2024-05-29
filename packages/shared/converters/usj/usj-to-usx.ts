@@ -59,14 +59,14 @@ function convertUsjRecurse(
     eidElement = createVerseEndElement(usxDoc, verseEid);
     verseEid = undefined;
   }
-  if (type === "verse" && typeof markerContent !== "string" && markerContent.sid)
+  if (type === "verse" && typeof markerContent !== "string" && markerContent.sid !== undefined)
     verseEid = markerContent.sid;
 
   if (chapterEid && (type === "chapter" || (type === "para" && isLastItem))) {
     eidElement = createChapterEndElement(usxDoc, chapterEid);
     chapterEid = undefined;
   }
-  if (type === "chapter" && typeof markerContent !== "string" && markerContent.sid)
+  if (type === "chapter" && typeof markerContent !== "string" && markerContent.sid !== undefined)
     chapterEid = markerContent.sid;
 
   // Append to parent.

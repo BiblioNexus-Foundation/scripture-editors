@@ -40,8 +40,9 @@ import {
   MilestoneNode,
   MilestoneMarker,
   SerializedMilestoneNode,
-  STARTING_MS_MARK_MARKER,
-  ENDING_MS_MARK_MARKER,
+  STARTING_MS_COMMENT_MARKER,
+  ENDING_MS_COMMENT_MARKER,
+  isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -95,7 +96,11 @@ import {
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import {
+  AddMissingComments,
+  MarkNodeName,
+  UsjNodeOptions,
+} from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getViewOptions } from "./view-options.utils";
 
@@ -104,9 +109,6 @@ interface UsjEditorAdaptor extends EditorAdaptor {
   reset: typeof reset;
   serializeEditorState: typeof serializeEditorState;
 }
-
-/** Milestone markers used to mark an annotation */
-const milestoneMarkMarkers = [STARTING_MS_MARK_MARKER, ENDING_MS_MARK_MARKER];
 
 const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
@@ -142,19 +144,24 @@ const defaultNoteCallers = [
   "z",
 ];
 
-/** View options - view mode parameters */
+/** Comment IDs in the USJ. */
+let commentIds: string[] = [];
+/** View options - view mode parameters. */
 let _viewOptions: ViewOptions | undefined;
-/** Options for each node */
+/** Options for each node. */
 let _nodeOptions: UsjNodeOptions | undefined;
-/** Count used for note callers */
+/** Count used for note callers. */
 let callerCount = 0;
-/** Logger instance */
+/** Method to add missing comments. */
+let addMissingComments: AddMissingComments;
+/** Logger instance. */
 let _logger: LoggerBasic;
 
 export function initialize(
   nodeOptions: UsjNodeOptions | undefined,
   logger: LoggerBasic | undefined,
 ) {
+  commentIds = [];
   setNodeOptions(nodeOptions);
   setLogger(logger);
 }
@@ -190,6 +197,7 @@ export function serializeEditorState(
     children = [emptyParaNode];
   }
 
+  addMissingComments?.(commentIds);
   return {
     root: {
       children,
@@ -208,6 +216,11 @@ export function serializeEditorState(
  */
 function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
+
+  // Set the `addMissingComments` method.
+  if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
+    addMissingComments = nodeOptions[MarkNodeName].addMissingComments as AddMissingComments;
+  }
 }
 
 /**
@@ -268,7 +281,7 @@ function getClassList(viewOptions: ViewOptions | undefined) {
  */
 function getNoteCaller(markerCaller: string | undefined): string {
   let noteCallers = defaultNoteCallers;
-  if (_nodeOptions) {
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
     const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
     if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
   }
@@ -453,7 +466,11 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName].onClick)
+  if (
+    _nodeOptions &&
+    _nodeOptions[immutableNoteCallerNodeName] &&
+    _nodeOptions[immutableNoteCallerNodeName].onClick
+  )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return {
@@ -600,10 +617,6 @@ function addClosingMarker(marker: string, nodes: SerializedLexicalNode[]) {
   }
 }
 
-function isMilestoneMarkMarker(markerContent: MarkerObject) {
-  return milestoneMarkMarkers.includes(markerContent.marker);
-}
-
 function reIndex(indexes: number[], offset: number): number[] {
   if (indexes.length <= 0 || offset === 0) return indexes;
 
@@ -617,48 +630,60 @@ function removeValueFromArray<T>(arr: T[], value: T) {
   }
 }
 
-function updateSids(sids: string[], msMarkNode: SerializedMilestoneNode) {
-  if (msMarkNode.marker === STARTING_MS_MARK_MARKER && msMarkNode.sid) sids.push(msMarkNode.sid);
-  if (msMarkNode.marker === ENDING_MS_MARK_MARKER && msMarkNode.eid)
-    removeValueFromArray(sids, msMarkNode.eid);
+function updateIds(ids: string[], msCommentNode: SerializedMilestoneNode) {
+  if (msCommentNode.marker === STARTING_MS_COMMENT_MARKER && msCommentNode.sid !== undefined)
+    ids.push(msCommentNode.sid);
+  if (msCommentNode.marker === ENDING_MS_COMMENT_MARKER && msCommentNode.eid !== undefined)
+    removeValueFromArray(ids, msCommentNode.eid);
 }
 
-function insertMilestoneMarksRecurse(
+function replaceMilestonesWithMarkRecurse(
   nodes: SerializedLexicalNode[],
-  msMarkIndexes: number[],
+  msCommentIndexes: number[],
   isPreviousMsStarting = false,
-  sids: string[] = [],
+  ids: string[] = [],
 ): SerializedLexicalNode[] {
-  if (msMarkIndexes.length <= 0 || msMarkIndexes[0] >= nodes.length) return nodes;
+  if (msCommentIndexes.length <= 0 || msCommentIndexes[0] >= nodes.length) return nodes;
 
-  const firstIndex = msMarkIndexes.shift();
-  const secondIndex = msMarkIndexes.length > 0 ? msMarkIndexes.shift() : nodes.length - 1;
-  if (!firstIndex || !secondIndex) return nodes;
+  // get the pair of indexes for the mark
+  const firstIndex: number | undefined = msCommentIndexes.shift();
+  const secondIndex: number | undefined =
+    msCommentIndexes.length > 0 ? msCommentIndexes.shift() : nodes.length - 1;
+  if (
+    firstIndex === undefined ||
+    secondIndex === undefined ||
+    secondIndex >= nodes.length ||
+    nodes.length <= 0
+  )
+    return nodes;
 
+  // get the nodes before the mark
   const startNodes = nodes.slice(0, firstIndex);
-  const nodesBefore = isPreviousMsStarting ? [createMark(startNodes, [...sids])] : startNodes;
-  const firstMSMarkNode = nodes[firstIndex] as SerializedMilestoneNode;
-  updateSids(sids, firstMSMarkNode);
-  const markedNodes = insertMilestoneMarksRecurse(
+  const nodesBefore = isPreviousMsStarting ? [createMark(startNodes, [...ids])] : startNodes;
+  // get the nodes inside the mark
+  const firstMSCommentNode = nodes[firstIndex] as SerializedMilestoneNode;
+  updateIds(ids, firstMSCommentNode);
+  const markedNodes = replaceMilestonesWithMarkRecurse(
     nodes.slice(firstIndex + 1, secondIndex),
-    reIndex(msMarkIndexes, firstIndex + 1),
-    firstMSMarkNode.marker === STARTING_MS_MARK_MARKER,
-    sids,
+    reIndex(msCommentIndexes, firstIndex + 1),
+    firstMSCommentNode.marker === STARTING_MS_COMMENT_MARKER,
+    ids,
   );
-  const markNode = createMark(markedNodes, [...sids]);
-  const secondMSMarkNode = nodes[secondIndex] as SerializedMilestoneNode;
-  updateSids(sids, secondMSMarkNode);
-  const nodesAfter = insertMilestoneMarksRecurse(
+  const markNode = createMark(markedNodes, [...ids]);
+  // get the nodes after the mark
+  const secondMSCommentNode = nodes[secondIndex] as SerializedMilestoneNode;
+  updateIds(ids, secondMSCommentNode);
+  const nodesAfter = replaceMilestonesWithMarkRecurse(
     nodes.slice(secondIndex + 1),
-    reIndex(msMarkIndexes, secondIndex + 1),
-    secondMSMarkNode.marker === STARTING_MS_MARK_MARKER,
-    sids,
+    reIndex(msCommentIndexes, secondIndex + 1),
+    secondMSCommentNode.marker === STARTING_MS_COMMENT_MARKER,
+    ids,
   );
-  return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
+  return [...nodesBefore, markNode, ...nodesAfter];
 }
 
 function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNode[] {
-  const msMarkIndexes: number[] = [];
+  const msCommentIndexes: number[] = [];
   const nodes: SerializedLexicalNode[] = [];
   markers?.forEach((markerContent) => {
     if (typeof markerContent === "string") {
@@ -689,7 +714,10 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           nodes.push(createNote(markerContent, recurseNodes(markerContent.content)));
           break;
         case MilestoneNode.getType():
-          if (isMilestoneMarkMarker(markerContent)) msMarkIndexes.push(nodes.length);
+          if (isMilestoneCommentMarker(markerContent.marker)) {
+            msCommentIndexes.push(nodes.length);
+            if (markerContent.sid !== undefined) commentIds?.push(markerContent.sid);
+          }
           nodes.push(createMilestone(markerContent));
           break;
         default:
@@ -698,7 +726,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
       }
     }
   });
-  return insertMilestoneMarksRecurse(nodes, msMarkIndexes);
+  return replaceMilestonesWithMarkRecurse(nodes, msCommentIndexes);
 }
 
 /**

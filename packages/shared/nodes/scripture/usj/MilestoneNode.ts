@@ -10,8 +10,11 @@ import {
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
-export const STARTING_MS_MARK_MARKER = "zmsa-s";
-export const ENDING_MS_MARK_MARKER = "zmsa-e";
+export const STARTING_MS_COMMENT_MARKER = "zmsc-s";
+export const ENDING_MS_COMMENT_MARKER = "zmsc-e";
+
+/** Milestone markers used to mark a comment annotation */
+const milestoneCommentMarkers = [STARTING_MS_COMMENT_MARKER, ENDING_MS_COMMENT_MARKER];
 
 /** @see https://ubsicap.github.io/usx/msstyles.html */
 const VALID_MILESTONE_MARKERS = [
@@ -35,8 +38,8 @@ const VALID_MILESTONE_MARKERS = [
   "qt-s",
   "qt-e",
   // custom markers used for annotations
-  STARTING_MS_MARK_MARKER,
-  ENDING_MS_MARK_MARKER,
+  STARTING_MS_COMMENT_MARKER,
+  ENDING_MS_COMMENT_MARKER,
 ] as const;
 
 export const MILESTONE_VERSION = 1;
@@ -159,6 +162,10 @@ export class MilestoneNode extends DecoratorNode<void> {
       version: MILESTONE_VERSION,
     };
   }
+}
+
+export function isMilestoneCommentMarker(marker: string) {
+  return milestoneCommentMarkers.includes(marker);
 }
 
 export function $createMilestoneNode(

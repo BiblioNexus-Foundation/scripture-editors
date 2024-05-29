@@ -7,7 +7,15 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { EditorState, LexicalEditor } from "lexical";
-import React, { JSX, forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
+import React, {
+  JSX,
+  PropsWithChildren,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { ScriptureReference } from "platform-bible-react";
 import { Usj } from "shared/converters/usj/usj.model";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
@@ -19,7 +27,7 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { ViewOptions } from "./adaptors/view-options.utils";
-import editorTheme from "./editor-theme";
+import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import useDeferredState from "./use-deferred-state.hook";
@@ -48,7 +56,7 @@ export type EditorOptions = {
   nodes?: UsjNodeOptions;
 };
 
-type EditorProps<TLogger extends LoggerBasic> = {
+export type EditorProps<TLogger extends LoggerBasic> = {
   /** Initial Scripture data in USJ form. */
   defaultUsj?: Usj;
   /** Scripture reference. */
@@ -87,8 +95,8 @@ function Placeholder(): JSX.Element {
  * Scripture Editor for USJ. Created for use in Platform.Bible.
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
- * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.ref - Forward reference for the editor.
+ * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
  * @param props.setScrRef - Scripture reference set callback function when the reference changes in
  *   the editor as the cursor moves.
@@ -98,10 +106,18 @@ function Placeholder(): JSX.Element {
  * @returns the editor element.
  */
 const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
-  { defaultUsj, scrRef, setScrRef, options, onChange, logger }: EditorProps<TLogger>,
+  {
+    defaultUsj,
+    scrRef,
+    setScrRef,
+    options,
+    onChange,
+    logger,
+    children,
+  }: PropsWithChildren<EditorProps<TLogger>>,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
-  const editorRef = useRef<LexicalEditor>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
   editorConfig.editable = !options?.isReadonly;
@@ -135,6 +151,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       <div className="editor-container">
         {!options?.isReadonly && <ToolbarPlugin />}
         <div className="editor-inner">
+          <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
             contentEditable={
               <ContentEditable className="editor-input" spellCheck={options?.hasSpellCheck} />
@@ -150,7 +167,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               viewOptions={options?.view}
             />
           )}
-          <EditorRefPlugin editorRef={editorRef} />
           <UpdateStatePlugin
             scripture={loadedUsj}
             nodeOptions={options?.nodes}
@@ -158,8 +174,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             viewOptions={options?.view}
             logger={logger}
           />
-          <NoteNodePlugin />
           <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
+          <NoteNodePlugin />
+          {children}
         </div>
       </div>
     </LexicalComposer>
