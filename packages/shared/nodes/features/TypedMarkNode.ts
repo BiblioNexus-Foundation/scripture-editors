@@ -248,7 +248,6 @@ export function $unwrapTypedMarkNode(node: TypedMarkNode): void {
 
 export function $wrapSelectionInTypedMarkNode(
   selection: RangeSelection,
-  isBackward: boolean,
   type: string,
   id: string,
   createNode?: (typedIds: TypedIDs) => TypedMarkNode,
@@ -257,6 +256,7 @@ export function $wrapSelectionInTypedMarkNode(
   const anchorOffset = selection.anchor.offset;
   const focusOffset = selection.focus.offset;
   const nodesLength = nodes.length;
+  const isBackward = selection.isBackward();
   const startOffset = isBackward ? focusOffset : anchorOffset;
   const endOffset = isBackward ? anchorOffset : focusOffset;
   let currentNodeParent;
@@ -335,9 +335,8 @@ export function $wrapSelectionInTypedMarkNode(
       lastCreatedMarkNode = undefined;
     }
   }
-  // Make selection collapsed at the end
-  if ($isElementNode(lastCreatedMarkNode)) {
-    // eslint-disable-next-line no-unused-expressions
+  // Make selection collapsed at the end for comments.
+  if (type === COMMENT_MARK_TYPE && $isElementNode(lastCreatedMarkNode)) {
     isBackward ? lastCreatedMarkNode.selectStart() : lastCreatedMarkNode.selectEnd();
   }
 }

@@ -32,6 +32,7 @@ const annotationRange3 = {
   start: { jsonPath: "$.content[11].content[0]", offset: 4 },
   end: { jsonPath: "$.content[11].content[0]", offset: 9 },
 };
+const cursorLocation = { start: { jsonPath: "$.content[10].content[2]", offset: 15 } };
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
@@ -61,16 +62,17 @@ export default function App() {
     const timeoutId = setTimeout(() => {
       marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
       marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
-      marginalRef.current?.addAnnotation(annotationRange3, "other", "bcd567");
       marginalRef.current?.addAnnotation(annotationRange1, "other", "bcd234");
+      marginalRef.current?.addAnnotation(annotationRange3, "other", "bcd567");
     }, 3000);
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Remove some annotations after they were added.
+  // Remove some annotations after they were added and set cursor location.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       marginalRef.current?.removeAnnotation("other", "bcd234");
+      marginalRef.current?.setSelection(cursorLocation);
     }, 4000);
     return () => clearTimeout(timeoutId);
   }, []);

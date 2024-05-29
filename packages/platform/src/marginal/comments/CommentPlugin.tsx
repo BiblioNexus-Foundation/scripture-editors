@@ -766,11 +766,7 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
       if (isInlineComment) {
         editor.update(() => {
           if ($isRangeSelection(selection)) {
-            const isBackward = selection.isBackward();
-            const id = commentOrThread.id;
-
-            // Wrap content in a TypedMarkNode
-            $wrapSelectionInTypedMarkNode(selection, isBackward, COMMENT_MARK_TYPE, id);
+            $wrapSelectionInTypedMarkNode(selection, COMMENT_MARK_TYPE, commentOrThread.id);
           }
         });
         setShowCommentInput(false);
