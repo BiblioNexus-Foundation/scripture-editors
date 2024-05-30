@@ -1,4 +1,3 @@
-import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   EditorState,
   LineBreakNode,
@@ -13,6 +12,11 @@ import {
   USJ_VERSION,
   Usj,
 } from "shared/converters/usj/usj.model";
+import {
+  COMMENT_MARK_TYPE,
+  SerializedTypedMarkNode,
+  TypedMarkNode,
+} from "shared/nodes/features/TypedMarkNode";
 import {
   NBSP,
   getEditableCallerText,
@@ -44,9 +48,9 @@ import {
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;
@@ -217,10 +221,23 @@ function createUnknownMarker(
 }
 
 /**
+ * If the last added content is text then combine the new text content to it, otherwise add the new
+ * text content.
+ * @param markers - Markers accumulated so far.
+ * @param textContent - New text content.
+ */
+function combineTextContentOrAdd(markers: MarkerContent[], textContent: string) {
+  const lastContent: MarkerContent | undefined = markers[markers.length - 1];
+  if (lastContent && typeof lastContent === "string")
+    markers[markers.length - 1] = lastContent + textContent;
+  else markers.push(textContent);
+}
+
+/**
  * Strip the mark and insert its children enclosed in milestone mark markers.
- * @param childMarkers - Children markers of the mark.
- * @param ids - IDs from the current mark.
- * @param pids - IDs from the previous mark.
+ * @param childMarkers - Children of the mark.
+ * @param ids - Comment IDs from the current mark.
+ * @param pids - Comment IDs from the previous mark.
  * @param nextNode - Next serialized node.
  * @param markers - Markers accumulated so far.
  */
@@ -272,7 +289,7 @@ function replaceMarkWithMilestones(
     });
     markers.push(milestone);
   }
-  const isLastEnd = !nextNode || nextNode.type !== MarkNode.getType();
+  const isLastEnd = !nextNode || nextNode.type !== TypedMarkNode.getType();
   if (isLastEnd) {
     ids.forEach((eid) => {
       const milestone = createMilestoneMarker({
@@ -292,14 +309,14 @@ function recurseNodes(
 ): MarkerContent[] | undefined {
   const markers: MarkerContent[] = [];
   let childMarkers: MarkerContent[] | undefined;
-  /** Previous IDs from MarkNodes. */
+  /** Previous comment IDs from TypedMarkNodes. */
   let pids: string[] = [];
   nodes.forEach((node, index) => {
     const serializedBookNode = node as SerializedBookNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
-    const serializedMarkNode = node as SerializedMarkNode;
+    const serializedMarkNode = node as SerializedTypedMarkNode;
     const serializedUnknownNode = node as SerializedUnknownNode;
     switch (node.type) {
       case BookNode.getType():
@@ -338,17 +355,22 @@ function recurseNodes(
       case MarkerNode.getType():
         // These nodes are for presentation only so they don't go into the USJ.
         break;
-      case MarkNode.getType():
+      case TypedMarkNode.getType():
         childMarkers = recurseNodes(serializedMarkNode.children);
         if (childMarkers) {
-          replaceMarkWithMilestones(
-            childMarkers,
-            serializedMarkNode.ids,
-            pids,
-            nodes[index + 1],
-            markers,
-          );
-          pids = serializedMarkNode.ids;
+          const commentIDs = serializedMarkNode.typedIDs[COMMENT_MARK_TYPE];
+          if (commentIDs && commentIDs.length >= 0) {
+            replaceMarkWithMilestones(childMarkers, commentIDs, pids, nodes[index + 1], markers);
+            pids = commentIDs;
+          } else {
+            // Strip the mark and insert its children.
+            const firstChild = childMarkers.shift();
+            if (firstChild) {
+              if (typeof firstChild === "string") combineTextContentOrAdd(markers, firstChild);
+              else markers.push(firstChild);
+            }
+            if (childMarkers) markers.push(...childMarkers);
+          }
         }
         break;
       case MilestoneNode.getType():
@@ -360,7 +382,7 @@ function recurseNodes(
           serializedTextNode.text !== NBSP &&
           (!noteCaller || serializedTextNode.text !== getEditableCallerText(noteCaller))
         ) {
-          markers.push(createTextMarker(serializedTextNode));
+          combineTextContentOrAdd(markers, createTextMarker(serializedTextNode));
         }
         break;
       case UnknownNode.getType():

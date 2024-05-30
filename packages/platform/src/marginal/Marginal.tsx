@@ -16,7 +16,7 @@ import Editor, { EditorProps, EditorRef } from "../editor/Editor";
 
 /** Forward reference for the editor. */
 export type MarginalRef = EditorRef & {
-  /** Method to set the comments to accompany USJ Scripture. */
+  /** Set the comments to accompany USJ Scripture. */
   setComments?(comments: Comments): void;
 };
 
@@ -54,6 +54,12 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     },
     setUsj(usj) {
       editorRef.current?.setUsj(usj);
+    },
+    addAnnotation(selection, type, id) {
+      editorRef.current?.addAnnotation(selection, type, id);
+    },
+    removeAnnotation(type, id) {
+      editorRef.current?.removeAnnotation(type, id);
     },
     setComments(comments) {
       commentStoreRef.current?.setComments(comments);

@@ -5,6 +5,8 @@ const editorTheme = {
   para: "para",
   ltr: "ltr",
   rtl: "rtl",
+  typedMark: "editor-typed-mark",
+  typedMarkOverlap: "editor-typed-markOverlap",
   mark: "editor-mark",
   markOverlap: "editor-markOverlap",
   placeholder: "editor-placeholder",

@@ -17,6 +17,21 @@ import "./App.css";
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
 const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => undefined } };
+// Word "man" inside first q1 of PSA 1:1.
+const annotationRange1 = {
+  start: { jsonPath: "$.content[10].content[2]", offset: 15 },
+  end: { jsonPath: "$.content[10].content[2]", offset: 18 },
+};
+// Phrase "man who" inside first q1 of PSA 1:1.
+const annotationRange2 = {
+  start: { jsonPath: "$.content[10].content[2]", offset: 15 },
+  end: { jsonPath: "$.content[10].content[2]", offset: 22 },
+};
+// Phrase "stand on " inside first q2 of PSA 1:1.
+const annotationRange3 = {
+  start: { jsonPath: "$.content[11].content[0]", offset: 4 },
+  end: { jsonPath: "$.content[11].content[0]", offset: 9 },
+};
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
@@ -27,6 +42,11 @@ export default function App() {
     [viewMode],
   );
 
+  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => {
+    console.log({ usj, comments });
+    marginalRef.current?.setUsj(usj);
+  }, []);
+
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -36,9 +56,23 @@ export default function App() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => {
-    console.log({ usj, comments });
-    marginalRef.current?.setUsj(usj);
+  // Add annotations after USJ is loaded.
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
+      marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
+      marginalRef.current?.addAnnotation(annotationRange3, "other", "bcd567");
+      marginalRef.current?.addAnnotation(annotationRange1, "other", "bcd234");
+    }, 3000);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  // Remove some annotations after they were added.
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      marginalRef.current?.removeAnnotation("other", "bcd234");
+    }, 4000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (

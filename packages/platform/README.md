@@ -39,9 +39,8 @@ const usx = `
 <?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
   <book code="PSA" style="id">World English Bible (WEB)</book>
-  <para style="h">Psalms</para>
+  <para style="mt1">The Psalms</para>
   <chapter number="1" style="c" sid="PSA 1" />
-  <para style="ms1">BOOK 1</para>
   <para style="q1">
     <verse number="1" style="v" sid="PSA 1:1" />Blessed is the man who doesn’t walk in the counsel of the wicked,</para>
   <para style="q2" vid="PSA 1:1">nor stand on the path of sinners,</para>
@@ -52,10 +51,22 @@ const defaultUsj = usxStringToUsj(emptyUsx);
 const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => console.log('Note was clicked!') } };
 const options: EditorOptions = { nodes: nodeOptions };
+// Word "man" inside first q1 of PSA 1:1.
+const annotationRange1 = {
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 18 },
+};
+// Phrase "man who" inside first q1 of PSA 1:1.
+const annotationRange2 = {
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 22 },
+};
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
   const [scrRef, setScrRef] = useState(defaultScrRef);
+
+  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => console.log({ usj, comments }), []);
 
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
@@ -66,7 +77,15 @@ export default function App() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => console.log({ usj, comments }), []);
+  // Add and remove annotations after USJ is loaded.
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
+      marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
+      marginalRef.current?.removeAnnotation("spelling", "annotationId");
+    }, 3000);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   return (
     <>
@@ -96,6 +115,7 @@ export default function App() {
 - Add comments to selected text, reply in comment threads, delete comments and threads.
   - To enable comments use the `<Marginal>` editor component (comments appear in the margin).
   - To use the editor without comments use the `<Editorial>` component.
+- Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
