@@ -11,10 +11,10 @@
   "license": "MIT",
   "version": "0.13.1",
   "dependencies": {
-    "@lexical/utils": "^0.14.5",
+    "@lexical/utils": "^0.15.0",
     "@xmldom/xmldom": "^0.8.10",
     "epitelete": "^0.2.20",
-    "lexical": "^0.14.5"
+    "lexical": "^0.15.0"
   },
   "devDependencies": {
     "proskomma-core": "^0.10.4"

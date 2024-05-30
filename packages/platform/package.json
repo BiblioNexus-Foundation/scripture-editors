@@ -28,13 +28,13 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/react": "^0.14.5",
-    "@lexical/selection": "^0.14.5",
-    "@lexical/text": "^0.14.5",
-    "@lexical/utils": "^0.14.5",
-    "@lexical/yjs": "^0.14.5",
+    "@lexical/react": "^0.15.0",
+    "@lexical/selection": "^0.15.0",
+    "@lexical/text": "^0.15.0",
+    "@lexical/utils": "^0.15.0",
+    "@lexical/yjs": "^0.15.0",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.14.5",
+    "lexical": "^0.15.0",
     "yjs": "^13.6.15"
   },
   "devDependencies": {
