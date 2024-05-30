@@ -5,7 +5,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { EditorState, LexicalEditor } from "lexical";
+import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
 import React, {
   JSX,
@@ -20,8 +20,11 @@ import { ScriptureReference } from "platform-bible-react";
 import { Usj } from "shared/converters/usj/usj.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { AnnotationRange } from "shared-react/annotation/annotation.model";
-import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
+import AnnotationPlugin, {
+  $getRangeFromSelection,
+  AnnotationRef,
+} from "shared-react/annotation/AnnotationPlugin";
+import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
@@ -41,6 +44,12 @@ export type EditorRef = {
   focus(): void;
   /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
+  /**
+   * Set the selection location or range.
+   * @param selection - A selection location or range. The json-path in the selection location
+   *   assumes no comment Milestone nodes are present in the USJ.
+   */
+  setSelection(selection: SelectionRange): void;
   /**
    * Add an ephemeral annotation.
    * @param selection - An annotation range containing the start and end location. The json-path in
@@ -150,6 +159,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     },
     setUsj(usj) {
       setUsj(usj);
+    },
+    setSelection(selection) {
+      editorRef.current?.update(() => {
+        const rangeSelection = $getRangeFromSelection(selection);
+        if (rangeSelection !== undefined) $setSelection(rangeSelection);
+      });
     },
     addAnnotation(selection, type, id) {
       annotationRef.current?.addAnnotation(selection, type, id);

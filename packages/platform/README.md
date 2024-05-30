@@ -61,6 +61,7 @@ const annotationRange2 = {
   start: { jsonPath: "$.content[3].content[1]", offset: 15 },
   end: { jsonPath: "$.content[3].content[1]", offset: 22 },
 };
+const cursorLocation = { start: { jsonPath: "$.content[3].content[1]", offset: 15 } };
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
@@ -77,12 +78,13 @@ export default function App() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Add and remove annotations after USJ is loaded.
+  // Add and remove annotations after USJ is loaded, and set cursor location.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
       marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
       marginalRef.current?.removeAnnotation("spelling", "annotationId");
+      marginalRef.current?.setSelection(cursorLocation);
     }, 3000);
     return () => clearTimeout(timeoutId);
   }, []);
@@ -116,6 +118,7 @@ export default function App() {
   - To enable comments use the `<Marginal>` editor component (comments appear in the margin).
   - To use the editor without comments use the `<Editorial>` component.
 - Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
+- Set the cursor location or select a range.
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`

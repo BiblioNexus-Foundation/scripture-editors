@@ -10,6 +10,7 @@ import {
   LexicalEditor,
   LexicalNode,
   NodeKey,
+  RangeSelection,
   TextNode,
 } from "lexical";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
@@ -21,7 +22,7 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
-import { AnnotationLocation, AnnotationRange } from "./annotation.model";
+import { AnnotationRange, SelectionRange, UsjLocation } from "./selection.model";
 import { LoggerBasic } from "../plugins/logger-basic.model";
 
 /** Forward reference for annotations. */
@@ -150,7 +151,7 @@ function $findTextNodeInMarks(
 }
 
 function $getNodeFromLocation(
-  location: AnnotationLocation,
+  location: UsjLocation,
 ): [LexicalNode | undefined, number | undefined] {
   const indexes = extractJsonPathIndexes(location.jsonPath);
   let currentNode: LexicalNode | undefined = $getRoot();
@@ -165,6 +166,26 @@ function $getNodeFromLocation(
 
 function $getPointType(node: LexicalNode | undefined): "text" | "element" {
   return $isElementNode(node) ? "element" : "text";
+}
+
+export function $getRangeFromSelection(
+  selection: SelectionRange | AnnotationRange,
+): RangeSelection | undefined {
+  const { start } = selection;
+  let { end } = selection;
+  if (end === undefined) end = start;
+
+  // Find the start and end nodes with offsets based on the location.
+  const [startNode, startOffset] = $getNodeFromLocation(start);
+  const [endNode, endOffset] = $getNodeFromLocation(end);
+  if (!startNode || !endNode || startOffset === undefined || endOffset === undefined)
+    return undefined;
+
+  // Create selection range.
+  const rangeSelection = $createRangeSelection();
+  rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, $getPointType(startNode));
+  rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, $getPointType(endNode));
+  return rangeSelection;
 }
 
 const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends LoggerBasic>(
@@ -185,22 +206,15 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
             " Use the appropriate plugin instead.",
         );
 
-      const { start, end } = selection;
       editor.update(() => {
-        // Find the start and end nodes with offsets based on the location.
-        const [startNode, startOffset] = $getNodeFromLocation(start);
-        const [endNode, endOffset] = $getNodeFromLocation(end);
-        if (!startNode || !endNode || startOffset === undefined || endOffset === undefined) {
+        // Apply the annotation to the selected range.
+        const rangeSelection = $getRangeFromSelection(selection);
+        if (rangeSelection === undefined) {
           logger?.error("Failed to find start or end node of the annotation.");
           return;
         }
 
-        // Apply the annotation to the selected range.
-        const selection = $createRangeSelection();
-        selection.anchor = $createPoint(startNode.getKey(), startOffset, $getPointType(startNode));
-        selection.focus = $createPoint(endNode.getKey(), endOffset, $getPointType(endNode));
-        const isBackward = selection.isBackward();
-        $wrapSelectionInTypedMarkNode(selection, isBackward, type, id);
+        $wrapSelectionInTypedMarkNode(rangeSelection, type, id);
       });
     },
 
