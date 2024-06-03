@@ -59,6 +59,8 @@ export default function App() {
 
   // Add annotations after USJ is loaded.
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
     const timeoutId = setTimeout(() => {
       marginalRef.current?.addAnnotation(annotationRange1, "spelling", "annotationId");
       marginalRef.current?.addAnnotation(annotationRange2, "grammar", "abc123");
@@ -70,6 +72,8 @@ export default function App() {
 
   // Remove some annotations after they were added and set cursor location.
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
     const timeoutId = setTimeout(() => {
       marginalRef.current?.removeAnnotation("other", "bcd234");
       marginalRef.current?.setSelection(cursorLocation);
