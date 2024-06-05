@@ -64,6 +64,7 @@ export type EditorRef = {
    * @param id - ID of the annotation.
    */
   removeAnnotation(type: string, id: string): void;
+  toolbarEndRef: React.RefObject<HTMLElement>;
 };
 
 /** Options to configure the editor. */
@@ -145,6 +146,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor | null>(null);
   const annotationRef = useRef<AnnotationRef | null>(null);
+  const toolbarEndRef = useRef<HTMLDivElement>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, editedUsj, setEditedUsj] = useDeferredState(usj);
   editorConfig.editable = !options?.isReadonly;
@@ -172,6 +174,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     removeAnnotation(type, id) {
       annotationRef.current?.removeAnnotation(type, id);
     },
+    get toolbarEndRef() {
+      return toolbarEndRef;
+    },
   }));
 
   const handleChange = useCallback(
@@ -189,7 +194,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
-        {!options?.isReadonly && <ToolbarPlugin />}
+        {!options?.isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
         <div className="editor-inner">
           <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
