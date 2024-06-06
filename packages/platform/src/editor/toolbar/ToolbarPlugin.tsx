@@ -20,7 +20,7 @@ import {
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 import { IS_APPLE } from "shared/lexical/environment";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
@@ -29,7 +29,7 @@ function Divider(): JSX.Element {
   return <div className="divider" />;
 }
 
-export default function ToolbarPlugin(): JSX.Element {
+const ToolbarPlugin = forwardRef<HTMLDivElement>(function ToolbarPlugin(_props, ref): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
   const [blockMarker, setBlockMarker] = useState("");
@@ -134,6 +134,9 @@ export default function ToolbarPlugin(): JSX.Element {
           <Divider />
         </>
       )}
+      <div ref={ref} className="end-container"></div>
     </div>
   );
-}
+});
+
+export default ToolbarPlugin;

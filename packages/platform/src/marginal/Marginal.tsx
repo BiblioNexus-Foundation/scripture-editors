@@ -3,8 +3,10 @@ import React, {
   PropsWithChildren,
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import { Usj } from "shared/converters/usj/usj.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
@@ -15,7 +17,7 @@ import useMissingCommentsProps from "./comments/use-missing-comments-props.hook"
 import Editor, { EditorProps, EditorRef } from "../editor/Editor";
 
 /** Forward reference for the editor. */
-export type MarginalRef = EditorRef & {
+export type MarginalRef = Omit<EditorRef, "toolbarEndRef"> & {
   /** Set the comments to accompany USJ Scripture. */
   setComments?(comments: Comments): void;
 };
@@ -44,6 +46,8 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   ref: React.ForwardedRef<MarginalRef>,
 ): JSX.Element {
   const editorRef = useRef<EditorRef>(null);
+  const commentContainerRef = useRef<HTMLDivElement>(null);
+  const [toolbarEndRef, setToolbarEndRef] = useState<React.RefObject<HTMLElement> | null>(null);
   const { children, onChange, ...editorProps } = props as PropsWithChildren<MarginalProps<TLogger>>;
   const [commentStoreRef, setCommentStoreRef] = useCommentStoreRef();
   useMissingCommentsProps(editorProps, commentStoreRef);
@@ -77,9 +81,22 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     [commentStoreRef, onChange],
   );
 
+  useEffect(() => {
+    // The refs aren't defined until after the first render so we don't include the showComments
+    // button until this is set.
+    setToolbarEndRef(editorRef.current?.toolbarEndRef ?? null);
+    return () => setToolbarEndRef(null);
+  }, []);
+
   return (
     <Editor ref={editorRef} onChange={handleChange} {...editorProps}>
-      <CommentPlugin setCommentStore={setCommentStoreRef} logger={editorProps.logger} />
+      <CommentPlugin
+        setCommentStore={setCommentStoreRef}
+        showCommentsContainerRef={toolbarEndRef}
+        commentContainerRef={commentContainerRef}
+        logger={editorProps.logger}
+      />
+      <div ref={commentContainerRef} className="comment-container"></div>
     </Editor>
   );
 });

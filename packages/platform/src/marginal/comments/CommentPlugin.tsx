@@ -64,10 +64,12 @@ export const INSERT_INLINE_COMMAND: LexicalCommand<void> = createCommand("INSERT
 function AddCommentBox({
   anchorKey,
   editor,
+  showComments,
   onAddComment,
 }: {
   anchorKey: NodeKey;
   editor: LexicalEditor;
+  showComments: boolean;
   onAddComment: () => void;
 }): JSX.Element {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -95,7 +97,7 @@ function AddCommentBox({
 
   useLayoutEffect(() => {
     updatePosition();
-  }, [anchorKey, editor, updatePosition]);
+  }, [anchorKey, editor, showComments, updatePosition]);
 
   return (
     <div className="CommentPlugin_AddCommentBox" ref={boxRef}>
@@ -673,10 +675,14 @@ function useCollabAuthorName(): string {
 export default function CommentPlugin<TLogger extends LoggerBasic>({
   providerFactory,
   setCommentStore,
+  showCommentsContainerRef,
+  commentContainerRef,
   logger,
 }: {
   providerFactory?: (id: string, yjsDocMap: Map<string, Doc>) => Provider;
   setCommentStore?: (commentStore: CommentStore) => void;
+  showCommentsContainerRef?: React.RefObject<HTMLElement> | null;
+  commentContainerRef?: React.RefObject<HTMLElement>;
   logger?: TLogger;
 }): JSX.Element {
   const collabContext = useCollaborationContext();
@@ -926,19 +932,25 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
         activeAnchorKey !== undefined &&
         !showCommentInput &&
         createPortal(
-          <AddCommentBox anchorKey={activeAnchorKey} editor={editor} onAddComment={onAddComment} />,
+          <AddCommentBox
+            anchorKey={activeAnchorKey}
+            editor={editor}
+            showComments={showComments}
+            onAddComment={onAddComment}
+          />,
           document.body,
         )}
-      {createPortal(
-        <Button
-          className={`CommentPlugin_ShowCommentsButton ${showComments ? "active" : ""}`}
-          onClick={() => setShowComments(!showComments)}
-          title={showComments ? "Hide Comments" : "Show Comments"}
-        >
-          <i className="comments" />
-        </Button>,
-        document.body,
-      )}
+      {showCommentsContainerRef !== null &&
+        createPortal(
+          <Button
+            className={`CommentPlugin_ShowCommentsButton ${showComments ? "active" : ""}`}
+            onClick={() => setShowComments(!showComments)}
+            title={showComments ? "Hide Comments" : "Show Comments"}
+          >
+            <i className="comments" />
+          </Button>,
+          showCommentsContainerRef?.current ?? document.body,
+        )}
       {showComments &&
         createPortal(
           <CommentsPanel
@@ -948,7 +960,7 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
             activeIDs={activeIDs}
             markNodeMap={markNodeMap}
           />,
-          document.body,
+          commentContainerRef?.current ?? document.body,
         )}
     </>
   );
