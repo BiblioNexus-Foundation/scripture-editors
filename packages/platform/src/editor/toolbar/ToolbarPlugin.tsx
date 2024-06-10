@@ -8,7 +8,7 @@
  */
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $findMatchingParent, mergeRegister } from "@lexical/utils";
+import { $findMatchingParent, IS_APPLE, mergeRegister } from "@lexical/utils";
 import {
   $getSelection,
   $isRangeSelection,
@@ -21,7 +21,6 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { forwardRef, useCallback, useEffect, useState } from "react";
-import { IS_APPLE } from "shared/lexical/environment";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
 
