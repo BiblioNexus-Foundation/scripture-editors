@@ -1,0 +1,19 @@
+{
+  "name": "@biblionexus-foundation/scripture-utilities",
+  "version": "0.0.1",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "!src/**/*.test.ts",
+    "!src/**/*.data.ts"
+  ],
+  "scripts": {
+    "prepublish": "cd ../.. && nx build utilities"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.10"
+  }
+}
