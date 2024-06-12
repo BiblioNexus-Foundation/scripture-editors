@@ -61,7 +61,10 @@ export type MarkerObject = {
   category?: string;
 };
 
-/** Scripture data represented in JSON format. Data compatible transformation from USX/USFM */
+/**
+ * Scripture data represented in JSON format. Data compatible transformation from USX/USFM.
+ * @deprecated Use from "@biblionexus-foundation/scripture-utilities" instead. This will be removed in the next version.
+ * */
 export type Usj = {
   /** The USJ spec type */
   type: typeof USJ_TYPE;

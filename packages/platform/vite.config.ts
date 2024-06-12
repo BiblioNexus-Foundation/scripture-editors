@@ -2,6 +2,7 @@ import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import dts from "vite-plugin-dts";
+import { peerDependencies, dependencies } from "./package.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,13 +15,7 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
-      output: {
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-        },
-      },
+      external: [...Object.keys(peerDependencies ?? {}), ...Object.keys(dependencies ?? {})],
     },
   },
 });
