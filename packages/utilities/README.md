@@ -12,7 +12,7 @@ Utilities for working with Scripture data.
 
 ## Features
 
-For USX/USJ v3.1:
+For data that conforms to [USX/USJ v3.1](https://ubsicap.github.io/usx/):
 
 - USJ to USX converter.
 - USX to USJ converter.
@@ -62,10 +62,10 @@ Run `nx test utilities` to execute the unit tests via [Jest](https://jestjs.io).
 
 <!-- define variables used above -->
 
-[github-actions-status]: https://github.com/BiblioNexus-Foundation/scripture-utilities/actions/workflows/test-publish.yml/badge.svg
-[github-actions-url]: https://github.com/BiblioNexus-Foundation/scripture-utilities/actions
+[github-actions-status]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/test-publish.yml/badge.svg
+[github-actions-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions
 [gitghub-codeql-status]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/codeql.yml/badge.svg
 [gitghub-codeql-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/actions/workflows/codeql.yml
 [npm-version-image]: https://img.shields.io/npm/v/@biblionexus-foundation/scripture-utilities
-[npm-version-url]: https://github.com/BiblioNexus-Foundation/scripture-utilities/releases
-[github-license]: https://github.com/BiblioNexus-Foundation/scripture-utilities/blob/main/packages/utilities/LICENSE
+[npm-version-url]: https://github.com/BiblioNexus-Foundation/scripture-editors/releases
+[github-license]: https://github.com/BiblioNexus-Foundation/scripture-editors/blob/main/packages/utilities/LICENSE
