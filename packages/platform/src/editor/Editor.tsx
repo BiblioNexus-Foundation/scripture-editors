@@ -64,7 +64,7 @@ export type EditorRef = {
    * @param id - ID of the annotation.
    */
   removeAnnotation(type: string, id: string): void;
-  toolbarEndRef: React.RefObject<HTMLElement>;
+  toolbarEndRef: React.RefObject<HTMLElement> | null;
 };
 
 /** Options to configure the editor. */
