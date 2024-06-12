@@ -17,7 +17,7 @@ import useMissingCommentsProps from "./comments/use-missing-comments-props.hook"
 import Editor, { EditorProps, EditorRef } from "../editor/Editor";
 
 /** Forward reference for the editor. */
-export type MarginalRef = Omit<EditorRef, "toolbarEndRef"> & {
+export type MarginalRef = EditorRef & {
   /** Set the comments to accompany USJ Scripture. */
   setComments?(comments: Comments): void;
 };
@@ -70,6 +70,9 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     },
     setComments(comments) {
       commentStoreRef.current?.setComments(comments);
+    },
+    get toolbarEndRef() {
+      return toolbarEndRef;
     },
   }));
 
