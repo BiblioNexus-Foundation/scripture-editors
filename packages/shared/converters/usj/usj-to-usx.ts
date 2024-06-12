@@ -91,6 +91,9 @@ export function usjToUsxDom(usj: Usj, usxDoc: XMLDocument): HTMLElement {
   return usxDoc.documentElement;
 }
 
+/**
+ * @deprecated Use from "@biblionexus-foundation/scripture-utilities" instead. This will be removed in the next version.
+ */
 export function usjToUsxString(usj: Usj): string {
   const usxDoc = new DOMImplementation().createDocument("", USX_TYPE);
   usxDoc.documentElement.setAttribute("version", USX_VERSION);

@@ -112,6 +112,9 @@ export function usxDomToUsj(inputUsxDom: HTMLElement): Usj {
   return outputJson;
 }
 
+/**
+ * @deprecated Use from "@biblionexus-foundation/scripture-utilities" instead. This will be removed in the next version.
+ */
 export function usxStringToUsj(usxString: string): Usj {
   const parser = new DOMParser();
   const inputUsxDom = parser.parseFromString(usxString, "text/xml");
