@@ -79,6 +79,14 @@ jobs:
           access: public
           token: ${{ secrets.NPM_TOKEN }}
 
+      - name: npm publish utilities
+        if: ${{ matrix.os == 'ubuntu-latest' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/utilities_v') && contains(github.ref, '.') }}
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          package: ./packages/utilities
+          access: public
+          token: ${{ secrets.NPM_TOKEN }}
+
       # Enable tmate debugging of manually-triggered workflows if the input option was provided
       - name: Setup tmate session
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
