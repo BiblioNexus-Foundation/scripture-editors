@@ -3,8 +3,6 @@
  * Original source: https://github.com/facebook/lexical
  */
 
-// TODO: Resolve the issue of an infinite loop occurring when updating the editor state if the user clicks the same position twice in a row. This issue is suspected to be caused by the "updateEditor" function in the lexical module.
-
 import type { EditorState, LexicalEditor, LexicalNode, NodeKey } from "lexical";
 
 import { mergeRegister } from "@lexical/utils";
@@ -265,16 +263,16 @@ function createMergeActionGetter(
       editor.isComposing(),
     );
 
-    console.log(
-      [
-        "OTHER",
-        "COMPOSING_CHARACTER",
-        "INSERT_CHARACTER_AFTER_SELECTION",
-        "DELETE_CHARACTER_BEFORE_SELECTION",
-        "DELETE_CHARACTER_AFTER_SELECTION",
-      ][changeType],
-      tags,
-    );
+    // console.log(
+    //   [
+    //     "OTHER",
+    //     "COMPOSING_CHARACTER",
+    //     "INSERT_CHARACTER_AFTER_SELECTION",
+    //     "DELETE_CHARACTER_BEFORE_SELECTION",
+    //     "DELETE_CHARACTER_AFTER_SELECTION",
+    //   ][changeType],
+    //   tags,
+    // );
 
     const mergeAction = (() => {
       const isSameEditor = currentHistoryEntry === null || currentHistoryEntry.editor === editor;

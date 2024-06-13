@@ -5,18 +5,25 @@ export type Attributes = { [key: string]: string };
 export type SerializedUsfmElementNode = Spread<
   {
     attributes?: Attributes;
+    props?: NodeProps;
     tag?: string;
   },
   SerializedElementNode
 >;
 
+export type NodeProps = {
+  isInline?: boolean;
+};
+
 export class UsfmElementNode extends ElementNode {
   __attributes: Attributes;
+  __props?: NodeProps;
   __tag?: string;
 
-  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
+  constructor(attributes: Attributes = {}, props?: NodeProps, tag?: string, key?: NodeKey) {
     super(key);
     this.__attributes = attributes;
+    this.__props = props;
     this.__tag = tag;
   }
 
@@ -64,6 +71,10 @@ export class UsfmElementNode extends ElementNode {
     this.removeAttribute(`data-ui-${key}`);
   }
 
+  getProps(): NodeProps | undefined {
+    return this.getLatest().__props;
+  }
+
   getTag(): string | undefined {
     return this.getLatest().__tag;
   }
@@ -89,6 +100,10 @@ export class UsfmElementNode extends ElementNode {
       type: "usfmelement",
       version: 1,
     };
+  }
+
+  isInline(): boolean {
+    return this.__props?.isInline ?? false;
   }
 
   updateDOM(_: UsfmElementNode, element: HTMLElement): boolean {

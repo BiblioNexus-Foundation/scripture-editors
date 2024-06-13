@@ -6,7 +6,7 @@ function App() {
     <div className="editors">
       <div className="source-editor">
         <Editor
-          editable={false}
+          editable={true}
           {...{
             serverName: "dbl",
             organizationId: "bfbs",

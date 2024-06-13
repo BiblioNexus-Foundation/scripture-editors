@@ -1,7 +1,6 @@
 import {
   $applyNodeReplacement,
   $createParagraphNode,
-  $createTextNode,
   $insertNodes,
   $isRootOrShadowRoot,
   $parseSerializedNode,
@@ -9,15 +8,17 @@ import {
 } from "lexical";
 import { $wrapNodeInElement } from "@lexical/utils";
 
-export const $insertUsfmNode = (serializedNode: SerializedLexicalNode) => {
-  const newNode = $applyNodeReplacement($parseSerializedNode(serializedNode));
-  $insertNodes([newNode]);
+export const $createNodeFromSerializedNode = (serializedNode: SerializedLexicalNode) => {
+  return $applyNodeReplacement($parseSerializedNode(serializedNode));
+};
 
-  //temporary trick so there is some text to move the cursor to after and before the newly added span
-  if (!newNode.getNextSibling()) newNode.insertAfter($createTextNode(" "));
-  if (!newNode.getPreviousSibling()) newNode.insertBefore($createTextNode(" "));
+export const $insertUsfmNode = (serializedNode: SerializedLexicalNode) => {
+  const newNode = $createNodeFromSerializedNode(serializedNode);
+  $insertNodes([newNode]);
 
   if ($isRootOrShadowRoot(newNode.getParentOrThrow())) {
     $wrapNodeInElement(newNode, $createParagraphNode).selectEnd();
   }
+
+  return newNode;
 };

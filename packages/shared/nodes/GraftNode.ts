@@ -6,7 +6,12 @@ import {
   NodeKey,
   isHTMLElement,
 } from "lexical";
-import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
+import {
+  Attributes,
+  NodeProps,
+  SerializedUsfmElementNode,
+  UsfmElementNode,
+} from "./UsfmElementNode";
 import { addClassNamesToElement } from "@lexical/utils";
 
 const DEFAULT_TAG = "span";
@@ -14,8 +19,8 @@ const DEFAULT_TAG = "span";
 export type SerializedGraftNode = SerializedUsfmElementNode;
 
 export class GraftNode extends UsfmElementNode {
-  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
-    super(attributes, tag, key);
+  constructor(attributes: Attributes = {}, props?: NodeProps, tag?: string, key?: NodeKey) {
+    super(attributes, props, tag, key);
   }
 
   static getType(): string {
@@ -23,11 +28,11 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static clone(node: GraftNode): GraftNode {
-    return new GraftNode(node.__attributes, node.__tag, node.__key);
+    return new GraftNode(node.__attributes, node.__props, node.__tag, node.__key);
   }
 
   isInline(): boolean {
-    return true;
+    return this.getProps()?.isInline ?? false;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -71,8 +76,8 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
-    const { attributes, format, indent, direction, tag } = serializedNode;
-    const node = $createGraftNode(attributes, tag ?? DEFAULT_TAG);
+    const { attributes, props, format, indent, direction, tag } = serializedNode;
+    const node = $createGraftNode(attributes, props, tag ?? DEFAULT_TAG);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -92,6 +97,10 @@ export class GraftNode extends UsfmElementNode {
   }
 }
 
-export function $createGraftNode(attributes?: Attributes, tag?: string): GraftNode {
-  return $applyNodeReplacement(new GraftNode(attributes, tag));
+export function $createGraftNode(
+  attributes?: Attributes,
+  props?: NodeProps,
+  tag?: string,
+): GraftNode {
+  return $applyNodeReplacement(new GraftNode(attributes, props, tag));
 }

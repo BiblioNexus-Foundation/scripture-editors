@@ -147,7 +147,7 @@ type Builder<T, C, K = PerfKind> = (args: {
   perfChildren: C;
   lexicalNode: PerfLexicalMap<K>;
   metadata: PerfNodeBuilderArgs<ChildrenMap<K>>["metadata"];
-}) => T;
+}) => T | undefined;
 
 type SequenceBuilder<K> = Builder<SubtypedSequence, Block[], K>;
 type BlockBuilder<K> = Builder<Block, Content, K>;
@@ -226,8 +226,20 @@ const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
         children: perfChildren as Block[],
       });
     if (isDivisionMark(element)) {
-      const markNumber = isChapterVerse(perfChildren[0]) ? perfChildren[0] : element.atts.number;
-      return { ...element, atts: { ...element.atts, number: markNumber } };
+      let markNumber = null;
+      if (element.atts?.number) {
+        if (isChapterVerse(perfChildren[0])) {
+          markNumber = perfChildren[0];
+        } else {
+          markNumber = element.atts?.number;
+        }
+      }
+      return {
+        ...element,
+        ...(element.atts
+          ? { atts: { ...element.atts, ...(markNumber ? { number: markNumber } : {}) } }
+          : null),
+      };
     }
     return {
       ...element,
@@ -235,6 +247,8 @@ const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
     };
   },
   contentText: ({ lexicalNode }) => {
+    // const ZERO_WIDTH_SPACE = "\u200B";
+    // if (lexicalNode.text === ZERO_WIDTH_SPACE || !lexicalNode.text) return undefined;
     return lexicalNode.text;
   },
 });

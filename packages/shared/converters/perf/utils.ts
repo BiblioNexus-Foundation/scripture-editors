@@ -54,7 +54,7 @@ export function perfPropsAdapter(obj: Record<string, any>): PerfProps {
   return result;
 }
 
-export type AttributeKey = `${typeof DATA_PREFIX}-${string}`;
+export type AttributeKey = `${typeof DATA_PREFIX}-${string}` | `${string}-${string}`;
 export type Attributes = { [key: AttributeKey]: string };
 
 const handleNestedAttributes = (key: string, att: Atts, atts: Attributes) => {
@@ -69,6 +69,13 @@ export const getAttributesFromPerfElementProps = <T extends PerfProps>(perfProps
     if (typeof value === "object" && value !== null) {
       handleNestedAttributes(key, value, atts);
     } else {
+      if (key === "subtype") {
+        const [namespace, marker] = value.split(":") as [string, string | undefined];
+        if (marker) {
+          atts[`data-namespace`] = namespace;
+          atts[`data-marker`] = marker;
+        }
+      }
       atts[`${DATA_PREFIX}-${key}`] = value;
     }
     return atts;

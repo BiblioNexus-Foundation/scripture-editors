@@ -6,7 +6,7 @@ export type SerializedInlineNode = SerializedUsfmElementNode;
 
 export class InlineNode extends UsfmElementNode {
   constructor(attributes: Attributes = {}, key?: NodeKey) {
-    super(attributes, "span", key);
+    super(attributes, undefined, "span", key);
   }
 
   static getType(): string {

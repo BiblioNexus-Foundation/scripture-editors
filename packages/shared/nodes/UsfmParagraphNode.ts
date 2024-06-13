@@ -4,6 +4,7 @@ import {
   $isTextNode,
   EditorConfig,
   LexicalNode,
+  NodeKey,
   RangeSelection,
 } from "lexical";
 import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
@@ -13,6 +14,10 @@ const DEFAULT_TAG = "p";
 export type SerializedUsfmParagraphNode = SerializedUsfmElementNode;
 
 export class UsfmParagraphNode extends UsfmElementNode {
+  constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
+    super(attributes, undefined, tag, key);
+  }
+
   static getType(): string {
     return "usfmparagraph";
   }

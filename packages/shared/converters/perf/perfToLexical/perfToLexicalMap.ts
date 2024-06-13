@@ -93,7 +93,7 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
     },
   },
   graft: {
-    "*": ({ node }): SerializedUsfmElementNode => {
+    "*": ({ node, metadata }): SerializedUsfmElementNode => {
       const lexicalNode =
         perfSequences !== undefined &&
         node.target !== undefined &&
@@ -113,7 +113,13 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
         indent: 0,
         type: "graft",
         version: 1,
-        attributes: { ...getAttributesFromPerfElementProps(getPerfProps(node)), class: "graft" },
+        attributes: {
+          ...getAttributesFromPerfElementProps(getPerfProps(node)),
+          class: "graft",
+        },
+        props: {
+          isInline: metadata.kind !== PerfKind.Block,
+        },
         ...getTagFromPerfSubtype({
           subtype: node.subtype,
           replacementMap: {
@@ -192,6 +198,7 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
         [`${DATA_PREFIX}-type`]: node.type,
         [`${DATA_PREFIX}-subtype`]: node.subtype ?? "",
         class: `${node.subtype}`,
+        contenteditable: "false",
       },
       version: 1,
       tag: "span",

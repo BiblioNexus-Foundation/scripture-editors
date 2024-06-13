@@ -3,7 +3,7 @@ export default String.raw`\id TIT TITFLS1910.PTX, Louis Segond 1910, French, 31-
 \h TITE
 \toc1 Épître de Paul à Tite
 \toc2 Tite
-\mt1 Tito
+\mt1 Titus
 \p
 `;
 

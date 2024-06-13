@@ -31,17 +31,14 @@ export const getOperationBuilder =
     } = { sequences: {}, extendedOperations: [] },
   ): Mapper =>
   ({ node, operationType, path }) => {
-    console.log(node);
     if (operationType === OperationType.Move) {
-      console.log("SKIPPED MOVE OPERATION", node);
+      // console.log("SKIPPED MOVE OPERATION", node);
       return undefined;
     }
     if (!$isUsfmElementNode(node)) return undefined;
-    const { "perf-type": perfType } = node.getAttributes?.() ?? {};
-    console.log("GRAFT NODE?", perfType);
+    // const { "perf-type": perfType } = node.getAttributes?.() ?? {};
     const kind = getPerfKindFromNode(node);
     if (kind === PerfKind.Block) {
-      if (perfType === "graft") console.log("GRAFT NODE", node);
       extraData.extendedOperations.push({
         lexicalNode: node,
         operationType,
@@ -50,7 +47,6 @@ export const getOperationBuilder =
       });
       if (operationType === OperationType.Remove) return buildRemoveOperation(path);
       const serializedNode = exportNodeToJSON(node);
-      if (perfType === "graft") console.log("SERIALIZED NODE", serializedNode);
       const { result: perfNode, sequences: sideSequences } = transformLexicalStateToPerf(
         serializedNode as SerializedElementNode,
         kind,

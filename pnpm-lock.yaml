@@ -192,6 +192,9 @@ importers:
       open-patcher:
         specifier: 1.0.0-beta.1
         version: 1.0.0-beta.1
+      shared:
+        specifier: '*'
+        version: link:../shared
     devDependencies:
       '@types/deep-equal':
         specifier: ^1.0.4
@@ -199,9 +202,6 @@ importers:
       deep-equal:
         specifier: ^2.2.3
         version: 2.2.3
-      shared:
-        specifier: link:../shared
-        version: link:../shared
 
   packages/platform:
     dependencies:
@@ -2912,6 +2912,14 @@ packages:
       - nx
     dev: true
 
+  /@nrwl/devkit@18.3.4(nx@18.3.4):
+    resolution: {integrity: sha512-Fty9Huqm12OYueU3uLJl3uvBUl5BvEyPfvw8+rLiNx9iftdEattM8C+268eAbIRRSLSOVXlWsJH4brlc6QZYYw==}
+    dependencies:
+      '@nx/devkit': 18.3.4(nx@18.3.4)
+    transitivePeerDependencies:
+      - nx
+    dev: true
+
   /@nrwl/eslint-plugin-nx@18.3.4(@types/node@20.12.12)(@typescript-eslint/parser@7.10.0)(eslint-config-prettier@9.1.0)(eslint@8.57.0)(nx@16.10.0)(typescript@5.4.5):
     resolution: {integrity: sha512-IiBAxWgOZC4dIqnirpoRJ0YvDeR9HjlOyKna2CZoUj4Dr5uYOiNHbxVbfLPhsIenRLEbjttCxrA9Mm9k++bdjA==}
     dependencies:
@@ -3087,7 +3095,7 @@ packages:
     peerDependencies:
       nx: '>= 16 <= 19'
     dependencies:
-      '@nrwl/devkit': 18.3.4(nx@16.10.0)
+      '@nrwl/devkit': 18.3.4(nx@18.3.4)
       ejs: 3.1.10
       enquirer: 2.3.6
       ignore: 5.3.1

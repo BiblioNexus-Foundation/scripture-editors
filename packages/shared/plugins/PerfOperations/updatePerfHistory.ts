@@ -89,6 +89,7 @@ export const getPerfHistoryUpdater: (
           pathBuilder: getPathBuilder(prevPerfDocument["main_sequence_id"] ?? "main_sequence"),
           operationBuilder: getOperationBuilder(extraData),
         }) as Operation[];
+        console.log("PERF ELEMENT OPERATIONS", perfElementOperations);
 
         // Apply the operations to the previous perf document sequences
         const patchedSequences = applyPatch({
@@ -130,10 +131,12 @@ export const getPerfHistoryUpdater: (
               editorLexicalNode.type !== patchedLexicalNode.type ||
               editorLexicalNode?.children?.length !==
                 (patchedLexicalNode as SerializedElementNode).children?.length
-            )
+            ) {
+              console.error({ currentNode: editorLexicalNode, convertedNode: patchedLexicalNode });
               throw new Error(
                 "Current node and converted node have different types, or different structure. Unable to merge.",
               );
+            }
 
             if (!deepEqual(editorLexicalNode, patchedLexicalNode, roundtripExcludedKeys)) {
               console.error(

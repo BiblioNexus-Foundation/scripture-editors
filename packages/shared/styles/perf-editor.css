@@ -8,6 +8,7 @@
   min-height: 40em;
   padding: 0 8px;
   outline: none;
+  counter-reset: ts-counter;
 }
 
 .editor-paragraph {
@@ -20,7 +21,7 @@ span.chapter {
   position: relative;
   visibility: visible;
   display: inline-flex;
-  color: rgb(242 242 242);
+  color: rgb(242 242 242) !important;
 }
 
 span.chapter {
@@ -67,7 +68,6 @@ span.verses {
 
 [perf-type="paragraph"] {
   color: #faffca;
-  /* text-decoration: underline 2px wavy #f4ff93; */
 }
 
 [perf-subtype="mt2"] {
@@ -88,6 +88,20 @@ h1 span[perf-type="paragraph"] {
 p[perf-type="paragraph"] {
   color: rgba(255, 255, 255, 0.87);
   text-align: left;
+  padding: 1em;
+  border: 0.15rem;
+  border-style: double;
+  border-color: #ffffff0f;
+}
+
+p.paragraph:before {
+  content: "¶";
+  display: inline-block;
+  position: absolute;
+  z-index: -1;
+  padding-right: 3em;
+  width: 11em;
+  left: 5px;
 }
 
 [perf-subtype="introduction"] [perf-subtype="title"] {
@@ -206,17 +220,59 @@ p[perf-type="paragraph"] {
   opacity: 1;
 }
 
-@media print {
-  body * {
-    color: #070707 !important;
-    background-color: #c50000 !important;
-  }
-}
-
 [perf-subtype="usfm:xo"]:empty::before {
   content: "origin reference";
 }
 
 [perf-subtype="usfm:xt"]:empty::before {
   content: "target references";
+}
+
+span[perf-subtype="usfm:ts"] {
+  display: flex;
+  border-bottom: 2px #a8ff9730;
+  border-style: dashed;
+  height: 2px;
+  width: 100%;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  position: relative;
+  justify-content: center;
+  opacity: 0.5;
+}
+
+span[perf-subtype="usfm:ts"]:hover {
+  opacity: 1;
+  border-color: #a8ff97;
+  cursor: pointer;
+}
+
+span[perf-subtype="usfm:ts"]:after {
+  content: "";
+}
+
+span[perf-subtype="usfm:ts"]:empty::before {
+  counter-increment: ts-counter;
+  content: counter(ts-counter); /* Avoids adding extra text */
+  position: absolute; /* Position the triangle relative to the line */
+  /* top: 50%; */ /* Center the triangle vertically */
+  /* left: -5px; */ /* Offset the triangle slightly to the left of the line */
+  transform: translateY(-50%) scale(0.8); /* Adjust vertical position if needed */
+  font-weight: 900;
+  background: #242424;
+  color: white;
+  border-radius: 0.3em;
+  padding: 0em 0.5em;
+  opacity: 1;
+  display: inline-block;
+}
+
+@media print {
+  body * {
+    color: #070707 !important;
+    background-color: #c50000 !important;
+  }
+  span[perf-subtype="usfm:ts"] {
+    display: none;
+  }
 }

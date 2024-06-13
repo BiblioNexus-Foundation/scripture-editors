@@ -17,7 +17,7 @@ export class DivisionMarkNode extends UsfmElementNode {
 
   constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
     // TODO: define this value. This was added because previously `super` was passed `key` as `tag`.
-    super(attributes, tag, key);
+    super(attributes, undefined, tag, key);
   }
 
   static importJSON(serializedNode: SerializedDivisionMarkNode) {
@@ -30,6 +30,14 @@ export class DivisionMarkNode extends UsfmElementNode {
     return node;
   }
 
+  canBeEmpty(): boolean {
+    return false;
+  }
+
+  canInsertTextAfter(): boolean {
+    return true;
+  }
+
   createDOM(config: EditorConfig): HTMLSpanElement {
     const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     const attributes = this.getAttributes();
@@ -37,6 +45,7 @@ export class DivisionMarkNode extends UsfmElementNode {
     Object.keys(attributes).forEach((attKey) => {
       element.setAttribute(attKey, attributes[attKey]);
     });
+    // element.setAttribute("contenteditable", "false");
     addClassNamesToElement(element, config.theme.sectionmark);
     return element;
   }
@@ -55,6 +64,7 @@ export class DivisionMarkNode extends UsfmElementNode {
 
   updateDOM(_prevNode: DivisionMarkNode, element: HTMLElement): boolean {
     const newNumber = element.innerText;
+    if (!this.__attributes["perf-atts-number"]) return false;
     this.__attributes["perf-atts-number"] = newNumber;
     element.setAttribute("perf-atts-number", newNumber);
     // Returning false tells Lexical that this node does not need its

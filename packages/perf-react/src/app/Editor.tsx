@@ -11,15 +11,35 @@ import { HistoryMergeListener, createEmptyHistoryState } from "shared/plugins/Hi
 import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandlersPlugin";
 import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
+import { verseBlockStyle } from "shared/styles/dynamic";
 
 import Button from "./Components/Button";
 
 import { emptyCrossRefence } from "./emptyNodes/crossReference";
 import { createEmptyDivisionMark } from "./emptyNodes/emptyVerse";
-import { $insertUsfmNode } from "./emptyNodes/emptyUsfmNodes";
+import { emptyFootnote } from "./emptyNodes/emptyFootnote";
+import { $createNodeFromSerializedNode, $insertUsfmNode } from "./emptyNodes/emptyUsfmNodes";
+import { emptyHeading } from "./emptyNodes/emptyHeading";
+
+import { $getSelection, $isRangeSelection } from "lexical";
 
 const theme = {
   // Theme styling goes here
+};
+
+const translationSection = {
+  indent: 0,
+  direction: null,
+  children: [],
+  format: "",
+  type: "divisionmark",
+  attributes: {
+    "perf-type": "mark",
+    "perf-subtype": "usfm:ts",
+    class: "usfm:ts",
+  },
+  version: 1,
+  tag: "span",
 };
 
 function onError(error: Error) {
@@ -120,7 +140,43 @@ export default function Editor({
             });
           }}
         >
-          Add Cross Reference
+          + Cross Reference
+        </Button>
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              $insertUsfmNode(emptyFootnote);
+            });
+          }}
+        >
+          + Footnote
+        </Button>
+        <Button
+          onClick={(_, editor) => {
+            // editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+            editor.update(
+              () => {
+                const selection = $getSelection();
+                if (!$isRangeSelection(selection)) {
+                  return false;
+                }
+                selection.insertNodes([$createNodeFromSerializedNode(emptyHeading)]);
+              },
+              { skipTransforms: true, tag: "history-merge", discrete: true },
+            );
+          }}
+        >
+          + Heading
+        </Button>
+
+        <Button
+          onClick={(_, editor) => {
+            editor.update(() => {
+              $insertUsfmNode(translationSection);
+            });
+          }}
+        >
+          + translator's section marker
         </Button>
         <Button
           onClick={(_, editor) => {
@@ -141,13 +197,11 @@ export default function Editor({
           Add Verse
         </Button>
         <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              console.log("button clicked");
-            });
+          onClick={() => {
+            verseBlockStyle.toggle();
           }}
         >
-          Add Button
+          verse block view
         </Button>
       </div>
       <div className={"editor-oce"}>

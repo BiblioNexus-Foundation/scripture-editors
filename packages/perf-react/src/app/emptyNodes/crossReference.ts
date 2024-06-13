@@ -129,5 +129,8 @@ export const emptyCrossRefence = {
     "perf-target": generateId(),
     class: "graft",
   },
+  props: {
+    isInline: true,
+  },
   tag: "span",
 };
