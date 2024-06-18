@@ -1,4 +1,15 @@
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { deepEqual } from "fast-equals";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
+import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
+import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
+import { createBasicTestEnvironment } from "shared/nodes/test.utils";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+// Reaching inside only for tests.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   CHAPTER_1_INDEX,
   VERSE_2_EDITABLE_INDEX,
@@ -15,16 +26,7 @@ import {
   usjGen1v1ImpliedPara,
   usjMarks,
   usjWithUnknownItems,
-} from "shared/converters/usj/converter-test.data";
-import { MarkerObject } from "shared/converters/usj/usj.model";
-import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
-import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
-import { createBasicTestEnvironment } from "shared/nodes/test.utils";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+} from "../../../../utilities/src/converters/usj/converter-test.data";
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 

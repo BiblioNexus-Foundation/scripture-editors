@@ -9,7 +9,7 @@
     "outDir": "dist/",
 
     /* Bundler mode */
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,

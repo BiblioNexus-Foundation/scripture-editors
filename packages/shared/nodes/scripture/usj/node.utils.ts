@@ -1,14 +1,14 @@
 /** Utility functions for editor nodes */
 
+import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
 import { CharNode, SerializedCharNode } from "./CharNode";
-import { MARKER_OBJECT_PROPS, MarkerObject } from "../../../converters/usj/usj.model";
 
-export type UnknownAttributes = { [name: string]: string };
+export type UnknownAttributes = { [name: string]: string | undefined };
 
 // If you want use these utils with your own chapter node, add it to this list of types.
 type ChapterNodes = ChapterNode | ImmutableChapterNode;
@@ -388,7 +388,7 @@ export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
 /**
  * Remove all known properties of the `markerObject`.
  * @param markerObject - Scripture marker and its contents.
- * @returns all the unknown properties.
+ * @returns all the unknown properties or `undefined` if all are known.
  */
 export function getUnknownAttributes(markerObject: MarkerObject): UnknownAttributes | undefined {
   const attributes: Partial<MarkerObject> = { ...markerObject };

@@ -6,13 +6,15 @@
     "editor",
     "rich-text"
   ],
-  "scripts": {},
   "license": "MIT",
   "version": "0.13.1",
+  "type": "module",
+  "scripts": {},
   "peerDependencies": {
     "proskomma-core": ">=0.10.4"
   },
   "dependencies": {
+    "@biblionexus-foundation/scripture-utilities": "workspace:*",
     "@lexical/utils": "^0.16.0",
     "@xmldom/xmldom": "^0.8.10",
     "epitelete": "^0.2.20",

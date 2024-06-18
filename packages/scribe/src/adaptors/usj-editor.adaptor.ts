@@ -1,3 +1,11 @@
+import {
+  BookCode,
+  MarkerContent,
+  MarkerObject,
+  USJ_TYPE,
+  USJ_VERSION,
+  Usj,
+} from "@biblionexus-foundation/scripture-utilities";
 import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   LineBreakNode,
@@ -7,14 +15,6 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
-import {
-  BookCode,
-  MarkerContent,
-  MarkerObject,
-  USJ_TYPE,
-  USJ_VERSION,
-  Usj,
-} from "shared/converters/usj/usj.model";
 import {
   BOOK_MARKER,
   BOOK_VERSION,

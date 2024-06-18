@@ -1,5 +1,6 @@
 /** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#book */
 
+import { BookCode, isValidBookCode } from "@biblionexus-foundation/scripture-utilities";
 import {
   type LexicalNode,
   type NodeKey,
@@ -8,7 +9,6 @@ import {
   ElementNode,
   SerializedElementNode,
 } from "lexical";
-import { BookCode, isValidBookCode } from "../../../converters/usj/usj.model";
 import { UnknownAttributes } from "./node.utils";
 
 export const BOOK_MARKER = "id";

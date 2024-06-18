@@ -1,4 +1,11 @@
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedEditorState } from "lexical";
+import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+// Reaching inside only for tests.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   NOTE_CALLER_INDEX,
   NOTE_INDEX,
@@ -15,12 +22,7 @@ import {
   usjGen1v1ImpliedPara,
   usjMarks,
   usjWithUnknownItems,
-} from "shared/converters/usj/converter-test.data";
-import { MarkerObject } from "shared/converters/usj/usj.model";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+} from "../../../../utilities/src/converters/usj/converter-test.data";
 import { UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
 import { serializeEditorState, reset, initialize } from "./usj-editor.adaptor";
 import { getViewOptions } from "./view-options.utils";

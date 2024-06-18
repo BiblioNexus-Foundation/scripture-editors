@@ -1,7 +1,7 @@
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
 import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 import Editor, { EditorRef } from "./components/Editor";
-import { Usj } from "shared/converters/usj/usj.model";
 import { getViewOptions } from "./adaptors/view-options.utils";
 import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
