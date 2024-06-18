@@ -1,16 +1,7 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-
-    /* Bundler mode */
-    "jsx": "react-jsx",
-    "declaration": true,
-
-    /* Linting */
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true
+    "jsx": "react-jsx"
   },
   "include": ["src"],
   "references": [

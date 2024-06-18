@@ -1,19 +1,8 @@
 {
   "extends": "../../tsconfig",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx",
-
-    /* Bundler mode */
-    "declaration": true,
-
-    /* Linting */
-    "allowJs": true
+    "jsx": "react-jsx"
   },
   "include": ["."],
-  "exclude": ["dist", "jest.config.ts"]
+  "exclude": ["node_modules", "jest.config.ts"]
 }

@@ -1,17 +1,5 @@
 {
   "extends": "../../tsconfig",
-  "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "esModuleInterop": true,
-    "outDir": "dist/",
-
-    /* Bundler mode */
-    "declaration": true,
-
-    /* Linting */
-    "allowJs": true
-  },
   "include": ["."],
-  "exclude": ["dist", "jest.config.ts"]
+  "exclude": ["node_modules", "jest.config.ts"]
 }
