@@ -430,7 +430,7 @@ body {
 }
 
 .usfm_v {
-  @apply text-left align-top text-xs uppercase tracking-wider text-primary;
+  @apply text-left align-top text-xs uppercase tracking-wider text-cyan-500;
 }
 
 .usfm_va {
@@ -1858,7 +1858,7 @@ rt {
 }
 
 .verse {
-  /* @appy text-primary;
+  /* @appy text-cyan-500;
   background-color: rgba(222, 222, 222, 1);
   margin: 0px 2px 0px 2px;
   padding: 0px 1px 0px 1px;
@@ -1988,4 +1988,98 @@ span.read img {
   border-top: 1px solid #ff0000;
   border-bottom: 1px solid #ff0000;
   background-color: rgba(255, 204, 204, 0.5);
+}
+
+/* ContextMenuPlugin */
+
+.auto-embed-menu {
+  width: 150px;
+}
+
+.typeahead-popover {
+  background: #fff;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.typeahead-popover ul {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.typeahead-popover ul::-webkit-scrollbar {
+  display: none;
+}
+
+.typeahead-popover ul li {
+  margin: 0;
+  min-width: 180px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.typeahead-popover ul li.selected {
+  background: #eee;
+}
+
+.typeahead-popover li {
+  margin: 0 8px 0 8px;
+  padding: 8px;
+  color: #050505;
+  cursor: pointer;
+  line-height: 16px;
+  font-size: 15px;
+  display: flex;
+  align-content: center;
+  flex-direction: row;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 0;
+}
+
+.typeahead-popover li.active {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+}
+
+.typeahead-popover li:first-child {
+  border-radius: 8px 8px 0px 0px;
+}
+
+.typeahead-popover li:last-child {
+  border-radius: 0px 0px 8px 8px;
+}
+
+.typeahead-popover li:hover {
+  background-color: #eee;
+}
+
+.typeahead-popover li .text {
+  display: flex;
+  line-height: 20px;
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+.typeahead-popover li .icon {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  user-select: none;
+  margin-right: 8px;
+  line-height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }

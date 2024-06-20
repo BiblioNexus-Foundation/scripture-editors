@@ -7,6 +7,7 @@ import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model"
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { NoteEditor } from "./components/NoteEditor";
+import { Usj2Usfm } from "./hooks/usj2Usfm";
 
 const defaultUsj: Usj = {
   type: "USJ",
@@ -39,8 +40,10 @@ function App() {
   };
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
   // const noteViewOptions = useMemo(() => getViewOptions(noteViewMode), [noteViewMode]);
-  const onChange = (usj: Usj) => {
+  const onChange = async (usj: Usj) => {
     console.log({ usj });
+    const usfm = await Usj2Usfm(usj);
+    console.log(usfm);
   };
 
   return (
@@ -49,7 +52,7 @@ function App() {
         <div className="left-0 right-0 top-0 z-10 flex items-center justify-between bg-gray-200 px-4 py-2">
           <span className="text-lg font-semibold">Editor</span>
           <button
-            className="rounded bg-primary px-2 py-1 text-sm font-bold text-white hover:bg-white hover:text-primary"
+            className="rounded bg-cyan-500 px-2 py-1 text-sm font-bold text-white hover:bg-white hover:text-cyan-500"
             onClick={() => setStateX(true)}
           >
             Graft Editor

@@ -20,6 +20,9 @@ import { ViewOptions } from "../adaptors/view-options.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import LoadingSpinner from "./LoadingSpinner";
 import useDeferredState from "../hooks/use-deferred-state.hook";
+import ContextMenuPlugin from "./ContextMenuPlugin";
+import ClipboardPlugin from "./ClipboardPlugin";
+import { Toolbar } from "./Toolbar";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -82,8 +85,10 @@ const Editor = forwardRef(function Editor(
   }));
 
   const handleChange = useCallback(
-    (editorState: EditorState) => {
+    (editorState: EditorState, editor: LexicalEditor) => {
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+      const editorParsed = JSON.stringify(editor.getEditorState());
+      console.log({ editorParsed });
       if (usj) {
         onChange?.(usj);
         setEditedUsj(usj);
@@ -95,6 +100,7 @@ const Editor = forwardRef(function Editor(
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
+        <Toolbar />
         <RichTextPlugin
           contentEditable={<ContentEditable className="outline-none" />}
           placeholder={<LoadingSpinner />}
@@ -111,7 +117,8 @@ const Editor = forwardRef(function Editor(
         <NoteNodePlugin />
         <HistoryPlugin />
         <AutoFocusPlugin />
-        {/* <TreeViewPlugin /> */}
+        <ContextMenuPlugin />
+        <ClipboardPlugin />
       </LexicalComposer>
     </>
   );
