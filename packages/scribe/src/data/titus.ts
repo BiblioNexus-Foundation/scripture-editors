@@ -15,4 +15,4 @@ export default String.raw`\id TIT TITFLS1910.PTX, Louis Segond 1910, French, 31-
 \p
 \v 1 verse1  \f + \ft The Hebrew text can be read either as \fqa established praise \fqa* or \fqa established strength \fqa* . \f* text
 \v 2 verse 2
-\v  \f + \ft The Hebrew text can be read either as \fqa established praise \fqa* or \fqa established strength \fqa* . \f*`;
+\v 3 verse`;

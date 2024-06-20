@@ -1,4 +1,3 @@
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {
   LexicalEditor,
   $getSelection,
@@ -16,9 +15,9 @@ import {
 import { recurseNodes as recurseSerializedNodes } from "../adaptors/editor-usj.adaptor";
 import { recurseNodes as recurseEditorNodes } from "../adaptors/usj-editor.adaptor";
 
-import { $createChapterNode } from "shared/nodes/scripture/usj/EditableChapterNode";
+import { $createChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { $createVerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { emptyFootnote } from "../nodes/emptyCrossRefence";
+import { emptyFootnote, Footnote, Char } from "../nodes/emptyFootNote";
 import { $wrapNodeInElement } from "@lexical/utils";
 
 function moveToEndOfNode(selection: RangeSelection, node: TextNode) {
@@ -31,6 +30,7 @@ export const $createNodeFromSerializedNode = (serializedNode: SerializedLexicalN
 };
 export const $insertUsfmNode = (serializedNode: SerializedLexicalNode) => {
   const newNode = $createNodeFromSerializedNode(serializedNode);
+  console.log("===>", { newNode });
   $insertNodes([newNode]);
 
   if ($isRootOrShadowRoot(newNode.getParentOrThrow())) {
@@ -95,75 +95,48 @@ export interface InsertNoteNodeParams {
   };
 }
 type InputValues = InsertNoteNodeParams["inputValues"];
-function createFootnodeFromInputs(inputValues: InputValues): any {
-  const createNode = (node: any, inputValues: InputValues): any => {
-    console.log({ node });
-    const newNode = { ...node };
 
-    if (newNode.children) {
-      newNode.children[0] = newNode.children[0]?.map((child: any) =>
-        createNode(child, inputValues),
-      );
+function deepCopy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+function updateOrAddNodes(footnote: Footnote, values: InputValues): Footnote {
+  const modifiedFootnote = deepCopy(footnote);
+  const newNodes: Char[] = [];
+  const note = modifiedFootnote.children[0].children.find((child) => child.type === "note");
+  if (!note) return modifiedFootnote;
 
-      Object.keys(inputValues).forEach((key) => {
-        if (!newNode[0].children.some((child: any) => child.marker === key)) {
-          newNode.children[0].push({
-            type: "char",
-            marker: key,
-            text: inputValues[key as keyof InputValues],
-            detail: 0,
-            format: 0,
-            mode: "normal",
-            style: "display: none",
-            version: 1,
-          });
-        }
-      });
+  Object.entries(values).forEach(([marker, text]) => {
+    const existingNode = note.children.find((child) => (child as Char).marker === marker);
+    if (existingNode) {
+      (existingNode as Char).text = text;
+    } else {
+      const newNode: Char = {
+        type: "char",
+        marker: marker,
+        text: text,
+        detail: 0,
+        format: 0,
+        mode: "normal",
+        style: "display: none",
+        version: 1,
+      };
+      note.children.push(newNode);
+      newNodes.push(newNode);
     }
-    // if (newNode.children && newNode.children[0]?.children) {
-    //   console.log(newNode.children[0].children);
-    //   newNode.children[0].children = newNode.children[0].children.map((child: any) =>
-    //     createNode(child, inputValues),
-    //   );
+  });
 
-    //   // Add missing markers as new nodes
-    //   Object.keys(inputValues).forEach((key) => {
-    //     if (!newNode.children[0].children.some((child: any) => child.marker === key)) {
-    //       newNode.children[0].children.push({
-    //         type: "char",
-    //         marker: key,
-    //         text: inputValues[key as keyof InputValues],
-    //         detail: 0,
-    //         format: 0,
-    //         mode: "normal",
-    //         style: "display: none",
-    //         version: 1,
-    //       });
-    //     }
-    //   });
-    // }
-
-    const key = newNode.marker as keyof InputValues;
-    if (inputValues[key]) {
-      newNode.text = inputValues[key];
-    }
-
-    return newNode;
-  };
-  // const rootNote = emptyFootnote.children[0];
-  // if (rootNote) {
-  //   emptyFootnote.children[0] = createNode(rootNote, inputValues);
-  // }
-
-  return createNode(emptyFootnote, inputValues);
+  return modifiedFootnote;
 }
 
 export function insertFootNoteNode({ editor, inputValues }: InsertNoteNodeParams): void {
-  const newFootnoteNode = createFootnodeFromInputs(inputValues);
-  console.log({ newFootnoteNode });
   editor.update(() => {
+    const newFootnoteNode = updateOrAddNodes(emptyFootnote, inputValues);
+    console.log({ newFootnoteNode, emptyFootnote });
     const notecontent = recurseSerializedNodes(newFootnoteNode.children);
+    // const notecontent = recurseSerializedNodes(emptyFootnote.children);
+    console.log({ notecontent });
     const noteNode = recurseEditorNodes(notecontent);
+    console.log({ noteNode });
     $insertUsfmNode(noteNode[0]);
   });
 }
