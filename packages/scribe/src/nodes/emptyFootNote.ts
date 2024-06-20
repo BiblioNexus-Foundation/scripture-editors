@@ -9,14 +9,14 @@ export type Note = {
   children: (ImmutableNoteCaller | Char | Text)[];
 };
 
-type ImmutableNoteCaller = {
+export type ImmutableNoteCaller = {
   type: "immutable-note-caller";
   caller: string;
   previewText: string;
   version: number;
 };
 
-type Char = {
+export type Char = {
   type: "char";
   marker: string;
   text: string;
@@ -36,82 +36,105 @@ type Text = {
   style: string;
   version: number;
 };
-
-export type Footnote = {
+export interface Para {
+  direction: null;
+  format: string;
+  indent: number;
+  type: "para";
+  version: number;
+  textFormat: number;
+  marker: string;
+  classList: string[];
   children: Note[];
-};
+}
+
+export interface Footnote {
+  children: Para[];
+}
 
 export const emptyFootnote: Footnote = {
   children: [
     {
-      type: "note",
-      marker: "f",
-      caller: "+",
       direction: null,
       format: "",
       indent: 0,
+      type: "para",
       version: 1,
+      textFormat: 0,
+      marker: "p",
+      classList: ["text-spacing", "formatted-font"],
       children: [
         {
-          type: "immutable-note-caller",
-          caller: "b",
-          previewText: "",
+          type: "note",
+          marker: "f",
+          caller: "+",
+          direction: null,
+          format: "",
+          indent: 0,
           version: 1,
-        },
-        {
-          type: "char",
-          marker: "ft",
-          text: "The Hebrew text can be read either as",
-          detail: 0,
-          format: 0,
-          mode: "normal",
-          style: "display: none",
-          version: 1,
-        },
-        {
-          type: "char",
-          marker: "fqa",
-          text: "established praise",
-          detail: 0,
-          format: 0,
-          mode: "normal",
-          style: "display: none",
-          version: 1,
-        },
-        {
-          type: "text",
-          text: "or",
-          detail: 0,
-          format: 0,
-          mode: "normal",
-          style: "display: none",
-          version: 1,
-        },
-        {
-          type: "char",
-          marker: "fqa",
-          text: "established strength IIIII",
-          detail: 0,
-          format: 0,
-          mode: "normal",
-          style: "display: none",
-          version: 1,
-        },
-        {
-          type: "text",
-          text: ".",
-          detail: 0,
-          format: 0,
-          mode: "normal",
-          style: "display: none",
-          version: 1,
+          children: [
+            {
+              type: "immutable-note-caller",
+              caller: "b",
+              previewText: "",
+              version: 1,
+            },
+            // {
+            //   type: "char",
+            //   marker: "ft",
+            //   text: "The Hebrew text can be read either as",
+            //   detail: 0,
+            //   format: 0,
+            //   mode: "normal",
+            //   style: "display: none",
+            //   version: 1,
+            // },
+            // {
+            //   type: "char",
+            //   marker: "fqa",
+            //   text: "established praise",
+            //   detail: 0,
+            //   format: 0,
+            //   mode: "normal",
+            //   style: "display: none",
+            //   version: 1,
+            // },
+            // {
+            //   type: "text",
+            //   text: "or",
+            //   detail: 0,
+            //   format: 0,
+            //   mode: "normal",
+            //   style: "display: none",
+            //   version: 1,
+            // },
+            // {
+            //   type: "char",
+            //   marker: "fqa",
+            //   text: "established strength IIIII",
+            //   detail: 0,
+            //   format: 0,
+            //   mode: "normal",
+            //   style: "display: none",
+            //   version: 1,
+            // },
+            // {
+            //   type: "text",
+            //   text: ".",
+            //   detail: 0,
+            //   format: 0,
+            //   mode: "normal",
+            //   style: "display: none",
+            //   version: 1,
+            // },
+          ],
         },
       ],
     },
   ],
 };
 
-// export const emptyFootnote = {
+// export const emptyFootnote: Footnote = {
 //   children: [
 //     {
 //       type: "note",
@@ -174,77 +197,6 @@ export const emptyFootnote: Footnote = {
 //           format: 0,
 //           mode: "normal",
 //           style: "display: none",
-//           version: 1,
-//         },
-//       ],
-//     },
-//   ],
-// };
-
-// export const emptyCrossRefence = {
-//   children: [
-//     {
-//       direction: null,
-//       format: "",
-//       indent: 0,
-//       type: "note",
-//       version: 1,
-//       marker: "f",
-//       caller: "+",
-//       children: [
-//         {
-//           type: "immutable-note-caller",
-//           caller: "a",
-//           previewText:
-//             "The Hebrew text can be read either as established praise established strength",
-//           version: 1,
-//         },
-//         {
-//           detail: 0,
-//           format: 0,
-//           mode: "normal",
-//           style: "display: none",
-//           text: "The Hebrew text can be read either as",
-//           type: "char",
-//           version: 1,
-//           marker: "ft",
-//         },
-//         {
-//           detail: 0,
-//           format: 0,
-//           mode: "normal",
-//           style: "display: none",
-//           text: "established praise",
-//           type: "char",
-//           version: 1,
-//           marker: "fqa",
-//         },
-//         {
-//           detail: 0,
-//           format: 0,
-//           mode: "normal",
-//           style: "display: none",
-//           text: "or",
-//           type: "text",
-//           version: 1,
-//         },
-//         {
-//           detail: 0,
-//           format: 0,
-//           mode: "normal",
-//           style: "display: none",
-//           text: "established strength",
-//           type: "char",
-//           version: 1,
-//           marker: "fqa",
-//         },
-//         {
-//           detail: 0,
-//           format: 0,
-//           mode: "normal",
-//           style: "display: none",
-//           text: ".",
-//           type: "text",
 //           version: 1,
 //         },
 //       ],
