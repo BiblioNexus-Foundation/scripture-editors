@@ -1,5 +1,5 @@
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import USFMParser from "sj-usfm-grammar";
-import { Usj } from "shared/converters/usj/usj.model";
 
 export const Usj2Usfm = (usj: Usj) => {
   let usfm: string;

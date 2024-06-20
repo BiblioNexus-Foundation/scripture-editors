@@ -1,17 +1,17 @@
 import {
+  MarkerContent,
+  MarkerObject,
+  USJ_TYPE,
+  USJ_VERSION,
+  Usj,
+} from "@biblionexus-foundation/scripture-utilities";
+import {
   EditorState,
   LineBreakNode,
   SerializedLexicalNode,
   SerializedTextNode,
   TextNode,
 } from "lexical";
-import {
-  MarkerContent,
-  MarkerObject,
-  USJ_TYPE,
-  USJ_VERSION,
-  Usj,
-} from "shared/converters/usj/usj.model";
 import {
   NBSP,
   getEditableCallerText,

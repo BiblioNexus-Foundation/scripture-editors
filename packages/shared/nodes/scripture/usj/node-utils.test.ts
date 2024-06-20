@@ -1,5 +1,6 @@
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
-import { findLastVerse, findThisVerse } from "./node.utils";
+import { findLastVerse, findThisVerse, getUnknownAttributes } from "./node.utils";
 import { $createImmutableVerseNode } from "./ImmutableVerseNode";
 import { $createVerseNode, VerseNode } from "./VerseNode";
 import { $createParaNode } from "./ParaNode";
@@ -139,6 +140,25 @@ describe("Editor Node Utilities", () => {
         expect(verseNode).toBeDefined();
         expect(verseNode?.getNumber()).toEqual("2");
       });
+    });
+  });
+
+  describe("getUnknownAttributes()", () => {
+    it("should return all unknown properties", () => {
+      const unknownAttributes = getUnknownAttributes({
+        type: "",
+        marker: "",
+        unknown: "unknown",
+      } as MarkerObject);
+
+      expect(unknownAttributes).toBeDefined();
+      expect(unknownAttributes).toEqual({ unknown: "unknown" });
+    });
+
+    it("should return undefined when all properties are known", () => {
+      const unknownAttributes = getUnknownAttributes({ type: "", marker: "" });
+
+      expect(unknownAttributes).toBeUndefined();
     });
   });
 });

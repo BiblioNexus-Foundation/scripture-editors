@@ -1,3 +1,4 @@
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import React, {
   JSX,
   PropsWithChildren,
@@ -8,7 +9,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Usj } from "shared/converters/usj/usj.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { Comments } from "./comments/commenting";
 import CommentPlugin from "./comments/CommentPlugin";

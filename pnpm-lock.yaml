@@ -193,6 +193,9 @@ importers:
 
   packages/platform:
     dependencies:
+      '@biblionexus-foundation/scripture-utilities':
+        specifier: workspace:*
+        version: link:../utilities
       '@lexical/react':
         specifier: ^0.16.0
         version: 0.16.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.15)
@@ -251,6 +254,9 @@ importers:
 
   packages/scribe:
     dependencies:
+      '@biblionexus-foundation/scripture-utilities':
+        specifier: workspace:*
+        version: link:../utilities
       '@lexical/mark':
         specifier: ^0.16.0
         version: 0.16.0
@@ -303,6 +309,9 @@ importers:
 
   packages/shared:
     dependencies:
+      '@biblionexus-foundation/scripture-utilities':
+        specifier: workspace:*
+        version: link:../utilities
       '@lexical/utils':
         specifier: ^0.16.0
         version: 0.16.0
@@ -353,6 +362,10 @@ importers:
       '@xmldom/xmldom':
         specifier: ^0.8.10
         version: 0.8.10
+    devDependencies:
+      lexical:
+        specifier: ^0.16.0
+        version: 0.16.0
 
 packages:
 

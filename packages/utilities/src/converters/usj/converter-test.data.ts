@@ -1,3 +1,4 @@
+import type { SerializedEditorState } from "lexical";
 import { MarkerContent, Usj } from "./usj.model";
 
 const NBSP = "\xa0";
@@ -27,7 +28,7 @@ export const editorStateEmpty = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;
 
 /**
  * Reformatted from:
@@ -306,7 +307,7 @@ export const editorStateGen1v1 = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;
 
 /** Lexical editor state JSON (depends on nodes used). */
 export const editorStateGen1v1Editable = {
@@ -682,7 +683,7 @@ export const editorStateGen1v1Editable = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;
 
 export const usxGen1v1ImpliedPara = `
 <usx version="3.0">
@@ -809,7 +810,7 @@ export const editorStateGen1v1ImpliedPara = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;
 
 export const usjMarks: Usj = {
   type: "USJ",
@@ -1214,7 +1215,7 @@ export const editorStateMarks = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;
 
 /** para index where the note exists */
 export const NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX = 2;
@@ -1531,4 +1532,4 @@ export const editorStateWithUnknownItems = {
       },
     ],
   },
-};
+} as unknown as SerializedEditorState;

@@ -1,3 +1,4 @@
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -17,7 +18,6 @@ import React, {
   useState,
 } from "react";
 import { ScriptureReference } from "platform-bible-react";
-import { Usj } from "shared/converters/usj/usj.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import AnnotationPlugin, {

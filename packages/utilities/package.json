@@ -12,11 +12,19 @@
     "url": "https://github.com/BiblioNexus-Foundation/scripture-editors/issues"
   },
   "type": "module",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
-    "dist/**/*",
-    "src/**/*",
+    "dist",
+    "src",
     "!src/**/*.test.ts",
     "!src/**/*.data.ts"
   ],
@@ -25,6 +33,9 @@
   },
   "dependencies": {
     "@xmldom/xmldom": "^0.8.10"
+  },
+  "devDependencies": {
+    "lexical": "^0.16.0"
   },
   "volta": {
     "extends": "../../package.json"

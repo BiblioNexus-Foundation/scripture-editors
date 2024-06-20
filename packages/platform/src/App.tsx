@@ -1,7 +1,6 @@
+import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
 import { BookChapterControl, ScriptureReference } from "platform-bible-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
-import { Usj } from "shared/converters/usj/usj.model";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
