@@ -60,21 +60,6 @@ export const Toolbar = () => {
         >
           <span className="text">Footnote</span>
         </Button>
-        {/* <Button
-          onClick={() => {
-            showModal("Insert Cross Reference", (onClose) => (
-              <InsertDialog
-                activeEditor={activeEditor}
-                onClose={onClose}
-                insertFunction={insertXrefNode}
-                label="Cross Reference"
-              />
-            ));
-          }}
-          className="item"
-        >
-          <span className="text">Cross Reference</span>
-        </Button> */}
       </div>
       {modal}
     </div>

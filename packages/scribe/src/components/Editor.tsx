@@ -23,6 +23,7 @@ import useDeferredState from "../hooks/use-deferred-state.hook";
 import ContextMenuPlugin from "./ContextMenuPlugin";
 import ClipboardPlugin from "./ClipboardPlugin";
 import { Toolbar } from "./Toolbar";
+import { ScriptureReferencePlugin, ScriptureReference } from "../plugins/ScriptureReferencePlugin";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -54,10 +55,12 @@ type EditorProps = {
   onChange?: (usj: Usj) => void;
   viewOptions?: ViewOptions;
   nodeOptions?: UsjNodeOptions;
+  scrRef: ScriptureReference;
+  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
 };
 
 const Editor = forwardRef(function Editor(
-  { usjInput, onChange, viewOptions, nodeOptions }: EditorProps,
+  { usjInput, onChange, viewOptions, nodeOptions, scrRef, setScrRef }: EditorProps,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
@@ -87,8 +90,8 @@ const Editor = forwardRef(function Editor(
   const handleChange = useCallback(
     (editorState: EditorState, editor: LexicalEditor) => {
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      const editorParsed = JSON.stringify(editor.getEditorState());
-      console.log({ editorParsed });
+      const serializedState = editor.parseEditorState(usjEditorAdaptor.serializeEditorState(usj));
+      console.log({ serializedState });
       if (usj) {
         onChange?.(usj);
         setEditedUsj(usj);
@@ -119,6 +122,7 @@ const Editor = forwardRef(function Editor(
         <AutoFocusPlugin />
         <ContextMenuPlugin />
         <ClipboardPlugin />
+        <ScriptureReferencePlugin viewOptions={viewOptions} scrRef={scrRef} setScrRef={setScrRef} />
       </LexicalComposer>
     </>
   );

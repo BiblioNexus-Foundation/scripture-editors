@@ -140,25 +140,3 @@ export function insertFootNoteNode({ editor, inputValues }: InsertNoteNodeParams
     $insertUsfmNode(noteNode[0]);
   });
 }
-
-// export function insertXrefNode({
-//   editor,
-//   ftOriginRef,
-//   ftcontent,
-//   ftquot,
-//   fttext,
-// }: {
-//   editor: LexicalEditor;
-//   ftOriginRef?: string;
-//   ftcontent?: string;
-//   ftquot?: string;
-//   fttext?: string;
-// }): void {
-//   editor.update(() => {
-//     const notecontent = recurseSerializedNodes(emptyCrossRefence.children);
-//     console.log({ notecontent });
-//     const noteNode = recurseEditorNodes(notecontent);
-//     console.log({ noteNode });
-//     $insertUsfmNode(noteNode[0]);
-//   });
-// }
