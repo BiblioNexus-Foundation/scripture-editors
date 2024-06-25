@@ -404,7 +404,7 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
   };
 }
 
-function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
+export function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
   return {
     type: ImpliedParaNode.getType(),
     children,

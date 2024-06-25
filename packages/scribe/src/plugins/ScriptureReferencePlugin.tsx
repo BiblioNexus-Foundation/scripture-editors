@@ -4,9 +4,9 @@ import {
   $getRoot,
   $getSelection,
   COMMAND_PRIORITY_LOW,
+  EditorState,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { ScriptureReference } from "platform-bible-react";
 import { useEffect } from "react";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
@@ -18,11 +18,18 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { ViewOptions, getViewOptions } from "./adaptors/view-options.utils";
-import { getChapterNodeClass, getVerseNodeClass } from "./adaptors/usj-editor.adaptor";
+import { ViewOptions } from "../adaptors/view-options.utils";
+import { getChapterNodeClass, getVerseNodeClass } from "../adaptors/usj-editor.adaptor";
+import { BookCode } from "shared/converters/usj/usj.model";
 
 /** Prevents the cursor being moved again after a selection has changed. */
 let hasSelectionChanged = false;
+
+export interface ScriptureReference {
+  bookCode: BookCode;
+  chapterNum: number;
+  verseNum: number;
+}
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.
@@ -31,19 +38,18 @@ let hasSelectionChanged = false;
  * @param props.viewOptions - View options to select different view modes.
  * @returns null, i.e. no DOM elements.
  */
-export default function ScriptureReferencePlugin({
+export function ScriptureReferencePlugin({
   scrRef,
   setScrRef,
-  viewOptions = getViewOptions(),
+  viewOptions,
 }: {
   scrRef: ScriptureReference;
-  setScrRef: (scrRef: ScriptureReference) => void;
+  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
   viewOptions?: ViewOptions;
 }): null {
   const [editor] = useLexicalComposerContext();
-  const { bookNum, chapterNum, verseNum } = scrRef;
+  const { bookCode, chapterNum, verseNum } = scrRef;
 
-  // Book loaded or changed
   useEffect(
     () =>
       editor.registerMutationListener(BookNode, (nodeMutations) => {
@@ -51,7 +57,7 @@ export default function ScriptureReferencePlugin({
           for (const [nodeKey, mutation] of nodeMutations) {
             const bookNode = $getNodeByKey<BookNode>(nodeKey);
             if (bookNode && $isBookNode(bookNode) && mutation === "created") {
-              $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+              $moveCursorToVerseStart(chapterNum, verseNum);
             }
           }
         });
@@ -61,7 +67,6 @@ export default function ScriptureReferencePlugin({
 
   // Scripture Ref changed
   useEffect(() => {
-    console.log("===>", { chapterNum, verseNum, viewOptions });
     editor.update(() => {
       if (!hasSelectionChanged) $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
       else hasSelectionChanged = false;
@@ -70,13 +75,16 @@ export default function ScriptureReferencePlugin({
 
   // selection changed
   useEffect(() => {
-    console.log("clicked", { bookNum, chapterNum, verseNum });
     editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
-      () => $findAndSetChapterAndVerse(bookNum, chapterNum, verseNum, setScrRef, viewOptions),
+      () => $findAndSetChapterAndVerse(bookCode, chapterNum, verseNum, setScrRef, viewOptions),
       COMMAND_PRIORITY_LOW,
     );
-  }, [editor, bookNum, chapterNum, verseNum, setScrRef, viewOptions]);
+  }, [editor, bookCode, chapterNum, verseNum, setScrRef, viewOptions]);
+
+  editor.registerUpdateListener(({ editorState }) => {
+    $getBookCode(editorState, setScrRef);
+  });
 
   return null;
 }
@@ -100,7 +108,7 @@ function $moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOptio
 }
 
 function $findAndSetChapterAndVerse(
-  bookNum: number,
+  bookCode: BookCode,
   chapterNum: number,
   verseNum: number,
   setScrRef: (scrRef: ScriptureReference) => void,
@@ -119,10 +127,32 @@ function $findAndSetChapterAndVerse(
   );
   if (hasSelectionChanged)
     setScrRef({
-      bookNum,
+      bookCode,
       chapterNum: +(chapterNode?.getNumber() ?? chapterNum),
       verseNum: +(verseNode?.getNumber() ?? verseNum),
     });
 
   return false;
 }
+
+const $getBookCode = (
+  editorState: EditorState,
+  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>,
+) => {
+  editorState.read(() => {
+    const root = $getRoot();
+    let node = root.getFirstChild();
+
+    while (node !== null) {
+      if (node.getType() === BookNode.getType() && $isBookNode(node)) {
+        const bookNode = node as BookNode;
+        setScrRef((prevState: ScriptureReference) => ({
+          ...prevState,
+          bookCode: bookNode?.__code,
+        }));
+        break;
+      }
+      node = node.getNextSibling();
+    }
+  });
+};

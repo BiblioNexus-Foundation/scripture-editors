@@ -1,24 +1,27 @@
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
 import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 import Editor, { EditorRef } from "./components/Editor";
-import { Usj } from "shared/converters/usj/usj.model";
 import { getViewOptions } from "./adaptors/view-options.utils";
 import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { NoteEditor } from "./components/NoteEditor";
 import { Usj2Usfm } from "./hooks/usj2Usfm";
+import { ScriptureReference } from "./plugins/ScriptureReferencePlugin";
 
 const defaultUsj: Usj = {
   type: "USJ",
   version: "0.2.1",
   content: [],
 };
+const defaultScrRef: ScriptureReference = { /* PSA */ bookCode: "PSA", chapterNum: 1, verseNum: 1 };
 
 function App() {
   const editorRef = useRef<EditorRef>(null!);
   const [stateX, setStateX] = useState<boolean>(false);
   const [text, setText] = useState<string>();
+  const [scrRef, setScrRef] = useState(defaultScrRef);
   const { usj } = useUsfm2Usj();
 
   useEffect(() => {
@@ -45,7 +48,9 @@ function App() {
     const usfm = await Usj2Usfm(usj);
     console.log(usfm);
   };
-
+  useEffect(() => {
+    console.log({ scrRef });
+  }, [scrRef]);
   return (
     <div className="flex-center m-2 flex h-editor   justify-center p-8">
       <div className="relative w-2/3 overflow-hidden rounded-md border-2 border-secondary">
@@ -66,6 +71,8 @@ function App() {
             onChange={onChange}
             viewOptions={viewOptions}
             nodeOptions={nodeOptions}
+            scrRef={scrRef}
+            setScrRef={setScrRef}
           />
         </div>
       </div>

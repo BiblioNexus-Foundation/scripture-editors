@@ -7,7 +7,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { Usj } from "shared/converters/usj/usj.model";
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { EditorState } from "lexical";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";

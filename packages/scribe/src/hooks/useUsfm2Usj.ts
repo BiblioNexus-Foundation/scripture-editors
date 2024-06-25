@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import USFMParser from "sj-usfm-grammar";
-import { Usj } from "shared/converters/usj/usj.model";
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 
 export const useUsfm2Usj = () => {
   const [usfm, setUsfm] = useState<string>();

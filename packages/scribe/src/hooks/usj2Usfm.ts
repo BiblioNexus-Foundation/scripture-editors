@@ -1,19 +1,5 @@
 import USFMParser from "sj-usfm-grammar";
-import { Usj } from "shared/converters/usj/usj.model";
-
-// export const Usj2Usfm = (usj: Usj) => {
-//   let usfm: string;
-//   const parseUsj = async (usj: Usj) => {
-//     await USFMParser.init();
-//     const usfmParser = new USFMParser();
-//     usfm = usfmParser.usjToUsfm(usj);
-//     return usfm;
-//   };
-//   (async () => {
-//     usfm = usj && (await parseUsj(usj));
-//     return usfm;
-//   })();
-// };
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 
 export const Usj2Usfm = async (usj: Usj): Promise<string> => {
   // let usfm: string;
@@ -24,4 +10,15 @@ export const Usj2Usfm = async (usj: Usj): Promise<string> => {
   };
   const usfm: string = usj ? await parseUsj(usj) : "";
   return usfm;
+};
+
+export const usfm2Usj = async (usfm: string): Promise<Usj> => {
+  // let usfm: string;
+  const parseUsfm = async (usfm: string): Promise<Usj> => {
+    await USFMParser.init();
+    const usfmParser = new USFMParser();
+    return usfmParser.usfmToUsj(usfm);
+  };
+  const usj: Usj = usfm ? await parseUsfm(usfm) : ({} as Usj);
+  return usj;
 };
