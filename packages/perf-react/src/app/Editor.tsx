@@ -4,7 +4,6 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
-import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { OnChangePlugin, OnChange } from "../lexical/plugins/OnChangePlugin";
 import { useLexicalState } from "./useLexicalState";
 
@@ -50,7 +49,6 @@ export default function Editor() {
         />
         <OnChangePlugin onChange={onChange} />
         <HistoryPlugin />
-        <ContextMenuPlugin />
       </div>
     </LexicalComposer>
   );
