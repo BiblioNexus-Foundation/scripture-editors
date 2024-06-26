@@ -404,7 +404,7 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
   };
 }
 
-function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
+export function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
   return {
     type: ImpliedParaNode.getType(),
     children,
@@ -656,7 +656,7 @@ function insertMilestoneMarksRecurse(
   return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
 }
 
-function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNode[] {
+export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNode[] {
   const msMarkIndexes: number[] = [];
   const nodes: SerializedLexicalNode[] = [];
   markers?.forEach((markerContent) => {
@@ -705,7 +705,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
  * @param nodes - Serialized nodes.
  * @returns nodes with any needed implied paras inserted.
  */
-function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
+export function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
   const bookNodeIndex = nodes.findIndex((node) => node.type === BookNode.getType());
   const isBookNodeFound = bookNodeIndex >= 0;
   const chapterNodeIndex = nodes.findIndex((node) => node.type === ChapterNode.getType());

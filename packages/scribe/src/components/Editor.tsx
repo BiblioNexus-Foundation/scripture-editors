@@ -20,6 +20,10 @@ import { ViewOptions } from "../adaptors/view-options.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import LoadingSpinner from "./LoadingSpinner";
 import useDeferredState from "../hooks/use-deferred-state.hook";
+import ContextMenuPlugin from "./ContextMenuPlugin";
+import ClipboardPlugin from "./ClipboardPlugin";
+import { Toolbar } from "./Toolbar";
+import { ScriptureReferencePlugin, ScriptureReference } from "../plugins/ScriptureReferencePlugin";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -51,10 +55,12 @@ type EditorProps = {
   onChange?: (usj: Usj) => void;
   viewOptions?: ViewOptions;
   nodeOptions?: UsjNodeOptions;
+  scrRef: ScriptureReference;
+  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
 };
 
 const Editor = forwardRef(function Editor(
-  { usjInput, onChange, viewOptions, nodeOptions }: EditorProps,
+  { usjInput, onChange, viewOptions, nodeOptions, scrRef, setScrRef }: EditorProps,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
@@ -82,8 +88,10 @@ const Editor = forwardRef(function Editor(
   }));
 
   const handleChange = useCallback(
-    (editorState: EditorState) => {
+    (editorState: EditorState, editor: LexicalEditor) => {
       const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+      const serializedState = editor.parseEditorState(usjEditorAdaptor.serializeEditorState(usj));
+      console.log({ serializedState });
       if (usj) {
         onChange?.(usj);
         setEditedUsj(usj);
@@ -95,6 +103,7 @@ const Editor = forwardRef(function Editor(
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
+        <Toolbar />
         <RichTextPlugin
           contentEditable={<ContentEditable className="outline-none" />}
           placeholder={<LoadingSpinner />}
@@ -111,7 +120,9 @@ const Editor = forwardRef(function Editor(
         <NoteNodePlugin />
         <HistoryPlugin />
         <AutoFocusPlugin />
-        {/* <TreeViewPlugin /> */}
+        <ContextMenuPlugin />
+        <ClipboardPlugin />
+        <ScriptureReferencePlugin viewOptions={viewOptions} scrRef={scrRef} setScrRef={setScrRef} />
       </LexicalComposer>
     </>
   );

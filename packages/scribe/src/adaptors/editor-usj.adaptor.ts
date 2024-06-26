@@ -209,7 +209,7 @@ function createUnknownMarker(
   });
 }
 
-function recurseNodes(
+export function recurseNodes(
   nodes: SerializedLexicalNode[],
   noteCaller?: string,
 ): MarkerContent[] | undefined {
