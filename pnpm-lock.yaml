@@ -194,7 +194,7 @@ importers:
   packages/platform:
     dependencies:
       '@biblionexus-foundation/scripture-utilities':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../utilities
       '@lexical/react':
         specifier: ^0.16.0
