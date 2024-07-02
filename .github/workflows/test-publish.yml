@@ -63,10 +63,24 @@ jobs:
       - name: Production build
         run: pnpm nx run-many -t build
 
+      - name: Debug NPM config
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          echo "NPM_CONFIG_USERCONFIG: $NPM_CONFIG_USERCONFIG"
+          echo "NPM_CONFIG_GLOBALCONFIG: $NPM_CONFIG_GLOBALCONFIG"
+          echo "NODE_AUTH_TOKEN is set: ${{ env.NODE_AUTH_TOKEN != '' }}"
+          npm config list
+          cd ./packages/platform
+          pnpm config list
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: pnpm publish platform
         if: ${{ matrix.os == 'ubuntu-latest' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/platform_v') && contains(github.ref, '.') }}
         shell: bash
-        run: cd ./packages/platform && pnpm publish --no-git-checks --access public
+        run: |
+          cd ./packages/platform
+          pnpm publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
