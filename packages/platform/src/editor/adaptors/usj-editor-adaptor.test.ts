@@ -2,7 +2,11 @@ import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedEditorState } from "lexical";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  immutableNoteCallerNodeName,
+  SerializedImmutableNoteCallerNode,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { defaultNoteCallers } from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries
@@ -52,6 +56,9 @@ describe("USJ Editor Adaptor", () => {
   });
 
   it("should convert from USJ to Lexical editor state JSON", () => {
+    const nodeOptions = { [immutableNoteCallerNodeName]: { noteCallers: defaultNoteCallers } };
+    initialize(nodeOptions, console);
+
     const serializedEditorState = serializeEditorState(usjGen1v1);
 
     const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
@@ -164,6 +171,8 @@ describe("USJ Editor Adaptor", () => {
   });
 
   it("should convert from USJ with unknown items to Lexical editor state JSON", () => {
+    const nodeOptions = { [immutableNoteCallerNodeName]: { noteCallers: defaultNoteCallers } };
+    initialize(nodeOptions, console);
     reset();
 
     const serializedEditorState = serializeEditorState(usjWithUnknownItems);

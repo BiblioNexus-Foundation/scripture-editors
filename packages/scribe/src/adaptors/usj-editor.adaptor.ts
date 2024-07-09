@@ -96,6 +96,7 @@ import {
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getViewOptions } from "./view-options.utils";
@@ -110,42 +111,17 @@ const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
   version: 1,
 };
-/** Possible note callers to use when caller is '+'. Up to 2 characters are used, e.g. a-zz */
-const defaultNoteCallers = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-];
+const callerData: CallerData = {
+  /** Count used for note callers. */
+  count: 0,
+};
 
 /** View options - view mode parameters */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node */
 let _nodeOptions: UsjNodeOptions | undefined;
-/** Count used for note callers */
-let callerCount = 0;
+/** List of possible note callers. */
+let noteCallers: string[] | undefined;
 /** Logger instance */
 let _logger: LoggerBasic;
 
@@ -158,7 +134,8 @@ export function initialize(
 }
 
 export function reset(callerCountValue = 0) {
-  resetCallerCount(callerCountValue);
+  //Reset the caller count used for note callers.
+  callerData.count = callerCountValue;
 }
 
 export function serializeEditorState(
@@ -206,6 +183,12 @@ export function serializeEditorState(
  */
 function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
+
+  // Set list of possible note callers.
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
+    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
+    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
+  }
 }
 
 /**
@@ -214,14 +197,6 @@ function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
  */
 function setLogger(logger: LoggerBasic | undefined) {
   if (logger) _logger = logger;
-}
-
-/**
- * Reset the count used for note callers.
- * @param resetValue - Value to reset to. Defaults to 0.
- */
-function resetCallerCount(resetValue = 0) {
-  callerCount = resetValue;
 }
 
 /**
@@ -256,37 +231,6 @@ function getClassList(viewOptions: ViewOptions | undefined) {
   if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
   if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
   return classList;
-}
-
-/**
- * Get the note caller to use. E.g. for '+' replace with a-z, aa-zz.
- * @param markerCaller - the specified note caller.
- * @returns the specified caller, if '+' replace with up to 2 characters from the possible note
- *   callers list, '*' if undefined.
- */
-function getNoteCaller(markerCaller: string | undefined): string {
-  let noteCallers = defaultNoteCallers;
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
-    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
-    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
-  }
-  let caller = markerCaller;
-  if (markerCaller === "+") {
-    if (callerCount >= noteCallers.length ** 2 + noteCallers.length) {
-      resetCallerCount();
-      _logger?.warn("Note caller count was reset. Consider adding more possible note callers.");
-    }
-
-    const callerIndex = callerCount % noteCallers.length;
-    let callerLeadChar = "";
-    if (callerCount >= noteCallers.length) {
-      const callerLeadCharIndex = Math.trunc(callerCount / noteCallers.length) - 1;
-      callerLeadChar = noteCallers[callerLeadCharIndex];
-    }
-    caller = callerLeadChar + noteCallers[callerIndex];
-    callerCount += 1;
-  }
-  return caller ?? "*";
 }
 
 function getTextContent(markers: MarkerContent[] | undefined): string {
@@ -480,7 +424,8 @@ function createNote(
   if (_viewOptions?.markerMode === "editable") {
     callerNode = createText(getEditableCallerText(caller));
   } else {
-    callerNode = createNoteCaller(getNoteCaller(markerObject.caller), childNodes);
+    const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
+    callerNode = createNoteCaller(noteCaller, childNodes);
     childNodes.forEach((node) => {
       (node as SerializedTextNode).style = "display: none";
     });

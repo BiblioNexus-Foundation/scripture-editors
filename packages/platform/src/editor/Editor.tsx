@@ -3,7 +3,6 @@ import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
@@ -25,10 +24,12 @@ import AnnotationPlugin, {
   AnnotationRef,
 } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
-import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
+import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
@@ -78,9 +79,8 @@ export type EditorOptions = {
   /** View options. */
   view?: ViewOptions;
   /** Options for each editor node:
-   * @param nodes[].noteCallers - Possible note callers to use when caller is '+' for
-   *   ImmutableNoteCallerNode.
-   * @param nodes[].onClick - Click handler method for ImmutableNoteCallerNode.
+   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is '+'.
+   * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
    */
   nodes?: UsjNodeOptions;
 };
@@ -151,9 +151,17 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const [usj, setUsj] = useState(defaultUsj);
   const [loadedUsj, editedUsj, setEditedUsj] = useDeferredState(usj);
-  editorConfig.editable = !options?.isReadonly;
+  const {
+    isReadonly = false,
+    hasSpellCheck = false,
+    view: viewOptions,
+    nodes: nodeOptions = {},
+  } = options ?? {};
+  useDefaultNodeOptions(nodeOptions);
+
+  editorConfig.editable = !isReadonly;
   editorConfig.editorState = (editor: LexicalEditor) => {
-    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, options?.view));
+    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, viewOptions));
   };
   editorUsjAdaptor.initialize(logger);
 
@@ -196,12 +204,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
-        {!options?.isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
+        {!isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
         <div className="editor-inner">
           <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="editor-input" spellCheck={options?.hasSpellCheck} />
+              <ContentEditable className="editor-input" spellCheck={hasSpellCheck} />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
@@ -211,14 +219,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             <ScriptureReferencePlugin
               scrRef={scrRef}
               setScrRef={setScrRef}
-              viewOptions={options?.view}
+              viewOptions={viewOptions}
             />
           )}
           <UpdateStatePlugin
             scripture={loadedUsj}
-            nodeOptions={options?.nodes}
+            nodeOptions={nodeOptions}
             editorAdaptor={usjEditorAdaptor}
-            viewOptions={options?.view}
+            viewOptions={viewOptions}
             logger={logger}
           />
           <OnChangePlugin
@@ -227,7 +235,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             ignoreHistoryMergeTagChange
           />
           <AnnotationPlugin ref={annotationRef} logger={logger} />
-          <NoteNodePlugin />
+          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
           <ContextMenuPlugin />
           <ClipboardPlugin />
           {children}

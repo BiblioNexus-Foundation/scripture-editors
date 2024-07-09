@@ -107,9 +107,9 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
     return dom;
   }
 
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
+  updateDOM(prevNode: ImmutableNoteCallerNode): boolean {
+    if (prevNode.__caller !== this.__caller) return true;
+
     return false;
   }
 

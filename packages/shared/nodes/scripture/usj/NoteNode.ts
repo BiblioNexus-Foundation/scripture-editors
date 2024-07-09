@@ -40,6 +40,8 @@ export type SerializedNoteNode = Spread<
 
 export const NOTE_VERSION = 1;
 
+export const GENERATOR_NOTE_CALLER = "+";
+
 export class NoteNode extends ElementNode {
   __marker: NoteMarker;
   __caller: string;
@@ -168,6 +170,8 @@ export class NoteNode extends ElementNode {
       version: NOTE_VERSION,
     };
   }
+
+  // Mutation
 
   canBeEmpty(): false {
     return false;
