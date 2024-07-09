@@ -11,6 +11,9 @@ import {
   DOMConversionMap,
   DOMConversionOutput,
   ElementFormatType,
+  LexicalEditor,
+  DOMExportOutput,
+  isHTMLElement,
 } from "lexical";
 import {
   UnknownAttributes,
@@ -151,8 +154,8 @@ export class ParaNode extends ParagraphNode {
   static importDOM(): DOMConversionMap | null {
     return {
       p: () => ({
-        conversion: convertParaElement,
-        priority: 0,
+        conversion: $convertParaElement,
+        priority: 1,
       }),
     };
   }
@@ -198,8 +201,18 @@ export class ParaNode extends ParagraphNode {
     // Define the DOM element here
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`, ...this.__classList);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`, ...this.__classList);
     return dom;
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(this.getType(), `usfm_${this.getMarker()}`, ...this.getClassList());
+    }
+
+    return { element };
   }
 
   exportJSON(): SerializedParaNode {
@@ -226,8 +239,13 @@ export class ParaNode extends ParagraphNode {
   }
 }
 
-function convertParaElement(element: HTMLElement): DOMConversionOutput {
-  const node = $createParaNode();
+function $convertParaElement(element: HTMLElement): DOMConversionOutput {
+  const marker = element.getAttribute("data-marker") ?? undefined;
+  const type = ParaNode.getType();
+  const domNode = element.cloneNode(false) as HTMLElement;
+  domNode.classList.remove(type, `usfm_${marker}`, "ltr", "rtl");
+  const classList = [...domNode.classList.values()];
+  const node = $createParaNode(marker, classList);
   if (element.style) {
     node.setFormat(element.style.textAlign as ElementFormatType);
     const indent = parseInt(element.style.textIndent, 10) / 20;

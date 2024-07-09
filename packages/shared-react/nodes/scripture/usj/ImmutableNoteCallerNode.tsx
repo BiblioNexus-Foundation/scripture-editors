@@ -7,6 +7,11 @@ import {
   Spread,
   SerializedLexicalNode,
   DecoratorNode,
+  LexicalEditor,
+  DOMExportOutput,
+  isHTMLElement,
+  DOMConversionOutput,
+  DOMConversionMap,
 } from "lexical";
 import { JSX, ReactNode, SyntheticEvent } from "react";
 
@@ -51,6 +56,19 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
     return node;
   }
 
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isNoteCallerElement(node)) return null;
+
+        return {
+          conversion: $convertNoteCallerElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
   setCaller(caller: string): void {
     const self = this.getWritable();
     self.__caller = caller;
@@ -83,7 +101,7 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
-    dom.classList.add(this.getType());
+    dom.classList.add(this.__type);
     dom.setAttribute("data-caller", this.__caller);
     dom.setAttribute("data-preview-text", this.__previewText);
     return dom;
@@ -93,6 +111,17 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
     return false;
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.classList.add(this.getType());
+      element.setAttribute("data-caller", this.getCaller());
+      element.setAttribute("data-preview-text", this.getPreviewText());
+    }
+
+    return { element };
   }
 
   decorate(): JSX.Element {
@@ -115,12 +144,25 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
   }
 }
 
+function $convertNoteCallerElement(element: HTMLElement): DOMConversionOutput {
+  const caller = element.getAttribute("data-caller") ?? "";
+  const previewText = element.getAttribute("data-preview-text") ?? "";
+  const node = $createImmutableNoteCallerNode(caller, previewText);
+  return { node };
+}
+
 export function $createImmutableNoteCallerNode(
   caller: string,
   previewText: string,
   onClick?: OnClick,
 ): ImmutableNoteCallerNode {
   return $applyNodeReplacement(new ImmutableNoteCallerNode(caller, previewText, onClick));
+}
+
+function isNoteCallerElement(node: HTMLElement | null | undefined): boolean {
+  if (!node) return false;
+
+  return node.classList.contains(ImmutableNoteCallerNode.getType());
 }
 
 export function $isImmutableNoteCallerNode(
