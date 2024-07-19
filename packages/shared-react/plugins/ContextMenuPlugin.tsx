@@ -5,7 +5,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
 import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as ReactDOM from "react-dom";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 
@@ -89,6 +89,7 @@ export class ContextMenuOption extends MenuOption {
 
 export default function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
+  const closeMenuRef = useRef<(() => void) | undefined>();
 
   const options = useMemo(() => {
     return [
@@ -118,12 +119,24 @@ export default function ContextMenuPlugin(): JSX.Element {
   const onSelectOption = useCallback(
     (selectedOption: ContextMenuOption, targetNode: LexicalNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        selectedOption.onSelect(targetNode);
+        selectedOption?.onSelect(targetNode);
         closeMenu();
       });
     },
     [editor],
   );
+
+  useEffect(() => {
+    const handleScroll = () => {
+      closeMenuRef.current?.();
+    };
+
+    window.addEventListener("scroll", handleScroll, true);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, []);
 
   return (
     <LexicalContextMenuPlugin
@@ -134,8 +147,12 @@ export default function ContextMenuPlugin(): JSX.Element {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         { selectedIndex, options: _options, selectOptionAndCleanUp, setHighlightedIndex },
         { setMenuRef },
-      ) =>
-        anchorElementRef.current
+      ) => {
+        // Store the closeMenu function.
+        closeMenuRef.current = () =>
+          selectOptionAndCleanUp(undefined as unknown as ContextMenuOption);
+
+        return anchorElementRef.current
           ? ReactDOM.createPortal(
               <div
                 className="typeahead-popover auto-embed-menu"
@@ -160,8 +177,8 @@ export default function ContextMenuPlugin(): JSX.Element {
               </div>,
               anchorElementRef.current,
             )
-          : null
-      }
+          : null;
+      }}
     />
   );
 }
