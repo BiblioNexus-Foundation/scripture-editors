@@ -8,15 +8,16 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { EditorState } from "lexical";
 import { useCallback, useEffect } from "react";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
-import editorTheme from "../themes/editor-theme";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
-import { ViewOptions } from "../adaptors/view-options.utils";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
+import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
+import { ViewOptions } from "../adaptors/view-options.utils";
+import editorTheme from "../themes/editor-theme";
 
 type NoteEditorProps = {
   /** Scripture data in USJ form */
@@ -31,9 +32,11 @@ export const NoteEditor = ({
   usj,
   onChange,
   viewOptions,
-  nodeOptions,
+  nodeOptions = {},
   scrollId,
 }: NoteEditorProps) => {
+  useDefaultNodeOptions(nodeOptions);
+
   const initialConfig = {
     namespace: "ScribeNoteEditor",
     editable: true,
@@ -81,7 +84,7 @@ export const NoteEditor = ({
           // logger={logger}
         />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
-        <NoteNodePlugin />
+        <NoteNodePlugin nodeOptions={nodeOptions} />
         <HistoryPlugin />
         <AutoFocusPlugin />
         {/* <TreeViewPlugin /> */}

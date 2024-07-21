@@ -166,9 +166,9 @@ export class TypedMarkNode extends ElementNode {
   }
 
   insertNewAfter(_selection: RangeSelection, restoreSelection = true): null | ElementNode {
-    const typedMarkNode = $createTypedMarkNode(this.__typedIDs);
-    this.insertAfter(typedMarkNode, restoreSelection);
-    return typedMarkNode;
+    const node = $createTypedMarkNode(this.__typedIDs);
+    this.insertAfter(node, restoreSelection);
+    return node;
   }
 
   canInsertTextBefore(): false {

@@ -8,6 +8,11 @@ import {
   SerializedTextNode,
   Spread,
   EditorConfig,
+  DOMExportOutput,
+  LexicalEditor,
+  isHTMLElement,
+  DOMConversionMap,
+  DOMConversionOutput,
 } from "lexical";
 import {
   CHAR_NODE_TYPE,
@@ -132,6 +137,19 @@ export class CharNode extends TextNode {
     return node;
   }
 
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isCharElement(node)) return null;
+
+        return {
+          conversion: $convertCharElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
   static isValidMarker(marker: string): boolean {
     return (
       VALID_CHAR_MARKERS_NON_NUMBERED.includes(marker) ||
@@ -170,8 +188,18 @@ export class CharNode extends TextNode {
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     return dom;
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(this.getType(), `usfm_${this.getMarker()}`);
+    }
+
+    return { element };
   }
 
   exportJSON(): SerializedCharNode {
@@ -189,12 +217,27 @@ export class CharNode extends TextNode {
   }
 }
 
+function $convertCharElement(element: HTMLElement): DOMConversionOutput {
+  const marker = (element.getAttribute("data-marker") as CharMarker) ?? "f";
+  const text = element.textContent ?? "";
+  const node = $createCharNode(marker, text);
+  node.setStyle(element.getAttribute("style") ?? "");
+  return { node };
+}
+
 export function $createCharNode(
   marker: CharMarker,
   text: string,
   unknownAttributes?: UnknownAttributes,
 ): CharNode {
   return $applyNodeReplacement(new CharNode(marker, text, unknownAttributes));
+}
+
+function isCharElement(node: HTMLElement | null | undefined): boolean {
+  if (!node) return false;
+
+  const marker = node.getAttribute("data-marker") ?? "";
+  return CharNode.isValidMarker(marker) && node.classList.contains(CharNode.getType());
 }
 
 export function $isCharNode(node: LexicalNode | null | undefined): node is CharNode {

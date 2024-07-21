@@ -7,6 +7,11 @@ import {
   DecoratorNode,
   SerializedLexicalNode,
   Spread,
+  LexicalEditor,
+  DOMExportOutput,
+  isHTMLElement,
+  DOMConversionOutput,
+  DOMConversionMap,
 } from "lexical";
 import { CHAPTER_CLASS_NAME, UnknownAttributes, getVisibleOpenMarkerText } from "./node.utils";
 
@@ -103,6 +108,19 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     return node;
   }
 
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isChapterElement(node)) return null;
+
+        return {
+          conversion: $convertImmutableChapterElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
   setMarker(marker: ChapterMarker): void {
     const self = this.getWritable();
     self.__marker = marker;
@@ -197,6 +215,17 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
     return false;
   }
 
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.getMarker()}`, ...this.getClassList());
+      element.setAttribute("data-number", this.getNumber());
+    }
+
+    return { element };
+  }
+
   decorate(): string {
     return this.getShowMarker()
       ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
@@ -219,6 +248,16 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 }
 
+function $convertImmutableChapterElement(element: HTMLElement): DOMConversionOutput {
+  const marker = element.getAttribute("data-marker") ?? undefined;
+  const chapterNumber = element.getAttribute("data-number") ?? "0";
+  const domNode = element.cloneNode(false) as HTMLElement;
+  domNode.classList.remove(CHAPTER_CLASS_NAME, `usfm_${marker}`, "ltr", "rtl");
+  const classList = [...domNode.classList.values()];
+  const node = $createImmutableChapterNode(chapterNumber, classList);
+  return { node };
+}
+
 export function $createImmutableChapterNode(
   chapterNumber: string,
   classList?: string[],
@@ -239,6 +278,11 @@ export function $createImmutableChapterNode(
       unknownAttributes,
     ),
   );
+}
+
+function isChapterElement(node: HTMLElement | null | undefined): boolean {
+  const marker = node?.getAttribute("data-marker") ?? undefined;
+  return marker === CHAPTER_MARKER;
 }
 
 export function $isImmutableChapterNode(

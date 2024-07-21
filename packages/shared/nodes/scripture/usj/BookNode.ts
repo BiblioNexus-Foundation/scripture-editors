@@ -96,7 +96,7 @@ export class BookNode extends ElementNode {
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     dom.setAttribute("data-code", this.__code);
     return dom;
   }

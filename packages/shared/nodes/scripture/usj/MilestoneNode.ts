@@ -138,7 +138,7 @@ export class MilestoneNode extends DecoratorNode<void> {
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     return dom;
   }
 

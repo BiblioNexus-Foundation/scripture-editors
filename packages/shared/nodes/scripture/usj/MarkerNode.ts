@@ -75,7 +75,7 @@ export class MarkerNode extends TextNode {
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), this.__isOpening ? "opening" : "closing");
+    dom.classList.add(this.__type, this.__isOpening ? "opening" : "closing");
     return dom;
   }
 

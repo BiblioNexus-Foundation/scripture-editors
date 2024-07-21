@@ -1,12 +1,7 @@
 import { LexicalEditor, PASTE_COMMAND } from "lexical";
 
 export const pasteSelection = (editor: LexicalEditor) => {
-  navigator.clipboard.read().then(async () => {
-    const data = new DataTransfer();
-
-    const items = await navigator.clipboard.read();
-    const item = items[0];
-
+  navigator.clipboard.read().then(async (items) => {
     const permission = await navigator.permissions.query({
       // @ts-expect-error These types are incorrect.
       name: "clipboard-read",
@@ -16,6 +11,8 @@ export const pasteSelection = (editor: LexicalEditor) => {
       return;
     }
 
+    const data = new DataTransfer();
+    const item = items[0];
     for (const type of item.types) {
       const dataString = await (await item.getType(type)).text();
       data.setData(type, dataString);
@@ -24,7 +21,6 @@ export const pasteSelection = (editor: LexicalEditor) => {
     const event = new ClipboardEvent("paste", {
       clipboardData: data,
     });
-
     editor.dispatchCommand(PASTE_COMMAND, event);
   });
 };
