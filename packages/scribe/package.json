@@ -16,6 +16,7 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
+    "!dist/package.json",
     "src/index.ts",
     "src/editor"
   ],
@@ -28,7 +29,7 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@biblionexus-foundation/scripture-utilities": "^0.0.3",
+    "@biblionexus-foundation/scripture-utilities": "workspace:^",
     "@lexical/mark": "^0.16.1",
     "@lexical/react": "^0.16.1",
     "@lexical/selection": "^0.16.1",

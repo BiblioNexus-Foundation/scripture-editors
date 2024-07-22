@@ -255,8 +255,8 @@ importers:
   packages/scribe:
     dependencies:
       '@biblionexus-foundation/scripture-utilities':
-        specifier: ^0.0.3
-        version: 0.0.3
+        specifier: workspace:^
+        version: link:../utilities
       '@lexical/mark':
         specifier: ^0.16.1
         version: 0.16.1
@@ -1054,9 +1054,6 @@ packages:
 
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
-
-  '@biblionexus-foundation/scripture-utilities@0.0.3':
-    resolution: {integrity: sha512-Mu0G7wvsZ1hV9BknwXYIPgVpG93fyALPJXsPVSlvkD9SjA+xhsAqQV9hM3x/4SReN9eNlqfCnB6jEH9H/877/Q==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -7131,10 +7128,6 @@ snapshots:
       to-fast-properties: 2.0.0
 
   '@bcoe/v8-coverage@0.2.3': {}
-
-  '@biblionexus-foundation/scripture-utilities@0.0.3':
-    dependencies:
-      '@xmldom/xmldom': 0.8.10
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
