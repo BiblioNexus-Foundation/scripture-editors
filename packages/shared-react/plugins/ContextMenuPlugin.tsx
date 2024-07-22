@@ -26,6 +26,9 @@ function ContextMenuItem({
   if (isSelected) {
     className += " selected";
   }
+  if (option.isDisabled) {
+    className += " disabled";
+  }
   return (
     <li
       key={option.key}
@@ -34,9 +37,10 @@ function ContextMenuItem({
       ref={option.setRefElement}
       role="option"
       aria-selected={isSelected}
+      aria-disabled={option.isDisabled}
       id={"typeahead-item-" + index}
       onMouseEnter={onMouseEnter}
-      onClick={onClick}
+      onClick={option.isDisabled ? undefined : onClick}
     >
       <span className="text">{option.title}</span>
     </li>
@@ -75,19 +79,27 @@ function ContextMenu({
 export class ContextMenuOption extends MenuOption {
   title: string;
   onSelect: (targetNode: LexicalNode | null) => void;
+  isDisabled: boolean;
+
   constructor(
     title: string,
     options: {
       onSelect: (targetNode: LexicalNode | null) => void;
+      isDisabled?: boolean;
     },
   ) {
     super(title);
     this.title = title;
     this.onSelect = options.onSelect.bind(this);
+    this.isDisabled = options.isDisabled || false;
   }
 }
 
-export default function ContextMenuPlugin(): JSX.Element {
+export default function ContextMenuPlugin({
+  isReadonly = false,
+}: {
+  isReadonly?: boolean;
+}): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const closeMenuRef = useRef<(() => void) | undefined>();
 
@@ -97,6 +109,7 @@ export default function ContextMenuPlugin(): JSX.Element {
         onSelect: () => {
           editor.dispatchCommand(CUT_COMMAND, null);
         },
+        isDisabled: isReadonly,
       }),
       new ContextMenuOption(`Copy`, {
         onSelect: () => {
@@ -107,11 +120,13 @@ export default function ContextMenuPlugin(): JSX.Element {
         onSelect: () => {
           pasteSelection(editor);
         },
+        isDisabled: isReadonly,
       }),
       new ContextMenuOption(`Paste as Plain Text`, {
         onSelect: () => {
           pasteSelectionAsPlainText(editor);
         },
+        isDisabled: isReadonly,
       }),
     ];
   }, [editor]);
@@ -167,8 +182,10 @@ export default function ContextMenuPlugin(): JSX.Element {
                   options={options}
                   selectedItemIndex={selectedIndex}
                   onOptionClick={(option: ContextMenuOption, index: number) => {
-                    setHighlightedIndex(index);
-                    selectOptionAndCleanUp(option);
+                    if (!option.isDisabled) {
+                      setHighlightedIndex(index);
+                      selectOptionAndCleanUp(option);
+                    }
                   }}
                   onOptionMouseEnter={(index: number) => {
                     setHighlightedIndex(index);

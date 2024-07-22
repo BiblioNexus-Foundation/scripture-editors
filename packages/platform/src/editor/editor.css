@@ -818,6 +818,11 @@ button.toolbar-item.active i {
   background: #eee;
 }
 
+.typeahead-popover ul li.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .typeahead-popover li {
   margin: 0 8px 0 8px;
   padding: 8px;
