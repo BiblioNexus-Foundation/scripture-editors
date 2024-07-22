@@ -4,7 +4,7 @@ import { IS_APPLE } from "@lexical/utils";
 import { COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 
-const ClipboardPlugin = () => {
+export default function ClipboardPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {
@@ -38,6 +38,4 @@ const ClipboardPlugin = () => {
   }, [editor]);
 
   return null;
-};
-
-export default ClipboardPlugin;
+}
