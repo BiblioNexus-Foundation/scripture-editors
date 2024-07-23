@@ -95,12 +95,9 @@ export class ContextMenuOption extends MenuOption {
   }
 }
 
-export default function ContextMenuPlugin({
-  isReadonly = false,
-}: {
-  isReadonly?: boolean;
-}): JSX.Element {
+export default function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
+  const isReadonly = !editor.isEditable();
   const closeMenuRef = useRef<(() => void) | undefined>();
 
   const options = useMemo(() => {

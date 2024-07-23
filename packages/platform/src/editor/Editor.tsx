@@ -236,7 +236,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           />
           <AnnotationPlugin ref={annotationRef} logger={logger} />
           <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
-          <ContextMenuPlugin isReadonly={isReadonly} />
+          <ContextMenuPlugin />
           <ClipboardPlugin />
           {children}
         </div>
