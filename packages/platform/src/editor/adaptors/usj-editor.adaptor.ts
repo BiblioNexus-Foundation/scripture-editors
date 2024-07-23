@@ -27,10 +27,10 @@ import {
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
 import {
-  SerializedImmutableChapterNode,
-  IMMUTABLE_CHAPTER_VERSION,
-  ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+  SerializedImmutableChapterNumberNode,
+  IMMUTABLE_CHAPTER_NUMBER_VERSION,
+  ImmutableChapterNumberNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNumberNode";
 import {
   SerializedChapterNode,
   CHAPTER_VERSION,
@@ -226,7 +226,7 @@ function setLogger(logger: LoggerBasic | undefined) {
 export function getChapterNodeClass(viewOptions: ViewOptions | undefined) {
   if (!viewOptions) return;
 
-  return viewOptions.markerMode === "editable" ? ChapterNode : ImmutableChapterNode;
+  return ChapterNode;
 }
 
 /**
@@ -281,36 +281,37 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
   };
 }
 
-function createChapter(
-  markerObject: MarkerObject,
-): SerializedChapterNode | SerializedImmutableChapterNode {
+function createChapter(markerObject: MarkerObject): SerializedChapterNode {
   const { marker, number, sid, altnumber, pubnumber } = markerObject;
   if (marker !== CHAPTER_MARKER) {
     _logger?.warn(`Unexpected chapter marker '${marker}'!`);
   }
-  const ChapterNodeClass = getChapterNodeClass(_viewOptions) ?? ImmutableChapterNode;
-  const type = ChapterNodeClass.getType();
-  const version =
-    _viewOptions?.markerMode === "editable" ? CHAPTER_VERSION : IMMUTABLE_CHAPTER_VERSION;
   let text: string | undefined;
   const classList = getClassList(_viewOptions);
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
   else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
+  const children = [
+    _viewOptions?.markerMode === "editable"
+      ? createText(text ?? "")
+      : createImmutableChapterNumber(number ?? "", showMarker),
+  ];
 
   return {
-    type,
-    text,
+    type: ChapterNode.getType(),
     marker: marker as ChapterMarker,
     number: number ?? "",
     classList,
     sid,
     altnumber,
     pubnumber,
-    showMarker,
     unknownAttributes,
-    version,
+    children,
+    direction: null,
+    format: "",
+    indent: 0,
+    version: CHAPTER_VERSION,
   };
 }
 
@@ -539,6 +540,18 @@ function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
     mode: "normal",
     style: "",
     version: 1,
+  };
+}
+
+function createImmutableChapterNumber(
+  number: string,
+  showMarker?: boolean,
+): SerializedImmutableChapterNumberNode {
+  return {
+    type: ImmutableChapterNumberNode.getType(),
+    number,
+    showMarker,
+    version: IMMUTABLE_CHAPTER_NUMBER_VERSION,
   };
 }
 

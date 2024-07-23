@@ -148,12 +148,22 @@ export const editorStateGen1v1 = {
         ],
       },
       {
-        type: "immutable-chapter",
+        type: "chapter",
         marker: "c",
         number: "1",
         classList: ["text-spacing", "formatted-font"],
         sid: "GEN 1",
+        direction: null,
+        format: "",
+        indent: 0,
         version: 1,
+        children: [
+          {
+            type: "immutable-chapter-number",
+            number: "1",
+            version: 1,
+          },
+        ],
       },
       {
         type: "para",
@@ -343,9 +353,22 @@ export const editorStateGen1v1Editable = {
         marker: "c",
         number: "1",
         sid: "GEN 1",
-        text: `\\c${NBSP}1 `,
         classList: [],
+        direction: null,
+        format: "",
+        indent: 0,
         version: 1,
+        children: [
+          {
+            type: "text",
+            text: `\\c${NBSP}1 `,
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "para",
@@ -742,6 +765,24 @@ export const editorStateGen1v1ImpliedPara = {
         ],
       },
       {
+        type: "chapter",
+        marker: "c",
+        number: "1",
+        classList: ["text-spacing", "formatted-font"],
+        sid: "GEN 1",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "immutable-chapter-number",
+            number: "1",
+            version: 1,
+          },
+        ],
+      },
+      {
         type: "implied-para",
         direction: null,
         format: "",
@@ -749,14 +790,6 @@ export const editorStateGen1v1ImpliedPara = {
         textFormat: 0,
         version: 1,
         children: [
-          {
-            type: "immutable-chapter",
-            marker: "c",
-            number: "1",
-            classList: ["text-spacing", "formatted-font"],
-            sid: "GEN 1",
-            version: 1,
-          },
           { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
           {
             type: "text",
@@ -1307,12 +1340,22 @@ export const editorStateWithUnknownItems = {
         ],
       },
       {
-        type: "immutable-chapter",
+        type: "chapter",
         marker: "c",
         number: "1",
         classList: ["text-spacing", "formatted-font"],
         unknownAttributes: { "attr-unknown": "watAttr" },
+        direction: null,
+        format: "",
+        indent: 0,
         version: 1,
+        children: [
+          {
+            type: "immutable-chapter-number",
+            number: "1",
+            version: 1,
+          },
+        ],
       },
       {
         type: "para",

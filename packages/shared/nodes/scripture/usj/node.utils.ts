@@ -2,7 +2,7 @@
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
-import { ImmutableChapterNode } from "./ImmutableChapterNode";
+import { ImmutableChapterNumberNode } from "./ImmutableChapterNumberNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
@@ -11,7 +11,7 @@ import { CharNode, SerializedCharNode } from "./CharNode";
 export type UnknownAttributes = { [name: string]: string | undefined };
 
 // If you want use these utils with your own chapter node, add it to this list of types.
-type ChapterNodes = ChapterNode | ImmutableChapterNode;
+type ChapterNodes = ChapterNode | ImmutableChapterNumberNode;
 // If you want use these utils with your own verse node, add it to this list of types.
 type VerseNodes = VerseNode | ImmutableVerseNode;
 
@@ -78,10 +78,10 @@ export function extractNonNumberedMarkers(markers: string[] | readonly string[])
  * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findChapter<T extends ChapterNodes = ImmutableChapterNode>(
+export function findChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
   nodes: LexicalNode[],
   chapterNum: number,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
+  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
 ) {
   return nodes.find(
     (node) =>
@@ -97,10 +97,10 @@ export function findChapter<T extends ChapterNodes = ImmutableChapterNode>(
  * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the next chapter node if found, `undefined` otherwise.
  */
-export function findNextChapter<T extends ChapterNodes = ImmutableChapterNode>(
+export function findNextChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
   nodes: LexicalNode[],
   isCurrentChapterAtFirstNode = false,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
+  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
 ) {
   return nodes.find(
     (node, index) =>
@@ -114,9 +114,9 @@ export function findNextChapter<T extends ChapterNodes = ImmutableChapterNode>(
  * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findThisChapter<T extends ChapterNodes = ImmutableChapterNode>(
+export function findThisChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
   node: LexicalNode | null | undefined,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
+  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
 ) {
   if (!node) return;
 

@@ -55,7 +55,9 @@ export function insertChapterNode({
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      const chapterNode = $createChapterNode(chapter, classList, text, sid, altnumber, pubnumber);
+      const chapterNode = $createChapterNode(chapter, classList, sid, altnumber, pubnumber);
+      const textNode = $createTextNode(text);
+      chapterNode.append(textNode);
       const spaceNode = $createTextNode(" ");
       selection.insertNodes([chapterNode, spaceNode]);
       moveToEndOfNode(selection, spaceNode);
