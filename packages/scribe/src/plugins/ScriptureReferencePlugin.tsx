@@ -19,7 +19,7 @@ import {
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
 import { ViewOptions } from "../adaptors/view-options.utils";
-import { getChapterNodeClass, getVerseNodeClass } from "../adaptors/usj-editor.adaptor";
+import { getVerseNodeClass } from "../adaptors/usj-editor.adaptor";
 import { BookCode } from "utilities/src/converters/usj/usj.model.ts";
 
 /** Prevents the cursor being moved again after a selection has changed. */
@@ -90,14 +90,13 @@ export function ScriptureReferencePlugin({
 }
 
 function $moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOptions?: ViewOptions) {
-  const ChapterNodeClass = getChapterNodeClass(viewOptions);
   const VerseNodeClass = getVerseNodeClass(viewOptions);
-  if (!ChapterNodeClass || !VerseNodeClass) return;
+  if (!VerseNodeClass) return;
 
   const children = $getRoot().getChildren();
-  const chapterNode = findChapter(children, chapterNum, ChapterNodeClass);
+  const chapterNode = findChapter(children, chapterNum);
   const nodesInChapter = removeNodesBeforeNode(children, chapterNode);
-  const nextChapterNode = findNextChapter(nodesInChapter, !!chapterNode, ChapterNodeClass);
+  const nextChapterNode = findNextChapter(nodesInChapter, !!chapterNode);
   if ((nextChapterNode && !chapterNode) || !chapterNode) return;
 
   removeNodeAndAfter(nodesInChapter, chapterNode, nextChapterNode);
@@ -115,11 +114,10 @@ function $findAndSetChapterAndVerse(
   viewOptions?: ViewOptions,
 ) {
   const startNode = $getSelection()?.getNodes()[0];
-  const ChapterNodeClass = getChapterNodeClass(viewOptions);
   const VerseNodeClass = getVerseNodeClass(viewOptions);
-  if (!startNode || !ChapterNodeClass || !VerseNodeClass) return false;
+  if (!startNode || !VerseNodeClass) return false;
 
-  const chapterNode = findThisChapter(startNode, ChapterNodeClass);
+  const chapterNode = findThisChapter(startNode);
   const verseNode = findThisVerse(startNode, VerseNodeClass);
   hasSelectionChanged = !!(
     (chapterNode && +chapterNode.getNumber() !== chapterNum) ||

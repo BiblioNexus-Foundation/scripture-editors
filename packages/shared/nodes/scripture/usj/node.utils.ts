@@ -2,7 +2,6 @@
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
-import { ImmutableChapterNumberNode } from "./ImmutableChapterNumberNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
@@ -10,8 +9,6 @@ import { CharNode, SerializedCharNode } from "./CharNode";
 
 export type UnknownAttributes = { [name: string]: string | undefined };
 
-// If you want use these utils with your own chapter node, add it to this list of types.
-type ChapterNodes = ChapterNode | ImmutableChapterNumberNode;
 // If you want use these utils with your own verse node, add it to this list of types.
 type VerseNodes = VerseNode | ImmutableVerseNode;
 
@@ -75,61 +72,47 @@ export function extractNonNumberedMarkers(markers: string[] | readonly string[])
  * Finds the chapter node with the given chapter number amongst the nodes.
  * @param nodes - Nodes to look in.
  * @param chapterNum - Chapter number to look for.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
-  nodes: LexicalNode[],
-  chapterNum: number,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
-) {
+export function findChapter(nodes: LexicalNode[], chapterNum: number) {
   return nodes.find(
     (node) =>
-      node.getType() === ChapterNodeClass.getType() &&
-      (node as T).getNumber() === chapterNum.toString(),
-  ) as T | undefined;
+      node.getType() === ChapterNode.getType() &&
+      (node as ChapterNode).getNumber() === chapterNum.toString(),
+  ) as ChapterNode | undefined;
 }
 
 /**
  * Finds the next chapter.
  * @param nodes - Nodes to look in.
  * @param isCurrentChapterAtFirstNode - If `true` ignore the first node.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the next chapter node if found, `undefined` otherwise.
  */
-export function findNextChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
-  nodes: LexicalNode[],
-  isCurrentChapterAtFirstNode = false,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
-) {
+export function findNextChapter(nodes: LexicalNode[], isCurrentChapterAtFirstNode = false) {
   return nodes.find(
     (node, index) =>
-      (!isCurrentChapterAtFirstNode || index > 0) && node.getType() === ChapterNodeClass.getType(),
-  ) as T | undefined;
+      (!isCurrentChapterAtFirstNode || index > 0) && node.getType() === ChapterNode.getType(),
+  ) as ChapterNode | undefined;
 }
 
 /**
  * Find the chapter that this node is in.
  * @param node - Node to find the chapter it's in.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findThisChapter<T extends ChapterNodes = ImmutableChapterNumberNode>(
-  node: LexicalNode | null | undefined,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNumberNode,
-) {
+export function findThisChapter(node: LexicalNode | null | undefined) {
   if (!node) return;
 
   // is this node a chapter
-  if (node.getType() === ChapterNodeClass.getType()) return node as T;
+  if (node.getType() === ChapterNode.getType()) return node as ChapterNode;
 
   // is the chapter a previous top level sibling
   let previousSibling = node.getTopLevelElement()?.getPreviousSibling();
-  while (previousSibling && previousSibling.getType() !== ChapterNodeClass.getType()) {
+  while (previousSibling && previousSibling.getType() !== ChapterNode.getType()) {
     previousSibling = previousSibling.getPreviousSibling();
   }
-  if (previousSibling && previousSibling.getType() === ChapterNodeClass.getType())
-    return previousSibling as T;
+  if (previousSibling && previousSibling.getType() === ChapterNode.getType())
+    return previousSibling as ChapterNode;
 }
 
 /**

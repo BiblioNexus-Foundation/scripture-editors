@@ -219,17 +219,6 @@ function setLogger(logger: LoggerBasic | undefined) {
 }
 
 /**
- * Get the chapter node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the chapter node class if the view is defined, `undefined` otherwise.
- */
-export function getChapterNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return ChapterNode;
-}
-
-/**
  * Get the verse node class for the given view options.
  * @param viewOptions - View options of the editor.
  * @returns the verse node class if the view is defined, `undefined` otherwise.
