@@ -327,6 +327,26 @@ export function getVisibleOpenMarkerText(marker: string, content: string | undef
 }
 
 /**
+ * Parse number from marker text.
+ * @param marker - Chapter or verse marker.
+ * @param text - Text to parse.
+ * @param number - Default number to use if none is found.
+ * @returns the parsed number or the default value as a string.
+ */
+export function parseNumberFromMarkerText(
+  marker: string,
+  text: string | undefined,
+  number: string,
+): string {
+  const openMarkerText = openingMarkerText(marker);
+  if (text && text.startsWith(openMarkerText)) {
+    const numberText = parseInt(text.slice(openMarkerText.length), 10);
+    if (!isNaN(numberText)) number = numberText.toString();
+  }
+  return number;
+}
+
+/**
  * Gets the preview text for a serialized note caller.
  * @param childNodes - Child nodes of the NoteNode.
  * @returns the preview text.

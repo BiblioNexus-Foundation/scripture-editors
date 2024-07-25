@@ -1,6 +1,11 @@
 import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
-import { findLastVerse, findThisVerse, getUnknownAttributes } from "./node.utils";
+import {
+  findLastVerse,
+  findThisVerse,
+  getUnknownAttributes,
+  parseNumberFromMarkerText,
+} from "./node.utils";
 import { $createImmutableVerseNode } from "./ImmutableVerseNode";
 import { $createVerseNode, VerseNode } from "./VerseNode";
 import { $createParaNode } from "./ParaNode";
@@ -159,6 +164,28 @@ describe("Editor Node Utilities", () => {
       const unknownAttributes = getUnknownAttributes({ type: "", marker: "" });
 
       expect(unknownAttributes).toBeUndefined();
+    });
+  });
+
+  describe("parseNumberFromMarkerText()", () => {
+    it("should return the default if not found", () => {
+      const marker = "";
+      const text = "";
+      const defaultNumber = "0";
+
+      const number = parseNumberFromMarkerText(marker, text, defaultNumber);
+
+      expect(number).toEqual("0");
+    });
+
+    it("should return the number if found", () => {
+      const marker = "c";
+      const text = "\\c 1 ";
+      const defaultNumber = "0";
+
+      const number = parseNumberFromMarkerText(marker, text, defaultNumber);
+
+      expect(number).toEqual("1");
     });
   });
 });

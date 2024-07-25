@@ -277,14 +277,13 @@ function createChapter(markerObject: MarkerObject): SerializedChapterNode {
   }
   let text: string | undefined;
   const classList = getClassList(_viewOptions);
+  const isEditable = _viewOptions?.markerMode === "editable";
   let showMarker: boolean | undefined;
-  if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
+  if (isEditable) text = getVisibleOpenMarkerText(marker, number);
   else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
   const children = [
-    _viewOptions?.markerMode === "editable"
-      ? createText(text ?? "")
-      : createImmutableChapterNumber(number ?? "", showMarker),
+    isEditable ? createText(text ?? "") : createImmutableChapterNumber(number ?? "", showMarker),
   ];
 
   return {
@@ -292,6 +291,7 @@ function createChapter(markerObject: MarkerObject): SerializedChapterNode {
     marker: marker as ChapterMarker,
     number: number ?? "",
     classList,
+    isEditable,
     sid,
     altnumber,
     pubnumber,

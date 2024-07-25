@@ -19,6 +19,7 @@ import { $createChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { $createVerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { emptyFootnote, Footnote, Char } from "../nodes/emptyFootNote";
 import { $wrapNodeInElement } from "@lexical/utils";
+import { $createImmutableChapterNumberNode } from "shared/nodes/scripture/usj/ImmutableChapterNumberNode";
 
 function moveToEndOfNode(selection: RangeSelection, node: TextNode) {
   const anchorOffset = node.getTextContentSize();
@@ -51,13 +52,13 @@ export function insertChapterNode({
     altnumber: string = "xx",
     pubnumber: string = "xx",
     text: string = chapter,
-    classList: string[] = ["chapter", "usfm_c", "text-spacing", "formatted-font"];
+    classList: string[] = ["text-spacing", "formatted-font"];
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      const chapterNode = $createChapterNode(chapter, classList, sid, altnumber, pubnumber);
-      const textNode = $createTextNode(text);
-      chapterNode.append(textNode);
+      const chapterNode = $createChapterNode(chapter, classList, false, sid, altnumber, pubnumber);
+      const chapterNumberNode = $createImmutableChapterNumberNode(text);
+      chapterNode.append(chapterNumberNode);
       const spaceNode = $createTextNode(" ");
       selection.insertNodes([chapterNode, spaceNode]);
       moveToEndOfNode(selection, spaceNode);

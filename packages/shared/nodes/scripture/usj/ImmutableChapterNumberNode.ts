@@ -9,8 +9,11 @@ import {
   Spread,
   LexicalEditor,
   DOMExportOutput,
+  DOMConversionMap,
+  DOMConversionOutput,
+  isHTMLElement,
 } from "lexical";
-import { getVisibleOpenMarkerText } from "./node.utils";
+import { getVisibleOpenMarkerText, parseNumberFromMarkerText } from "./node.utils";
 import { ChapterNode } from "./ChapterNode";
 
 export const IMMUTABLE_CHAPTER_NUMBER_VERSION = 1;
@@ -50,6 +53,19 @@ export class ImmutableChapterNumberNode extends DecoratorNode<void> {
     return node;
   }
 
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isChapterNumberElement(node)) return null;
+
+        return {
+          conversion: $convertImmutableChapterNumberElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
   setNumber(chapterNumber: string): void {
     const self = this.getWritable();
     self.__number = chapterNumber;
@@ -72,6 +88,7 @@ export class ImmutableChapterNumberNode extends DecoratorNode<void> {
 
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
+    dom.classList.add(this.__type);
     return dom;
   }
 
@@ -83,7 +100,9 @@ export class ImmutableChapterNumberNode extends DecoratorNode<void> {
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
     const { element } = super.exportDOM(editor);
-
+    if (element && isHTMLElement(element)) {
+      element.classList.add(this.getType());
+    }
     return { element };
   }
 
@@ -104,6 +123,22 @@ export class ImmutableChapterNumberNode extends DecoratorNode<void> {
       version: IMMUTABLE_CHAPTER_NUMBER_VERSION,
     };
   }
+
+  // Mutation
+
+  isInline(): false {
+    return false;
+  }
+}
+
+function $convertImmutableChapterNumberElement(element: HTMLElement): DOMConversionOutput {
+  const marker = element.parentElement?.getAttribute("data-marker") ?? "";
+  const defaultNumber = element.parentElement?.getAttribute("data-number") ?? "";
+  const text = element.textContent ?? "";
+  const number = parseNumberFromMarkerText(marker, text, defaultNumber);
+  const showMarker = text.startsWith("\\");
+  const node = $createImmutableChapterNumberNode(number, showMarker);
+  return { node };
 }
 
 export function $createImmutableChapterNumberNode(
@@ -111,6 +146,12 @@ export function $createImmutableChapterNumberNode(
   showMarker?: boolean,
 ): ImmutableChapterNumberNode {
   return $applyNodeReplacement(new ImmutableChapterNumberNode(chapterNumber, showMarker));
+}
+
+function isChapterNumberElement(node: HTMLElement | null | undefined): boolean {
+  if (!node) return false;
+
+  return node.classList.contains(ImmutableChapterNumberNode.getType());
 }
 
 export function $isImmutableChapterNumberNode(

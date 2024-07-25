@@ -7,8 +7,15 @@ import {
   Spread,
   SerializedElementNode,
   ElementNode,
+  DOMConversionMap,
+  DOMExportOutput,
+  isHTMLElement,
+  LexicalEditor,
+  RangeSelection,
+  DOMConversionOutput,
+  ElementFormatType,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node.utils";
+import { CHAPTER_CLASS_NAME, parseNumberFromMarkerText, UnknownAttributes } from "./node.utils";
 
 export const CHAPTER_MARKER = "c";
 export const CHAPTER_VERSION = 1;
@@ -19,6 +26,7 @@ export type SerializedChapterNode = Spread<
     marker: ChapterMarker;
     number: string;
     classList: string[];
+    isEditable?: boolean;
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
@@ -31,6 +39,7 @@ export class ChapterNode extends ElementNode {
   __marker: ChapterMarker;
   __number: string;
   __classList: string[];
+  __isEditable: boolean;
   __sid?: string;
   __altnumber?: string;
   __pubnumber?: string;
@@ -39,6 +48,7 @@ export class ChapterNode extends ElementNode {
   constructor(
     chapterNumber: string,
     classList: string[] = [],
+    isEditable = false,
     sid?: string,
     altnumber?: string,
     pubnumber?: string,
@@ -49,6 +59,7 @@ export class ChapterNode extends ElementNode {
     this.__marker = CHAPTER_MARKER;
     this.__number = chapterNumber;
     this.__classList = classList;
+    this.__isEditable = isEditable;
     this.__sid = sid;
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
@@ -60,11 +71,20 @@ export class ChapterNode extends ElementNode {
   }
 
   static clone(node: ChapterNode): ChapterNode {
-    const { __number, __classList, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } =
-      node;
+    const {
+      __number,
+      __classList,
+      __isEditable,
+      __sid,
+      __altnumber,
+      __pubnumber,
+      __unknownAttributes,
+      __key,
+    } = node;
     return new ChapterNode(
       __number,
       __classList,
+      __isEditable,
       __sid,
       __altnumber,
       __pubnumber,
@@ -78,6 +98,7 @@ export class ChapterNode extends ElementNode {
       marker,
       number,
       classList,
+      isEditable,
       sid,
       altnumber,
       pubnumber,
@@ -89,6 +110,7 @@ export class ChapterNode extends ElementNode {
     const node = $createChapterNode(
       number,
       classList,
+      isEditable,
       sid,
       altnumber,
       pubnumber,
@@ -99,6 +121,19 @@ export class ChapterNode extends ElementNode {
     node.setIndent(indent);
     node.setDirection(direction);
     return node;
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    return {
+      p: (node: HTMLElement) => {
+        if (!isChapterElement(node)) return null;
+
+        return {
+          conversion: $convertChapterElement,
+          priority: 1,
+        };
+      },
+    };
   }
 
   setMarker(marker: ChapterMarker): void {
@@ -129,6 +164,16 @@ export class ChapterNode extends ElementNode {
   getClassList(): string[] {
     const self = this.getLatest();
     return self.__classList;
+  }
+
+  setIsEditable(isEditable: boolean): void {
+    const self = this.getWritable();
+    self.__isEditable = isEditable;
+  }
+
+  getIsEditable(): boolean {
+    const self = this.getLatest();
+    return self.__isEditable;
   }
 
   setSid(sid: string | undefined): void {
@@ -176,6 +221,7 @@ export class ChapterNode extends ElementNode {
     dom.setAttribute("data-marker", this.__marker);
     dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
     dom.setAttribute("data-number", this.__number);
+    if (!this.__isEditable) dom.setAttribute("contenteditable", "false");
     return dom;
   }
 
@@ -185,6 +231,18 @@ export class ChapterNode extends ElementNode {
     return false;
   }
 
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.getMarker()}`, ...this.getClassList());
+      element.setAttribute("data-number", this.getNumber());
+      if (!this.getIsEditable()) element.setAttribute("contenteditable", "false");
+    }
+
+    return { element };
+  }
+
   exportJSON(): SerializedChapterNode {
     return {
       ...super.exportJSON(),
@@ -192,6 +250,7 @@ export class ChapterNode extends ElementNode {
       marker: this.getMarker(),
       number: this.getNumber(),
       classList: this.getClassList(),
+      isEditable: this.getIsEditable(),
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
@@ -199,19 +258,72 @@ export class ChapterNode extends ElementNode {
       version: CHAPTER_VERSION,
     };
   }
+
+  // Mutation
+
+  insertNewAfter(_rangeSelection: RangeSelection, restoreSelection: boolean): ChapterNode {
+    const newElement = $createChapterNode(
+      this.getNumber(),
+      this.getClassList(),
+      this.getIsEditable(),
+      this.getSid(),
+      this.getAltnumber(),
+      this.getPubnumber(),
+    );
+    newElement.setFormat(this.getFormatType());
+    newElement.setIndent(this.getIndent());
+    newElement.setDirection(this.getDirection());
+    this.insertAfter(newElement, restoreSelection);
+    return newElement;
+  }
+}
+
+function $convertChapterElement(element: HTMLElement): DOMConversionOutput {
+  const marker = element.getAttribute("data-marker") ?? "";
+  const defaultNumber = element.getAttribute("data-number") ?? "";
+  const text = element.textContent ?? "";
+  const number = parseNumberFromMarkerText(marker, text, defaultNumber);
+  const domNode = element.cloneNode(false) as HTMLElement;
+  domNode.classList.remove(CHAPTER_CLASS_NAME, `usfm_${marker}`, "ltr", "rtl");
+  const classList = [...domNode.classList.values()];
+  const isEditable = element.getAttribute("contenteditable") !== "false";
+  const node = $createChapterNode(number, classList, isEditable);
+  if (element.style) {
+    node.setFormat(element.style.textAlign as ElementFormatType);
+    const indent = parseInt(element.style.textIndent, 10) / 20;
+    if (indent > 0) {
+      node.setIndent(indent);
+    }
+  }
+  return { node };
 }
 
 export function $createChapterNode(
   chapterNumber: string,
   classList?: string[],
+  isEditable?: boolean,
   sid?: string,
   altnumber?: string,
   pubnumber?: string,
   unknownAttributes?: UnknownAttributes,
 ): ChapterNode {
   return $applyNodeReplacement(
-    new ChapterNode(chapterNumber, classList, sid, altnumber, pubnumber, unknownAttributes),
+    new ChapterNode(
+      chapterNumber,
+      classList,
+      isEditable,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    ),
   );
+}
+
+function isChapterElement(node: HTMLElement | null | undefined): boolean {
+  if (!node) return false;
+
+  return node.classList.contains(CHAPTER_CLASS_NAME);
 }
 
 export function $isChapterNode(node: LexicalNode | null | undefined): node is ChapterNode {
