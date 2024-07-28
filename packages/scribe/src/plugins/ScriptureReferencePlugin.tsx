@@ -74,13 +74,15 @@ export function ScriptureReferencePlugin({
   }, [editor, chapterNum, verseNum, viewOptions]);
 
   // selection changed
-  useEffect(() => {
-    editor.registerCommand(
-      SELECTION_CHANGE_COMMAND,
-      () => $findAndSetChapterAndVerse(bookCode, chapterNum, verseNum, setScrRef, viewOptions),
-      COMMAND_PRIORITY_LOW,
-    );
-  }, [editor, bookCode, chapterNum, verseNum, setScrRef, viewOptions]);
+  useEffect(
+    () =>
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => $findAndSetChapterAndVerse(bookCode, chapterNum, verseNum, setScrRef, viewOptions),
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor, bookCode, chapterNum, verseNum, setScrRef, viewOptions],
+  );
 
   editor.registerUpdateListener(({ editorState }) => {
     $getBookCode(editorState, setScrRef);

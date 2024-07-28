@@ -12,10 +12,13 @@ import {
   DOMConversionMap,
   DOMConversionOutput,
   isHTMLElement,
+  createCommand,
+  LexicalCommand,
 } from "lexical";
 import { getVisibleOpenMarkerText, parseNumberFromMarkerText } from "./node.utils";
 import { ChapterNode } from "./ChapterNode";
 
+export const SELECT_IMMUTABLE_CHAPTER_NUMBER_COMMAND: LexicalCommand<string> = createCommand();
 export const IMMUTABLE_CHAPTER_NUMBER_VERSION = 1;
 
 export type SerializedImmutableChapterNumberNode = Spread<
@@ -148,7 +151,7 @@ export function $createImmutableChapterNumberNode(
   return $applyNodeReplacement(new ImmutableChapterNumberNode(chapterNumber, showMarker));
 }
 
-function isChapterNumberElement(node: HTMLElement | null | undefined): boolean {
+export function isChapterNumberElement(node: HTMLElement | null | undefined): boolean {
   if (!node) return false;
 
   return node.classList.contains(ImmutableChapterNumberNode.getType());

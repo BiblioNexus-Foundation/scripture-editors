@@ -16,7 +16,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ScriptureReference } from "platform-bible-react";
+import type { ScriptureReference } from "platform-bible-react";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import AnnotationPlugin, {
@@ -24,13 +24,14 @@ import AnnotationPlugin, {
   AnnotationRef,
 } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
-import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
-import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
+import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import SelectionPlugin from "shared-react/plugins/SelectionPlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
@@ -238,6 +239,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
           <ContextMenuPlugin />
           <ClipboardPlugin />
+          <SelectionPlugin />
           {children}
         </div>
       </div>

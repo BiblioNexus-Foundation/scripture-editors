@@ -7,6 +7,11 @@ import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalCont
 import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as ReactDOM from "react-dom";
+import {
+  isChapterNumberOrChild,
+  isEditorInput,
+  isImmutableChapter,
+} from "shared/nodes/scripture/usj/node.utils";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 
 function ContextMenuItem({
@@ -98,6 +103,8 @@ export class ContextMenuOption extends MenuOption {
 export default function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const isReadonly = !editor.isEditable();
+  const targetRef = useRef<HTMLElement | undefined>(undefined);
+  const editorInputClassNameRef = useRef<string>();
   const closeMenuRef = useRef<(() => void) | undefined>();
 
   const options = useMemo(() => {
@@ -139,6 +146,10 @@ export default function ContextMenuPlugin(): JSX.Element {
   );
 
   useEffect(() => {
+    editorInputClassNameRef.current = editor.getRootElement()?.className || "";
+  }, [editor]);
+
+  useEffect(() => {
     const handleScroll = () => {
       closeMenuRef.current?.();
     };
@@ -154,6 +165,9 @@ export default function ContextMenuPlugin(): JSX.Element {
     <LexicalContextMenuPlugin
       options={options}
       onSelectOption={onSelectOption}
+      onWillOpen={(event: MouseEvent) => {
+        targetRef.current = event.target as HTMLElement;
+      }}
       menuRenderFn={(
         anchorElementRef,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -164,7 +178,10 @@ export default function ContextMenuPlugin(): JSX.Element {
         closeMenuRef.current = () =>
           selectOptionAndCleanUp(undefined as unknown as ContextMenuOption);
 
-        return anchorElementRef.current
+        return anchorElementRef.current &&
+          !isChapterNumberOrChild(targetRef.current) &&
+          !isEditorInput(targetRef.current, editorInputClassNameRef.current) &&
+          !isImmutableChapter(targetRef.current)
           ? ReactDOM.createPortal(
               <div
                 className="typeahead-popover auto-embed-menu"

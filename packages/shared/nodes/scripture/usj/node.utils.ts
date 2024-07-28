@@ -2,6 +2,7 @@
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
+import { isChapterNumberElement } from "./ImmutableChapterNumberNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
@@ -376,7 +377,6 @@ export function getEditableCallerText(noteCaller: string): string {
  * @param childNodes - Child nodes of the NoteNode.
  * @returns the preview text.
  */
-
 export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
   const previewText = childNodes
     .reduce(
@@ -397,4 +397,114 @@ export function getUnknownAttributes(markerObject: MarkerObject): UnknownAttribu
   const attributes: Partial<MarkerObject> = { ...markerObject };
   MARKER_OBJECT_PROPS.forEach((property) => delete attributes[property]);
   return Object.keys(attributes).length === 0 ? undefined : (attributes as UnknownAttributes);
+}
+
+/**
+ * Checks if the given element is an ImmutableChapterNumberNode or a child of one.
+ *
+ * This function traverses up the DOM tree from the given element, checking each ancestor until it
+ * finds an ImmutableChapterNumberNode or reaches the top of the tree.
+ *
+ * @param element - The HTML element to check. This is typically the target of a mouse event.
+ *
+ * @returns `true` if the element is an ImmutableChapterNumberNode or is a descendant of an
+ *   ImmutableChapterNumberNode. Returns `false` otherwise.
+ *
+ * @example
+ * // Assuming 'event' is a MouseEvent:
+ * const shouldPreventContextMenu = isImmutableChapterNumberOrChild(event.target as HTMLElement);
+ *
+ * @remarks
+ * This function is useful for handling events that might bubble up from child elements of an
+ * ImmutableChapterNumberNode. It ensures that we correctly identify clicks or other interactions
+ * that should be treated as targeting the ImmutableChapterNumberNode, even if they technically
+ * occurred on a child element.
+ */
+export function isChapterNumberOrChild(element: HTMLElement | null | undefined): boolean {
+  while (element) {
+    if (isChapterNumberElement(element)) {
+      return true;
+    }
+    element = element.parentElement;
+  }
+  return false;
+}
+
+/**
+ * Checks if the given HTML element is an editor input.
+ *
+ * @param element - The HTML element to check.
+ * @param editorInputClassName - The class name that identifies an editor input. Defaults to "editor-input".
+ * @returns `true` if the element is an editor input, `false` otherwise.
+ */
+export function isEditorInput(
+  element: HTMLElement | null | undefined,
+  editorInputClassName = "editor-input",
+): boolean {
+  return !!element && element.classList.contains(editorInputClassName);
+}
+
+/**
+ * Determines if the given HTML element represents an immutable chapter.
+ *
+ * @param element - The HTML element to check.
+ * @returns `true` if the element is an immutable chapter, `false` otherwise.
+ */
+export function isImmutableChapter(element: HTMLElement | null | undefined): boolean {
+  if (!element) return false;
+
+  const oneChild = element.children.length === 1 ? (element.children[0] as HTMLElement) : undefined;
+  return (
+    element.classList.contains(ChapterNode.getType()) &&
+    !!oneChild &&
+    isChapterNumberOrChild(oneChild)
+  );
+}
+
+/**
+ * Finds the nearest element with a specified class name within a container,
+ * based on the given x and y coordinates.
+ *
+ * @param container - The HTML element to search within.
+ * @param className - The class name to search for.
+ * @param x - The x-coordinate of the point to measure distance from (usually the click
+ *   x-coordinate).
+ * @param y - The y-coordinate of the point to measure distance from (usually the click
+ *   y-coordinate).
+ * @returns The nearest HTMLElement with the specified class, or `undefined`` if no matching element
+ *   is found.
+ *
+ * @remarks
+ * This function measures the distance from the given (x, y) coordinates to the center of each
+ * element with the specified class name. It returns the element with the shortest distance.
+ *
+ * The function uses `getBoundingClientRect()` to calculate element positions, which may trigger a
+ * reflow. Consider caching element positions if performance becomes an issue with many elements.
+ */
+export function findNearestElementOfClass(
+  container: HTMLElement,
+  className: string,
+  x: number,
+  y: number,
+): HTMLElement | undefined {
+  // Get all elements with the specified class within the container
+  const elements = container.getElementsByClassName(className);
+  if (elements.length === 0) return undefined;
+
+  // Convert HTMLCollection to array and sort by distance to click point
+  return Array.from(elements).sort((a, b) => {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    const distanceA = Math.hypot(
+      x - (rectA.left + rectA.width / 2),
+      y - (rectA.top + rectA.height / 2),
+    );
+    const distanceB = Math.hypot(
+      x - (rectB.left + rectB.width / 2),
+      y - (rectB.top + rectB.height / 2),
+    );
+
+    return distanceA - distanceB;
+  })[0] as HTMLElement;
 }

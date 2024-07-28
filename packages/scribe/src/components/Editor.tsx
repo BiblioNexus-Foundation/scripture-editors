@@ -16,6 +16,7 @@ import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-option
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import SelectionPlugin from "shared-react/plugins/SelectionPlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import { ViewOptions } from "../adaptors/view-options.utils";
@@ -125,6 +126,7 @@ const Editor = forwardRef(function Editor(
         <ContextMenuPlugin />
         <ClipboardPlugin />
         <ScriptureReferencePlugin viewOptions={viewOptions} scrRef={scrRef} setScrRef={setScrRef} />
+        <SelectionPlugin />
       </LexicalComposer>
     </>
   );
