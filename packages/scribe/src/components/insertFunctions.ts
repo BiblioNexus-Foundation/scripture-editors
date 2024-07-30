@@ -50,12 +50,11 @@ export function insertChapterNode({
   const sid: string = "xx",
     altnumber: string = "xx",
     pubnumber: string = "xx",
-    text: string = chapter,
-    classList: string[] = ["text-spacing", "formatted-font"];
+    text: string = chapter;
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      const chapterNode = $createChapterNode(chapter, classList, sid, altnumber, pubnumber);
+      const chapterNode = $createChapterNode(chapter, sid, altnumber, pubnumber);
       const textNode = $createTextNode(text);
       chapterNode.append(textNode);
       const spaceNode = $createTextNode(" ");

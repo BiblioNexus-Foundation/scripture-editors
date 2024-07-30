@@ -21,7 +21,7 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { forwardRef, useCallback, useEffect, useState } from "react";
-import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
 
 function Divider(): JSX.Element {
@@ -55,7 +55,7 @@ const ToolbarPlugin = forwardRef<HTMLDivElement>(function ToolbarPlugin(_props, 
       const nodeKey = node.getKey();
       const elementDOM = activeEditor.getElementByKey(nodeKey);
 
-      if (elementDOM !== null) setBlockMarker((node as ParaNode).getMarker());
+      if (elementDOM !== null && $isParaNode(node)) setBlockMarker(node.getMarker());
     }
   }, [activeEditor]);
 

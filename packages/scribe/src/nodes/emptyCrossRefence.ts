@@ -8,7 +8,6 @@ export const emptyFootnote = {
       version: 1,
       textFormat: 0,
       marker: "p",
-      classList: ["text-spacing", "formatted-font"],
       children: [
         {
           type: "note",

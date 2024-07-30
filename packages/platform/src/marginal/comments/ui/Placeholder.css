@@ -20,5 +20,6 @@
 @media (max-width: 1025px) {
   .Placeholder__root {
     left: 8px;
+    right: 8px;
   }
 }

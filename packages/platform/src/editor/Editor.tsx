@@ -30,12 +30,14 @@ import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-option
 import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
+import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
-import { ViewOptions } from "./adaptors/view-options.utils";
+import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
@@ -76,6 +78,8 @@ export type EditorOptions = {
   isReadonly?: boolean;
   /** Is the editor enabled for spell checking. */
   hasSpellCheck?: boolean;
+  /** Text direction. */
+  textDirection?: TextDirection;
   /** View options. */
   view?: ViewOptions;
   /** Options for each editor node:
@@ -116,6 +120,8 @@ const editorConfig: Mutable<InitialConfigType> = {
   nodes: [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
 
+const defaultViewOptions = getViewOptions(undefined);
+
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
 }
@@ -154,7 +160,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const {
     isReadonly = false,
     hasSpellCheck = false,
-    view: viewOptions,
+    textDirection = "auto",
+    view: viewOptions = defaultViewOptions,
     nodes: nodeOptions = {},
   } = options ?? {};
   useDefaultNodeOptions(nodeOptions);
@@ -209,7 +216,10 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="editor-input" spellCheck={hasSpellCheck} />
+              <ContentEditable
+                className={`editor-input ${getViewClassList(viewOptions).join(" ")}`}
+                spellCheck={hasSpellCheck}
+              />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
@@ -238,6 +248,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
           <ContextMenuPlugin />
           <ClipboardPlugin />
+          <TextDirectionPlugin textDirection={textDirection} />
           {children}
         </div>
       </div>

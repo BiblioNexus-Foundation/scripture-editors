@@ -105,7 +105,7 @@ import {
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { ViewOptions, getClassList, getVerseNodeClass, getViewOptions } from "./view-options.utils";
+import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
   initialize: typeof initialize;
@@ -252,7 +252,6 @@ function createChapter(
   if (marker !== CHAPTER_MARKER) {
     _logger?.warn(`Unexpected chapter marker '${marker}'!`);
   }
-  const classList = getClassList(_viewOptions);
   const unknownAttributes = getUnknownAttributes(markerObject);
   let showMarker: boolean | undefined;
   if (_viewOptions?.markerMode === "visible") showMarker = true;
@@ -262,7 +261,6 @@ function createChapter(
         type: ChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
-        classList,
         sid,
         altnumber,
         pubnumber,
@@ -277,7 +275,6 @@ function createChapter(
         type: ImmutableChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
-        classList,
         showMarker,
         sid,
         altnumber,
@@ -361,7 +358,6 @@ function createPara(
   if (!ParaNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected para marker '${marker}'!`);
   }
-  const classList = getClassList(_viewOptions);
   const children: SerializedLexicalNode[] = [];
   if (_viewOptions?.markerMode === "editable")
     children.push(createMarker(marker), createText(NBSP));
@@ -371,7 +367,6 @@ function createPara(
   return {
     type: ParaNode.getType(),
     marker,
-    classList,
     unknownAttributes,
     children,
     direction: null,
@@ -664,7 +659,9 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
 function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
   const bookNodeIndex = nodes.findIndex((node) => node.type === BookNode.getType());
   const isBookNodeFound = bookNodeIndex >= 0;
-  const chapterNodeIndex = nodes.findIndex((node) => node.type === ChapterNode.getType());
+  const chapterNodeIndex = nodes.findIndex(
+    (node) => node.type === ChapterNode.getType() || node.type === ImmutableChapterNode.getType(),
+  );
   const isChapterNodeFound = chapterNodeIndex >= 0;
   if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {
     const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, bookNodeIndex));

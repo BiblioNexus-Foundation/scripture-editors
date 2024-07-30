@@ -1,6 +1,6 @@
 import { JSX } from "react";
-import DropDown, { DropDownItem } from "./DropDown";
-import { viewModeToViewNames, ViewNameKey } from "./view-mode.model";
+import DropDown, { DropDownItem } from "./editor/toolbar/DropDown";
+import { viewModeToViewNames, ViewNameKey } from "./editor/adaptors/view-mode.model";
 
 function viewModeToClassName(viewMode: string): string {
   return viewMode in viewModeToViewNames ? viewMode : "";
@@ -33,14 +33,14 @@ export default function ViewModeDropDown({
       buttonLabel={viewModeLabel(viewMode)}
       buttonAriaLabel="Selection options for view mode"
     >
-      {Object.keys(viewModeToViewNames).map((itemViewMode) => (
+      {Object.keys(viewModeToViewNames).map((item) => (
         <DropDownItem
-          key={itemViewMode}
-          className={"item view-mode " + dropDownActiveClass(viewMode === itemViewMode)}
-          onClick={() => handleSelect(itemViewMode)}
+          key={item}
+          className={"item view-mode " + dropDownActiveClass(viewMode === item)}
+          onClick={() => handleSelect(item)}
         >
-          <i className={"icon view-mode " + viewModeToClassName(itemViewMode)} />
-          {viewModeToViewNames[itemViewMode as ViewNameKey]}
+          <i className={"icon view-mode " + viewModeToClassName(item)} />
+          {viewModeToViewNames[item as ViewNameKey]}
         </DropDownItem>
       ))}
     </DropDown>

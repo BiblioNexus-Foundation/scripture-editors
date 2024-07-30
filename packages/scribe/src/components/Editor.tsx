@@ -18,7 +18,7 @@ import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import { ViewOptions } from "../adaptors/view-options.utils";
+import { getViewClassList, ViewOptions } from "../adaptors/view-options.utils";
 import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
 import useDeferredState from "../hooks/use-deferred-state.hook";
 import { ScriptureReferencePlugin, ScriptureReference } from "../plugins/ScriptureReferencePlugin";
@@ -107,7 +107,11 @@ const Editor = forwardRef(function Editor(
       <LexicalComposer initialConfig={initialConfig}>
         <Toolbar />
         <RichTextPlugin
-          contentEditable={<ContentEditable className="outline-none" />}
+          contentEditable={
+            <ContentEditable
+              className={`editor-input outline-none ${getViewClassList(viewOptions).join(" ")}`}
+            />
+          }
           placeholder={<LoadingSpinner />}
           ErrorBoundary={LexicalErrorBoundary}
         />
