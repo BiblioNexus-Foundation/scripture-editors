@@ -18,9 +18,13 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { ViewOptions } from "../adaptors/view-options.utils";
-import { getChapterNodeClass, getVerseNodeClass } from "../adaptors/usj-editor.adaptor";
 import { BookCode } from "utilities/src/converters/usj/usj.model.ts";
+import {
+  getChapterNodeClass,
+  getVerseNodeClass,
+  getViewOptions,
+  ViewOptions,
+} from "../adaptors/view-options.utils";
 
 /** Prevents the cursor being moved again after a selection has changed. */
 let hasSelectionChanged = false;
@@ -41,7 +45,7 @@ export interface ScriptureReference {
 export function ScriptureReferencePlugin({
   scrRef,
   setScrRef,
-  viewOptions,
+  viewOptions = getViewOptions(),
 }: {
   scrRef: ScriptureReference;
   setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
@@ -74,13 +78,15 @@ export function ScriptureReferencePlugin({
   }, [editor, chapterNum, verseNum, viewOptions]);
 
   // selection changed
-  useEffect(() => {
-    editor.registerCommand(
-      SELECTION_CHANGE_COMMAND,
-      () => $findAndSetChapterAndVerse(bookCode, chapterNum, verseNum, setScrRef, viewOptions),
-      COMMAND_PRIORITY_LOW,
-    );
-  }, [editor, bookCode, chapterNum, verseNum, setScrRef, viewOptions]);
+  useEffect(
+    () =>
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => $findAndSetChapterAndVerse(bookCode, chapterNum, verseNum, setScrRef, viewOptions),
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor, bookCode, chapterNum, verseNum, setScrRef, viewOptions],
+  );
 
   editor.registerUpdateListener(({ editorState }) => {
     $getBookCode(editorState, setScrRef);

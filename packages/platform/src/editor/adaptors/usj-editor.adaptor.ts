@@ -92,8 +92,6 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
-  TEXT_SPACING_CLASS_NAME,
-  FORMATTED_FONT_CLASS_NAME,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -107,7 +105,7 @@ import {
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { ViewOptions, getViewOptions } from "./view-options.utils";
+import { ViewOptions, getClassList, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
   initialize: typeof initialize;
@@ -218,40 +216,6 @@ function setLogger(logger: LoggerBasic | undefined) {
   if (logger) _logger = logger;
 }
 
-/**
- * Get the chapter node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the chapter node class if the view is defined, `undefined` otherwise.
- */
-export function getChapterNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return viewOptions.markerMode === "editable" ? ChapterNode : ImmutableChapterNode;
-}
-
-/**
- * Get the verse node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the verse node class if the view is defined, `undefined` otherwise.
- */
-export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return viewOptions.markerMode === "editable" ? VerseNode : ImmutableVerseNode;
-}
-
-/**
- * Get the class list for an element node.
- * @param viewOptions - View options of the editor.
- * @returns the element class list based on view options.
- */
-function getClassList(viewOptions: ViewOptions | undefined) {
-  const classList: string[] = [];
-  if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
-  if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
-  return classList;
-}
-
 function getTextContent(markers: MarkerContent[] | undefined): string {
   if (!markers || markers.length !== 1 || typeof markers[0] !== "string") return "";
 
@@ -288,30 +252,39 @@ function createChapter(
   if (marker !== CHAPTER_MARKER) {
     _logger?.warn(`Unexpected chapter marker '${marker}'!`);
   }
-  const ChapterNodeClass = getChapterNodeClass(_viewOptions) ?? ImmutableChapterNode;
-  const type = ChapterNodeClass.getType();
-  const version =
-    _viewOptions?.markerMode === "editable" ? CHAPTER_VERSION : IMMUTABLE_CHAPTER_VERSION;
-  let text: string | undefined;
   const classList = getClassList(_viewOptions);
-  let showMarker: boolean | undefined;
-  if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
-  else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
+  let showMarker: boolean | undefined;
+  if (_viewOptions?.markerMode === "visible") showMarker = true;
 
-  return {
-    type,
-    text,
-    marker: marker as ChapterMarker,
-    number: number ?? "",
-    classList,
-    sid,
-    altnumber,
-    pubnumber,
-    showMarker,
-    unknownAttributes,
-    version,
-  };
+  return _viewOptions?.markerMode === "editable"
+    ? {
+        type: ChapterNode.getType(),
+        marker: marker as ChapterMarker,
+        number: number ?? "",
+        classList,
+        sid,
+        altnumber,
+        pubnumber,
+        unknownAttributes,
+        children: [createText(getVisibleOpenMarkerText(marker, number) ?? "")],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: CHAPTER_VERSION,
+      }
+    : {
+        type: ImmutableChapterNode.getType(),
+        marker: marker as ChapterMarker,
+        number: number ?? "",
+        classList,
+        showMarker,
+        sid,
+        altnumber,
+        pubnumber,
+        unknownAttributes,
+        version: IMMUTABLE_CHAPTER_VERSION,
+      };
 }
 
 function createVerse(

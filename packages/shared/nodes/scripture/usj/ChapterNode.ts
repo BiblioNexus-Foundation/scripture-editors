@@ -5,10 +5,8 @@ import {
   type NodeKey,
   $applyNodeReplacement,
   Spread,
-  TextNode,
   SerializedElementNode,
   ElementNode,
-  $createTextNode,
 } from "lexical";
 import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node.utils";
 
@@ -21,7 +19,6 @@ export type SerializedChapterNode = Spread<
     marker: ChapterMarker;
     number: string;
     classList: string[];
-    text?: string;
     sid?: string;
     altnumber?: string;
     pubnumber?: string;
@@ -42,7 +39,6 @@ export class ChapterNode extends ElementNode {
   constructor(
     chapterNumber: string,
     classList: string[] = [],
-    text?: string,
     sid?: string,
     altnumber?: string,
     pubnumber?: string,
@@ -57,7 +53,6 @@ export class ChapterNode extends ElementNode {
     this.__altnumber = altnumber;
     this.__pubnumber = pubnumber;
     this.__unknownAttributes = unknownAttributes;
-    this.append($createTextNode(text ?? chapterNumber));
   }
 
   static getType(): string {
@@ -67,11 +62,9 @@ export class ChapterNode extends ElementNode {
   static clone(node: ChapterNode): ChapterNode {
     const { __number, __classList, __sid, __altnumber, __pubnumber, __unknownAttributes, __key } =
       node;
-    const __text = node.getFirstChild<TextNode>()?.getTextContent();
     return new ChapterNode(
       __number,
       __classList,
-      __text,
       __sid,
       __altnumber,
       __pubnumber,
@@ -85,7 +78,6 @@ export class ChapterNode extends ElementNode {
       marker,
       number,
       classList,
-      text,
       sid,
       altnumber,
       pubnumber,
@@ -97,7 +89,6 @@ export class ChapterNode extends ElementNode {
     const node = $createChapterNode(
       number,
       classList,
-      text,
       sid,
       altnumber,
       pubnumber,
@@ -188,6 +179,12 @@ export class ChapterNode extends ElementNode {
     return dom;
   }
 
+  updateDOM(): boolean {
+    // Returning false tells Lexical that this node does not need its
+    // DOM element replacing with a new copy from createDOM.
+    return false;
+  }
+
   exportJSON(): SerializedChapterNode {
     return {
       ...super.exportJSON(),
@@ -195,7 +192,6 @@ export class ChapterNode extends ElementNode {
       marker: this.getMarker(),
       number: this.getNumber(),
       classList: this.getClassList(),
-      text: this.getFirstChild<TextNode>()?.getTextContent(),
       sid: this.getSid(),
       altnumber: this.getAltnumber(),
       pubnumber: this.getPubnumber(),
@@ -208,14 +204,13 @@ export class ChapterNode extends ElementNode {
 export function $createChapterNode(
   chapterNumber: string,
   classList?: string[],
-  text?: string,
   sid?: string,
   altnumber?: string,
   pubnumber?: string,
   unknownAttributes?: UnknownAttributes,
 ): ChapterNode {
   return $applyNodeReplacement(
-    new ChapterNode(chapterNumber, classList, text, sid, altnumber, pubnumber, unknownAttributes),
+    new ChapterNode(chapterNumber, classList, sid, altnumber, pubnumber, unknownAttributes),
   );
 }
 

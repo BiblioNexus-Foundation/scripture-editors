@@ -26,6 +26,7 @@ import {
   $isTextNode,
   CLEAR_EDITOR_COMMAND,
   COMMAND_PRIORITY_EDITOR,
+  COMMAND_PRIORITY_NORMAL,
   createCommand,
   KEY_ESCAPE_COMMAND,
 } from "lexical";
@@ -117,7 +118,7 @@ function EscapeHandlerPlugin({ onEscape }: { onEscape: (e: KeyboardEvent) => boo
       (event: KeyboardEvent) => {
         return onEscape(event);
       },
-      2,
+      COMMAND_PRIORITY_NORMAL,
     );
   }, [editor, onEscape]);
 

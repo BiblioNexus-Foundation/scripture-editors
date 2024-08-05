@@ -6,7 +6,7 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { ScriptureReference } from "platform-bible-react";
+import type { ScriptureReference } from "platform-bible-utils";
 import { useEffect } from "react";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
@@ -18,8 +18,12 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { ViewOptions, getViewOptions } from "./adaptors/view-options.utils";
-import { getChapterNodeClass, getVerseNodeClass } from "./adaptors/usj-editor.adaptor";
+import {
+  getChapterNodeClass,
+  getVerseNodeClass,
+  getViewOptions,
+  ViewOptions,
+} from "./adaptors/view-options.utils";
 
 /** Prevents the cursor being moved again after a selection has changed. */
 let hasSelectionChanged = false;
