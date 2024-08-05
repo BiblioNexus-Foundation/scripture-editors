@@ -141,13 +141,22 @@ export class ParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const { marker, classList, unknownAttributes, format, indent, direction, textFormat } =
-      serializedNode;
+    const {
+      marker,
+      classList,
+      unknownAttributes,
+      format,
+      indent,
+      direction,
+      textFormat,
+      textStyle,
+    } = serializedNode;
     const node = $createParaNode(marker, classList, unknownAttributes);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
     node.setTextFormat(textFormat);
+    node.setTextStyle(textStyle);
     return node;
   }
 
@@ -230,10 +239,12 @@ export class ParaNode extends ParagraphNode {
 
   insertNewAfter(rangeSelection: RangeSelection, restoreSelection: boolean): ParagraphNode {
     const newElement = $createParaNode(this.getMarker(), this.getClassList());
-    newElement.setFormat(this.getFormatType());
-    newElement.setIndent(this.getIndent());
-    newElement.setDirection(this.getDirection());
     newElement.setTextFormat(rangeSelection.format);
+    newElement.setTextStyle(rangeSelection.style);
+    newElement.setDirection(this.getDirection());
+    newElement.setFormat(this.getFormatType());
+    newElement.setStyle(this.getTextStyle());
+    newElement.setIndent(this.getIndent());
     this.insertAfter(newElement, restoreSelection);
     return newElement;
   }

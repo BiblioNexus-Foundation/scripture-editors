@@ -371,6 +371,7 @@ function createImpliedPara(children: SerializedLexicalNode[]): SerializedImplied
     format: "",
     indent: 0,
     textFormat: 0,
+    textStyle: "",
     version: IMPLIED_PARA_VERSION,
   };
 }
@@ -400,6 +401,7 @@ function createPara(
     format: "",
     indent: 0,
     textFormat: 0,
+    textStyle: "",
     version: PARA_VERSION,
   };
 }

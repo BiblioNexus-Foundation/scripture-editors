@@ -16,9 +16,9 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/react": "^0.16.1",
-    "@lexical/utils": "^0.16.1",
-    "lexical": "^0.16.1"
+    "@lexical/react": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
+    "lexical": "^0.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
