@@ -22,12 +22,13 @@ export class ImpliedParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedImpliedParaNode): ImpliedParaNode {
-    const { format, indent, direction, textFormat } = serializedNode;
+    const { format, indent, direction, textFormat, textStyle } = serializedNode;
     const node = $createImpliedParaNode();
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
     node.setTextFormat(textFormat);
+    node.setTextStyle(textStyle);
     return node;
   }
 
@@ -49,10 +50,12 @@ export class ImpliedParaNode extends ParagraphNode {
 
   insertNewAfter(rangeSelection: RangeSelection, restoreSelection: boolean): ParagraphNode {
     const newElement = $createImpliedParaNode();
-    newElement.setFormat(this.getFormatType());
-    newElement.setIndent(this.getIndent());
-    newElement.setDirection(this.getDirection());
     newElement.setTextFormat(rangeSelection.format);
+    newElement.setTextStyle(rangeSelection.style);
+    newElement.setDirection(this.getDirection());
+    newElement.setFormat(this.getFormatType());
+    newElement.setStyle(this.getTextStyle());
+    newElement.setIndent(this.getIndent());
     this.insertAfter(newElement, restoreSelection);
     return newElement;
   }
