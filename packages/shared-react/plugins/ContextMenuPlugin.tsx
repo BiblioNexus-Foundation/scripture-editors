@@ -7,6 +7,7 @@ import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalCont
 import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as ReactDOM from "react-dom";
+import { isImmutableChapterElement } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 
 function ContextMenuItem({
@@ -95,10 +96,27 @@ export class ContextMenuOption extends MenuOption {
   }
 }
 
+/**
+ * Checks if the given HTML element is an editor input.
+ * @param element - The HTML element to check.
+ * @param editorInputClassName - The class name that identifies an editor input. Defaults to "editor-input".
+ * @returns `true` if the element is the editor input, `false` otherwise.
+ */
+function isEditorInput(
+  element: HTMLElement | null | undefined,
+  editorInputClassName = "editor-input",
+): boolean {
+  if (!element) return false;
+
+  return element.classList.contains(editorInputClassName);
+}
+
 export default function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const isReadonly = !editor.isEditable();
-  const closeMenuRef = useRef<(() => void) | undefined>();
+  const targetRef = useRef<HTMLElement>();
+  const editorInputClassNameRef = useRef<string>();
+  const closeMenuFnRef = useRef<() => void>();
 
   const options = useMemo(() => {
     return [
@@ -139,8 +157,12 @@ export default function ContextMenuPlugin(): JSX.Element {
   );
 
   useEffect(() => {
+    editorInputClassNameRef.current = editor.getRootElement()?.className || "";
+  }, [editor]);
+
+  useEffect(() => {
     const handleScroll = () => {
-      closeMenuRef.current?.();
+      closeMenuFnRef.current?.();
     };
 
     window.addEventListener("scroll", handleScroll, true);
@@ -154,6 +176,9 @@ export default function ContextMenuPlugin(): JSX.Element {
     <LexicalContextMenuPlugin
       options={options}
       onSelectOption={onSelectOption}
+      onWillOpen={(event: MouseEvent) => {
+        targetRef.current = event.target as HTMLElement;
+      }}
       menuRenderFn={(
         anchorElementRef,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -161,10 +186,12 @@ export default function ContextMenuPlugin(): JSX.Element {
         { setMenuRef },
       ) => {
         // Store the closeMenu function.
-        closeMenuRef.current = () =>
+        closeMenuFnRef.current = () =>
           selectOptionAndCleanUp(undefined as unknown as ContextMenuOption);
 
-        return anchorElementRef.current
+        return anchorElementRef.current &&
+          !isEditorInput(targetRef.current, editorInputClassNameRef.current) &&
+          !isImmutableChapterElement(targetRef.current)
           ? ReactDOM.createPortal(
               <div
                 className="typeahead-popover auto-embed-menu"

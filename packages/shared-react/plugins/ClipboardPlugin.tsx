@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { IS_APPLE } from "@lexical/utils";
 import { COPY_COMMAND, CUT_COMMAND } from "lexical";
@@ -7,7 +7,7 @@ import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 export default function ClipboardPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const { key, shiftKey, metaKey, ctrlKey, altKey } = event;
       if (!(IS_APPLE ? metaKey : ctrlKey) || altKey) return;

@@ -17,6 +17,7 @@ import { CHAPTER_CLASS_NAME, UnknownAttributes, getVisibleOpenMarkerText } from 
 
 export const CHAPTER_MARKER = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
+const IMMUTABLE_CHAPTER_TAG_NAME = "span";
 
 type ChapterMarker = typeof CHAPTER_MARKER;
 
@@ -111,7 +112,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   static importDOM(): DOMConversionMap | null {
     return {
       span: (node: HTMLElement) => {
-        if (!isChapterElement(node)) return null;
+        if (!isImmutableChapterElement(node)) return null;
 
         return {
           conversion: $convertImmutableChapterElement,
@@ -202,7 +203,7 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   }
 
   createDOM(): HTMLElement {
-    const dom = document.createElement("span");
+    const dom = document.createElement(IMMUTABLE_CHAPTER_TAG_NAME);
     dom.setAttribute("data-marker", this.__marker);
     dom.classList.add(CHAPTER_CLASS_NAME, `usfm_${this.__marker}`, ...this.__classList);
     dom.setAttribute("data-number", this.__number);
@@ -246,6 +247,12 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
       version: IMMUTABLE_CHAPTER_VERSION,
     };
   }
+
+  // Mutation
+
+  isInline(): false {
+    return false;
+  }
 }
 
 function $convertImmutableChapterElement(element: HTMLElement): DOMConversionOutput {
@@ -280,9 +287,13 @@ export function $createImmutableChapterNode(
   );
 }
 
-function isChapterElement(node: HTMLElement | null | undefined): boolean {
-  const marker = node?.getAttribute("data-marker") ?? undefined;
-  return marker === CHAPTER_MARKER;
+export function isImmutableChapterElement(element: HTMLElement | null | undefined): boolean {
+  if (!element) return false;
+
+  return (
+    element.classList.contains(CHAPTER_CLASS_NAME) &&
+    element.tagName.toLowerCase() === IMMUTABLE_CHAPTER_TAG_NAME
+  );
 }
 
 export function $isImmutableChapterNode(

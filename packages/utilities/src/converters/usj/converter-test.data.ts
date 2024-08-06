@@ -347,9 +347,22 @@ export const editorStateGen1v1Editable = {
         marker: "c",
         number: "1",
         sid: "GEN 1",
-        text: `\\c${NBSP}1 `,
         classList: [],
+        direction: null,
+        format: "",
+        indent: 0,
         version: 1,
+        children: [
+          {
+            type: "text",
+            text: `\\c${NBSP}1 `,
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
       },
       {
         type: "para",

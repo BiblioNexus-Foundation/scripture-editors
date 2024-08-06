@@ -15,7 +15,7 @@ import {
 import {
   NBSP,
   getEditableCallerText,
-  openingMarkerText,
+  parseNumberFromMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
 import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
@@ -98,22 +98,27 @@ function createBookMarker(
   });
 }
 
-function parseNumberFromText(marker: string, text: string | undefined, number: string): string {
-  const openMarkerText = openingMarkerText(marker);
-  if (text && text.startsWith(openMarkerText)) {
-    const numberText = parseInt(text.slice(openMarkerText.length), 10);
-    if (!isNaN(numberText)) number = numberText.toString();
-  }
-  return number;
+function createImmutableChapterMarker(node: SerializedImmutableChapterNode): MarkerObject {
+  const { marker, number, sid, altnumber, pubnumber, unknownAttributes } = node;
+  return removeUndefinedProperties({
+    type: ChapterNode.getType(),
+    marker,
+    number,
+    sid,
+    altnumber,
+    pubnumber,
+    ...unknownAttributes,
+  });
 }
 
 function createChapterMarker(
-  node: SerializedImmutableChapterNode | SerializedChapterNode,
+  node: SerializedChapterNode,
+  content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { marker, sid, altnumber, pubnumber, unknownAttributes } = node;
-  const { text } = node as SerializedChapterNode;
+  const text = content && typeof content[0] === "string" ? content[0] : undefined;
   let { number } = node;
-  number = parseNumberFromText(marker, text, number);
+  number = parseNumberFromMarkerText(marker, text, number);
   return removeUndefinedProperties({
     type: ChapterNode.getType(),
     marker,
@@ -129,7 +134,7 @@ function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseN
   const { marker, sid, altnumber, pubnumber, unknownAttributes } = node;
   const { text } = node as SerializedVerseNode;
   let { number } = node;
-  number = parseNumberFromText(marker, text, number);
+  number = parseNumberFromMarkerText(marker, text, number);
   return removeUndefinedProperties({
     type: VerseNode.getType(),
     marker,
@@ -216,6 +221,7 @@ export function recurseNodes(
   const markers: MarkerContent[] = [];
   nodes.forEach((node) => {
     const serializedBookNode = node as SerializedBookNode;
+    const serializedChapterNode = node as SerializedChapterNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
@@ -227,9 +233,11 @@ export function recurseNodes(
         );
         break;
       case ImmutableChapterNode.getType():
+        markers.push(createImmutableChapterMarker(node as SerializedImmutableChapterNode));
+        break;
       case ChapterNode.getType():
         markers.push(
-          createChapterMarker(node as SerializedImmutableChapterNode | SerializedChapterNode),
+          createChapterMarker(serializedChapterNode, recurseNodes(serializedChapterNode.children)),
         );
         break;
       case ImmutableVerseNode.getType():

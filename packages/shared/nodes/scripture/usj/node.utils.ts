@@ -331,6 +331,26 @@ export function closingMarkerText(marker: string): string {
 }
 
 /**
+ * Parse number from marker text.
+ * @param marker - Chapter or verse marker.
+ * @param text - Text to parse.
+ * @param number - Default number to use if none is found.
+ * @returns the parsed number or the default value as a string.
+ */
+export function parseNumberFromMarkerText(
+  marker: string,
+  text: string | undefined,
+  number: string,
+): string {
+  const openMarkerText = openingMarkerText(marker);
+  if (text && text.startsWith(openMarkerText)) {
+    const numberText = parseInt(text.slice(openMarkerText.length), 10);
+    if (!isNaN(numberText)) number = numberText.toString();
+  }
+  return number;
+}
+
+/**
  * Gets the open marker text with the marker visible.
  * @param marker - Verse marker.
  * @param content - Content such as chapter or verse number.
@@ -373,7 +393,6 @@ export function getEditableCallerText(noteCaller: string): string {
  * @param childNodes - Child nodes of the NoteNode.
  * @returns the preview text.
  */
-
 export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
   const previewText = childNodes
     .reduce(
