@@ -44,7 +44,6 @@ export interface Para {
   version: number;
   textFormat: number;
   marker: string;
-  classList: string[];
   children: Note[];
 }
 
@@ -62,7 +61,6 @@ export const emptyFootnote: Footnote = {
       version: 1,
       textFormat: 0,
       marker: "p",
-      classList: ["text-spacing", "formatted-font"],
       children: [
         {
           type: "note",

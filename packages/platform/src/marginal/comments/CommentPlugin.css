@@ -154,6 +154,10 @@ i.comments {
   transition: opacity 0.2s linear;
 }
 
+.CommentPlugin_ShowCommentsButton.Button__root:hover:not([disabled]) {
+  background-color: #eee;
+}
+
 .CommentPlugin_ShowCommentsButton:hover i.comments {
   opacity: 1;
 }

@@ -9,5 +9,5 @@ export {
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
 export { type EditorOptions, type EditorRef } from "./editor/Editor";
-export { type ViewMode } from "./editor/toolbar/view-mode.model";
+export { type ViewMode } from "./editor/adaptors/view-mode.model";
 export { type Comments } from "./marginal/comments/commenting";

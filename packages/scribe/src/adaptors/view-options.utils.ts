@@ -89,7 +89,7 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
  * @param viewOptions - View options of the editor.
  * @returns the element class list based on view options.
  */
-export function getClassList(viewOptions: ViewOptions | undefined) {
+export function getViewClassList(viewOptions: ViewOptions | undefined) {
   const classList: string[] = [];
   if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
   if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);

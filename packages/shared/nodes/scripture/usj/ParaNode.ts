@@ -106,7 +106,6 @@ export const PARA_VERSION = 1;
 export type SerializedParaNode = Spread<
   {
     marker: ParaMarker;
-    classList: string[];
     unknownAttributes?: UnknownAttributes;
   },
   SerializedParagraphNode
@@ -116,18 +115,15 @@ type ParaMarker = string;
 
 export class ParaNode extends ParagraphNode {
   __marker: ParaMarker;
-  __classList: string[];
   __unknownAttributes?: UnknownAttributes;
 
   constructor(
     marker: ParaMarker = PARA_MARKER_DEFAULT,
-    classList: string[] = [],
     unknownAttributes?: UnknownAttributes,
     key?: NodeKey,
   ) {
     super(key);
     this.__marker = marker;
-    this.__classList = classList;
     this.__unknownAttributes = unknownAttributes;
   }
 
@@ -136,22 +132,14 @@ export class ParaNode extends ParagraphNode {
   }
 
   static clone(node: ParaNode): ParaNode {
-    const { __marker, __classList, __unknownAttributes, __key } = node;
-    return new ParaNode(__marker, __classList, __unknownAttributes, __key);
+    const { __marker, __unknownAttributes, __key } = node;
+    return new ParaNode(__marker, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const {
-      marker,
-      classList,
-      unknownAttributes,
-      format,
-      indent,
-      direction,
-      textFormat,
-      textStyle,
-    } = serializedNode;
-    const node = $createParaNode(marker, classList, unknownAttributes);
+    const { marker, unknownAttributes, format, indent, direction, textFormat, textStyle } =
+      serializedNode;
+    const node = $createParaNode(marker, unknownAttributes);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -186,16 +174,6 @@ export class ParaNode extends ParagraphNode {
     return self.__marker;
   }
 
-  setClassList(classList: string[]): void {
-    const self = this.getWritable();
-    self.__classList = classList;
-  }
-
-  getClassList(): string[] {
-    const self = this.getLatest();
-    return self.__classList;
-  }
-
   setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
@@ -210,7 +188,7 @@ export class ParaNode extends ParagraphNode {
     // Define the DOM element here
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.__type, `usfm_${this.__marker}`, ...this.__classList);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     return dom;
   }
 
@@ -218,7 +196,7 @@ export class ParaNode extends ParagraphNode {
     const { element } = super.exportDOM(editor);
     if (element && isHTMLElement(element)) {
       element.setAttribute("data-marker", this.getMarker());
-      element.classList.add(this.getType(), `usfm_${this.getMarker()}`, ...this.getClassList());
+      element.classList.add(this.getType(), `usfm_${this.getMarker()}`);
     }
 
     return { element };
@@ -229,7 +207,6 @@ export class ParaNode extends ParagraphNode {
       ...super.exportJSON(),
       type: this.getType(),
       marker: this.getMarker(),
-      classList: this.getClassList(),
       unknownAttributes: this.getUnknownAttributes(),
       version: PARA_VERSION,
     };
@@ -238,7 +215,7 @@ export class ParaNode extends ParagraphNode {
   // Mutation
 
   insertNewAfter(rangeSelection: RangeSelection, restoreSelection: boolean): ParagraphNode {
-    const newElement = $createParaNode(this.getMarker(), this.getClassList());
+    const newElement = $createParaNode(this.getMarker());
     newElement.setTextFormat(rangeSelection.format);
     newElement.setTextStyle(rangeSelection.style);
     newElement.setDirection(this.getDirection());
@@ -252,11 +229,7 @@ export class ParaNode extends ParagraphNode {
 
 function $convertParaElement(element: HTMLElement): DOMConversionOutput {
   const marker = element.getAttribute("data-marker") ?? undefined;
-  const type = ParaNode.getType();
-  const domNode = element.cloneNode(false) as HTMLElement;
-  domNode.classList.remove(type, `usfm_${marker}`, "ltr", "rtl");
-  const classList = [...domNode.classList.values()];
-  const node = $createParaNode(marker, classList);
+  const node = $createParaNode(marker);
   if (element.style) {
     node.setFormat(element.style.textAlign as ElementFormatType);
     const indent = parseInt(element.style.textIndent, 10) / 20;
@@ -269,10 +242,9 @@ function $convertParaElement(element: HTMLElement): DOMConversionOutput {
 
 export function $createParaNode(
   marker?: ParaMarker,
-  classList?: string[],
   unknownAttributes?: UnknownAttributes,
 ): ParaNode {
-  return $applyNodeReplacement(new ParaNode(marker, classList, unknownAttributes));
+  return $applyNodeReplacement(new ParaNode(marker, unknownAttributes));
 }
 
 export function $isParaNode(node: LexicalNode | null | undefined): node is ParaNode {

@@ -6,11 +6,14 @@ import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { TextDirection } from "shared-react/plugins/text-direction.model";
 import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
-import ViewModeDropDown from "./editor/toolbar/ViewModeDropDown";
 import { EditorOptions } from "./editor/Editor";
 import { Comments } from "./marginal/comments/commenting";
 import Marginal, { MarginalRef } from "./marginal/Marginal";
+import TextDirectionDropDown from "./TextDirectionDropDown";
+import ViewModeDropDown from "./ViewModeDropDown";
+
 import "./App.css";
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
@@ -33,19 +36,36 @@ const annotationRange3 = {
 };
 const cursorLocation = { start: { jsonPath: "$.content[10].content[2]", offset: 15 } };
 
+function getOptions(
+  definedOptions: boolean,
+  hasSpellCheck: boolean,
+  textDirection: TextDirection,
+  viewMode: string | undefined,
+): EditorOptions {
+  return definedOptions
+    ? { hasSpellCheck, textDirection, view: getViewOptions(viewMode), nodes: nodeOptions }
+    : {};
+}
+
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
+  const [definedOptions, setDefinedOptions] = useState(true);
+  const [hasSpellCheck, setHasSpellCheck] = useState(false);
+  const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
+
   const options = useMemo<EditorOptions>(
-    () => ({ view: getViewOptions(viewMode), nodes: nodeOptions }),
-    [viewMode],
+    () => getOptions(definedOptions, hasSpellCheck, textDirection, viewMode),
+    [definedOptions, hasSpellCheck, textDirection, viewMode],
   );
 
   const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => {
     console.log({ usj, comments });
     marginalRef.current?.setUsj(usj);
   }, []);
+
+  const toggleDefineOptions = useCallback(() => setDefinedOptions((value) => !value), []);
 
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
@@ -84,8 +104,25 @@ export default function App() {
     <>
       <div className="controls">
         <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
-        <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
+        <button onClick={toggleDefineOptions}>
+          {definedOptions ? "Undefine" : "Define"} Options
+        </button>
       </div>
+      {definedOptions && (
+        <div className="defined-options">
+          <div className="checkbox">
+            <input
+              type="checkbox"
+              id="hasSpellCheckBox"
+              checked={hasSpellCheck}
+              onChange={(e) => setHasSpellCheck(e.target.checked)}
+            />
+            <label htmlFor="hasSpellCheckBox">Has Spell Check</label>
+          </div>
+          <TextDirectionDropDown textDirection={textDirection} handleSelect={setTextDirection} />
+          <ViewModeDropDown viewMode={viewMode} handleSelect={setViewMode} />
+        </div>
+      )}
       <Marginal
         ref={marginalRef}
         defaultUsj={defaultUsj}

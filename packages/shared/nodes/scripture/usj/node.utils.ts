@@ -1,7 +1,7 @@
 /** Utility functions for editor nodes */
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
-import { $isElementNode, LexicalNode, SerializedLexicalNode } from "lexical";
+import { $isElementNode, LexicalEditor, LexicalNode, SerializedLexicalNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
@@ -413,4 +413,19 @@ export function getUnknownAttributes(markerObject: MarkerObject): UnknownAttribu
   const attributes: Partial<MarkerObject> = { ...markerObject };
   MARKER_OBJECT_PROPS.forEach((property) => delete attributes[property]);
   return Object.keys(attributes).length === 0 ? undefined : (attributes as UnknownAttributes);
+}
+
+/**
+ * Retrieves the lowercase tag name of the DOM element associated with a LexicalNode.
+ * @param node - The LexicalNode for which to find the corresponding DOM element's tag name.
+ * @param editor - The LexicalEditor instance used to access the DOM.
+ * @returns The lowercase tag name of the DOM element if found, or `undefined` if no corresponding
+ *   DOM element exists.
+ */
+export function getNodeElementTagName(
+  node: LexicalNode,
+  editor: LexicalEditor,
+): string | undefined {
+  const domElement = editor.getElementByKey(node.getKey());
+  return domElement ? domElement.tagName.toLowerCase() : undefined;
 }

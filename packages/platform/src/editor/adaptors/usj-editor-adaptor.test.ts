@@ -27,8 +27,8 @@ import {
   usjMarks,
   usjWithUnknownItems,
 } from "../../../../utilities/src/converters/usj/converter-test.data";
-import { UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
 import { serializeEditorState, reset, initialize } from "./usj-editor.adaptor";
+import { UNFORMATTED_VIEW_MODE } from "./view-mode.model";
 import { getViewOptions } from "./view-options.utils";
 
 /**
