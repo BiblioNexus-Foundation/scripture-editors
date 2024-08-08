@@ -1,10 +1,12 @@
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
+import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { Provider } from "@lexical/yjs";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
 import React, {
@@ -17,6 +19,8 @@ import React, {
   useState,
 } from "react";
 import type { ScriptureReference } from "platform-bible-utils";
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import AnnotationPlugin, {
@@ -27,14 +31,12 @@ import { AnnotationRange, SelectionRange } from "shared-react/annotation/selecti
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
@@ -112,7 +114,8 @@ const editorConfig: Mutable<InitialConfigType> = {
   namespace: "platformEditor",
   theme: editorTheme,
   editable: true,
-  editorState: undefined,
+  // NOTE: This is critical for collaboration plugin to set editor state to null.
+  editorState: null,
   // Handling of errors during update
   onError(error) {
     throw error;
@@ -121,6 +124,19 @@ const editorConfig: Mutable<InitialConfigType> = {
 };
 
 const defaultViewOptions = getViewOptions(undefined);
+
+function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
+  let doc = yjsDocMap.get(id);
+
+  if (doc === undefined) {
+    doc = new Y.Doc();
+    yjsDocMap.set(id, doc);
+  } else {
+    doc.load();
+  }
+
+  return doc;
+}
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -153,6 +169,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor | null>(null);
+  const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const annotationRef = useRef<AnnotationRef | null>(null);
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const [usj, setUsj] = useState(defaultUsj);
@@ -196,6 +214,23 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     },
   }));
 
+  const handleConnectionToggle = () => {
+    if (yjsProvider == null) return;
+
+    if (isConnected) yjsProvider.disconnect();
+    else yjsProvider.connect();
+  };
+
+  const providerFactory = useCallback((id: string, yjsDocMap: Map<string, Y.Doc>) => {
+    const doc = getDocFromMap(id, yjsDocMap);
+    const provider = new WebsocketProvider("ws://localhost:1234", id, doc, {
+      connect: false,
+    }) as unknown as Provider;
+    provider.on("status", (event) => setIsConnected(event.status === "connected"));
+    setTimeout(() => setYjsProvider(provider), 0);
+    return provider;
+  }, []);
+
   const handleChange = useCallback(
     (editorState: EditorState) => {
       const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
@@ -211,7 +246,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="editor-container">
-        {!isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
+        {!isReadonly && (
+          <>
+            <button onClick={handleConnectionToggle}>
+              {isConnected ? "Disconnect" : "Connect"}
+            </button>
+            <ToolbarPlugin ref={toolbarEndRef} />
+          </>
+        )}
         <div className="editor-inner">
           <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
@@ -224,7 +266,11 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <HistoryPlugin />
+          <CollaborationPlugin
+            id="lexical/react-rich-collab"
+            providerFactory={providerFactory}
+            shouldBootstrap={false}
+          />
           {scrRef && setScrRef && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
@@ -232,13 +278,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               viewOptions={viewOptions}
             />
           )}
-          <UpdateStatePlugin
-            scripture={loadedUsj}
-            nodeOptions={nodeOptions}
-            editorAdaptor={usjEditorAdaptor}
-            viewOptions={viewOptions}
-            logger={logger}
-          />
           <OnChangePlugin
             onChange={handleChange}
             ignoreSelectionChange

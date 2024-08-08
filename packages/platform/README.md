@@ -28,7 +28,8 @@ npm install @biblionexus-foundation/platform-editor
 
 ## Usage
 
-**Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
+> [!NOTE]
+> This is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
 
 ```typescript
 import { EditorOptions, immutableNoteCallerNodeName, Marginal, MarginalRef, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
@@ -124,6 +125,10 @@ export default function App() {
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
 - Node options - callback for when a `<note>` link is clicked
+
+### Real-Time Collaborative Editing Feature
+
+See [Real-Time Collaborative Editing](COLLAB.md).
 
 ## Demo and Collaborative Web Development Environment
 
