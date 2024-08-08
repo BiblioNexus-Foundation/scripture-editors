@@ -50,7 +50,7 @@ const usx = `
 const defaultUsj = usxStringToUsj(emptyUsx);
 const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => console.log('Note was clicked!') } };
-const options: EditorOptions = { nodes: nodeOptions };
+const options: EditorOptions = { isReadonly: false, textDirection: "ltr", nodes: nodeOptions };
 // Word "man" inside first q1 of PSA 1:1.
 const annotationRange1 = {
   start: { jsonPath: "$.content[3].content[1]", offset: 15 },
@@ -119,10 +119,11 @@ export default function App() {
   - To use the editor without comments use the `<Editorial>` component.
 - Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
 - Set the cursor location or select a range.
+- Specify `textDirection` as `"ltr"`, `"rtl"`, or `"auto"`.
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
-- Node options - callback for `<note>` link
+- Node options - callback for when a `<note>` link is clicked
 
 ## Demo and Collaborative Web Development Environment
 
