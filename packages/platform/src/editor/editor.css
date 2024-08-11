@@ -48,14 +48,8 @@
   display: inline-block;
   pointer-events: none;
   margin-block-start: 1em;
-}
-
-.editor-input[dir="ltr"] ~ .editor-placeholder {
-  left: 10px;
-}
-
-.editor-input[dir="rtl"] ~ .editor-placeholder {
-  right: 10px;
+  margin-inline-start: calc(10px + 2.5vw);
+  width: -webkit-fill-available;
 }
 
 .editor-text-bold {

@@ -21,6 +21,11 @@ function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
         if (!rootElement || textDirection === "auto") return false;
 
         rootElement.dir = textDirection;
+        const placeholderClassName = editor._config.theme.placeholder;
+        const placeholderElement = document.getElementsByClassName(
+          placeholderClassName,
+        )[0] as HTMLElement;
+        if (placeholderElement) placeholderElement.dir = textDirection;
         return true;
       },
       COMMAND_PRIORITY_LOW,
