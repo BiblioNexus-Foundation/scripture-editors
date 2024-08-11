@@ -167,9 +167,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   useDefaultNodeOptions(nodeOptions);
 
   editorConfig.editable = !isReadonly;
-  editorConfig.editorState = (editor: LexicalEditor) => {
-    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, viewOptions));
-  };
   editorUsjAdaptor.initialize(logger);
 
   useImperativeHandle(ref, () => ({
