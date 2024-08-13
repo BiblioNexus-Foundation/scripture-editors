@@ -1,7 +1,8 @@
 import type { SerializedEditorState } from "lexical";
 import { MarkerContent, Usj } from "./usj.model";
 
-const NBSP = "\xa0";
+const NBSP = "\u00A0";
+const ZWSP = "\u200B";
 
 export const usxEmpty = '<usx version="3.0" />';
 
@@ -279,6 +280,15 @@ export const editorStateGen1v1 = {
                 detail: 0,
                 format: 0,
                 mode: "normal",
+                version: 1,
+              },
+              {
+                type: "text",
+                text: ZWSP,
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
                 version: 1,
               },
             ],
@@ -578,11 +588,11 @@ export const editorStateGen1v1Editable = {
                 type: "marker",
                 marker: "f",
                 isOpening: true,
+                text: "",
                 detail: 0,
                 format: 0,
                 mode: "normal",
                 style: "",
-                text: "",
                 version: 1,
               },
               {
@@ -640,11 +650,20 @@ export const editorStateGen1v1Editable = {
                 type: "marker",
                 marker: "f",
                 isOpening: false,
+                text: "",
                 detail: 0,
                 format: 0,
                 mode: "normal",
                 style: "",
-                text: "",
+                version: 1,
+              },
+              {
+                type: "text",
+                text: ZWSP,
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
                 version: 1,
               },
             ],
@@ -1376,6 +1395,15 @@ export const editorStateWithUnknownItems = {
                 detail: 0,
                 format: 0,
                 mode: "normal",
+                version: 1,
+              },
+              {
+                type: "text",
+                text: ZWSP,
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
                 version: 1,
               },
             ],

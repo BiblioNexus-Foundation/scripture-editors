@@ -92,10 +92,12 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
+  addEndingZwspIfMissing,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
+  removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
@@ -232,7 +234,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: BookNode.getType(),
     marker: marker as BookMarker,
     code: code ?? ("" as BookCode),
@@ -242,7 +244,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
     format: "",
     indent: 0,
     version: BOOK_VERSION,
-  };
+  });
 }
 
 function createChapter(
@@ -257,7 +259,7 @@ function createChapter(
   if (_viewOptions?.markerMode === "visible") showMarker = true;
 
   return _viewOptions?.markerMode === "editable"
-    ? {
+    ? removeUndefinedProperties({
         type: ChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -270,8 +272,8 @@ function createChapter(
         format: "",
         indent: 0,
         version: CHAPTER_VERSION,
-      }
-    : {
+      })
+    : removeUndefinedProperties({
         type: ImmutableChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -281,7 +283,7 @@ function createChapter(
         pubnumber,
         unknownAttributes,
         version: IMMUTABLE_CHAPTER_VERSION,
-      };
+      });
 }
 
 function createVerse(
@@ -300,7 +302,7 @@ function createVerse(
   else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type,
     text,
     marker: marker as VerseMarker,
@@ -311,7 +313,7 @@ function createVerse(
     showMarker,
     unknownAttributes,
     version,
-  };
+  });
 }
 
 function createChar(markerObject: MarkerObject): SerializedCharNode {
@@ -324,7 +326,7 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
     text = NBSP + text;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: CharNode.getType(),
     marker,
     text,
@@ -334,7 +336,7 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
     mode: "normal",
     style: "",
     version: CHAR_VERSION,
-  };
+  });
 }
 
 function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
@@ -364,7 +366,7 @@ function createPara(
   children.push(...childNodes);
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: ParaNode.getType(),
     marker,
     unknownAttributes,
@@ -375,7 +377,7 @@ function createPara(
     textFormat: 0,
     textStyle: "",
     version: PARA_VERSION,
-  };
+  });
 }
 
 function createNoteCaller(
@@ -391,13 +393,13 @@ function createNoteCaller(
   )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
-  return {
+  return removeUndefinedProperties({
     type: ImmutableNoteCallerNode.getType(),
     caller,
     previewText,
     onClick,
     version: IMMUTABLE_NOTE_CALLER_VERSION,
-  };
+  });
 }
 
 function createNote(
@@ -405,9 +407,7 @@ function createNote(
   childNodes: SerializedLexicalNode[],
 ): SerializedNoteNode {
   const { marker, category } = markerObject;
-  if (!NoteNode.isValidMarker(marker)) {
-    _logger?.warn(`Unexpected note marker '${marker}'!`);
-  }
+  if (!NoteNode.isValidMarker(marker)) _logger?.warn(`Unexpected note marker '${marker}'!`);
   const caller = markerObject.caller ?? "*";
   let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
   if (_viewOptions?.markerMode === "editable") {
@@ -419,6 +419,8 @@ function createNote(
       (node as SerializedTextNode).style = "display: none";
     });
   }
+  const unknownAttributes = getUnknownAttributes(markerObject);
+
   let openingMarkerNode: SerializedTextNode | undefined;
   let closingMarkerNode: SerializedTextNode | undefined;
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") {
@@ -429,9 +431,9 @@ function createNote(
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  const unknownAttributes = getUnknownAttributes(markerObject);
+  addEndingZwspIfMissing(children, TextNode.getType(), createText);
 
-  return {
+  return removeUndefinedProperties({
     type: NoteNode.getType(),
     marker: marker as NoteMarker,
     caller,
@@ -442,7 +444,7 @@ function createNote(
     format: "",
     indent: 0,
     version: NOTE_VERSION,
-  };
+  });
 }
 
 function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
@@ -452,14 +454,14 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: MilestoneNode.getType(),
     marker: marker as MilestoneMarker,
     sid,
     eid,
     unknownAttributes,
     version: MILESTONE_VERSION,
-  };
+  });
 }
 
 function createCommentMark(
@@ -485,7 +487,7 @@ function createUnknown(
   const tag = markerObject.type;
   const unknownAttributes = getUnknownAttributes(markerObject);
   const children: SerializedLexicalNode[] = [...childNodes];
-  return {
+  return removeUndefinedProperties({
     type: UnknownNode.getType(),
     tag,
     marker,
@@ -495,7 +497,7 @@ function createUnknown(
     format: "",
     indent: 0,
     version: UNKNOWN_VERSION,
-  };
+  });
 }
 
 function createMarker(marker: string, isOpening = true): SerializedMarkerNode {

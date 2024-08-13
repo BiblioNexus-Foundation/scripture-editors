@@ -88,6 +88,7 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
+  addEndingZwspIfMissing,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -401,9 +402,7 @@ function createNote(
   childNodes: SerializedLexicalNode[],
 ): SerializedNoteNode {
   const { marker, category } = markerObject;
-  if (!NoteNode.isValidMarker(marker)) {
-    _logger?.warn(`Unexpected note marker '${marker}'!`);
-  }
+  if (!NoteNode.isValidMarker(marker)) _logger?.warn(`Unexpected note marker '${marker}'!`);
   const caller = markerObject.caller ?? "*";
   let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
   if (_viewOptions?.markerMode === "editable") {
@@ -415,6 +414,8 @@ function createNote(
     //   (node as SerializedTextNode).style = "display: none";
     // });
   }
+  const unknownAttributes = getUnknownAttributes(markerObject);
+
   let openingMarkerNode: SerializedTextNode | undefined;
   let closingMarkerNode: SerializedTextNode | undefined;
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") {
@@ -425,7 +426,7 @@ function createNote(
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  const unknownAttributes = getUnknownAttributes(markerObject);
+  addEndingZwspIfMissing(children, TextNode.getType(), createText);
 
   return {
     type: NoteNode.getType(),

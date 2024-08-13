@@ -16,6 +16,8 @@ import {
   NBSP,
   getEditableCallerText,
   parseNumberFromMarkerText,
+  removeEndingZwsp,
+  removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
 import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
@@ -76,12 +78,6 @@ export function deserializeEditorState(editorState: EditorState): Usj | undefine
 
   const usj: Usj = { type: USJ_TYPE, version: USJ_VERSION, content };
   return usj;
-}
-
-function removeUndefinedProperties<T>(obj: T): T {
-  return Object.fromEntries(
-    Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined),
-  ) as T;
 }
 
 function createBookMarker(
@@ -176,6 +172,7 @@ function createNoteMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category, unknownAttributes } = node;
+  removeEndingZwsp(content);
   return removeUndefinedProperties({
     type,
     marker,
