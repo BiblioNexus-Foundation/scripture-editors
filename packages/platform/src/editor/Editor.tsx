@@ -29,6 +29,7 @@ import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
+import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
@@ -242,9 +243,10 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             ignoreHistoryMergeTagChange
           />
           <AnnotationPlugin ref={annotationRef} logger={logger} />
-          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
-          <ContextMenuPlugin />
           <ClipboardPlugin />
+          <CommandMenuPlugin logger={logger} />
+          <ContextMenuPlugin />
+          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
           <TextDirectionPlugin textDirection={textDirection} />
           {children}
         </div>
