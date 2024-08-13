@@ -27,3 +27,6 @@ dist-ssr
 
 # Collaboration
 /yjs-wss-db
+
+# Scripts
+/scripts/project_files.md
