@@ -21,6 +21,8 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { forwardRef, useCallback, useEffect, useState } from "react";
+import { $isBookNode } from "shared/nodes/scripture/usj/BookNode";
+import { $isImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
 
@@ -55,7 +57,11 @@ const ToolbarPlugin = forwardRef<HTMLDivElement>(function ToolbarPlugin(_props, 
       const nodeKey = node.getKey();
       const elementDOM = activeEditor.getElementByKey(nodeKey);
 
-      if (elementDOM !== null && $isParaNode(node)) setBlockMarker(node.getMarker());
+      if (
+        elementDOM !== null &&
+        ($isParaNode(node) || $isBookNode(node) || $isImmutableChapterNode(node))
+      )
+        setBlockMarker(node.getMarker());
     }
   }, [activeEditor]);
 
