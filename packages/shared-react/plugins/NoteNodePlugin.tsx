@@ -1,10 +1,10 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { $getNodeByKey, $getRoot, LexicalEditor } from "lexical";
+import { $createTextNode, $getNodeByKey, $getRoot, $isTextNode, LexicalEditor } from "lexical";
 import { useEffect } from "react";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, GENERATOR_NOTE_CALLER, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { getNoteCallerPreviewText } from "shared/nodes/scripture/usj/node.utils";
+import { getNoteCallerPreviewText, ZWSP } from "shared/nodes/scripture/usj/node.utils";
 import {
   $isImmutableNoteCallerNode,
   ImmutableNoteCallerNode,
@@ -33,6 +33,21 @@ function $noteCharNodeTransform(node: CharNode): void {
 
   const previewText = getNoteCallerPreviewText(children);
   (noteCaller as ImmutableNoteCallerNode).setPreviewText(previewText);
+}
+
+/**
+ * Ensure the note has an ending ZWSP so a double click on a word after only selects that word and
+ * does not include this note in the selection.
+ * @param node - NoteNode thats needs a ZWSP as its last child.
+ */
+function $noteNodeTransform(node: NoteNode): void {
+  if (!$isNoteNode(node)) return;
+
+  const children = node.getChildren();
+  const lastChild = children.length > 0 ? children[children.length - 1] : undefined;
+  if ($isTextNode(lastChild) && lastChild.getTextContent() === ZWSP) return;
+
+  node.append($createTextNode(ZWSP));
 }
 
 /**
@@ -70,6 +85,9 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
 
     return mergeRegister(
       editor.registerNodeTransform(CharNode, $noteCharNodeTransform),
+      editor.registerNodeTransform(NoteNode, $noteNodeTransform),
+
+      // Re-generate all note callers when a note is added or removed.
       editor.registerMutationListener(ImmutableNoteCallerNode, (nodeMutations) => {
         editor.update(() => {
           for (const [nodeKey, mutation] of nodeMutations) {
