@@ -21,7 +21,10 @@
     "src/editor"
   ],
   "scripts": {
+    "collab": "cross-env HOST=localhost PORT=1234 npx y-websocket",
+    "collab:persist": "cross-env HOST=localhost PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
     "dev": "vite",
+    "dev:collab": "cross-env NODE_ENV=development concurrently \"npm:collab:persist\" \"vite\"",
     "dev:test": "cross-env NODE_ENV=testing vite",
     "files:smash": "cd scripts && python3 ./consolidate_files.py",
     "prepublish": "cd ../.. && nx build platform"
@@ -37,13 +40,16 @@
     "@lexical/text": "^0.17.1",
     "@lexical/utils": "^0.17.1",
     "@lexical/yjs": "^0.17.1",
+    "@sillsdev/scripture": "^2.0.1",
     "fast-equals": "^5.0.1",
     "lexical": "^0.17.1",
-    "yjs": "^13.6.15"
+    "y-websocket": "^2.0.4",
+    "yjs": "^13.6.17"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
+    "concurrently": "^8.2.2",
     "platform-bible-react": "file:./lib/platform-bible-react",
     "platform-bible-utils": "file:./lib/platform-bible-utils",
     "react": "^18.3.1",
