@@ -269,6 +269,10 @@ export type MarginalRef = EditorRef & {
 };
 ```
 
+### Real-Time Collaborative Editing Feature
+
+See [Real-Time Collaborative Editing](COLLAB.md).
+
 ## Demo and Collaborative Web Development Environment
 
 Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main

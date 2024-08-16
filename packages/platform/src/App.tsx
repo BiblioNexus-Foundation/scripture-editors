@@ -3,7 +3,7 @@ import { BookChapterControl, ScriptureReference } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 // import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
-import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
+// import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
@@ -25,6 +25,7 @@ type Annotations = {
 };
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
+const projectId = "projectId";
 const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = {
   [immutableNoteCallerNodeName]: { onClick: () => console.log("note node clicked") },
@@ -150,7 +151,6 @@ export default function App() {
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      marginalRef.current?.setComments?.(comments as Comments);
       marginalRef.current?.setUsj(usxStringToUsj(usx));
     }, 1000);
     return () => clearTimeout(timeoutId);
@@ -228,6 +228,7 @@ export default function App() {
       <Marginal
         ref={marginalRef}
         defaultUsj={defaultUsj}
+        projectId={projectId}
         scrRef={scrRef}
         onScrRefChange={setScrRef}
         onSelectionChange={(selection) => console.log({ selection })}
