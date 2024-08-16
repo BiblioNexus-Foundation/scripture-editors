@@ -1,10 +1,13 @@
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
+import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { Provider } from "@lexical/yjs";
+import { Canon } from "@sillsdev/scripture";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
 import React, {
@@ -13,10 +16,13 @@ import React, {
   forwardRef,
   useCallback,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import type { ScriptureReference } from "platform-bible-utils";
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
@@ -110,6 +116,8 @@ export type EditorOptions = {
 export type EditorProps<TLogger extends LoggerBasic> = {
   /** Initial Scripture data in USJ format. */
   defaultUsj?: Usj;
+  /** Paratext Project ID. */
+  projectId?: string;
   /** Scripture reference that controls the general cursor location of the Scripture. */
   scrRef?: ScriptureReference;
   /** Callback function when the Scripture reference has changed. */
@@ -128,11 +136,14 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
+const chapterDesignation = "1-end";
+
 const editorConfig: Mutable<InitialConfigType> = {
   namespace: "platformEditor",
   theme: editorTheme,
   editable: true,
-  editorState: undefined,
+  // NOTE: This is critical for collaboration plugin to set editor state to null.
+  editorState: null,
   // Handling of errors during update
   onError(error) {
     throw error;
@@ -141,6 +152,19 @@ const editorConfig: Mutable<InitialConfigType> = {
 };
 
 const defaultViewOptions = getViewOptions(undefined);
+
+function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
+  let doc = yjsDocMap.get(id);
+
+  if (doc === undefined) {
+    doc = new Y.Doc();
+    yjsDocMap.set(id, doc);
+  } else {
+    doc.load();
+  }
+
+  return doc;
+}
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -164,6 +188,7 @@ function Placeholder(): JSX.Element {
 const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   {
     defaultUsj,
+    projectId,
     scrRef,
     onScrRefChange,
     onSelectionChange,
@@ -175,6 +200,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor | null>(null);
+  const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const annotationRef = useRef<AnnotationRef | null>(null);
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
@@ -227,6 +254,30 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     },
   }));
 
+  const docId = useMemo(() => {
+    if (!projectId || !scrRef?.bookNum || !chapterDesignation) return "";
+
+    const bookId = Canon.bookNumberToId(scrRef?.bookNum);
+    return `${projectId}/${bookId}_${chapterDesignation}`;
+  }, [projectId, scrRef?.bookNum]);
+
+  const handleConnectionToggle = () => {
+    if (yjsProvider == null) return;
+
+    if (isConnected) yjsProvider.disconnect();
+    else yjsProvider.connect();
+  };
+
+  const providerFactory = useCallback((id: string, yjsDocMap: Map<string, Y.Doc>) => {
+    const doc = getDocFromMap(id, yjsDocMap);
+    const provider = new WebsocketProvider("ws://localhost:1234", id, doc, {
+      connect: false,
+    }) as unknown as Provider;
+    provider.on("status", (event) => setIsConnected(event.status === "connected"));
+    setTimeout(() => setYjsProvider(provider), 0);
+    return provider;
+  }, []);
+
   const handleChange = useCallback(
     (editorState: EditorState, _editor: LexicalEditor, tags: Set<string>) => {
       if (blackListedChangeTags.some((tag) => tags.has(tag))) return;
@@ -245,6 +296,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     <LexicalComposer initialConfig={editorConfig}>
       <EditablePlugin isEditable={!isReadonly} />
       <div className="editor-container">
+        {docId && (
+          <button onClick={handleConnectionToggle}>{isConnected ? "Disconnect" : "Connect"}</button>
+        )}
         {!isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
         <div className="editor-inner">
           <EditorRefPlugin editorRef={editorRef} />
@@ -258,7 +312,15 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <HistoryPlugin />
+          {docId ? (
+            <CollaborationPlugin
+              id={docId}
+              providerFactory={providerFactory}
+              shouldBootstrap={false}
+            />
+          ) : (
+            <HistoryPlugin />
+          )}
           {scrRef && onScrRefChange && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
@@ -266,13 +328,15 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               viewOptions={viewOptions}
             />
           )}
-          <UpdateStatePlugin
-            scripture={usj}
-            nodeOptions={nodeOptions}
-            editorAdaptor={usjEditorAdaptor}
-            viewOptions={viewOptions}
-            logger={logger}
-          />
+          {!docId && (
+            <UpdateStatePlugin
+              scripture={usj}
+              nodeOptions={nodeOptions}
+              editorAdaptor={usjEditorAdaptor}
+              viewOptions={viewOptions}
+              logger={logger}
+            />
+          )}
           <OnSelectionChangePlugin onChange={onSelectionChange} />
           <OnChangePlugin
             onChange={handleChange}
