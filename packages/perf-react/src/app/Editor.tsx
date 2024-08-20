@@ -75,8 +75,6 @@ export default function Editor({
     (async () => {
       if (bookHandler) {
         const perf = await bookHandler.read(bookCode);
-        const alignmentData = bookHandler;
-        console.log({ alignmentData });
         setPerfDocument(perf);
         console.log(perf);
         const lexicalState = getLexicalState(perf);

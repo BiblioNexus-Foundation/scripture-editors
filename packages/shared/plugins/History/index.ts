@@ -16,10 +16,13 @@ import {
   COMMAND_PRIORITY_EDITOR,
   REDO_COMMAND,
   UNDO_COMMAND,
+  createCommand,
 } from "lexical";
 import { UpdateListener } from "lexical/LexicalEditor";
 import { HistoryState, HistoryStateEntry, LexicalHistoryManager } from "./HistoryManager";
 import { DirtyNodes } from "./DirtyNodes";
+
+export const PUSH_COMMAND = createCommand("PUSH_COMMAND");
 
 type MergeAction = 0 | 1 | 2;
 const HISTORY_MERGE = 0;
@@ -346,7 +349,7 @@ export function registerHistory(
   const dirtyNodes = new DirtyNodes();
   const historyManager = new LexicalHistoryManager(editor, historyState);
   const getMergeAction = createMergeActionGetter(editor, delay);
-  const triggerOnChange = debounce(onChange, delay, ({ editorChanged }) => editorChanged);
+  const delayOnChange = debounce(onChange, delay, ({ editorChanged }) => editorChanged);
 
   const applyChange = ({
     editorState,
@@ -361,16 +364,16 @@ export function registerHistory(
     dirtyLeaves: Set<NodeKey>;
     tags: Set<string>;
   }): void => {
-    const current = historyManager.getCurrent();
-    const currentEditorState = current === null ? null : current.editorState;
+    const currentHistoryEntry = historyManager.getCurrent();
+    const currentEditorState = currentHistoryEntry?.editorState;
 
-    if (current !== null && editorState === currentEditorState) {
+    if (currentHistoryEntry !== null && editorState === currentEditorState) {
       return;
     }
     const mergeAction = getMergeAction(
       prevEditorState,
       editorState,
-      current,
+      currentHistoryEntry,
       dirtyLeaves,
       dirtyElements,
       tags,
@@ -378,7 +381,7 @@ export function registerHistory(
     console.log("MERGE ACTION: ", ["MERGE", "PUSH", "DISCARD"][mergeAction]);
     if (mergeAction === HISTORY_PUSH) {
       dirtyNodes.reset();
-      console.log("PUSHING");
+      editor.dispatchCommand(PUSH_COMMAND, { historyManager });
       historyManager.push();
     } else if (mergeAction === DISCARD_HISTORY_CANDIDATE) {
       dirtyNodes.reset();
@@ -392,7 +395,8 @@ export function registerHistory(
 
     dirtyNodes.merge(dirtyLeaves, dirtyElements);
     const editorChanged = dirtyElements.size > 0 || dirtyLeaves.size > 0;
-    (() => (!current ? onChange : triggerOnChange))()({
+    const actionFunction = currentHistoryEntry ? onChange : delayOnChange;
+    actionFunction({
       editorState,
       editorChanged,
       prevEditorState: historyManager.getPrevious()?.editorState || prevEditorState,
@@ -405,12 +409,13 @@ export function registerHistory(
         mergeHistory(historyEntry) {
           historyManager.merge({ ...historyEntry, editor, editorState });
         },
-        currentEntry: historyManager.getCurrent(),
+        currentEntry: currentHistoryEntry,
       },
     });
   };
 
   const unregisterCommandListener = mergeRegister(
+    editor.registerCommand(PUSH_COMMAND, () => false, COMMAND_PRIORITY_EDITOR),
     editor.registerCommand(
       UNDO_COMMAND,
       () => {

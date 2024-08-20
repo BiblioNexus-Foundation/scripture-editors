@@ -10,7 +10,6 @@ declare module "epitelete" {
 
 import { SerializedEditorState } from "lexical";
 import { PerfDocument } from "../plugins/PerfOperations/perfTypes";
-import Epitelete from "epitelete";
 import { PipelineHandler } from "proskomma-json-tools";
 
 export function getLexicalState(perf: PerfDocument): SerializedEditorState | SerializedLexicalNode;

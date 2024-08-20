@@ -1,6 +1,6 @@
 import Epitelete from "epitelete";
 import { usfm2perf } from "../converters/perf/usfmToPerf";
-import transformPerfDocumentToLexicalState from "../converters/perf/perfToLexical";
+import transformPerfDocumentToSerializedLexicalState from "../converters/perf/perfToLexical";
 //TODO: import { Validator, PipelineHandler } from "proskomma-json-tools";
 
 const readOptions = { readPipeline: "stripAlignmentPipeline" };
@@ -63,7 +63,7 @@ export const getBookHandler = async ({
 };
 
 export const getLexicalState = (perf) => {
-  const _lexicalState = transformPerfDocumentToLexicalState(perf, perf.main_sequence_id);
+  const _lexicalState = transformPerfDocumentToSerializedLexicalState(perf, perf.main_sequence_id);
   return _lexicalState;
 };
 

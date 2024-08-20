@@ -31,7 +31,7 @@ import { getDiff } from "json-difference";
 import { PerfKind } from "./types";
 import { OperationType } from "../History/operations/index.d";
 import { FlatDocument as PerfDocument } from "./Types/Document";
-import { transformPerfNodeToLexicalNode } from "../../converters/perf/perfToLexical";
+import { transformPerfNodeToSerializedLexicalNode } from "../../converters/perf/perfToLexical";
 
 const DEFAULT_ROUNDTRIP_EXCEPTIONS = ["direction"];
 
@@ -43,6 +43,7 @@ const DEFAULT_ROUNDTRIP_EXCEPTIONS = ["direction"];
 export const getPerfHistoryUpdater: (
   perfSource: PerfDocument,
   roundtripExcludedKeys?: string[],
+  perfAlignment?: { [key: string]: string },
 ) => HistoryMergeListener =
   (perfSource, roundtripExcludedKeys = DEFAULT_ROUNDTRIP_EXCEPTIONS) =>
   /**
@@ -56,9 +57,9 @@ export const getPerfHistoryUpdater: (
   ({ editorChanged, dirtyElements, editorState, prevEditorState, history, tags }) => {
     const { canUndo, mergeHistory, currentEntry = {} } = history;
     const { perfDocument: prevPerfDocument, editor: currentEditor } =
-      currentEntry as HistoryStateEntry<{
+      (currentEntry as HistoryStateEntry<{
         perfDocument: PerfDocument;
-      }>;
+      }>) || {};
     console.log("=================================");
     // History initialization
     if (!canUndo && !prevPerfDocument) {
@@ -71,7 +72,7 @@ export const getPerfHistoryUpdater: (
     if (!editorChanged) return;
 
     try {
-      if (editorChanged || !tags.has("history-merge")) {
+      if (!tags.has("history-merge")) {
         const extendedOperations: Array<{
           lexicalNode: LexicalNode;
           operationType: OperationType;
@@ -100,6 +101,8 @@ export const getPerfHistoryUpdater: (
         // Patch the sequences in the previous perf document
         const patchedPerfDocument = { ...prevPerfDocument, sequences: patchedSequences };
 
+        console.log({ patchedPerfDocument });
+
         // Merge the history with the patched perf document
         mergeHistory({
           perfDocument: patchedPerfDocument,
@@ -118,7 +121,7 @@ export const getPerfHistoryUpdater: (
             );
 
             // Convert the patched perf node to a Serialized Element Node
-            const patchedLexicalNode = transformPerfNodeToLexicalNode({
+            const patchedLexicalNode = transformPerfNodeToSerializedLexicalNode({
               source: {
                 node: perfElementOperations[index].value,
                 kind: getPerfKindFromNode(operation.lexicalNode),

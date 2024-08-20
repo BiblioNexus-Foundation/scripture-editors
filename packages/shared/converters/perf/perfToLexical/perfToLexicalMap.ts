@@ -4,7 +4,7 @@ import { FlatDocument as PerfDocument } from "../../../plugins/PerfOperations/Ty
 import { PerfKind } from "../../../plugins/PerfOperations/types";
 import { PerfMap } from "../perfMapper";
 import { DATA_PREFIX, getAttributesFromPerfElementProps, getPerfProps } from "../utils";
-import { transformPerfNodeToLexicalNode } from ".";
+import { transformPerfNodeToSerializedLexicalNode } from ".";
 import { getTagFromPerfSubtype } from "../utils";
 
 export type PerfLexicalNode =
@@ -98,7 +98,7 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
         perfSequences !== undefined &&
         node.target !== undefined &&
         perfSequences[node.target] !== undefined
-          ? transformPerfNodeToLexicalNode({
+          ? transformPerfNodeToSerializedLexicalNode({
               source: {
                 kind: PerfKind.Sequence,
                 node: perfSequences[node.target],

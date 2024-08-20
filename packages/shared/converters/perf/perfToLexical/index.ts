@@ -7,13 +7,13 @@ import ContentElement from "../../../plugins/PerfOperations/Types/ContentElement
 import { PerfMap, mapPerf } from "../perfMapper";
 import { PerfLexicalNode, createPerfToLexicalMap } from "./perfToLexicalMap";
 
-export const transformPerfDocumentToLexicalState = (
+export const transformPerfDocumentToSerializedLexicalState = (
   perfDocument: PerfDocument,
   sequenceId: string,
   perfMap: PerfMap<PerfLexicalNode>,
 ) => {
   if (!perfDocument.sequences) throw new Error("No sequences found in the PERF document");
-  const nodeBuilder = (buildSource: NodeBuildSource<PerfKind, PerfLexicalNode>) => {
+  const nodeAdapter = (buildSource: NodeBuildSource<PerfKind, PerfLexicalNode>) => {
     const map = mapPerf({
       buildSource: buildSource,
       perfMap: perfMap ?? createPerfToLexicalMap(perfDocument.sequences),
@@ -25,18 +25,18 @@ export const transformPerfDocumentToLexicalState = (
     root: convertSequence<PerfLexicalNode>({
       sequence: perfDocument.sequences[sequenceId],
       sequenceId,
-      nodeBuilder,
+      nodeBuilder: nodeAdapter,
     }),
   };
 };
-export default transformPerfDocumentToLexicalState;
+export default transformPerfDocumentToSerializedLexicalState;
 
 type NodeSource =
   | { node: Sequence; kind: PerfKind.Sequence; sequenceId?: string }
   | { node: Block; kind: PerfKind.Block }
   | { node: ContentElement; kind: PerfKind.ContentElement };
 
-export function transformPerfNodeToLexicalNode({
+export function transformPerfNodeToSerializedLexicalNode({
   source,
   perfSequences,
   perfMap,
