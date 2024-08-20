@@ -36,6 +36,7 @@ export const ZWSP = "\u200B";
 
 export const CHAPTER_CLASS_NAME = "chapter";
 export const VERSE_CLASS_NAME = "verse";
+export const INVALID_CLASS_NAME = "invalid";
 export const TEXT_SPACING_CLASS_NAME = "text-spacing";
 export const FORMATTED_FONT_CLASS_NAME = "formatted-font";
 
