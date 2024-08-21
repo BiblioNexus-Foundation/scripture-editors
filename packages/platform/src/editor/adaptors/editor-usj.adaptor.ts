@@ -17,13 +17,6 @@ import {
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
-import {
-  NBSP,
-  getEditableCallerText,
-  parseNumberFromMarkerText,
-  removeEndingZwsp,
-  removeUndefinedProperties,
-} from "shared/nodes/scripture/usj/node.utils";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
 import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
@@ -32,6 +25,11 @@ import {
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+  UNMATCHED_TAG_NAME,
+} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
 import {
   ImmutableVerseNode,
   SerializedImmutableVerseNode,
@@ -52,6 +50,13 @@ import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNod
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import {
+  NBSP,
+  getEditableCallerText,
+  parseNumberFromMarkerText,
+  removeEndingZwsp,
+  removeUndefinedProperties,
+} from "shared/nodes/scripture/usj/node.utils";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 interface EditorUsjAdaptor {
@@ -220,6 +225,14 @@ function createUnknownMarker(
     ...unknownAttributes,
     content,
   });
+}
+
+function createUnmatchedMarker(node: SerializedImmutableUnmatchedNode): MarkerObject {
+  const { marker } = node;
+  return {
+    type: UNMATCHED_TAG_NAME,
+    marker,
+  };
 }
 
 /**
@@ -394,6 +407,9 @@ function recurseNodes(
         markers.push(
           createUnknownMarker(serializedUnknownNode, recurseNodes(serializedUnknownNode.children)),
         );
+        break;
+      case ImmutableUnmatchedNode.getType():
+        markers.push(createUnmatchedMarker(node as SerializedImmutableUnmatchedNode));
         break;
       default:
         _logger?.error(`Unexpected node type '${node.type}'!`);

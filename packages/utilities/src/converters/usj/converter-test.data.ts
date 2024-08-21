@@ -45,7 +45,7 @@ export const usxGen1v1 = `
       <verse style="v" number="15" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
     </para>
     <para style="b" />
-    <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
+    <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <unmatched style="f*" /> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
   <chapter eid="GEN 1" />
 </usx>
 `;
@@ -112,6 +112,8 @@ export const usjGen1v1: Usj = {
             },
           ],
         },
+        " ",
+        { type: "unmatched", marker: "f*" },
         " ",
         { type: "char", marker: "qs", content: ["Selah."] },
       ],
@@ -292,6 +294,20 @@ export const editorStateGen1v1 = {
                 version: 1,
               },
             ],
+          },
+          {
+            type: "text",
+            text: " ",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "unmatched",
+            marker: "f*",
+            version: 1,
           },
           {
             type: "text",
@@ -667,6 +683,20 @@ export const editorStateGen1v1Editable = {
                 version: 1,
               },
             ],
+          },
+          {
+            type: "text",
+            text: " ",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "unmatched",
+            marker: "f*",
+            version: 1,
           },
           {
             type: "text",

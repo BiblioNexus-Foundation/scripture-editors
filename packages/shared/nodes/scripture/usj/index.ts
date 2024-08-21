@@ -11,6 +11,7 @@ import { MarkerNode } from "./MarkerNode";
 import { ImpliedParaNode } from "./ImpliedParaNode";
 import { ParaNode } from "./ParaNode";
 import { UnknownNode } from "./UnknownNode";
+import { ImmutableUnmatchedNode } from "./ImmutableUnmatchedNode";
 
 const scriptureUsjNodes = [
   BookNode,
@@ -23,6 +24,7 @@ const scriptureUsjNodes = [
   MilestoneNode,
   MarkerNode,
   UnknownNode,
+  ImmutableUnmatchedNode,
   ImpliedParaNode,
   ParaNode,
   {

@@ -27,11 +27,6 @@ import {
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
 import {
-  SerializedImmutableChapterNode,
-  IMMUTABLE_CHAPTER_VERSION,
-  ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
   SerializedChapterNode,
   CHAPTER_VERSION,
   ChapterNode,
@@ -39,6 +34,33 @@ import {
   ChapterMarker,
 } from "shared/nodes/scripture/usj/ChapterNode";
 import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+import {
+  SerializedImmutableChapterNode,
+  IMMUTABLE_CHAPTER_VERSION,
+  ImmutableChapterNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  IMMUTABLE_UNMATCHED_VERSION,
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared/nodes/scripture/usj/ImmutableVerseNode";
+import {
+  IMPLIED_PARA_VERSION,
+  ImpliedParaNode,
+  SerializedImpliedParaNode,
+} from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
   MILESTONE_VERSION,
   MilestoneNode,
@@ -49,34 +71,17 @@ import {
   isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
-  IMPLIED_PARA_VERSION,
-  ImpliedParaNode,
-  SerializedImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
-import {
-  PARA_MARKER_DEFAULT,
-  PARA_VERSION,
-  ParaNode,
-  SerializedParaNode,
-} from "shared/nodes/scripture/usj/ParaNode";
-import {
   NOTE_VERSION,
   NoteNode,
   NoteMarker,
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared/nodes/scripture/usj/ImmutableVerseNode";
+  PARA_MARKER_DEFAULT,
+  PARA_VERSION,
+  ParaNode,
+  SerializedParaNode,
+} from "shared/nodes/scripture/usj/ParaNode";
 import {
   SerializedUnknownNode,
   UNKNOWN_VERSION,
@@ -500,6 +505,14 @@ function createUnknown(
   });
 }
 
+function createUnmatched(marker: string): SerializedImmutableUnmatchedNode {
+  return {
+    type: ImmutableUnmatchedNode.getType(),
+    marker,
+    version: IMMUTABLE_UNMATCHED_VERSION,
+  };
+}
+
 function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
   return {
     type: MarkerNode.getType(),
@@ -643,6 +656,9 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
             if (markerContent.sid !== undefined) commentIds?.push(markerContent.sid);
           }
           nodes.push(createMilestone(markerContent));
+          break;
+        case ImmutableUnmatchedNode.getType():
+          nodes.push(createUnmatched(markerContent.marker));
           break;
         default:
           _logger?.warn(`Unknown type-marker '${markerContent.type}-${markerContent.marker}'!`);
