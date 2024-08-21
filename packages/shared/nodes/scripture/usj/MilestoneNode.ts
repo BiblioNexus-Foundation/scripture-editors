@@ -91,8 +91,11 @@ export class MilestoneNode extends DecoratorNode<void> {
     return node;
   }
 
-  static isValidMarker(marker: string): boolean {
-    return VALID_MILESTONE_MARKERS.includes(marker as MilestoneMarker) || marker.startsWith("z");
+  static isValidMarker(marker: string | undefined): boolean {
+    return (
+      !!marker &&
+      (VALID_MILESTONE_MARKERS.includes(marker as MilestoneMarker) || marker.startsWith("z"))
+    );
   }
 
   setMarker(marker: MilestoneMarker): void {

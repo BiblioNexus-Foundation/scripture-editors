@@ -44,10 +44,15 @@ const NUMBERED_MARKER_PLACEHOLDER = "#";
 /**
  * Check if the marker is valid and numbered.
  * @param marker - Marker to check.
- * @param numberedMarkers - List of valid numbered markers.
+ * @param numberedMarkers - List of valid numbered markers ('#' removed).
  * @returns true if the marker is a valid numbered marker, false otherwise.
  */
-export function isValidNumberedMarker(marker: string, numberedMarkers: string[]): boolean {
+export function isValidNumberedMarker(
+  marker: string | undefined,
+  numberedMarkers: string[],
+): boolean {
+  if (!marker) return false;
+
   // Starts with a valid numbered marker.
   const numberedMarker = numberedMarkers.find((markerNumbered) =>
     marker.startsWith(markerNumbered),
@@ -68,7 +73,7 @@ export function isValidNumberedMarker(marker: string, numberedMarkers: string[])
 export function extractNumberedMarkers(markers: string[] | readonly string[]): string[] {
   return (
     markers
-      .filter((marker) => marker.endsWith(NUMBERED_MARKER_PLACEHOLDER))
+      .filter((marker) => !!marker && marker.endsWith(NUMBERED_MARKER_PLACEHOLDER))
       // remove placeholder
       .map((marker) => marker.slice(0, -1))
   );
@@ -80,7 +85,7 @@ export function extractNumberedMarkers(markers: string[] | readonly string[]): s
  * @returns list of non-numbered markers (numbered are filtered out), e.g. ['p'].
  */
 export function extractNonNumberedMarkers(markers: string[] | readonly string[]): string[] {
-  return markers.filter((marker) => !marker.endsWith(NUMBERED_MARKER_PLACEHOLDER));
+  return markers.filter((marker) => !(marker && marker.endsWith(NUMBERED_MARKER_PLACEHOLDER)));
 }
 
 /**

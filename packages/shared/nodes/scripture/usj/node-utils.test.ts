@@ -1,9 +1,12 @@
 import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
 import {
+  extractNonNumberedMarkers,
+  extractNumberedMarkers,
   findLastVerse,
   findThisVerse,
   getUnknownAttributes,
+  isValidNumberedMarker,
   parseNumberFromMarkerText,
 } from "./node.utils";
 import { $createImmutableVerseNode } from "./ImmutableVerseNode";
@@ -12,6 +15,44 @@ import { $createParaNode } from "./ParaNode";
 import { createBasicTestEnvironment } from "../../test.utils";
 
 describe("Editor Node Utilities", () => {
+  describe("isValidNumberedMarker()", () => {
+    it("should not throw", async () => {
+      expect(() => isValidNumberedMarker(undefined as unknown as string, [""])).not.toThrow();
+    });
+
+    it("should identify a valid numbered marker", async () => {
+      expect(isValidNumberedMarker("pi1", ["pi"])).toBe(true);
+    });
+
+    it("should not identify an invalid numbered marker", async () => {
+      expect(isValidNumberedMarker("pi1", ["pa"])).toBe(false);
+    });
+
+    it("should not identify a non-numbered marker", async () => {
+      expect(isValidNumberedMarker("pi", ["pi"])).toBe(false);
+    });
+  });
+
+  describe("extractNumberedMarkers()", () => {
+    it("should not throw", async () => {
+      expect(() => extractNumberedMarkers([undefined as unknown as string])).not.toThrow();
+    });
+
+    it("should extract numbered markers", async () => {
+      expect(extractNumberedMarkers(["p", "pi#"])).toEqual(["pi"]);
+    });
+  });
+
+  describe("extractNonNumberedMarkers()", () => {
+    it("should not throw", async () => {
+      expect(() => extractNonNumberedMarkers([undefined as unknown as string])).not.toThrow();
+    });
+
+    it("should extract non-numbered markers", async () => {
+      expect(extractNonNumberedMarkers(["p", "pi#"])).toEqual(["p"]);
+    });
+  });
+
   describe("findLastVerse()", () => {
     it("should find the last verse in node", async () => {
       const { editor } = createBasicTestEnvironment();

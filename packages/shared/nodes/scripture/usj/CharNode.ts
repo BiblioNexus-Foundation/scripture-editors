@@ -150,19 +150,19 @@ export class CharNode extends TextNode {
     };
   }
 
-  static isValidMarker(marker: string): boolean {
+  static isValidMarker(marker: string | undefined): boolean {
     return (
-      VALID_CHAR_MARKERS_NON_NUMBERED.includes(marker) ||
+      (marker && VALID_CHAR_MARKERS_NON_NUMBERED.includes(marker)) ||
       isValidNumberedMarker(marker, VALID_CHAR_MARKERS_NUMBERED)
     );
   }
 
-  static isValidFootnoteMarker(marker: string): boolean {
-    return VALID_CHAR_FOOTNOTE_MARKERS.includes(marker);
+  static isValidFootnoteMarker(marker: string | undefined): boolean {
+    return !!marker && VALID_CHAR_FOOTNOTE_MARKERS.includes(marker);
   }
 
-  static isValidCrossReferenceMarker(marker: string): boolean {
-    return VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
+  static isValidCrossReferenceMarker(marker: string | undefined): boolean {
+    return !!marker && VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
   }
 
   setMarker(marker: CharMarker): void {

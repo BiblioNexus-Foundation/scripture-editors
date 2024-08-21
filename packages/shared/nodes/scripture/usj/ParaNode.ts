@@ -157,9 +157,9 @@ export class ParaNode extends ParagraphNode {
     };
   }
 
-  static isValidMarker(marker: string): boolean {
+  static isValidMarker(marker: string | undefined): boolean {
     return (
-      VALID_PARA_MARKERS_NON_NUMBERED.includes(marker) ||
+      (marker && VALID_PARA_MARKERS_NON_NUMBERED.includes(marker)) ||
       isValidNumberedMarker(marker, VALID_PARA_MARKERS_NUMBERED)
     );
   }

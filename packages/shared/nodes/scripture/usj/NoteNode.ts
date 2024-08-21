@@ -90,8 +90,8 @@ export class NoteNode extends ElementNode {
     };
   }
 
-  static isValidMarker(marker: string): boolean {
-    return VALID_NOTE_MARKERS.includes(marker as NoteMarker);
+  static isValidMarker(marker: string | undefined): boolean {
+    return !!marker && VALID_NOTE_MARKERS.includes(marker as NoteMarker);
   }
 
   setMarker(marker: NoteMarker): void {
