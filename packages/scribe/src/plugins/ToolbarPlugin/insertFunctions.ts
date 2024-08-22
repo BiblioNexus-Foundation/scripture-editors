@@ -12,12 +12,13 @@ import {
   $isRootOrShadowRoot,
   $createParagraphNode,
 } from "lexical";
-import { recurseNodes as recurseSerializedNodes } from "../adaptors/editor-usj.adaptor";
-import { recurseNodes as recurseEditorNodes } from "../adaptors/usj-editor.adaptor";
+import { recurseNodes as recurseSerializedNodes } from "../../adaptors/editor-usj.adaptor";
+import { recurseNodes as recurseEditorNodes } from "../../adaptors/usj-editor.adaptor";
 
 import { $createChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { $createVerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { emptyFootnote, Footnote, Char } from "../nodes/emptyFootNote";
+import { emptyFootnote, Footnote, Char } from "../../nodes/emptyFootNote";
+import { emptyXref } from "../../nodes/emptyCrossRefence";
 import { $wrapNodeInElement } from "@lexical/utils";
 
 function moveToEndOfNode(selection: RangeSelection, node: TextNode) {
@@ -47,17 +48,16 @@ export function insertChapterNode({
   inputValues: { chapter: string };
 }): void {
   console.log({ chapter });
-  const sid: string = "xx",
-    altnumber: string = "xx",
-    pubnumber: string = "xx",
-    text: string = chapter;
+  const sid: string = chapter,
+    altnumber: string = chapter,
+    pubnumber: string = chapter;
+  // text: string = chapter;
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const chapterNode = $createChapterNode(chapter, sid, altnumber, pubnumber);
-      const textNode = $createTextNode(text);
-      chapterNode.append(textNode);
       const spaceNode = $createTextNode(" ");
+      chapterNode.append(spaceNode);
       selection.insertNodes([chapterNode, spaceNode]);
       moveToEndOfNode(selection, spaceNode);
     }
@@ -134,6 +134,19 @@ export function insertFootNoteNode({ editor, inputValues }: InsertNoteNodeParams
     const newFootnoteNode = updateOrAddNodes(emptyFootnote, inputValues);
     console.log({ newFootnoteNode, emptyFootnote });
     const notecontent = recurseSerializedNodes(newFootnoteNode.children);
+    // const notecontent = recurseSerializedNodes(emptyFootnote.children);
+    console.log({ notecontent });
+    const noteNode = recurseEditorNodes(notecontent);
+    console.log({ noteNode });
+    $insertUsfmNode(noteNode[0]);
+  });
+}
+
+export function insertXrefNode({ editor, inputValues }: InsertNoteNodeParams): void {
+  editor.update(() => {
+    const newXrefNode = updateOrAddNodes(emptyXref, inputValues);
+    console.log({ newXrefNode, emptyXref });
+    const notecontent = recurseSerializedNodes(newXrefNode.children);
     // const notecontent = recurseSerializedNodes(emptyFootnote.children);
     console.log({ notecontent });
     const noteNode = recurseEditorNodes(notecontent);

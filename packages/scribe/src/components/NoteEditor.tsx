@@ -1,23 +1,24 @@
-import { Usj } from "@biblionexus-foundation/scripture-utilities";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { useEffect, useState } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { MarkerContent, Usj } from "@biblionexus-foundation/scripture-utilities";
 import { EditorState } from "lexical";
-import { useCallback, useEffect } from "react";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
+import UsjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
 import { ViewOptions } from "../adaptors/view-options.utils";
+import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
+import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { MarkNode } from "@lexical/mark";
 import editorTheme from "../themes/editor-theme";
+import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 
 type NoteEditorProps = {
   /** Scripture data in USJ form */
@@ -36,6 +37,7 @@ export const NoteEditor = ({
   scrollId,
 }: NoteEditorProps) => {
   useDefaultNodeOptions(nodeOptions);
+  const [noteUsj, setNoteUsj] = useState<Usj | null>(null);
 
   const initialConfig = {
     namespace: "ScribeNoteEditor",
@@ -45,18 +47,28 @@ export const NoteEditor = ({
     onError(error: Error) {
       throw error;
     },
-    nodes: [ImmutableNoteCallerNode, ...scriptureUsjNodes],
+    nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
   };
 
-  const handleChange = useCallback(
-    (editorState: EditorState) => {
-      const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      if (usj && onChange) {
-        onChange(usj);
+  const handleChange = (editorState: EditorState) => {
+    if (usj && onChange) {
+      const updatedNoteUsj = editorUsjAdaptor.deserializeEditorState(editorState);
+      if (updatedNoteUsj) {
+        // Merge the updated note nodes back into the original USJ
+        const updatedUsj = mergeUpdatedNotes(usj, updatedNoteUsj);
+        onChange(updatedUsj);
       }
-    },
-    [onChange],
-  );
+    }
+  };
+
+  useEffect(() => {
+    if (usj) {
+      const noteNodes = extractNoteNodes(usj.content);
+      const noteUsj: Usj = { ...usj, content: noteNodes };
+      setNoteUsj(noteUsj);
+    }
+  }, [usj, viewOptions]);
+
   useEffect(() => {
     const noteEditor = document.getElementById("noteEditor");
     if (scrollId && noteEditor) {
@@ -77,9 +89,9 @@ export const NoteEditor = ({
           ErrorBoundary={LexicalErrorBoundary}
         />
         <UpdateStatePlugin
-          scripture={usj}
+          scripture={noteUsj}
           nodeOptions={nodeOptions}
-          editorAdaptor={usjNoteEditorAdapter}
+          editorAdaptor={UsjNoteEditorAdapter}
           viewOptions={viewOptions}
           // logger={logger}
         />
@@ -92,3 +104,50 @@ export const NoteEditor = ({
     </>
   );
 };
+
+export function extractNoteNodes(usjContent: MarkerContent[]): MarkerContent[] {
+  const noteNodes: MarkerContent[] = [];
+  console.log({ usjContent });
+  function traverse(content: MarkerContent[]) {
+    content.forEach((item) => {
+      if (typeof item === "object" && item.type === "note") {
+        noteNodes.push(item);
+      } else if (typeof item === "object" && item.content) {
+        traverse(item.content);
+      }
+    });
+  }
+
+  traverse(usjContent);
+  return noteNodes;
+}
+
+export function mergeUpdatedNotes(originalUsj: Usj, updatedNoteUsj: Usj): Usj {
+  const updatedUsj = { ...originalUsj };
+  const updatedNotes = updatedNoteUsj.content;
+
+  function updateNotes(content: MarkerContent[]): MarkerContent[] {
+    let updatedNoteIndex = 0;
+
+    return content.map((item): MarkerContent => {
+      if (typeof item === "object") {
+        if (item.type === "note") {
+          if (updatedNoteIndex < updatedNotes.length) {
+            const updatedNote = updatedNotes[updatedNoteIndex];
+            updatedNoteIndex++;
+            if (typeof updatedNote === "object" && updatedNote.type === "note") {
+              return updatedNote;
+            }
+          }
+          return item;
+        } else if (item.content) {
+          return { ...item, content: updateNotes(item.content) };
+        }
+      }
+      return item;
+    });
+  }
+
+  updatedUsj.content = updateNotes(originalUsj.content);
+  return updatedUsj;
+}

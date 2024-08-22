@@ -377,3 +377,60 @@ export function removeUndefinedProperties<T>(obj: T): T {
     Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined),
   ) as T;
 }
+
+/**
+ * Checks if a node is a serialized text node.
+ *
+ * @param  node - The node to check.
+ * @returns {boolean} True if the node is a serialized text node, false otherwise.
+ */
+function isSerializedTextNode(node: SerializedLexicalNode): node is SerializedTextNode {
+  return node.type === "text";
+}
+
+/**
+ * Adds space between note elements in an array of serialized Lexical nodes.
+ *
+ * @param children - The array of serialized Lexical nodes to process.
+ * @param createTextNodeFn - A function that creates a new serialized text node given a string.
+ * @returns {void}
+ */
+export function addTextSpaceBtwnNoteElements(
+  children: SerializedLexicalNode[],
+  createTextNodeFn: (text: string) => SerializedTextNode,
+): void {
+  const punctuationMarks = [".", ",", "!", "?", ":", ";", ")", "]", "}"];
+
+  const isPunctuation = (node: SerializedLexicalNode): boolean => {
+    return isSerializedTextNode(node) && punctuationMarks.includes(node.text.trim());
+  };
+
+  for (let i = children.length - 1; i > 0; i--) {
+    const currentNode = children[i];
+    const previousNode = children[i - 1];
+
+    if (isPunctuation(currentNode)) continue;
+
+    if (isSerializedTextNode(previousNode) && previousNode.text.trim() === "") continue;
+
+    if (
+      currentNode.type !== previousNode.type ||
+      (currentNode.type !== "text" && previousNode.type !== "text")
+    ) {
+      const spaceNode = createTextNodeFn(" ");
+      children.splice(i, 0, spaceNode);
+    }
+  }
+}
+
+/**
+ * Removes standalone space elements from a mixed array of strings and CharNodes.
+ *
+ * @param content- The input array containing strings and CharNodes.
+ * @returns  A new array with standalone space elements removed.
+ */
+export function removeSpacesFromMarkerContent(content: MarkerContent[] = []): MarkerContent[] {
+  return content.filter((element) => {
+    return typeof element !== "string" || element.trim() !== "";
+  });
+}

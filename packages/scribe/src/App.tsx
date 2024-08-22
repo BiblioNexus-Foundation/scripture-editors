@@ -1,5 +1,5 @@
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
-import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
+import { useState, useMemo, SyntheticEvent, useRef, useEffect, useCallback } from "react";
 import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 import Editor, { EditorRef } from "./components/Editor";
 import { getViewOptions } from "./adaptors/view-options.utils";
@@ -9,6 +9,7 @@ import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/Im
 import { NoteEditor } from "./components/NoteEditor";
 import { Usj2Usfm } from "./hooks/usj2Usfm";
 import { ScriptureReference } from "./plugins/ScriptureReferencePlugin";
+import { TextDirection } from "shared-react/plugins/text-direction.model";
 
 const defaultUsj: Usj = {
   type: "USJ",
@@ -16,17 +17,26 @@ const defaultUsj: Usj = {
   content: [],
 };
 const defaultScrRef: ScriptureReference = { /* PSA */ bookCode: "PSA", chapterNum: 1, verseNum: 1 };
+const directions: TextDirection[] = ["ltr", "rtl", "auto"];
 
 function App() {
-  const editorRef = useRef<EditorRef>(null!);
+  const editorRef1 = useRef<EditorRef>(null!);
+  const editorRef2 = useRef<EditorRef>(null!);
   const [stateX, setStateX] = useState<boolean>(false);
-  const [text, setText] = useState<string>();
+  const [text, setText] = useState<string>("");
   const [scrRef, setScrRef] = useState(defaultScrRef);
+  const [textDirection, setTextDirection] = useState<TextDirection>("rtl");
+
+  const [mainEditorScrollPosition, setMainEditorScrollPosition] = useState(0);
+  const [noteEditorScrollPosition, setNoteEditorScrollPosition] = useState(0);
+  const [isSyncingScroll, setIsSyncingScroll] = useState(false);
+
   const { usj } = useUsfm2Usj();
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      usj && editorRef.current?.setUsj(usj);
+      usj && editorRef1.current?.setUsj(usj);
+      usj && editorRef2.current?.setUsj(usj);
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [usj]);
@@ -37,23 +47,65 @@ function App() {
       onClick: (e: SyntheticEvent) => {
         setStateX(true);
         setText(e.currentTarget.getAttribute("data-caller-id") as string);
-        console.log({ e });
       },
     },
   };
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
   // const noteViewOptions = useMemo(() => getViewOptions(noteViewMode), [noteViewMode]);
-  const onChange = async (usj: Usj) => {
-    console.log({ usj });
-    const usfm = await Usj2Usfm(usj);
+  const onChange = async (updatedUsj: Usj) => {
+    editorRef1.current?.setUsj(updatedUsj);
+    const usfm = await Usj2Usfm(updatedUsj);
     console.log(usfm);
   };
+
   useEffect(() => {
     console.log({ scrRef });
   }, [scrRef]);
+  const toggleDirection = () => {
+    setTextDirection((current) => {
+      const index = directions.indexOf(current);
+      return directions[(index + 1) % directions.length];
+    });
+  };
+  const handleMainEditorScroll = useCallback(
+    (position: number) => {
+      if (!isSyncingScroll) {
+        setIsSyncingScroll(true);
+        setMainEditorScrollPosition(position);
+        if (
+          editorRef2.current &&
+          typeof usj?.content[0] === "object" &&
+          usj?.content[0]?.code === scrRef.bookCode
+        ) {
+          editorRef2.current.setScrollPosition(position);
+        }
+        setIsSyncingScroll(false);
+      }
+    },
+    [isSyncingScroll, usj, scrRef.bookCode],
+  );
+
+  const handleNoteEditorScroll = useCallback(
+    (position: number) => {
+      if (!isSyncingScroll) {
+        setIsSyncingScroll(true);
+        setNoteEditorScrollPosition(position);
+        if (
+          editorRef1.current &&
+          typeof usj?.content[0] === "object" &&
+          usj?.content[0]?.code === scrRef.bookCode
+        ) {
+          editorRef1.current.setScrollPosition(position);
+        }
+        setIsSyncingScroll(false);
+      }
+    },
+    [isSyncingScroll, usj, scrRef.bookCode],
+  );
+
   return (
-    <div className="flex-center m-2 flex h-editor   justify-center p-8">
-      <div className="relative w-2/3 overflow-hidden rounded-md border-2 border-secondary">
+    <div className="m-2 flex h-editor items-start justify-center">
+      <div className="w-full overflow-hidden rounded-md border-2 border-secondary">
         <div className="left-0 right-0 top-0 z-10 flex items-center justify-between bg-gray-200 px-4 py-2">
           <span className="text-lg font-semibold">Editor</span>
           <button
@@ -62,24 +114,49 @@ function App() {
           >
             Graft Editor
           </button>
+          <button
+            className="rounded bg-cyan-500 px-2 py-1 text-sm font-bold text-white hover:bg-white hover:text-cyan-500"
+            onClick={() => toggleDirection()}
+          >
+            Toggle Direction ({textDirection})
+          </button>
         </div>
-
-        <div className=" h-editor overflow-y-auto p-2">
-          <Editor
-            usjInput={defaultUsj}
-            ref={editorRef}
-            onChange={onChange}
-            viewOptions={viewOptions}
-            nodeOptions={nodeOptions}
-            scrRef={scrRef}
-            setScrRef={setScrRef}
-          />
+        <div className="flex">
+          <div className="h-editor">
+            <Editor
+              usjInput={defaultUsj}
+              ref={editorRef1}
+              onChange={onChange}
+              viewOptions={viewOptions}
+              nodeOptions={nodeOptions}
+              scrRef={scrRef}
+              setScrRef={setScrRef}
+              textDirection={textDirection}
+              onScroll={handleMainEditorScroll}
+              syncScrollPosition={mainEditorScrollPosition}
+            />
+          </div>
+          <div className="h-editor overflow-y-auto">
+            <Editor
+              usjInput={defaultUsj}
+              ref={editorRef2}
+              onChange={onChange}
+              viewOptions={viewOptions}
+              nodeOptions={nodeOptions}
+              scrRef={scrRef}
+              setScrRef={setScrRef}
+              textDirection={textDirection}
+              onScroll={handleNoteEditorScroll}
+              syncScrollPosition={noteEditorScrollPosition}
+              IsRefEditor={true}
+            />
+          </div>
         </div>
       </div>
 
       {stateX && (
         <div
-          className="relative h-56 overflow-hidden rounded-md border-2 border-secondary"
+          className="h-56 w-[300px] overflow-hidden rounded-md border-2 border-secondary"
           id="noteEditor"
         >
           <div className="left-0 right-0 top-0 z-10 flex items-center justify-between bg-gray-200 px-4 py-2">

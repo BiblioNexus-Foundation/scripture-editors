@@ -1,4 +1,56 @@
-export const emptyFootnote = {
+export type Note = {
+  type: "note";
+  marker: string;
+  caller: string;
+  direction: string | null;
+  format: string;
+  indent: number;
+  version: number;
+  children: (ImmutableNoteCaller | Char | Text)[];
+};
+
+export type ImmutableNoteCaller = {
+  type: "immutable-note-caller";
+  caller: string;
+  previewText: string;
+  version: number;
+};
+
+export type Char = {
+  type: "char";
+  marker: string;
+  text: string;
+  detail: number;
+  format: number;
+  mode: string;
+  style: string;
+  version: number;
+};
+
+type Text = {
+  type: "text";
+  text: string;
+  detail: number;
+  format: number;
+  mode: string;
+  style: string;
+  version: number;
+};
+export interface Para {
+  direction: null;
+  format: string;
+  indent: number;
+  type: "para";
+  version: number;
+  textFormat: number;
+  marker: string;
+  children: Note[];
+}
+
+export interface Xref {
+  children: Para[];
+}
+export const emptyXref: Xref = {
   children: [
     {
       direction: null,
@@ -11,7 +63,7 @@ export const emptyFootnote = {
       children: [
         {
           type: "note",
-          marker: "f",
+          marker: "x",
           caller: "+",
           direction: null,
           format: "",
@@ -21,56 +73,7 @@ export const emptyFootnote = {
             {
               type: "immutable-note-caller",
               caller: "b",
-              previewText:
-                "The Hebrew text can be read either as established praise established strength",
-              version: 1,
-            },
-            {
-              type: "char",
-              marker: "ft",
-              text: "The Hebrew text can be read either as",
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "display: none",
-              version: 1,
-            },
-            {
-              type: "char",
-              marker: "fqa",
-              text: "established praise",
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "display: none",
-              version: 1,
-            },
-            {
-              type: "text",
-              text: "or",
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "display: none",
-              version: 1,
-            },
-            {
-              type: "char",
-              marker: "fqa",
-              text: "established strength IIIII",
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "display: none",
-              version: 1,
-            },
-            {
-              type: "text",
-              text: ".",
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "display: none",
+              previewText: "",
               version: 1,
             },
           ],

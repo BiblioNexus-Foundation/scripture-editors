@@ -1,6 +1,6 @@
 {
   "name": "scripture-editors",
-  "version": "0.0.0",
+  "version": "0.0.5-v1",
   "license": "MIT",
   "scripts": {
     "prepare": "husky install"

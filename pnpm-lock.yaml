@@ -296,6 +296,9 @@ importers:
       '@lexical/utils':
         specifier: ^0.17.1
         version: 0.17.1
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.4.20(postcss@8.4.45)
       fast-equals:
         specifier: ^5.0.1
         version: 5.0.1

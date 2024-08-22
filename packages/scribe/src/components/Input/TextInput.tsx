@@ -1,4 +1,4 @@
-import "./Input.css";
+// import "./Input.css";
 import { LexicalEditor } from "lexical";
 import React, { ReactNode, useEffect, useState } from "react";
 
@@ -12,18 +12,16 @@ type TextInputProps = {
 };
 
 const TextInput: React.FC<TextInputProps> = ({
-  label,
   value,
   onChange,
   placeholder = "",
   "data-test-id": dataTestId,
   type = "text",
 }) => (
-  <div className="Input__wrapper">
-    <label className="Input__label">{label}</label>
+  <div className="mb-4 flex flex-col">
     <input
       type={type}
-      className="Input__input"
+      className="rounded-md border border-gray-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -71,7 +69,7 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
   };
 
   return (
-    <>
+    <div className="mx-auto max-w-sm rounded-lg bg-white p-6 shadow-lg">
       {label === "Footnote" ? (
         <>
           <TextInput
@@ -107,32 +105,25 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
       ) : label === "XRef" ? (
         <>
           <TextInput
-            placeholder="Note Title"
-            label="Title"
-            onChange={handleChange("title")}
-            value={inputValues.title || ""}
-            data-test-id="note-title"
+            placeholder="Origin Reference."
+            label="Origin Reference"
+            onChange={handleChange("xo")}
+            value={inputValues.xo || ""}
+            data-test-id="note-xo"
           />
           <TextInput
-            placeholder="Note Content"
-            label="Content"
-            onChange={handleChange("content")}
-            value={inputValues.content || ""}
-            data-test-id="note-content"
+            placeholder="Target Reference"
+            label="Target Reference"
+            onChange={handleChange("xt")}
+            value={inputValues.xt || ""}
+            data-test-id="note-xt"
           />
           <TextInput
-            placeholder="Author"
-            label="Author"
-            onChange={handleChange("author")}
-            value={inputValues.author || ""}
-            data-test-id="note-author"
-          />
-          <TextInput
-            placeholder="Date"
-            label="Date"
-            onChange={handleChange("date")}
-            value={inputValues.date || ""}
-            data-test-id="note-date"
+            placeholder="Quotation"
+            label="Quotation"
+            onChange={handleChange("xq")}
+            value={inputValues.xq || ""}
+            data-test-id="note-xq"
           />
         </>
       ) : (
@@ -148,7 +139,7 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
       <Button disabled={isDisabled} onClick={onClick}>
         Confirm
       </Button>
-    </>
+    </div>
   );
 };
 
@@ -171,7 +162,9 @@ export const Button: React.FC<ButtonProps> = ({
 }) => (
   <button
     disabled={disabled}
-    className={`Button__root ${className}`}
+    className={`rounded-md bg-primary px-4 py-2 font-bold text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 ${
+      disabled ? "cursor-not-allowed opacity-50" : ""
+    } ${className}`}
     onClick={onClick}
     title={title}
     aria-label={title}
