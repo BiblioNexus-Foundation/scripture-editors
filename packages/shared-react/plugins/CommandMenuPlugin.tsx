@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { LoggerBasic } from "./logger-basic.model";
 
 /**
- * This plugin prevents the backslash key from being typed, or pasted or dragged.
+ * This plugin prevents the backslash or forward slash key from being typed, or pasted or dragged.
  * Later this plugin will open the command menu to insert USJ elements.
  * @returns `null`. This plugin has no DOM presence.
  */
@@ -14,11 +14,11 @@ export default function CommandMenuPlugin({ logger }: { logger?: LoggerBasic }):
 
   useEffect(() => {
     return mergeRegister(
-      // When the backslash key is typed.
+      // When the backslash or forward slash key is typed.
       editor.registerCommand(
         KEY_DOWN_COMMAND,
         (event: KeyboardEvent) => {
-          if (event.key !== "\\") return false;
+          if (event.key !== "\\" && event.key !== "/") return false;
 
           event.preventDefault();
           return true;
@@ -26,28 +26,28 @@ export default function CommandMenuPlugin({ logger }: { logger?: LoggerBasic }):
         COMMAND_PRIORITY_NORMAL,
       ),
 
-      // When the backslash character is pasted into the editor.
+      // When the backslash or forward slash character is pasted into the editor.
       editor.registerCommand(
         PASTE_COMMAND,
         (event: ClipboardEvent) => {
           const text = event.clipboardData?.getData("text/plain");
-          if (!text || !text.includes("\\")) return false;
+          if (!text || (!text.includes("\\") && !text.includes("/"))) return false;
 
-          logger?.info("CommandMenuPlugin: paste containing backslash ignored.");
+          logger?.info("CommandMenuPlugin: paste containing backslash or forward slash ignored.");
           event.preventDefault();
           return true;
         },
         COMMAND_PRIORITY_NORMAL,
       ),
 
-      // When the backslash character is dragged into the editor.
+      // When the backslash or forward slash character is dragged into the editor.
       editor.registerCommand(
         DROP_COMMAND,
         (event: DragEvent) => {
           const text = event.dataTransfer?.getData("text/plain");
-          if (!text || !text.includes("\\")) return false;
+          if (!text || (!text.includes("\\") && !text.includes("/"))) return false;
 
-          logger?.info("CommandMenuPlugin: drag containing backslash ignored.");
+          logger?.info("CommandMenuPlugin: drag containing backslash or forward slash ignored.");
           event.preventDefault();
           return true;
         },
