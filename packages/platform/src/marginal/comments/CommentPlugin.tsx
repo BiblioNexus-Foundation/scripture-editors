@@ -704,12 +704,6 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   const { yjsDocMap } = collabContext;
 
   useEffect(() => {
-    if (!editor.hasNodes([TypedMarkNode])) {
-      throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
-    }
-  }, [editor]);
-
-  useEffect(() => {
     if (providerFactory) {
       const provider = providerFactory("comments", yjsDocMap);
       return commentStore.registerCollaboration(provider);
@@ -807,9 +801,8 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   }, [activeIDs, editor, markNodeMap]);
 
   useEffect(() => {
-    if (!editor.hasNodes([TypedMarkNode])) {
+    if (!editor.hasNodes([TypedMarkNode]))
       throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
-    }
 
     const markNodeKeysToIDs: Map<NodeKey, Array<string>> = new Map();
 
