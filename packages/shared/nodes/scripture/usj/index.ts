@@ -29,9 +29,7 @@ const scriptureUsjNodes = [
   ParaNode,
   {
     replace: ParagraphNode,
-    with: () => {
-      return new ParaNode();
-    },
+    with: (node: ParaNode) => new ParaNode(node.__marker, node.__unknownAttributes),
   },
 ];
 export default scriptureUsjNodes;
