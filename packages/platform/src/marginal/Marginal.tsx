@@ -14,6 +14,7 @@ import { Comments } from "./comments/commenting";
 import CommentPlugin from "./comments/CommentPlugin";
 import useCommentStoreRef from "./comments/use-comment-store-ref.hook";
 import useMissingCommentsProps from "./comments/use-missing-comments-props.hook";
+import { createWebsocketProvider, useCollabDocId } from "../editor/collaboration";
 import Editor, { EditorProps, EditorRef } from "../editor/Editor";
 
 /** Forward reference for the editor. */
@@ -60,6 +61,8 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   const { children, onCommentChange, onUsjChange, ...editorProps } = props as PropsWithChildren<
     MarginalProps<TLogger>
   >;
+  const { projectId, scrRef } = props as PropsWithChildren<MarginalProps<TLogger>>;
+  const docId = useCollabDocId(projectId, scrRef, "comments");
   const [commentStoreRef, setCommentStoreRef] = useCommentStoreRef();
   useMissingCommentsProps(editorProps, commentStoreRef);
 
@@ -124,6 +127,7 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   return (
     <Editor ref={editorRef} onUsjChange={handleUsjChange} {...editorProps}>
       <CommentPlugin
+        providerFactory={docId ? createWebsocketProvider : undefined}
         setCommentStore={setCommentStoreRef}
         onChange={handleCommentChange}
         showCommentsContainerRef={toolbarEndRef}

@@ -7,7 +7,6 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { Provider } from "@lexical/yjs";
-import { Canon } from "@sillsdev/scripture";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
 import React, {
@@ -16,13 +15,11 @@ import React, {
   forwardRef,
   useCallback,
   useImperativeHandle,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import type { ScriptureReference } from "platform-bible-utils";
 import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
@@ -50,6 +47,7 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
+import { createWebsocketProvider, useCollabDocId } from "./collaboration";
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
@@ -136,8 +134,6 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
-const chapterDesignation = "1-end";
-
 const editorConfig: Mutable<InitialConfigType> = {
   namespace: "platformEditor",
   theme: editorTheme,
@@ -152,19 +148,6 @@ const editorConfig: Mutable<InitialConfigType> = {
 };
 
 const defaultViewOptions = getViewOptions(undefined);
-
-function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
-  let doc = yjsDocMap.get(id);
-
-  if (doc === undefined) {
-    doc = new Y.Doc();
-    yjsDocMap.set(id, doc);
-  } else {
-    doc.load();
-  }
-
-  return doc;
-}
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -202,6 +185,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const editorRef = useRef<LexicalEditor | null>(null);
   const [yjsProvider, setYjsProvider] = useState<null | Provider>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const docId = useCollabDocId(projectId, scrRef);
   const annotationRef = useRef<AnnotationRef | null>(null);
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
@@ -254,13 +238,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     },
   }));
 
-  const docId = useMemo(() => {
-    if (!projectId || !scrRef?.bookNum || !chapterDesignation) return "";
-
-    const bookId = Canon.bookNumberToId(scrRef?.bookNum);
-    return `${projectId}/${bookId}_${chapterDesignation}`;
-  }, [projectId, scrRef?.bookNum]);
-
   const handleConnectionToggle = () => {
     if (yjsProvider == null) return;
 
@@ -269,10 +246,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   };
 
   const providerFactory = useCallback((id: string, yjsDocMap: Map<string, Y.Doc>) => {
-    const doc = getDocFromMap(id, yjsDocMap);
-    const provider = new WebsocketProvider("ws://localhost:1234", id, doc, {
-      connect: false,
-    }) as unknown as Provider;
+    const provider = createWebsocketProvider(id, yjsDocMap);
     provider.on("status", (event) => setIsConnected(event.status === "connected"));
     setTimeout(() => setYjsProvider(provider), 0);
     return provider;
