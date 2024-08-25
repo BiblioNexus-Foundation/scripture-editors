@@ -45,7 +45,7 @@ export function createComment(
     content,
     deleted: deleted === undefined ? false : deleted,
     id: id === undefined ? createUID() : id,
-    timeStamp: timeStamp === undefined ? performance.now() : timeStamp,
+    timeStamp: timeStamp === undefined ? performance.timeOrigin + performance.now() : timeStamp,
     type: "comment",
   };
 }
