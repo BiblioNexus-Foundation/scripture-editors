@@ -1,4 +1,4 @@
-# Scripture Editor for Platform.Bible using USX3.0 <-> USJ
+# Scripture Editor for [Platform](https://platform.bible) using USX3.0 ↔ USJ
 
 <div align="center">
 
