@@ -9,7 +9,7 @@ import { JSX, useEffect, useMemo } from "react";
 
 export const MERGE_HISTORY_COMMAND: LexicalCommand<void> = createCommand("MERGE_HISTORY_COMMAND");
 
-export function HistoryPlugin({
+export default function HistoryPlugin({
   externalHistoryState,
 }: {
   externalHistoryState?: HistoryState;

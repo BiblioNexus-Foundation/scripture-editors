@@ -1,18 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister, registerNestedElementResolver } from "@lexical/utils";
-import {
-  $createPoint,
-  $createRangeSelection,
-  $getNodeByKey,
-  $getRoot,
-  $isElementNode,
-  $isTextNode,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
-  RangeSelection,
-  TextNode,
-} from "lexical";
+import { $getNodeByKey, LexicalEditor, NodeKey } from "lexical";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import {
   $createTypedMarkNode,
@@ -22,17 +10,15 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
-import { AnnotationRange, SelectionRange, UsjLocation } from "./selection.model";
 import { LoggerBasic } from "../plugins/logger-basic.model";
+import { AnnotationRange } from "./selection.model";
+import { $getRangeFromSelection } from "./selection.utils";
 
 /** Forward reference for annotations. */
 export type AnnotationRef = {
   addAnnotation(selection: AnnotationRange, type: string, id: string): void;
   removeAnnotation(type: string, id: string): void;
 };
-
-const JSON_PATH_START = "$";
-const JSON_PATH_CONTENT = ".content[";
 
 function getTypeIDMapKey(type: string, id: string): string {
   return `${type}:${id}`;
@@ -108,84 +94,6 @@ function useAnnotations(editor: LexicalEditor, markNodeMap: Map<string, Set<Node
       }),
     );
   }, [editor, markNodeMap]);
-}
-
-function extractJsonPathIndexes(jsonPath: string): number[] {
-  const path = jsonPath.split(JSON_PATH_CONTENT);
-  if (path.shift() !== JSON_PATH_START)
-    throw new Error(`extractJsonPathIndexes: jsonPath didn't start with '${JSON_PATH_START}'`);
-
-  const indexes = path.map((str) => parseInt(str, 10));
-  return indexes;
-}
-
-/**
- * Find the text node that contains the location offset. Check if the offset fits within the current
- * text node, if it doesn't check in the next nodes ignoring the TypedMarkNodes but looking inside
- * as if the text was contiguous.
- * @param node - Current text node.
- * @param offset - Annotation location offset.
- * @returns the text node and offset where the offset was found in.
- */
-function $findTextNodeInMarks(
-  node: LexicalNode | undefined,
-  offset: number,
-): [TextNode | undefined, number | undefined] {
-  if (!node || !$isTextNode(node)) return [undefined, undefined];
-
-  const text = node.getTextContent();
-  if (offset >= 0 && offset < text.length) return [node, offset];
-
-  let nextNode = node.getNextSibling();
-  if (!nextNode) {
-    const parent = node.getParent();
-    if ($isTypedMarkNode(parent)) nextNode = parent.getNextSibling();
-  }
-  if (!nextNode || (!$isTypedMarkNode(nextNode) && !$isTextNode(nextNode)))
-    return [undefined, undefined];
-
-  const nextOffset = offset - text.length;
-  if (nextNode && $isTextNode(nextNode)) return $findTextNodeInMarks(nextNode, nextOffset);
-
-  return $findTextNodeInMarks(nextNode.getFirstChild() ?? undefined, nextOffset);
-}
-
-function $getNodeFromLocation(
-  location: UsjLocation,
-): [LexicalNode | undefined, number | undefined] {
-  const indexes = extractJsonPathIndexes(location.jsonPath);
-  let currentNode: LexicalNode | undefined = $getRoot();
-  for (const index of indexes) {
-    if (!currentNode || !$isElementNode(currentNode)) return [undefined, undefined];
-
-    currentNode = currentNode.getChildAtIndex(index) ?? undefined;
-  }
-
-  return $findTextNodeInMarks(currentNode, location.offset);
-}
-
-function $getPointType(node: LexicalNode | undefined): "text" | "element" {
-  return $isElementNode(node) ? "element" : "text";
-}
-
-export function $getRangeFromSelection(
-  selection: SelectionRange | AnnotationRange,
-): RangeSelection | undefined {
-  const { start } = selection;
-  let { end } = selection;
-  if (end === undefined) end = start;
-
-  // Find the start and end nodes with offsets based on the location.
-  const [startNode, startOffset] = $getNodeFromLocation(start);
-  const [endNode, endOffset] = $getNodeFromLocation(end);
-  if (!startNode || !endNode || startOffset === undefined || endOffset === undefined)
-    return undefined;
-
-  // Create selection range.
-  const rangeSelection = $createRangeSelection();
-  rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, $getPointType(startNode));
-  rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, $getPointType(endNode));
-  return rangeSelection;
 }
 
 const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends LoggerBasic>(

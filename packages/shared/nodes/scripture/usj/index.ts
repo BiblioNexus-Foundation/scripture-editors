@@ -29,6 +29,7 @@ const scriptureUsjNodes = [
   ParaNode,
   {
     replace: ParagraphNode,
+    withKlass: ParaNode,
     with: (node: ParaNode) => new ParaNode(node.__marker, node.__unknownAttributes),
   },
 ];
