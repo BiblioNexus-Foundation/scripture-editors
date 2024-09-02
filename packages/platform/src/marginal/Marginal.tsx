@@ -28,14 +28,15 @@ export type MarginalProps<TLogger extends LoggerBasic> = Omit<EditorProps<TLogge
 };
 
 /**
- * Scripture Editor for USJ with comments in the margin. Created for use in Platform.Bible.
+ * Scripture Editor for USJ with comments in the margin. Created for use in [Platform](https://platform.bible).
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
  * @param props.ref - Forward reference for the editor.
- * @param props.defaultUsj - Default USJ Scripture data.
- * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
- * @param props.setScrRef - Scripture reference set callback function when the reference changes in
- *   the editor as the cursor moves.
+ * @param props.defaultUsj - Initial Scripture data in USJ format.
+ * @param props.scrRef - Scripture reference that links the general cursor location in the
+ *   Scripture.
+ * @param props.setScrRef - Callback function when the Scripture reference changes in the editor as
+ *   the cursor moves.
  * @param props.options - Options to configure the editor.
  * @param props.onChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
@@ -58,6 +59,9 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     },
     setUsj(usj) {
       editorRef.current?.setUsj(usj);
+    },
+    getSelection() {
+      return editorRef.current?.getSelection();
     },
     setSelection(selection) {
       editorRef.current?.setSelection(selection);

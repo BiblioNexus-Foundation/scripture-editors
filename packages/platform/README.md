@@ -1,4 +1,4 @@
-# Scripture Editor for [Platform](https://platform.bible) using USX3.0 ↔ USJ
+# Scripture Editor for [Platform](https://platform.bible) using USJ
 
 <div align="center">
 
@@ -12,7 +12,7 @@ A Scripture editor React component that works on USJ Scripture data. A utility t
 
 ```mermaid
 ---
-title: ScriptureData—Editor flow
+title: Scripture Data — Editor flow
 ---
 graph TB
   DB[(DB)] <-- USX --> C
@@ -28,7 +28,13 @@ npm install @biblionexus-foundation/platform-editor
 
 ## Usage
 
-**Note:** this is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
+> [!NOTE]
+> This is an [uncontrolled React component](https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components).
+
+> [!NOTE]
+>
+> - Use the `<Editorial />` component for an editor without commenting features.
+> - Use the `<Marginal />` component for an editor with comments (comments appear in the margin).
 
 ```typescript
 import { EditorOptions, immutableNoteCallerNodeName, Marginal, MarginalRef, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
@@ -115,21 +121,127 @@ export default function App() {
 - History - undo & redo
 - Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
 - Add comments to selected text, reply in comment threads, delete comments and threads.
-  - To enable comments use the `<Marginal>` editor component (comments appear in the margin).
-  - To use the editor without comments use the `<Editorial>` component.
+  - To enable comments use the `<Marginal />` editor component (comments appear in the margin).
+  - To use the editor without comments use the `<Editorial />` component.
 - Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
-- Set the cursor location or select a range.
-- Specify `textDirection` as `"ltr"`, `"rtl"`, or `"auto"`.
+- Get and set the cursor location or selection range.
+- Specify `textDirection` as `"ltr"`, `"rtl"`, or `"auto"` (`"auto"` is unlikely to be useful for minority languages).
 - BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
 - Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
 - Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
 - Node options - callback for when a `<note>` link is clicked
+
+## `<Editorial />` API
+
+### Editorial Properties
+
+```ts
+/**
+ * Scripture Editor for USJ. Created for use in [Platform](https://platform.bible).
+ * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
+ *
+ * @param props.ref - Forward reference for the editor.
+ * @param props.defaultUsj - Initial Scripture data in USJ format.
+ * @param props.scrRef - Scripture reference that links the general cursor location of the Scripture.
+ * @param props.setScrRef - Callback function when the Scripture reference changes in the editor as the cursor moves.
+ * @param props.options - Options to configure the editor.
+ * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.logger - Logger instance.
+ * @returns the editor element.
+ */
+```
+
+### Editorial Ref
+
+```ts
+/** Forward reference for the editor. */
+export type EditorRef = {
+  /** Focus the editor. */
+  focus(): void;
+  /** Set the USJ Scripture data. */
+  setUsj(usj: Usj): void;
+  /**
+   * Get the selection location or range.
+   * @returns the selection location or range, or `undefined` if there is no selection. The
+   *   json-path in the selection assumes no comment Milestone nodes are present in the USJ.
+   */
+  getSelection(): SelectionRange | undefined;
+  /**
+   * Set the selection location or range.
+   * @param selection - A selection location or range. The json-path in the selection assumes no
+   *   comment Milestone nodes are present in the USJ.
+   */
+  setSelection(selection: SelectionRange): void;
+  /**
+   * Add an ephemeral annotation.
+   * @param selection - An annotation range containing the start and end location. The json-path in
+   *   an annotation location assumes no comment Milestone nodes are present in the USJ.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  addAnnotation(selection: AnnotationRange, type: string, id: string): void;
+  /**
+   * Remove an ephemeral annotation.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  removeAnnotation(type: string, id: string): void;
+  /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
+  toolbarEndRef: React.RefObject<HTMLElement> | null;
+};
+```
+
+### Editorial Options
+
+```ts
+/** Options to configure the editor. */
+export type EditorOptions = {
+  /** Is the editor readonly or editable. */
+  isReadonly?: boolean;
+  /** Is the editor enabled for spell checking. */
+  hasSpellCheck?: boolean;
+  /** Text direction: "ltr" | "rtl" | "auto". */
+  textDirection?: TextDirection;
+  /** View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only functional option. */
+  view?: ViewOptions;
+  /** Options for each editor node:
+   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is
+   *   '+'. Defaults to Latin lower case letters.
+   * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
+   */
+  nodes?: UsjNodeOptions;
+};
+```
+
+## `<Marginal />` API
+
+These are the same as Editorial except where noted below. See [Editorial API](#editorial--api).
+
+### Marginal Ref
+
+Inherits from the [Editorial Ref](#editorial-ref).
+
+```ts
+/** Forward reference for the editor. */
+export type MarginalRef = EditorRef & {
+  /** Set the comments to accompany USJ Scripture. */
+  setComments?(comments: Comments): void;
+};
+```
 
 ## Demo and Collaborative Web Development Environment
 
 Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main
 
 This package is the third tab (`dev:platform:5175`).
+
+OR
+
+To run the demo app locally, first follow the [Developer Quick Start](/README.md#developer-quick-start), but instead of running the last step, instead run:
+
+```sh
+nx dev platform
+```
 
 ## Develop in App
 

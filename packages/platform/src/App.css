@@ -22,6 +22,7 @@ body {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+  color: black;
 }
 
 .controls button {
@@ -32,6 +33,15 @@ body {
 }
 .controls button:hover {
   background-color: #ddd;
+}
+.controls button.active {
+  background-color: #ccc;
+}
+.controls button.active:hover {
+  background-color: #bbb;
+}
+.controls input {
+  width: 150px;
 }
 
 .defined-options {

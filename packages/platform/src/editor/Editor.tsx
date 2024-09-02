@@ -19,18 +19,20 @@ import React, {
 import type { ScriptureReference } from "platform-bible-utils";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import AnnotationPlugin, {
-  $getRangeFromSelection,
-  AnnotationRef,
-} from "shared-react/annotation/AnnotationPlugin";
+import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
+import {
+  $getRangeFromEditor,
+  $getRangeFromSelection,
+} from "shared-react/annotation/selection.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { HistoryPlugin } from "shared-react/plugins/HistoryPlugin";
+import HistoryPlugin from "shared-react/plugins/HistoryPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
+import EditablePlugin from "shared-react/plugins/EditablePlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
@@ -51,9 +53,15 @@ export type EditorRef = {
   /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
   /**
+   * Get the selection location or range.
+   * @returns the selection location or range, or `undefined` if there is no selection. The
+   *   json-path in the selection assumes no comment Milestone nodes are present in the USJ.
+   */
+  getSelection(): SelectionRange | undefined;
+  /**
    * Set the selection location or range.
-   * @param selection - A selection location or range. The json-path in the selection location
-   *   assumes no comment Milestone nodes are present in the USJ.
+   * @param selection - A selection location or range. The json-path in the selection assumes no
+   *   comment Milestone nodes are present in the USJ.
    */
   setSelection(selection: SelectionRange): void;
   /**
@@ -70,6 +78,7 @@ export type EditorRef = {
    * @param id - ID of the annotation.
    */
   removeAnnotation(type: string, id: string): void;
+  /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
   toolbarEndRef: React.RefObject<HTMLElement> | null;
 };
 
@@ -79,23 +88,27 @@ export type EditorOptions = {
   isReadonly?: boolean;
   /** Is the editor enabled for spell checking. */
   hasSpellCheck?: boolean;
-  /** Text direction. */
+  /** Text direction: "ltr" | "rtl" | "auto". */
   textDirection?: TextDirection;
-  /** View options. */
+  /**
+   * View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only
+   * functional option.
+   */
   view?: ViewOptions;
   /** Options for each editor node:
-   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is '+'.
+   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is
+   *   '+'. Defaults to Latin lower case letters.
    * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
    */
   nodes?: UsjNodeOptions;
 };
 
 export type EditorProps<TLogger extends LoggerBasic> = {
-  /** Initial Scripture data in USJ form. */
+  /** Initial Scripture data in USJ format. */
   defaultUsj?: Usj;
-  /** Scripture reference. */
+  /** Scripture reference that controls the general cursor location of the Scripture. */
   scrRef?: ScriptureReference;
-  /** Set Scripture reference callback function. */
+  /** Callback function when the Scripture reference has changed. */
   setScrRef?: (scrRef: ScriptureReference) => void;
   /** Options to configure the editor. */
   options?: EditorOptions;
@@ -128,7 +141,7 @@ function Placeholder(): JSX.Element {
 }
 
 /**
- * Scripture Editor for USJ. Created for use in Platform.Bible.
+ * Scripture Editor for USJ. Created for use in [Platform](https://platform.bible).
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
  * @param props.ref - Forward reference for the editor.
@@ -177,6 +190,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     setUsj(usj) {
       setUsj(usj);
     },
+    getSelection() {
+      return editorRef.current?.read(() => $getRangeFromEditor());
+    },
     setSelection(selection) {
       editorRef.current?.update(() => {
         const rangeSelection = $getRangeFromSelection(selection);
@@ -208,6 +224,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
+      <EditablePlugin isEditable={!isReadonly} />
       <div className="editor-container">
         {!isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
         <div className="editor-inner">
