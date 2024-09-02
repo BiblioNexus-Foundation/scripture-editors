@@ -114,6 +114,26 @@ export default function App() {
 }
 ```
 
+## Styling
+
+This npm package does not include styling so you need to style the editor component to suit your application. A good place to start is to copy the **CSS** from this repo:
+
+- Scripture Nodes [/packages/platform/src/usj-nodes.css](/packages/platform/src/usj-nodes.css)
+- Editor [/packages/platform/src/editor/editor.css](/packages/platform/src/editor/editor.css)
+
+For **icon assets** for the editor referenced in `editor.css` (the license file is included):
+
+- [/packages/platform/assets](/packages/platform/assets)
+
+If using the **commenting features** in the `<Marginal />` component:
+
+- [/packages/platform/src/marginal/comments/ui/Button.css](/packages/platform/src/marginal/comments/ui/Button.css)
+- [/packages/platform/src/marginal/comments/ui/ContentEditable.css](/packages/platform/src/marginal/comments/ui/ContentEditable.css)
+- [/packages/platform/src/marginal/comments/ui/Modal.css](/packages/platform/src/marginal/comments/ui/Modal.css)
+- [/packages/platform/src/marginal/comments/ui/Placeholder.css](/packages/platform/src/marginal/comments/ui/Placeholder.css)
+- [/packages/platform/src/marginal/comments/comment-editor.theme.css](/packages/platform/src/marginal/comments/comment-editor.theme.css)
+- [/packages/platform/src/marginal/comments/CommentPlugin.css](/packages/platform/src/marginal/comments/CommentPlugin.css)
+
 ## Features
 
 - USJ editor with USX support
