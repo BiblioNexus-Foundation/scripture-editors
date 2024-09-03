@@ -114,7 +114,6 @@ export type EditorProps<TLogger extends LoggerBasic> = {
   options?: EditorOptions;
   /** Callback function when USJ Scripture data has changed. */
   onChange?: (usj: Usj) => void;
-  onMutation?: (usj: Usj) => void;
   /** Logger instance. */
   logger?: TLogger;
 };
