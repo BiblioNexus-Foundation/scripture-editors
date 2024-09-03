@@ -206,16 +206,19 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
             " Use the appropriate plugin instead.",
         );
 
-      editor.update(() => {
-        // Apply the annotation to the selected range.
-        const rangeSelection = $getRangeFromSelection(selection);
-        if (rangeSelection === undefined) {
-          logger?.error("Failed to find start or end node of the annotation.");
-          return;
-        }
+      editor.update(
+        () => {
+          // Apply the annotation to the selected range.
+          const rangeSelection = $getRangeFromSelection(selection);
+          if (rangeSelection === undefined) {
+            logger?.error("Failed to find start or end node of the annotation.");
+            return;
+          }
 
-        $wrapSelectionInTypedMarkNode(rangeSelection, type, id);
-      });
+          $wrapSelectionInTypedMarkNode(rangeSelection, type, id);
+        },
+        { tag: "annotation-change" },
+      );
     },
 
     removeAnnotation(type, id) {
@@ -229,17 +232,20 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
       if (markNodeKeys !== undefined) {
         // Do async to avoid causing a React infinite loop
         setTimeout(() => {
-          editor.update(() => {
-            for (const key of markNodeKeys) {
-              const node: TypedMarkNode | null = $getNodeByKey(key);
-              if ($isTypedMarkNode(node)) {
-                node.deleteID(type, id);
-                if (node.hasNoIDsForEveryType()) {
-                  $unwrapTypedMarkNode(node);
+          editor.update(
+            () => {
+              for (const key of markNodeKeys) {
+                const node: TypedMarkNode | null = $getNodeByKey(key);
+                if ($isTypedMarkNode(node)) {
+                  node.deleteID(type, id);
+                  if (node.hasNoIDsForEveryType()) {
+                    $unwrapTypedMarkNode(node);
+                  }
                 }
               }
-            }
-          });
+            },
+            { tag: "annotation-change" },
+          );
         });
       }
     },
