@@ -19,6 +19,7 @@ import React, {
 import type { ScriptureReference } from "platform-bible-utils";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
 import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
 import {
@@ -109,11 +110,11 @@ export type EditorProps<TLogger extends LoggerBasic> = {
   /** Scripture reference that controls the general cursor location of the Scripture. */
   scrRef?: ScriptureReference;
   /** Callback function when the Scripture reference has changed. */
-  setScrRef?: (scrRef: ScriptureReference) => void;
+  onScrRefChange?: (scrRef: ScriptureReference) => void;
   /** Options to configure the editor. */
   options?: EditorOptions;
   /** Callback function when USJ Scripture data has changed. */
-  onChange?: (usj: Usj) => void;
+  onUsjChange?: (usj: Usj) => void;
   /** Logger instance. */
   logger?: TLogger;
 };
@@ -147,10 +148,10 @@ function Placeholder(): JSX.Element {
  * @param props.ref - Forward reference for the editor.
  * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
- * @param props.setScrRef - Scripture reference set callback function when the reference changes in
+ * @param props.onScrRefChange - Scripture reference set callback function when the reference changes in
  *   the editor as the cursor moves.
  * @param props.options - Options to configure the editor.
- * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
@@ -158,9 +159,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   {
     defaultUsj,
     scrRef,
-    setScrRef,
+    onScrRefChange,
     options,
-    onChange,
+    onUsjChange,
     logger,
     children,
   }: PropsWithChildren<EditorProps<TLogger>>,
@@ -199,7 +200,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           const rangeSelection = $getRangeFromSelection(selection);
           if (rangeSelection !== undefined) $setSelection(rangeSelection);
         },
-        { tag: "selection-change" },
+        { tag: SELECTION_CHANGE_TAG },
       );
     },
     addAnnotation(selection, type, id) {
@@ -215,21 +216,16 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 
   const handleChange = useCallback(
     (editorState: EditorState, _editor: LexicalEditor, tags: Set<string>) => {
-      const blackListedTags = [
-        "external-usj-mutation",
-        "selection-change",
-        "cursor-change",
-        "annotation-change",
-      ];
-      if (blackListedTags.some((tag) => tags.has(tag))) return;
+      if (blackListedChangeTags.some((tag) => tags.has(tag))) return;
+
       const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
       if (newUsj) {
         const isEdited = !deepEqual(editedUsj, newUsj);
         if (isEdited) setEditedUsj(newUsj);
-        if (isEdited || !deepEqual(loadedUsj, newUsj)) onChange?.(newUsj);
+        if (isEdited || !deepEqual(loadedUsj, newUsj)) onUsjChange?.(newUsj);
       }
     },
-    [editedUsj, loadedUsj, onChange, setEditedUsj],
+    [editedUsj, loadedUsj, onUsjChange, setEditedUsj],
   );
 
   return (
@@ -250,10 +246,10 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          {scrRef && setScrRef && (
+          {scrRef && onScrRefChange && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
-              setScrRef={setScrRef}
+              onScrRefChange={onScrRefChange}
               viewOptions={viewOptions}
             />
           )}

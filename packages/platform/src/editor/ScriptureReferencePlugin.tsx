@@ -10,6 +10,7 @@ import type { ScriptureReference } from "platform-bible-utils";
 import { useEffect } from "react";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
+  CURSOR_CHANGE_TAG,
   findChapter,
   findNextChapter,
   findThisChapter,
@@ -31,17 +32,17 @@ let hasSelectionChanged = false;
 /**
  * A component (plugin) that keeps the Scripture reference updated.
  * @param props.scrRef - Scripture reference.
- * @param props.setScrRef - Set Scripture reference callback function.
+ * @param props.onScrRefChange - Callback function when the Scripture reference has changed.
  * @param props.viewOptions - View options to select different view modes.
  * @returns null, i.e. no DOM elements.
  */
 export default function ScriptureReferencePlugin({
   scrRef,
-  setScrRef,
+  onScrRefChange,
   viewOptions = getViewOptions(),
 }: {
   scrRef: ScriptureReference;
-  setScrRef: (scrRef: ScriptureReference) => void;
+  onScrRefChange: (scrRef: ScriptureReference) => void;
   viewOptions?: ViewOptions;
 }): null {
   const [editor] = useLexicalComposerContext();
@@ -60,7 +61,7 @@ export default function ScriptureReferencePlugin({
               }
             }
           },
-          { tag: "cursor-change" },
+          { tag: CURSOR_CHANGE_TAG },
         );
       }),
     [editor, chapterNum, verseNum, viewOptions],
@@ -73,7 +74,7 @@ export default function ScriptureReferencePlugin({
         if (!hasSelectionChanged) $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
         else hasSelectionChanged = false;
       },
-      { tag: "cursor-change" },
+      { tag: CURSOR_CHANGE_TAG },
     );
   }, [editor, chapterNum, verseNum, viewOptions]);
 
@@ -82,10 +83,11 @@ export default function ScriptureReferencePlugin({
     () =>
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
-        () => $findAndSetChapterAndVerse(bookNum, chapterNum, verseNum, setScrRef, viewOptions),
+        () =>
+          $findAndSetChapterAndVerse(bookNum, chapterNum, verseNum, onScrRefChange, viewOptions),
         COMMAND_PRIORITY_LOW,
       ),
-    [editor, bookNum, chapterNum, verseNum, setScrRef, viewOptions],
+    [editor, bookNum, chapterNum, verseNum, onScrRefChange, viewOptions],
   );
 
   return null;
@@ -113,7 +115,7 @@ function $findAndSetChapterAndVerse(
   bookNum: number,
   chapterNum: number,
   verseNum: number,
-  setScrRef: (scrRef: ScriptureReference) => void,
+  onScrRefChange: (scrRef: ScriptureReference) => void,
   viewOptions?: ViewOptions,
 ) {
   const startNode = $getSelection()?.getNodes()[0];
@@ -128,7 +130,7 @@ function $findAndSetChapterAndVerse(
     (verseNode && +verseNode.getNumber() !== verseNum)
   );
   if (hasSelectionChanged)
-    setScrRef({
+    onScrRefChange({
       bookNum,
       chapterNum: +(chapterNode?.getNumber() ?? chapterNum),
       verseNum: +(verseNode?.getNumber() ?? verseNum),

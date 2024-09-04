@@ -22,9 +22,12 @@ export type MarginalRef = EditorRef & {
   setComments?(comments: Comments): void;
 };
 
-export type MarginalProps<TLogger extends LoggerBasic> = Omit<EditorProps<TLogger>, "onChange"> & {
+export type MarginalProps<TLogger extends LoggerBasic> = Omit<
+  EditorProps<TLogger>,
+  "onUsjChange"
+> & {
   /** Callback function when USJ Scripture data has changed. */
-  onChange?: (usj: Usj, comments: Comments | undefined) => void;
+  onUsjChange?: (usj: Usj, comments: Comments | undefined) => void;
 };
 
 /**
@@ -35,10 +38,10 @@ export type MarginalProps<TLogger extends LoggerBasic> = Omit<EditorProps<TLogge
  * @param props.defaultUsj - Initial Scripture data in USJ format.
  * @param props.scrRef - Scripture reference that links the general cursor location in the
  *   Scripture.
- * @param props.setScrRef - Callback function when the Scripture reference changes in the editor as
+ * @param props.onScrRefChange - Callback function when the Scripture reference changes in the editor as
  *   the cursor moves.
  * @param props.options - Options to configure the editor.
- * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
@@ -49,7 +52,9 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   const editorRef = useRef<EditorRef>(null);
   const commentContainerRef = useRef<HTMLDivElement>(null);
   const [toolbarEndRef, setToolbarEndRef] = useState<React.RefObject<HTMLElement> | null>(null);
-  const { children, onChange, ...editorProps } = props as PropsWithChildren<MarginalProps<TLogger>>;
+  const { children, onUsjChange, ...editorProps } = props as PropsWithChildren<
+    MarginalProps<TLogger>
+  >;
   const [commentStoreRef, setCommentStoreRef] = useCommentStoreRef();
   useMissingCommentsProps(editorProps, commentStoreRef);
 
@@ -80,12 +85,12 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     },
   }));
 
-  const handleChange = useCallback(
+  const handleUsjChange = useCallback(
     (usj: Usj) => {
       const comments = commentStoreRef.current?.getComments();
-      onChange?.(usj, comments);
+      onUsjChange?.(usj, comments);
     },
-    [commentStoreRef, onChange],
+    [commentStoreRef, onUsjChange],
   );
 
   useEffect(() => {
@@ -96,7 +101,7 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   }, []);
 
   return (
-    <Editor ref={editorRef} onChange={handleChange} {...editorProps}>
+    <Editor ref={editorRef} onUsjChange={handleUsjChange} {...editorProps}>
       <CommentPlugin
         setCommentStore={setCommentStoreRef}
         showCommentsContainerRef={toolbarEndRef}
