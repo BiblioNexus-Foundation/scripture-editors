@@ -35,7 +35,7 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
     const editorState = editor.parseEditorState(serializedEditorState);
     // Execute after the current render cycle.
     const timeoutId = setTimeout(() => {
-      editor.setEditorState(editorState);
+      editor.setEditorState(editorState, { tag: "external-usj-mutation" });
       editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
     }, 0);
     return () => clearTimeout(timeoutId);

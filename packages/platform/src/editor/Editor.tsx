@@ -194,10 +194,13 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       return editorRef.current?.read(() => $getRangeFromEditor());
     },
     setSelection(selection) {
-      editorRef.current?.update(() => {
-        const rangeSelection = $getRangeFromSelection(selection);
-        if (rangeSelection !== undefined) $setSelection(rangeSelection);
-      });
+      editorRef.current?.update(
+        () => {
+          const rangeSelection = $getRangeFromSelection(selection);
+          if (rangeSelection !== undefined) $setSelection(rangeSelection);
+        },
+        { tag: "selection-change" },
+      );
     },
     addAnnotation(selection, type, id) {
       annotationRef.current?.addAnnotation(selection, type, id);
@@ -211,7 +214,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   }));
 
   const handleChange = useCallback(
-    (editorState: EditorState) => {
+    (editorState: EditorState, _editor: LexicalEditor, tags: Set<string>) => {
+      const blackListedTags = [
+        "external-usj-mutation",
+        "selection-change",
+        "cursor-change",
+        "annotation-change",
+      ];
+      if (blackListedTags.some((tag) => tags.has(tag))) return;
       const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
       if (newUsj) {
         const isEdited = !deepEqual(editedUsj, newUsj);

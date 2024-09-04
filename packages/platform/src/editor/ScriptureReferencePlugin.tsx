@@ -51,24 +51,30 @@ export default function ScriptureReferencePlugin({
   useEffect(
     () =>
       editor.registerMutationListener(BookNode, (nodeMutations) => {
-        editor.update(() => {
-          for (const [nodeKey, mutation] of nodeMutations) {
-            const bookNode = $getNodeByKey<BookNode>(nodeKey);
-            if (bookNode && $isBookNode(bookNode) && mutation === "created") {
-              $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+        editor.update(
+          () => {
+            for (const [nodeKey, mutation] of nodeMutations) {
+              const bookNode = $getNodeByKey<BookNode>(nodeKey);
+              if (bookNode && $isBookNode(bookNode) && mutation === "created") {
+                $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+              }
             }
-          }
-        });
+          },
+          { tag: "cursor-change" },
+        );
       }),
     [editor, chapterNum, verseNum, viewOptions],
   );
 
   // Scripture Ref changed
   useEffect(() => {
-    editor.update(() => {
-      if (!hasSelectionChanged) $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
-      else hasSelectionChanged = false;
-    });
+    editor.update(
+      () => {
+        if (!hasSelectionChanged) $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+        else hasSelectionChanged = false;
+      },
+      { tag: "cursor-change" },
+    );
   }, [editor, chapterNum, verseNum, viewOptions]);
 
   // selection changed
