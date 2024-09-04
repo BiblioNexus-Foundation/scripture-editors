@@ -73,7 +73,7 @@ export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
   const [scrRef, setScrRef] = useState(defaultScrRef);
 
-  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => console.log({ usj, comments }), []);
+  const handleUsjChange = useCallback((usj: Usj, comments: Comments | undefined) => console.log({ usj, comments }), []);
 
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
@@ -104,9 +104,9 @@ export default function App() {
         ref={marginalRef}
         defaultUsj={defaultUsj}
         scrRef={scrRef}
-        setScrRef={setScrRef}
+        onScrRefChange={setScrRef}
         options={options}
-        onChange={handleChange}
+        onUsjChange={handleUsjChange}
         logger={console}
       />
     </>
@@ -139,6 +139,7 @@ If using the **commenting features** in the `<Marginal />` component:
 - USJ editor with USX support
 - Read-only and edit mode
 - History - undo & redo
+- Cut, copy, paste, paste as plain text - context menu and keyboard shortcuts
 - Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
 - Add comments to selected text, reply in comment threads, delete comments and threads.
   - To enable comments use the `<Marginal />` editor component (comments appear in the margin).
@@ -163,9 +164,9 @@ If using the **commenting features** in the `<Marginal />` component:
  * @param props.ref - Forward reference for the editor.
  * @param props.defaultUsj - Initial Scripture data in USJ format.
  * @param props.scrRef - Scripture reference that links the general cursor location of the Scripture.
- * @param props.setScrRef - Callback function when the Scripture reference changes in the editor as the cursor moves.
+ * @param props.onScrRefChange - Callback function when the Scripture reference changes in the editor as the cursor moves.
  * @param props.options - Options to configure the editor.
- * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */

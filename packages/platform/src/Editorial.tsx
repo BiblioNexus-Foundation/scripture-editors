@@ -10,10 +10,10 @@ import Editor, { EditorRef, EditorProps } from "./editor/Editor";
  * @param props.defaultUsj - Initial Scripture data in USJ format.
  * @param props.scrRef - Scripture reference that links the general cursor location of the
  *   Scripture.
- * @param props.setScrRef - Callback function when the Scripture reference changes in the editor as
+ * @param props.onScrRefChange - Callback function when the Scripture reference changes in the editor as
  *   the cursor moves.
  * @param props.options - Options to configure the editor.
- * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */

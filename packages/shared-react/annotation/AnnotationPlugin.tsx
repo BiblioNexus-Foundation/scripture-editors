@@ -10,6 +10,7 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
+import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
 import { LoggerBasic } from "../plugins/logger-basic.model";
 import { AnnotationRange } from "./selection.model";
 import { $getRangeFromSelection } from "./selection.utils";
@@ -125,7 +126,7 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
 
           $wrapSelectionInTypedMarkNode(rangeSelection, type, id);
         },
-        { tag: "annotation-change" },
+        { tag: ANNOTATION_CHANGE_TAG },
       );
     },
 
@@ -152,7 +153,7 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
                 }
               }
             },
-            { tag: "annotation-change" },
+            { tag: ANNOTATION_CHANGE_TAG },
           );
         });
       }

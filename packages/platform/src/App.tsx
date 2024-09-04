@@ -105,7 +105,7 @@ export default function App() {
     [definedOptions, isReadonly, hasSpellCheck, textDirection, viewMode],
   );
 
-  const handleChange = useCallback((usj: Usj, comments: Comments | undefined) => {
+  const handleUsjChange = useCallback((usj: Usj, comments: Comments | undefined) => {
     console.log({ usj, comments });
     marginalRef.current?.setUsj(usj);
   }, []);
@@ -229,9 +229,9 @@ export default function App() {
         ref={marginalRef}
         defaultUsj={defaultUsj}
         scrRef={scrRef}
-        setScrRef={setScrRef}
+        onScrRefChange={setScrRef}
         options={options}
-        onChange={handleChange}
+        onUsjChange={handleUsjChange}
         logger={console}
       />
     </>
