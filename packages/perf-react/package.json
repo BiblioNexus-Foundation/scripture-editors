@@ -12,19 +12,20 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/headless": "^0.16.0",
-    "@lexical/html": "^0.16.0",
-    "@lexical/react": "^0.16.0",
-    "@lexical/selection": "^0.16.0",
-    "@lexical/utils": "^0.16.0",
-    "@lexical/mark": "^0.16.0",
     "epitelete-html": "^0.2.21-beta.2",
-    "lexical": "^0.16.0",
     "open-patcher": "1.0.0-beta.1",
-    "shared": "*",
-    "shared-react": "*",
+    "shared": "link:../shared",
+    "shared-react": "link:../shared-react",
     "pure-uuid": "^1.8.1",
-    "base-64": "^1.0.0"
+    "base-64": "^1.0.0",
+    "lexical": "^0.17.0",
+    "@lexical/headless": "^0.17.0",
+    "@lexical/html": "^0.17.0",
+    "@lexical/react": "^0.17.0",
+    "@lexical/selection": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
+    "@lexical/mark": "^0.17.0",
+    "epitelete-html": "^0.2.21-beta.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

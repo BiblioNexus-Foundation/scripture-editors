@@ -8,7 +8,7 @@
  */
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $findMatchingParent, mergeRegister } from "@lexical/utils";
+import { $findMatchingParent, IS_APPLE, mergeRegister } from "@lexical/utils";
 import {
   $getSelection,
   $isRangeSelection,
@@ -20,16 +20,17 @@ import {
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useState } from "react";
-import { IS_APPLE } from "shared/lexical/environment";
-import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { forwardRef, useCallback, useEffect, useState } from "react";
+import { $isBookNode } from "shared/nodes/scripture/usj/BookNode";
+import { $isImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import BlockFormatDropDown from "./BlockFormatDropDown";
 
 function Divider(): JSX.Element {
   return <div className="divider" />;
 }
 
-export default function ToolbarPlugin(): JSX.Element {
+const ToolbarPlugin = forwardRef<HTMLDivElement>(function ToolbarPlugin(_props, ref): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
   const [blockMarker, setBlockMarker] = useState("");
@@ -56,7 +57,11 @@ export default function ToolbarPlugin(): JSX.Element {
       const nodeKey = node.getKey();
       const elementDOM = activeEditor.getElementByKey(nodeKey);
 
-      if (elementDOM !== null) setBlockMarker((node as ParaNode).getMarker());
+      if (
+        elementDOM !== null &&
+        ($isParaNode(node) || $isBookNode(node) || $isImmutableChapterNode(node))
+      )
+        setBlockMarker(node.getMarker());
     }
   }, [activeEditor]);
 
@@ -134,6 +139,9 @@ export default function ToolbarPlugin(): JSX.Element {
           <Divider />
         </>
       )}
+      <div ref={ref} className="end-container"></div>
     </div>
   );
-}
+});
+
+export default ToolbarPlugin;

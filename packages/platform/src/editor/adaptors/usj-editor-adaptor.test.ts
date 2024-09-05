@@ -1,4 +1,15 @@
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedEditorState } from "lexical";
+import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import {
+  immutableNoteCallerNodeName,
+  SerializedImmutableNoteCallerNode,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { defaultNoteCallers } from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
+import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+// Reaching inside only for tests.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   NOTE_CALLER_INDEX,
   NOTE_INDEX,
@@ -15,13 +26,9 @@ import {
   usjGen1v1ImpliedPara,
   usjMarks,
   usjWithUnknownItems,
-} from "shared/converters/usj/converter-test.data";
-import { MarkerObject } from "shared/converters/usj/usj.model";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { SerializedImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { UNFORMATTED_VIEW_MODE } from "../toolbar/view-mode.model";
-import { serializeEditorState, reset } from "./usj-editor.adaptor";
+} from "../../../../utilities/src/converters/usj/converter-test.data";
+import { serializeEditorState, reset, initialize } from "./usj-editor.adaptor";
+import { UNFORMATTED_VIEW_MODE } from "./view-mode.model";
 import { getViewOptions } from "./view-options.utils";
 
 /**
@@ -49,6 +56,9 @@ describe("USJ Editor Adaptor", () => {
   });
 
   it("should convert from USJ to Lexical editor state JSON", () => {
+    const nodeOptions = { [immutableNoteCallerNodeName]: { noteCallers: defaultNoteCallers } };
+    initialize(nodeOptions, console);
+
     const serializedEditorState = serializeEditorState(usjGen1v1);
 
     const note = (serializedEditorState.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
@@ -147,7 +157,22 @@ describe("USJ Editor Adaptor", () => {
     expect(serializedEditorState).toEqual(editorStateMarks);
   });
 
+  it("should call `addMissingComments` if it's set", () => {
+    const mockAddMissingComments = jest.fn();
+    const nodeOptions = { [MarkNodeName]: { addMissingComments: mockAddMissingComments } };
+    initialize(nodeOptions, console);
+
+    const serializedEditorState = serializeEditorState(usjMarks);
+
+    expect(serializedEditorState).toEqual(editorStateMarks);
+    expect(mockAddMissingComments.mock.calls).toHaveLength(1); // called once
+    // Called with `sid` array argument from `usjMarks`.
+    expect(mockAddMissingComments.mock.calls[0][0]).toEqual(["1", "1", "2", "1", "2", "1", "2"]);
+  });
+
   it("should convert from USJ with unknown items to Lexical editor state JSON", () => {
+    const nodeOptions = { [immutableNoteCallerNodeName]: { noteCallers: defaultNoteCallers } };
+    initialize(nodeOptions, console);
     reset();
 
     const serializedEditorState = serializeEditorState(usjWithUnknownItems);

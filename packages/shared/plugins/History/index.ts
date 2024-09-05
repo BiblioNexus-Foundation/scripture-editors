@@ -18,9 +18,9 @@ import {
   UNDO_COMMAND,
   createCommand,
 } from "lexical";
-import { UpdateListener } from "lexical/LexicalEditor";
 import { HistoryState, HistoryStateEntry, LexicalHistoryManager } from "./HistoryManager";
 import { DirtyNodes } from "./DirtyNodes";
+import { UpdateListener } from "lexical/LexicalEditor";
 
 export const PUSH_COMMAND = createCommand("PUSH_COMMAND");
 

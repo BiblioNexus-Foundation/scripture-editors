@@ -26,7 +26,7 @@ import { HistoryStateEntry } from "../History/HistoryManager";
 
 import { deepEqual, getPerfKindFromNode } from "./utils";
 import { getNodePath } from "../History/operations/defaults";
-import { exportNodeToJSON } from "../../lexical/exportNodeToJSON";
+import { exportNodeToJSON } from "../../localLexical/exportNodeToJSON";
 import { getDiff } from "json-difference";
 import { PerfKind } from "./types";
 import { OperationType } from "../History/operations/index.d";

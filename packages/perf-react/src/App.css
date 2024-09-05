@@ -83,7 +83,7 @@
 
 .editor-oce {
   position: relative;
-  text-align: left;
+  text-align: start;
 }
 
 .contentEditable {

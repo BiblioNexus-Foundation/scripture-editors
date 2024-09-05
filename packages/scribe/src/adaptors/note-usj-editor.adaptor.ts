@@ -1,3 +1,11 @@
+import {
+  BookCode,
+  MarkerContent,
+  MarkerObject,
+  USJ_TYPE,
+  USJ_VERSION,
+  Usj,
+} from "@biblionexus-foundation/scripture-utilities";
 import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   LineBreakNode,
@@ -7,14 +15,6 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
-import {
-  BookCode,
-  MarkerContent,
-  MarkerObject,
-  USJ_TYPE,
-  USJ_VERSION,
-  Usj,
-} from "shared/converters/usj/usj.model";
 import {
   BOOK_MARKER,
   BOOK_VERSION,
@@ -40,8 +40,9 @@ import {
   MilestoneNode,
   MilestoneMarker,
   SerializedMilestoneNode,
-  STARTING_MS_MARK_MARKER,
-  ENDING_MS_MARK_MARKER,
+  STARTING_MS_COMMENT_MARKER,
+  ENDING_MS_COMMENT_MARKER,
+  isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -87,17 +88,17 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
-  TEXT_SPACING_CLASS_NAME,
-  FORMATTED_FONT_CLASS_NAME,
+  addEndingZwspIfMissing,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
-import { ViewOptions, getViewOptions } from "./view-options.utils";
+import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjNoteEditorAdapter extends EditorAdaptor {
   initialize: typeof initialize;
@@ -105,49 +106,21 @@ interface UsjNoteEditorAdapter extends EditorAdaptor {
   serializeEditorState: typeof serializeEditorState;
 }
 
-/** Milestone markers used to mark an annotation */
-const milestoneMarkMarkers = [STARTING_MS_MARK_MARKER, ENDING_MS_MARK_MARKER];
-
 const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
   version: 1,
 };
-/** Possible note callers to use when caller is '+'. Up to 2 characters are used, e.g. a-zz */
-const defaultNoteCallers = [
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-];
+const callerData: CallerData = {
+  /** Count used for note callers. */
+  count: 0,
+};
 
 /** View options - view mode parameters */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node */
 let _nodeOptions: UsjNodeOptions | undefined;
-/** Count used for note callers */
-let callerCount = 0;
+/** List of possible note callers. */
+let noteCallers: string[] | undefined;
 /** Logger instance */
 let _logger: LoggerBasic;
 
@@ -160,7 +133,8 @@ export function initialize(
 }
 
 export function reset(callerCountValue = 0) {
-  resetCallerCount(callerCountValue);
+  //Reset the caller count used for note callers.
+  callerData.count = callerCountValue;
 }
 
 function getNotesFromUsj(usjContent: MarkerContent[]) {
@@ -223,6 +197,12 @@ export function serializeEditorState(
  */
 function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
+
+  // Set list of possible note callers.
+  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
+    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
+    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
+  }
 }
 
 /**
@@ -231,79 +211,6 @@ function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
  */
 function setLogger(logger: LoggerBasic | undefined) {
   if (logger) _logger = logger;
-}
-
-/**
- * Reset the count used for note callers.
- * @param resetValue - Value to reset to. Defaults to 0.
- */
-function resetCallerCount(resetValue = 0) {
-  callerCount = resetValue;
-}
-
-/**
- * Get the chapter node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the chapter node class if the view is defined, `undefined` otherwise.
- */
-export function getChapterNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return viewOptions.markerMode === "editable" ? ChapterNode : ImmutableChapterNode;
-}
-
-/**
- * Get the verse node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the verse node class if the view is defined, `undefined` otherwise.
- */
-export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return viewOptions.markerMode === "editable" ? VerseNode : ImmutableVerseNode;
-}
-
-/**
- * Get the class list for an element node.
- * @param viewOptions - View options of the editor.
- * @returns the element class list based on view options.
- */
-function getClassList(viewOptions: ViewOptions | undefined) {
-  const classList: string[] = [];
-  if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
-  if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
-  return classList;
-}
-
-/**
- * Get the note caller to use. E.g. for '+' replace with a-z, aa-zz.
- * @param markerCaller - the specified note caller.
- * @returns the specified caller, if '+' replace with up to 2 characters from the possible note
- *   callers list, '*' if undefined.
- */
-function getNoteCaller(markerCaller: string | undefined): string {
-  let noteCallers = defaultNoteCallers;
-  if (_nodeOptions) {
-    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
-    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
-  }
-  let caller = markerCaller;
-  if (markerCaller === "+") {
-    if (callerCount >= noteCallers.length ** 2 + noteCallers.length) {
-      resetCallerCount();
-      _logger?.warn("Note caller count was reset. Consider adding more possible note callers.");
-    }
-
-    const callerIndex = callerCount % noteCallers.length;
-    let callerLeadChar = "";
-    if (callerCount >= noteCallers.length) {
-      const callerLeadCharIndex = Math.trunc(callerCount / noteCallers.length) - 1;
-      callerLeadChar = noteCallers[callerLeadCharIndex];
-    }
-    caller = callerLeadChar + noteCallers[callerIndex];
-    callerCount += 1;
-  }
-  return caller ?? "*";
 }
 
 function getTextContent(markers: MarkerContent[] | undefined): string {
@@ -342,30 +249,36 @@ function createChapter(
   if (marker !== CHAPTER_MARKER) {
     _logger?.warn(`Unexpected chapter marker '${marker}'!`);
   }
-  const ChapterNodeClass = getChapterNodeClass(_viewOptions) ?? ImmutableChapterNode;
-  const type = ChapterNodeClass.getType();
-  const version =
-    _viewOptions?.markerMode === "editable" ? CHAPTER_VERSION : IMMUTABLE_CHAPTER_VERSION;
-  let text: string | undefined;
-  const classList = getClassList(_viewOptions);
-  let showMarker: boolean | undefined;
-  if (_viewOptions?.markerMode === "editable") text = getVisibleOpenMarkerText(marker, number);
-  else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
+  let showMarker: boolean | undefined;
+  if (_viewOptions?.markerMode === "visible") showMarker = true;
 
-  return {
-    type,
-    text,
-    marker: marker as ChapterMarker,
-    number: number ?? "",
-    classList,
-    sid,
-    altnumber,
-    pubnumber,
-    showMarker,
-    unknownAttributes,
-    version,
-  };
+  return _viewOptions?.markerMode === "editable"
+    ? {
+        type: ChapterNode.getType(),
+        marker: marker as ChapterMarker,
+        number: number ?? "",
+        sid,
+        altnumber,
+        pubnumber,
+        unknownAttributes,
+        children: [createText(getVisibleOpenMarkerText(marker, number) ?? "")],
+        direction: null,
+        format: "",
+        indent: 0,
+        version: CHAPTER_VERSION,
+      }
+    : {
+        type: ImmutableChapterNode.getType(),
+        marker: marker as ChapterMarker,
+        number: number ?? "",
+        showMarker,
+        sid,
+        altnumber,
+        pubnumber,
+        unknownAttributes,
+        version: IMMUTABLE_CHAPTER_VERSION,
+      };
 }
 
 function createVerse(
@@ -429,6 +342,7 @@ function createImpliedPara(children: SerializedLexicalNode[]): SerializedImplied
     format: "",
     indent: 0,
     textFormat: 0,
+    textStyle: "",
     version: IMPLIED_PARA_VERSION,
   };
 }
@@ -441,7 +355,6 @@ function createPara(
   if (!ParaNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected para marker '${marker}'!`);
   }
-  const classList = getClassList(_viewOptions);
   const children: SerializedLexicalNode[] = [];
   if (_viewOptions?.markerMode === "editable")
     children.push(createMarker(marker), createText(NBSP));
@@ -451,13 +364,13 @@ function createPara(
   return {
     type: ParaNode.getType(),
     marker,
-    classList,
     unknownAttributes,
     children,
     direction: null,
     format: "",
     indent: 0,
     textFormat: 0,
+    textStyle: "",
     version: PARA_VERSION,
   };
 }
@@ -468,7 +381,11 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName].onClick)
+  if (
+    _nodeOptions &&
+    _nodeOptions[immutableNoteCallerNodeName] &&
+    _nodeOptions[immutableNoteCallerNodeName].onClick
+  )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return {
@@ -485,19 +402,20 @@ function createNote(
   childNodes: SerializedLexicalNode[],
 ): SerializedNoteNode {
   const { marker, category } = markerObject;
-  if (!NoteNode.isValidMarker(marker)) {
-    _logger?.warn(`Unexpected note marker '${marker}'!`);
-  }
+  if (!NoteNode.isValidMarker(marker)) _logger?.warn(`Unexpected note marker '${marker}'!`);
   const caller = markerObject.caller ?? "*";
   let callerNode: SerializedImmutableNoteCallerNode | SerializedTextNode;
   if (_viewOptions?.markerMode === "editable") {
     callerNode = createText(getEditableCallerText(caller));
   } else {
-    callerNode = createNoteCaller(getNoteCaller(markerObject.caller), childNodes);
+    const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
+    callerNode = createNoteCaller(noteCaller, childNodes);
     // childNodes.forEach((node) => {
     //   (node as SerializedTextNode).style = "display: none";
     // });
   }
+  const unknownAttributes = getUnknownAttributes(markerObject);
+
   let openingMarkerNode: SerializedTextNode | undefined;
   let closingMarkerNode: SerializedTextNode | undefined;
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable") {
@@ -508,7 +426,7 @@ function createNote(
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  const unknownAttributes = getUnknownAttributes(markerObject);
+  addEndingZwspIfMissing(children, TextNode.getType(), createText);
 
   return {
     type: NoteNode.getType(),
@@ -615,10 +533,6 @@ function addClosingMarker(marker: string, nodes: SerializedLexicalNode[]) {
   }
 }
 
-function isMilestoneMarkMarker(markerContent: MarkerObject) {
-  return milestoneMarkMarkers.includes(markerContent.marker);
-}
-
 function reIndex(indexes: number[], offset: number): number[] {
   if (indexes.length <= 0 || offset === 0) return indexes;
 
@@ -633,8 +547,9 @@ function removeValueFromArray<T>(arr: T[], value: T) {
 }
 
 function updateSids(sids: string[], msMarkNode: SerializedMilestoneNode) {
-  if (msMarkNode.marker === STARTING_MS_MARK_MARKER && msMarkNode.sid) sids.push(msMarkNode.sid);
-  if (msMarkNode.marker === ENDING_MS_MARK_MARKER && msMarkNode.eid)
+  if (msMarkNode.marker === STARTING_MS_COMMENT_MARKER && msMarkNode.sid !== undefined)
+    sids.push(msMarkNode.sid);
+  if (msMarkNode.marker === ENDING_MS_COMMENT_MARKER && msMarkNode.eid !== undefined)
     removeValueFromArray(sids, msMarkNode.eid);
 }
 
@@ -657,7 +572,7 @@ function insertMilestoneMarksRecurse(
   const markedNodes = insertMilestoneMarksRecurse(
     nodes.slice(firstIndex + 1, secondIndex),
     reIndex(msMarkIndexes, firstIndex + 1),
-    firstMSMarkNode.marker === STARTING_MS_MARK_MARKER,
+    firstMSMarkNode.marker === STARTING_MS_COMMENT_MARKER,
     sids,
   );
   const markNode = createMark(markedNodes, [...sids]);
@@ -666,7 +581,7 @@ function insertMilestoneMarksRecurse(
   const nodesAfter = insertMilestoneMarksRecurse(
     nodes.slice(secondIndex + 1),
     reIndex(msMarkIndexes, secondIndex + 1),
-    secondMSMarkNode.marker === STARTING_MS_MARK_MARKER,
+    secondMSMarkNode.marker === STARTING_MS_COMMENT_MARKER,
     sids,
   );
   return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
@@ -704,7 +619,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           nodes.push(createNote(markerContent, recurseNodes(markerContent.content)));
           break;
         case MilestoneNode.getType():
-          if (isMilestoneMarkMarker(markerContent)) msMarkIndexes.push(nodes.length);
+          if (isMilestoneCommentMarker(markerContent.marker)) msMarkIndexes.push(nodes.length);
           nodes.push(createMilestone(markerContent));
           break;
         default:

@@ -1,5 +1,6 @@
 /** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#book */
 
+import { BookCode, isValidBookCode } from "@biblionexus-foundation/scripture-utilities";
 import {
   type LexicalNode,
   type NodeKey,
@@ -8,7 +9,6 @@ import {
   ElementNode,
   SerializedElementNode,
 } from "lexical";
-import { BookCode, isValidBookCode } from "../../../converters/usj/usj.model";
 import { UnknownAttributes } from "./node.utils";
 
 export const BOOK_MARKER = "id";
@@ -96,7 +96,7 @@ export class BookNode extends ElementNode {
   createDOM(): HTMLElement {
     const dom = document.createElement("p");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     dom.setAttribute("data-code", this.__code);
     return dom;
   }

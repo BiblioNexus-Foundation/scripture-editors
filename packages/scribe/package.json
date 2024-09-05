@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/scribe-editor",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "Scripture editor used in Scribe",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/scribe#readme",
@@ -16,6 +16,7 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
+    "!dist/package.json",
     "src/index.ts",
     "src/editor"
   ],
@@ -28,12 +29,13 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/mark": "^0.16.0",
-    "@lexical/react": "^0.16.0",
-    "@lexical/selection": "^0.16.0",
-    "@lexical/utils": "^0.16.0",
+    "@biblionexus-foundation/scripture-utilities": "workspace:^",
+    "@lexical/mark": "^0.17.0",
+    "@lexical/react": "^0.17.0",
+    "@lexical/selection": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.16.0"
+    "lexical": "^0.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
@@ -42,7 +44,6 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "platform": "link:../platform",
     "shared": "link:../shared",
     "shared-react": "link:../shared-react",
     "sj-usfm-grammar": "^3.0.0",

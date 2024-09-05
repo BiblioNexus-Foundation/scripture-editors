@@ -1,35 +1,86 @@
-import { MarkNode } from "@lexical/mark";
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { EditorState, LexicalEditor } from "lexical";
-import React, { JSX, forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
-import { ScriptureReference } from "platform-bible-react";
-import { Usj } from "shared/converters/usj/usj.model";
+import { $setSelection, EditorState, LexicalEditor } from "lexical";
+import { deepEqual } from "fast-equals";
+import React, {
+  JSX,
+  PropsWithChildren,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import type { ScriptureReference } from "platform-bible-utils";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
+import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
+import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
+import {
+  $getRangeFromEditor,
+  $getRangeFromSelection,
+} from "shared-react/annotation/selection.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import HistoryPlugin from "shared-react/plugins/HistoryPlugin";
+import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
+import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
+import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
+import EditablePlugin from "shared-react/plugins/EditablePlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
+import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
-import { ViewOptions } from "./adaptors/view-options.utils";
-import editorTheme from "./editor-theme";
+import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
+import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import useDeferredState from "./use-deferred-state.hook";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
-  /** Method to focus the editor. */
+  /** Focus the editor. */
   focus(): void;
-  /** Method to set the USJ Scripture data. */
+  /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
+  /**
+   * Get the selection location or range.
+   * @returns the selection location or range, or `undefined` if there is no selection. The
+   *   json-path in the selection assumes no comment Milestone nodes are present in the USJ.
+   */
+  getSelection(): SelectionRange | undefined;
+  /**
+   * Set the selection location or range.
+   * @param selection - A selection location or range. The json-path in the selection assumes no
+   *   comment Milestone nodes are present in the USJ.
+   */
+  setSelection(selection: SelectionRange): void;
+  /**
+   * Add an ephemeral annotation.
+   * @param selection - An annotation range containing the start and end location. The json-path in
+   *   an annotation location assumes no comment Milestone nodes are present in the USJ.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  addAnnotation(selection: AnnotationRange, type: string, id: string): void;
+  /**
+   * Remove an ephemeral annotation.
+   * @param type - Type of the annotation.
+   * @param id - ID of the annotation.
+   */
+  removeAnnotation(type: string, id: string): void;
+  /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
+  toolbarEndRef: React.RefObject<HTMLElement> | null;
 };
 
 /** Options to configure the editor. */
@@ -38,27 +89,32 @@ export type EditorOptions = {
   isReadonly?: boolean;
   /** Is the editor enabled for spell checking. */
   hasSpellCheck?: boolean;
-  /** View options. */
+  /** Text direction: "ltr" | "rtl" | "auto". */
+  textDirection?: TextDirection;
+  /**
+   * View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only
+   * functional option.
+   */
   view?: ViewOptions;
   /** Options for each editor node:
-   * @param nodes[].noteCallers - Possible note callers to use when caller is '+' for
-   *   ImmutableNoteCallerNode.
-   * @param nodes[].onClick - Click handler method for ImmutableNoteCallerNode.
+   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is
+   *   '+'. Defaults to Latin lower case letters.
+   * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
    */
   nodes?: UsjNodeOptions;
 };
 
-type EditorProps<TLogger extends LoggerBasic> = {
-  /** Initial Scripture data in USJ form. */
+export type EditorProps<TLogger extends LoggerBasic> = {
+  /** Initial Scripture data in USJ format. */
   defaultUsj?: Usj;
-  /** Scripture reference. */
+  /** Scripture reference that controls the general cursor location of the Scripture. */
   scrRef?: ScriptureReference;
-  /** Set Scripture reference callback function. */
-  setScrRef?: (scrRef: ScriptureReference) => void;
+  /** Callback function when the Scripture reference has changed. */
+  onScrRefChange?: (scrRef: ScriptureReference) => void;
   /** Options to configure the editor. */
   options?: EditorOptions;
   /** Callback function when USJ Scripture data has changed. */
-  onChange?: (usj: Usj) => void;
+  onUsjChange?: (usj: Usj) => void;
   /** Logger instance. */
   logger?: TLogger;
 };
@@ -76,90 +132,146 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
+  nodes: [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
 };
+
+const defaultViewOptions = getViewOptions(undefined);
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
 }
 
 /**
- * Scripture Editor for USJ. Created for use in Platform.Bible.
+ * Scripture Editor for USJ. Created for use in [Platform](https://platform.bible).
  * @see https://github.com/usfm-bible/tcdocs/blob/usj/grammar/usj.js
  *
- * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.ref - Forward reference for the editor.
+ * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
- * @param props.setScrRef - Scripture reference set callback function when the reference changes in
+ * @param props.onScrRefChange - Scripture reference set callback function when the reference changes in
  *   the editor as the cursor moves.
  * @param props.options - Options to configure the editor.
- * @param props.onChange - Callback function when USJ Scripture data has changed.
+ * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
 const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
-  { defaultUsj, scrRef, setScrRef, options, onChange, logger }: EditorProps<TLogger>,
+  {
+    defaultUsj,
+    scrRef,
+    onScrRefChange,
+    options,
+    onUsjChange,
+    logger,
+    children,
+  }: PropsWithChildren<EditorProps<TLogger>>,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
-  const editorRef = useRef<LexicalEditor>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
+  const annotationRef = useRef<AnnotationRef | null>(null);
+  const toolbarEndRef = useRef<HTMLDivElement>(null);
   const [usj, setUsj] = useState(defaultUsj);
-  const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
-  editorConfig.editable = !options?.isReadonly;
-  editorConfig.editorState = (editor: LexicalEditor) => {
-    editor.parseEditorState(usjEditorAdaptor.serializeEditorState(defaultUsj, options?.view));
-  };
+  const [loadedUsj, editedUsj, setEditedUsj] = useDeferredState(usj);
+  const {
+    isReadonly = false,
+    hasSpellCheck = false,
+    textDirection = "auto",
+    view: viewOptions = defaultViewOptions,
+    nodes: nodeOptions = {},
+  } = options ?? {};
+  useDefaultNodeOptions(nodeOptions);
+
+  editorConfig.editable = !isReadonly;
   editorUsjAdaptor.initialize(logger);
 
   useImperativeHandle(ref, () => ({
     focus() {
       editorRef.current?.focus();
     },
-    setUsj(usj: Usj) {
+    setUsj(usj) {
       setUsj(usj);
+    },
+    getSelection() {
+      return editorRef.current?.read(() => $getRangeFromEditor());
+    },
+    setSelection(selection) {
+      editorRef.current?.update(
+        () => {
+          const rangeSelection = $getRangeFromSelection(selection);
+          if (rangeSelection !== undefined) $setSelection(rangeSelection);
+        },
+        { tag: SELECTION_CHANGE_TAG },
+      );
+    },
+    addAnnotation(selection, type, id) {
+      annotationRef.current?.addAnnotation(selection, type, id);
+    },
+    removeAnnotation(type, id) {
+      annotationRef.current?.removeAnnotation(type, id);
+    },
+    get toolbarEndRef() {
+      return toolbarEndRef;
     },
   }));
 
   const handleChange = useCallback(
-    (editorState: EditorState) => {
-      const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      if (usj) {
-        setEditedUsj(usj);
-        onChange?.(usj);
+    (editorState: EditorState, _editor: LexicalEditor, tags: Set<string>) => {
+      if (blackListedChangeTags.some((tag) => tags.has(tag))) return;
+
+      const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
+      if (newUsj) {
+        const isEdited = !deepEqual(editedUsj, newUsj);
+        if (isEdited) setEditedUsj(newUsj);
+        if (isEdited || !deepEqual(loadedUsj, newUsj)) onUsjChange?.(newUsj);
       }
     },
-    [onChange, setEditedUsj],
+    [editedUsj, loadedUsj, onUsjChange, setEditedUsj],
   );
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
+      <EditablePlugin isEditable={!isReadonly} />
       <div className="editor-container">
-        {!options?.isReadonly && <ToolbarPlugin />}
+        {!isReadonly && <ToolbarPlugin ref={toolbarEndRef} />}
         <div className="editor-inner">
+          <EditorRefPlugin editorRef={editorRef} />
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="editor-input" spellCheck={options?.hasSpellCheck} />
+              <ContentEditable
+                className={`editor-input ${getViewClassList(viewOptions).join(" ")}`}
+                spellCheck={hasSpellCheck}
+              />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          {scrRef && setScrRef && (
+          {scrRef && onScrRefChange && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
-              setScrRef={setScrRef}
-              viewOptions={options?.view}
+              onScrRefChange={onScrRefChange}
+              viewOptions={viewOptions}
             />
           )}
-          <EditorRefPlugin editorRef={editorRef} />
           <UpdateStatePlugin
             scripture={loadedUsj}
-            nodeOptions={options?.nodes}
+            nodeOptions={nodeOptions}
             editorAdaptor={usjEditorAdaptor}
-            viewOptions={options?.view}
+            viewOptions={viewOptions}
             logger={logger}
           />
-          <NoteNodePlugin />
-          <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
+          <OnChangePlugin
+            onChange={handleChange}
+            ignoreSelectionChange
+            ignoreHistoryMergeTagChange
+          />
+          <AnnotationPlugin ref={annotationRef} logger={logger} />
+          <ClipboardPlugin />
+          <CommandMenuPlugin logger={logger} />
+          <ContextMenuPlugin />
+          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
+          <TextDirectionPlugin textDirection={textDirection} />
+          {children}
         </div>
       </div>
     </LexicalComposer>

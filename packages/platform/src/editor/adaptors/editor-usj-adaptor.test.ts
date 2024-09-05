@@ -1,6 +1,16 @@
-import { MarkNode } from "@lexical/mark";
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { deepEqual } from "fast-equals";
-import { createEditor } from "lexical";
+import { SerializedTextNode } from "lexical";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
+import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
+import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
+import { createBasicTestEnvironment } from "shared/nodes/test.utils";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+// Reaching inside only for tests.
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   CHAPTER_1_INDEX,
   VERSE_2_EDITABLE_INDEX,
@@ -17,24 +27,12 @@ import {
   usjGen1v1ImpliedPara,
   usjMarks,
   usjWithUnknownItems,
-} from "shared/converters/usj/converter-test.data";
-import { MarkerObject } from "shared/converters/usj/usj.model";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
-import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+} from "../../../../utilities/src/converters/usj/converter-test.data";
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
-const testConfig = {
-  namespace: "TestEditor",
-  theme: {},
-  nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
-  onError: console.error,
-};
-const editor = createEditor(testConfig);
+const nodes = [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes];
+const { editor } = createBasicTestEnvironment(nodes);
 
 describe("Editor USJ Adaptor", () => {
   it("should convert to USJ from empty Lexical editor state JSON", () => {
@@ -65,7 +63,10 @@ describe("Editor USJ Adaptor", () => {
     const editorStateEdited = editorStateGen1v1Editable;
     const chapter1 = editorStateEdited.root.children[CHAPTER_1_INDEX] as SerializedChapterNode;
     const chapter1Number = "101";
-    chapter1.text = getVisibleOpenMarkerText(CHAPTER_MARKER, chapter1Number);
+    (chapter1.children[0] as SerializedTextNode).text = getVisibleOpenMarkerText(
+      CHAPTER_MARKER,
+      chapter1Number,
+    );
     const verse2 = (editorStateEdited.root.children[VERSE_PARA_INDEX] as SerializedParaNode)
       .children[VERSE_2_EDITABLE_INDEX] as SerializedVerseNode;
     const verse2Number = "202";

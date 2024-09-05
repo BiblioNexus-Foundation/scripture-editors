@@ -1,7 +1,7 @@
 {
   "name": "@biblionexus-foundation/platform-editor",
-  "version": "0.2.1",
-  "description": "Scripture editor used in Platform.Bible.",
+  "version": "0.6.0",
+  "description": "Scripture editor used in Platform. See https://platform.bible",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform#readme",
   "repository": {
@@ -16,11 +16,13 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
+    "!dist/package.json",
     "src/index.ts",
     "src/editor"
   ],
   "scripts": {
     "dev": "vite",
+    "dev:test": "cross-env NODE_ENV=testing vite",
     "prepublish": "cd ../.. && nx build platform"
   },
   "peerDependencies": {
@@ -28,12 +30,16 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@lexical/mark": "^0.16.0",
-    "@lexical/react": "^0.16.0",
-    "@lexical/selection": "^0.16.0",
-    "@lexical/utils": "^0.16.0",
+    "@biblionexus-foundation/scripture-utilities": "workspace:^",
+    "@lexical/react": "^0.17.0",
+    "@lexical/selection": "^0.17.0",
+    "@lexical/text": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
+    "@lexical/yjs": "^0.17.0",
+    "@lexical/mark": "^0.17.0",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.16.0"
+    "lexical": "^0.17.0",
+    "yjs": "^13.6.15"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

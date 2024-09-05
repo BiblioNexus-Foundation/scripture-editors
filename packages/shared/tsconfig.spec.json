@@ -4,5 +4,5 @@
     "outDir": "../../dist/out-tsc",
     "types": ["jest", "node"]
   },
-  "include": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts"]
+  "include": ["jest.config.ts", "**/*.test.ts", "**/*.data.ts", "**/*.spec.ts", "**/*.d.ts"]
 }

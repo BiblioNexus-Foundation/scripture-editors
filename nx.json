@@ -3,8 +3,7 @@
     "default": {
       "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["build", "serve", "preview", "typecheck", "test", "lint", "dev"],
-        "accessToken": "MDdlNDM5NzAtYjlkMy00YjY2LWFkNjctZGFiNzJlOGRhNGY1fHJlYWQtd3JpdGU="
+        "cacheableOperations": ["build", "serve", "preview", "typecheck", "test", "lint", "dev"]
       }
     }
   },
@@ -16,21 +15,12 @@
       "inputs": ["production", "^production"],
       "dependsOn": ["^build"]
     },
-    "dev": {
-      "dependsOn": ["^build"]
-    },
-    "devpub": {
-      "dependsOn": ["build", "^build"]
-    },
+    "dev": { "dependsOn": ["^build"] },
+    "devpub": { "dependsOn": ["build", "^build"] },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "tsc -p tsconfig.json",
-            "forwardAllArgs": false
-          }
-        ],
+        "commands": [{ "command": "tsc -p tsconfig.json", "forwardAllArgs": false }],
         "cwd": "{projectRoot}"
       }
     },
@@ -40,14 +30,10 @@
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "silent": true
       },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
+      "configurations": { "ci": { "ci": true, "codeCoverage": true } }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -58,9 +44,12 @@
         "{workspaceRoot}/eslint.config.js"
       ],
       "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
-      }
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"] }
+    },
+    "@nx/vite:build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
@@ -86,5 +75,26 @@
         "babel": true
       }
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/vite/plugin",
+      "options": {
+        "buildTargetName": "vite:build",
+        "testTargetName": "test",
+        "serveTargetName": "vite:serve",
+        "previewTargetName": "vite:preview",
+        "serveStaticTargetName": "serve-static"
+      }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "eslint:lint",
+        "extensions": ["ts", "tsx", "js", "jsx", "html", "vue"]
+      }
+    }
+  ],
+  "pluginsConfig": { "@nx/js": { "analyzeSourceFiles": true } },
+  "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU="
 }

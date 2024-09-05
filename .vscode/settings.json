@@ -3,30 +3,27 @@
   "editor.formatOnSave": true,
   "editor.rulers": [100],
   "editor.wordWrapColumn": 100,
-
   "eslint.validate": ["javascript", "javascriptreact", "html", "typescriptreact"],
-
   "files.associations": {
     ".eslintignore": "ignore",
     ".prettierignore": "ignore"
   },
   "files.eol": "\n",
-
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
   "typescript.format.enable": false,
-
   "json.schemas": [
     {
       "fileMatch": ["*tsconfig*.json"],
       "url": "http://json.schemastore.org/tsconfig"
     }
   ],
-
   "search.exclude": {
     ".git": true,
     "node_modules": true
   },
-
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

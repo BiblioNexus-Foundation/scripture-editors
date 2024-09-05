@@ -7,6 +7,11 @@ import {
   Spread,
   $applyNodeReplacement,
   LexicalNode,
+  LexicalEditor,
+  DOMExportOutput,
+  isHTMLElement,
+  DOMConversionMap,
+  DOMConversionOutput,
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
@@ -34,6 +39,8 @@ export type SerializedNoteNode = Spread<
 >;
 
 export const NOTE_VERSION = 1;
+
+export const GENERATOR_NOTE_CALLER = "+";
 
 export class NoteNode extends ElementNode {
   __marker: NoteMarker;
@@ -70,8 +77,21 @@ export class NoteNode extends ElementNode {
     return node;
   }
 
-  static isValidMarker(marker: string): boolean {
-    return VALID_NOTE_MARKERS.includes(marker as NoteMarker);
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isNoteElement(node)) return null;
+
+        return {
+          conversion: $convertNoteElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
+  static isValidMarker(marker: string | undefined): boolean {
+    return !!marker && VALID_NOTE_MARKERS.includes(marker as NoteMarker);
   }
 
   setMarker(marker: NoteMarker): void {
@@ -117,7 +137,7 @@ export class NoteNode extends ElementNode {
   createDOM(): HTMLElement {
     const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
-    dom.classList.add(this.getType(), `usfm_${this.__marker}`);
+    dom.classList.add(this.__type, `usfm_${this.__marker}`);
     dom.setAttribute("data-caller", this.__caller);
     return dom;
   }
@@ -126,6 +146,17 @@ export class NoteNode extends ElementNode {
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
     return false;
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(this.getType(), `usfm_${this.getMarker()}`);
+      element.setAttribute("data-caller", this.getCaller());
+    }
+
+    return { element };
   }
 
   exportJSON(): SerializedNoteNode {
@@ -139,6 +170,23 @@ export class NoteNode extends ElementNode {
       version: NOTE_VERSION,
     };
   }
+
+  // Mutation
+
+  canBeEmpty(): false {
+    return false;
+  }
+
+  isInline(): true {
+    return true;
+  }
+}
+
+function $convertNoteElement(element: HTMLElement): DOMConversionOutput {
+  const marker = (element.getAttribute("data-marker") as NoteMarker) ?? "f";
+  const caller = element.getAttribute("data-caller") ?? "";
+  const node = $createNoteNode(marker, caller);
+  return { node };
 }
 
 export const noteNodeName = Symbol.for(NoteNode.name);
@@ -150,6 +198,13 @@ export function $createNoteNode(
   unknownAttributes?: UnknownAttributes,
 ): NoteNode {
   return $applyNodeReplacement(new NoteNode(marker, caller, category, unknownAttributes));
+}
+
+function isNoteElement(node: HTMLElement | null | undefined): boolean {
+  if (!node) return false;
+
+  const marker = node.getAttribute("data-marker") ?? "";
+  return NoteNode.isValidMarker(marker) && node.classList.contains(NoteNode.getType());
 }
 
 export function $isNoteNode(node: LexicalNode | null | undefined): node is NoteNode {

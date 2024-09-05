@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { useEffect } from "react";
+import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node.utils";
 import { LoggerBasic } from "./logger-basic.model";
 import { EditorAdaptor, NodeOptions } from "../adaptors/editor-adaptor.model";
 
@@ -35,7 +36,7 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
     const editorState = editor.parseEditorState(serializedEditorState);
     // Execute after the current render cycle.
     const timeoutId = setTimeout(() => {
-      editor.setEditorState(editorState);
+      editor.setEditorState(editorState, { tag: EXTERNAL_USJ_MUTATION_TAG });
       editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
     }, 0);
     return () => clearTimeout(timeoutId);

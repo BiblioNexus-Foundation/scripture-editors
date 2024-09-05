@@ -8,11 +8,11 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@lexical/rich-text": "^0.16.0",
-    "@lexical/utils": "^0.16.0",
-    "lexical": "^0.16.0",
     "open-patcher": "1.0.0-beta.1",
-    "shared": "*"
+    "shared": "*",
+    "@lexical/rich-text": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
+    "lexical": "^0.17.0"
   },
   "devDependencies": {
     "shared": "link:../shared",

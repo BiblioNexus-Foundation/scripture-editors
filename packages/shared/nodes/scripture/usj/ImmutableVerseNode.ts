@@ -7,8 +7,13 @@ import {
   DecoratorNode,
   SerializedLexicalNode,
   Spread,
+  DOMConversionMap,
+  LexicalEditor,
+  DOMExportOutput,
+  isHTMLElement,
+  DOMConversionOutput,
 } from "lexical";
-import { UnknownAttributes, VERSE_CLASS_NAME, getVisibleOpenMarkerText } from "./node.utils";
+import { UnknownAttributes, VERSE_CLASS_NAME, ZWSP, getVisibleOpenMarkerText } from "./node.utils";
 
 export const VERSE_MARKER = "v";
 export const IMMUTABLE_VERSE_VERSION = 1;
@@ -87,6 +92,19 @@ export class ImmutableVerseNode extends DecoratorNode<void> {
     );
     node.setMarker(marker);
     return node;
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (node: HTMLElement) => {
+        if (!isVerseElement(node)) return null;
+
+        return {
+          conversion: $convertImmutableVerseElement,
+          priority: 1,
+        };
+      },
+    };
   }
 
   setMarker(marker: VerseMarker): void {
@@ -173,10 +191,21 @@ export class ImmutableVerseNode extends DecoratorNode<void> {
     return false;
   }
 
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+    if (element && isHTMLElement(element)) {
+      element.setAttribute("data-marker", this.getMarker());
+      element.classList.add(VERSE_CLASS_NAME, `usfm_${this.getMarker()}`);
+      element.setAttribute("data-number", this.getNumber());
+    }
+
+    return { element };
+  }
+
   decorate(): string {
     return this.getShowMarker()
       ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
-      : this.getNumber();
+      : this.getNumber() + ZWSP;
   }
 
   exportJSON(): SerializedImmutableVerseNode {
@@ -194,6 +223,12 @@ export class ImmutableVerseNode extends DecoratorNode<void> {
   }
 }
 
+function $convertImmutableVerseElement(element: HTMLElement): DOMConversionOutput {
+  const verseNumber = element.getAttribute("data-number") ?? "0";
+  const node = $createImmutableVerseNode(verseNumber);
+  return { node };
+}
+
 export function $createImmutableVerseNode(
   verseNumber: string,
   showMarker?: boolean,
@@ -205,6 +240,11 @@ export function $createImmutableVerseNode(
   return $applyNodeReplacement(
     new ImmutableVerseNode(verseNumber, showMarker, sid, altnumber, pubnumber, unknownAttributes),
   );
+}
+
+function isVerseElement(node: HTMLElement | null | undefined): boolean {
+  const marker = node?.getAttribute("data-marker") ?? undefined;
+  return marker === VERSE_MARKER;
 }
 
 export function $isImmutableVerseNode(

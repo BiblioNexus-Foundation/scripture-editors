@@ -40,6 +40,16 @@ NOTE: there is a [known limitation using PNPM with Volta](https://docs.volta.sh/
 
 ## Nx Monorepo Build System
 
+| Source                                 | Package                                                                 |
+| -------------------------------------- | ----------------------------------------------------------------------- |
+| [perf-vanilla](/packages/perf-react)   |                                                                         |
+| [perf-react](/packages/perf-react)     |                                                                         |
+| [platform](/packages/platform)         | [![Github Tag][npm-platform-version-image]][npm-platform-version-url]   |
+| [scribe](/packages/scribe)             | [![Github Tag][npm-scribe-version-image]][npm-scribe-version-url]       |
+| [shared-react](/packages/shared-react) |                                                                         |
+| [shared](/packages/shared)             |                                                                         |
+| [utilities](/packages/utilities)       | [![Github Tag][npm-utilities-version-image]][npm-utilities-version-url] |
+
 ```mermaid
 ---
 title: Nx Graph
@@ -48,8 +58,14 @@ graph TB
   V(perf-vanilla) --> S(shared)
   R(perf-react) --> S
   P(platform) --> SR
+  SB(scribe) --> SR
   SR(shared-react) --> S
+  R --> SR
   P --> S
+  SB --> S
+  S --> U(utilities)
+  P --> U
+  SB --> U
 ```
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
@@ -160,10 +176,22 @@ nx run-many -t typecheck # to check types
 
 Thanks to [CodeSandbox](https://codesandbox.io/) for the instant dev environment: https://codesandbox.io/p/github/BiblioNexus-Foundation/scripture-editors/main
 
+## Plain Vanilla JS and React
+
+Lexical works with plain-vanilla JS/TS as well as with React. To that end, the editor packages in this repo `perf-react` and `perf-vanilla` are 2 editor components that behave the same to edit the [PERF](https://github.com/Proskomma/proskomma-json-tools/blob/main/doc/schema/perf.html) data format.
+
+If you are using a framework other than React and need to wrap a plain-vanilla JS editor for your framework, you could add your own vanilla TS editor package to this repo. By comparing `perf-vanilla` and `perf-react` you can see how to take any existing React plugins you might want and convert them to vanilla TS.
+
 ## License
 
 [MIT][github-license] © [BiblioNexus Foundation](https://biblionexus.org/)
 
 <!-- define variables used above -->
 
+[npm-platform-version-image]: https://img.shields.io/npm/v/@biblionexus-foundation/platform-editor
+[npm-platform-version-url]: https://www.npmjs.com/package/@biblionexus-foundation/platform-editor
+[npm-scribe-version-image]: https://img.shields.io/npm/v/@biblionexus-foundation/scribe-editor
+[npm-scribe-version-url]: https://www.npmjs.com/package/@biblionexus-foundation/scribe-editor
+[npm-utilities-version-image]: https://img.shields.io/npm/v/@biblionexus-foundation/scripture-utilities
+[npm-utilities-version-url]: https://www.npmjs.com/package/@biblionexus-foundation/scripture-utilities
 [github-license]: https://github.com/BiblioNexus-Foundation/scripture-editors/blob/main/LICENSE

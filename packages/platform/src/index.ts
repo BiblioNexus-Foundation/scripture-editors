@@ -1,7 +1,5 @@
-export { default as Editor, type EditorRef, type EditorOptions } from "./editor/Editor";
-export { type Usj } from "shared/converters/usj/usj.model";
-export { usxStringToUsj } from "shared/converters/usj/usx-to-usj";
-export { usjToUsxString } from "shared/converters/usj/usj-to-usx";
+export { default as Editorial } from "./Editorial";
+export { default as Marginal, type MarginalRef } from "./marginal/Marginal";
 export { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 export { type UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 export {
@@ -10,4 +8,6 @@ export {
   getViewOptions,
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
-export { type ViewMode } from "./editor/toolbar/view-mode.model";
+export { type EditorOptions, type EditorRef } from "./editor/Editor";
+export { type ViewMode } from "./editor/adaptors/view-mode.model";
+export { type Comments } from "./marginal/comments/commenting";

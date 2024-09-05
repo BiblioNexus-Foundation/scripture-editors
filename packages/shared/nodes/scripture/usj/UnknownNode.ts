@@ -5,6 +5,7 @@ import {
   Spread,
   ElementNode,
   SerializedElementNode,
+  DOMExportOutput,
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
@@ -91,6 +92,10 @@ export class UnknownNode extends ElementNode {
     return false;
   }
 
+  exportDOM(): DOMExportOutput {
+    return { element: null };
+  }
+
   exportJSON(): SerializedUnknownNode {
     return {
       ...super.exportJSON(),
@@ -100,6 +105,24 @@ export class UnknownNode extends ElementNode {
       unknownAttributes: this.getUnknownAttributes(),
       version: UNKNOWN_VERSION,
     };
+  }
+
+  // Mutation
+
+  canBeEmpty(): true {
+    return true;
+  }
+
+  isInline(): true {
+    return true;
+  }
+
+  extractWithChild(): false {
+    return false;
+  }
+
+  excludeFromCopy(destination: "clone" | "html"): boolean {
+    return destination !== "clone";
   }
 }
 
