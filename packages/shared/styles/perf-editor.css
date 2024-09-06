@@ -329,6 +329,7 @@ span.paragraph[perf-subtype="usfm:f"] {
   align-items: center;
   font-family: sans-serif;
   font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .toolbar button:hover {
@@ -340,4 +341,5 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-style: normal;
   font-family: "Material Symbols Outlined";
   font-size: 1.3rem;
+  font-size: 130%;
 }
