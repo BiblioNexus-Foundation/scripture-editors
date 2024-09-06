@@ -26,6 +26,7 @@ a:hover {
 }
 
 body {
+  width: 100%;
   margin: 0;
   display: flex;
   place-items: center;
@@ -58,13 +59,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
 .placeholder {
   color: #999;
   overflow: hidden;
@@ -75,9 +69,13 @@ button:focus-visible {
   pointer-events: none;
 }
 
+#app {
+  width: 100%;
+}
+
 .editors {
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  justify-content: center;
   gap: 1em;
 }
 
