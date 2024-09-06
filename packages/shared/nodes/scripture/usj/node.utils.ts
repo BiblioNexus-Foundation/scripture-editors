@@ -5,25 +5,15 @@ import {
   MarkerContent,
   MarkerObject,
 } from "@biblionexus-foundation/scripture-utilities";
-import {
-  $isElementNode,
-  LexicalEditor,
-  LexicalNode,
-  SerializedLexicalNode,
-  SerializedTextNode,
-} from "lexical";
+import { LexicalEditor, LexicalNode, SerializedLexicalNode, SerializedTextNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
-import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
-import { VerseNode } from "./VerseNode";
 import { CharNode, SerializedCharNode } from "./CharNode";
 
 export type UnknownAttributes = { [name: string]: string | undefined };
 
 // If you want use these utils with your own chapter node, add it to this list of types.
 type ChapterNodes = ChapterNode | ImmutableChapterNode;
-// If you want use these utils with your own verse node, add it to this list of types.
-type VerseNodes = VerseNode | ImmutableVerseNode;
 
 /** RegEx to test for a string only containing digits. */
 export const ONLY_DIGITS_TEST = /^\d+$/;
@@ -160,154 +150,6 @@ export function findThisChapter<T extends ChapterNodes = ImmutableChapterNode>(
   }
   if (previousSibling && previousSibling.getType() === ChapterNodeClass.getType())
     return previousSibling as T;
-}
-
-/**
- * Find the given verse in the children of the node.
- * @param node - Node with potential verses in children.
- * @param verseNum - Verse number to look for.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
-  node: LexicalNode,
-  verseNum: number,
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  if (!$isElementNode(node)) return;
-
-  const children = node.getChildren();
-  const verseNode = children.find(
-    (node) =>
-      node.getType() === VerseNodeClass.getType() &&
-      (node as T).getNumber() === verseNum.toString(),
-  );
-  return verseNode as T | undefined;
-}
-
-/**
- * Finds the verse node with the given verse number amongst the children of nodes.
- * @param nodes - Nodes to look in.
- * @param verseNum - Verse number to look for.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findVerse<T extends VerseNodes = ImmutableVerseNode>(
-  nodes: LexicalNode[],
-  verseNum: number,
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  return (
-    nodes
-      .map((node) => findVerseInNode<T>(node, verseNum, VerseNodeClass))
-      // remove any undefined results and take the first found
-      .filter((verseNode) => verseNode)[0] as T | undefined
-  );
-}
-
-/**
- * Find the next verse in the children of the node.
- * @param node - Node with potential verses in children.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findNextVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
-  node: LexicalNode,
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  if (!$isElementNode(node)) return;
-  const children = node.getChildren();
-  const verseNode = children.find((node) => node.getType() === VerseNodeClass.getType());
-  return verseNode as T | undefined;
-}
-
-/**
- * Finds the next verse node amongst the children of nodes.
- * @param nodes - Nodes to look in.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findNextVerse<T extends VerseNodes = ImmutableVerseNode>(
-  nodes: LexicalNode[],
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  return (
-    nodes
-      .map((node) => findNextVerseInNode<T>(node, VerseNodeClass))
-      // remove any undefined results and take the first found
-      .filter((verseNode) => verseNode)[0]
-  );
-}
-
-/**
- * Find the last verse in the children of the node.
- * @param node - Node with potential verses in children.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findLastVerseInNode<T extends VerseNodes = ImmutableVerseNode>(
-  node: LexicalNode | null | undefined,
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  if (!node || !$isElementNode(node)) return;
-
-  const children = node.getChildren();
-  const verseNode = children.findLast((node) => node.getType() === VerseNodeClass.getType());
-  return verseNode as T | undefined;
-}
-
-/**
- * Finds the last verse node amongst the children of nodes.
- * @param nodes - Nodes to look in.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findLastVerse<T extends VerseNodes = ImmutableVerseNode>(
-  nodes: LexicalNode[],
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-) {
-  const verseNodes = nodes
-    .map((node) => findLastVerseInNode<T>(node, VerseNodeClass))
-    // remove any undefined results
-    .filter((verseNode) => verseNode);
-  if (verseNodes.length <= 0) return;
-
-  return verseNodes[verseNodes.length - 1];
-}
-
-/**
- * Find the verse that this node is in.
- * @param node - Node to find the verse it's in.
- * @param VerseNodeClass - Use a different verse node class if needed.
- * @returns the verse node if found, `undefined` otherwise.
- */
-export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
-  node: LexicalNode | null | undefined,
-  VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
-): T | undefined {
-  if (!node) return;
-
-  // is this node a verse
-  if (node.getType() === VerseNodeClass.getType()) return node as T;
-
-  // is one of the previous sibling nodes a verse
-  let previousSibling = node.getPreviousSibling();
-  while (previousSibling && previousSibling.getType() !== VerseNodeClass.getType()) {
-    previousSibling = previousSibling.getPreviousSibling();
-  }
-  if (previousSibling && previousSibling.getType() === VerseNodeClass.getType())
-    return previousSibling as T;
-
-  // is the verse in a previous parent sibling
-  let previousParentSibling = node.getTopLevelElement()?.getPreviousSibling();
-  let verseNode = findLastVerseInNode<T>(previousParentSibling, VerseNodeClass);
-  let nextVerseNode = verseNode;
-  while (previousParentSibling && !verseNode) {
-    verseNode = nextVerseNode;
-    previousParentSibling = previousParentSibling.getPreviousSibling();
-    nextVerseNode = findLastVerseInNode<T>(previousParentSibling, VerseNodeClass);
-  }
-  return verseNode;
 }
 
 /**

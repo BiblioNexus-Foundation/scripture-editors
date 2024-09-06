@@ -11,6 +11,7 @@ import { EditorState, LexicalEditor } from "lexical";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
@@ -77,7 +78,7 @@ const Editor = forwardRef(function Editor(
     onError(error: Error) {
       throw error;
     },
-    nodes: [MarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
+    nodes: [MarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
   };
 
   useImperativeHandle(ref, () => ({

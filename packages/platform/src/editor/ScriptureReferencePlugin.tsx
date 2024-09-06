@@ -14,11 +14,10 @@ import {
   findChapter,
   findNextChapter,
   findThisChapter,
-  findThisVerse,
-  findVerse,
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
+import { findThisVerse, findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   getChapterNodeClass,
   getVerseNodeClass,

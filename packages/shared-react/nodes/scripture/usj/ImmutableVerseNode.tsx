@@ -13,7 +13,13 @@ import {
   isHTMLElement,
   DOMConversionOutput,
 } from "lexical";
-import { UnknownAttributes, VERSE_CLASS_NAME, ZWSP, getVisibleOpenMarkerText } from "./node.utils";
+import { JSX } from "React";
+import {
+  UnknownAttributes,
+  VERSE_CLASS_NAME,
+  ZWSP,
+  getVisibleOpenMarkerText,
+} from "shared/nodes/scripture/usj/node.utils";
 
 export const VERSE_MARKER = "v";
 export const IMMUTABLE_VERSE_VERSION = 1;
@@ -33,7 +39,7 @@ export type SerializedImmutableVerseNode = Spread<
   SerializedLexicalNode
 >;
 
-export class ImmutableVerseNode extends DecoratorNode<void> {
+export class ImmutableVerseNode extends DecoratorNode<JSX.Element> {
   __marker: VerseMarker;
   __number: string;
   __showMarker?: boolean;
@@ -202,10 +208,14 @@ export class ImmutableVerseNode extends DecoratorNode<void> {
     return { element };
   }
 
-  decorate(): string {
-    return this.getShowMarker()
-      ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
-      : this.getNumber() + ZWSP;
+  decorate(): JSX.Element {
+    return (
+      <span>
+        {this.getShowMarker()
+          ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
+          : this.getNumber() + ZWSP}
+      </span>
+    );
   }
 
   exportJSON(): SerializedImmutableVerseNode {

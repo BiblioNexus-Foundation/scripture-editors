@@ -40,22 +40,10 @@ import {
   ImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
   IMMUTABLE_UNMATCHED_VERSION,
   ImmutableUnmatchedNode,
   SerializedImmutableUnmatchedNode,
 } from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
@@ -105,6 +93,18 @@ import {
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,

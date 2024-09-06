@@ -1,11 +1,11 @@
 import { ChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { ImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { ImmutableVerseNode } from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   TEXT_SPACING_CLASS_NAME,
   FORMATTED_FONT_CLASS_NAME,
 } from "shared/nodes/scripture/usj/node.utils";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { ViewMode, FORMATTED_VIEW_MODE, UNFORMATTED_VIEW_MODE } from "./view-mode.model";
 
 export type ViewOptions = {
