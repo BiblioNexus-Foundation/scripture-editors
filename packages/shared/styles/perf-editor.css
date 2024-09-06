@@ -14,7 +14,6 @@
   color: var(--editor-text-color);
   border-radius: 0 0 1rem 1rem;
   padding: 1em 2em;
-  max-width: 600px;
 }
 
 .contentEditable {
@@ -354,7 +353,7 @@ span.paragraph[perf-subtype="usfm:f"] {
 }
 
 .target-editor {
-  max-width: 600px;
+  max-width: 1000px;
 }
 
 /* Toolbar related */
