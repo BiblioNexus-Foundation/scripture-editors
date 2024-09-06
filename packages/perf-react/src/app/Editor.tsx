@@ -1,4 +1,4 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
@@ -23,7 +23,7 @@ export default function Editor() {
    **/
   const lexicalState = useLexicalState();
 
-  const initialConfig = {
+  const initialConfig: InitialConfigType = {
     namespace: "ScriptureEditor",
     theme,
     editorState: lexicalState,
