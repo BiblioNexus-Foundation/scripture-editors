@@ -24,8 +24,7 @@
     "@lexical/react": "^0.17.0",
     "@lexical/selection": "^0.17.0",
     "@lexical/utils": "^0.17.0",
-    "@lexical/mark": "^0.17.0",
-    "epitelete-html": "^0.2.21-beta.2"
+    "@lexical/mark": "^0.17.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

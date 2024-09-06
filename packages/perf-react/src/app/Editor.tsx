@@ -127,9 +127,8 @@ export default function Editor({
             }
             getUsfmFromPerf();
           }}
-          style={{ marginBottom: "1rem" }}
         >
-          Download USFM
+          <i>download</i>
         </button>
         <Button
           onClick={(_, editor) => {
@@ -138,7 +137,7 @@ export default function Editor({
             });
           }}
         >
-          + Cross Reference
+          \X
         </Button>
         <Button
           onClick={(_, editor) => {
@@ -147,7 +146,7 @@ export default function Editor({
             });
           }}
         >
-          + Footnote
+          \F
         </Button>
         <Button
           onClick={(_, editor) => {
@@ -164,7 +163,7 @@ export default function Editor({
             );
           }}
         >
-          + Heading
+          \S
         </Button>
 
         <Button
@@ -174,7 +173,7 @@ export default function Editor({
             });
           }}
         >
-          + translator's section marker
+          \TS
         </Button>
         <Button
           onClick={(_, editor) => {
@@ -183,7 +182,7 @@ export default function Editor({
             });
           }}
         >
-          Add Chapter
+          \C
         </Button>
         <Button
           onClick={(_, editor) => {
@@ -192,21 +191,21 @@ export default function Editor({
             });
           }}
         >
-          Add Verse
+          \V
         </Button>
         <Button
           onClick={() => {
             verseBlockStyle.toggle();
           }}
         >
-          verse block view
+          <i>view_agenda</i>
         </Button>
       </div>
       <div className={"editor-oce"}>
         <RichTextPlugin
           contentEditable={
             <div className="editor">
-              <ContentEditable className="contentEditable" />
+              <ContentEditable className="contentEditable" spellCheck={false} />
             </div>
           }
           placeholder={<div className="placeholder">Enter some text...</div>}
