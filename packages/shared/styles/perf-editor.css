@@ -4,7 +4,7 @@
   --verse-marker-color: black;
   --chapter-marker-color: black;
   --title-color: orange;
-  --pilcrow-color: black;
+  --pilcrow-color: rgb(0 0 0 / 25%);
 }
 
 .editor-oce {
@@ -70,15 +70,18 @@ span.verses {
   text-align: center;
 }
 
-[perf-subtype="mt2"] {
-  font-style: italic;
-  font-size: 0.6em;
-  font-weight: 400;
+h1 {
+  font-weight: 700;
+  font-size: 2.5em;
 }
 
-[perf-subtype="mt"],
-[perf-subtype="mt1"] {
-  font-weight: 700;
+[data-marker="mt2"] {
+  font-style: italic;
+  font-size: 0.6em;
+}
+
+[perf-subtype="introduction"] {
+  color: #1a1aa0;
 }
 
 h1 span[perf-type="paragraph"] {
@@ -91,12 +94,57 @@ p[perf-type="paragraph"] {
   margin: 0.5rem 0;
 }
 
-[perf-subtype="introduction"] [perf-subtype="title"] {
-  font-size: 1.5rem;
+p[data-marker="io"] {
+  margin: 0;
+  padding-left: 1rem;
 }
 
-[perf-subtype="imt3"] {
-  font-size: 0.8em;
+[data-marker="ior"] {
+  font-style: italic;
+}
+
+p[data-marker="ib"],
+p[data-marker="b"] {
+  padding: 0;
+  margin: 0;
+  height: 1rem;
+}
+
+p[data-marker="q"] {
+  margin: 0;
+}
+
+@counter-style padded {
+  system: cyclic;
+  symbols: " " "            ";
+  suffix: " ";
+}
+p[data-marker="q"] {
+  padding-left: 2rem;
+}
+p[data-marker="q"]:nth-child(2n) {
+  padding-left: 4rem;
+}
+
+[perf-subtype="introduction"] > [perf-subtype="title"] {
+  margin-bottom: 0;
+}
+
+[data-marker="s"],
+[data-marker="imt"],
+[data-marker="imt1"] {
+  font-size: 1.17rem;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+[data-marker="imt3"],
+[data-marker="r"] {
+  font-size: 0.8rem;
+}
+
+h3 {
+  margin-bottom: 0;
 }
 
 /* [perf-type]:hover [perf-type="graft"],
