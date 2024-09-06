@@ -26,11 +26,6 @@ import {
   ImmutableChapterNode,
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  ImmutableVerseNode,
-  SerializedImmutableVerseNode,
-} from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   ImpliedParaNode,
   SerializedImpliedParaNode,
@@ -39,9 +34,14 @@ import { MarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import { MilestoneNode, SerializedMilestoneNode } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
+import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  ImmutableVerseNode,
+  SerializedImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;

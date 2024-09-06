@@ -1,7 +1,6 @@
 import { ParagraphNode } from "lexical";
 import { BookNode } from "./BookNode";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
-import { ImmutableVerseNode } from "./ImmutableVerseNode";
 import { ChapterNode } from "./ChapterNode";
 import { VerseNode } from "./VerseNode";
 import { CharNode } from "./CharNode";
@@ -16,7 +15,6 @@ import { ImmutableUnmatchedNode } from "./ImmutableUnmatchedNode";
 const scriptureUsjNodes = [
   BookNode,
   ImmutableChapterNode,
-  ImmutableVerseNode,
   ChapterNode,
   VerseNode,
   CharNode,

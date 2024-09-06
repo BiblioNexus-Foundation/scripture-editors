@@ -62,18 +62,6 @@ import {
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared/nodes/scripture/usj/ImmutableVerseNode";
-import {
   SerializedUnknownNode,
   UNKNOWN_VERSION,
   UnknownNode,
@@ -95,6 +83,18 @@ import {
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
 import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
