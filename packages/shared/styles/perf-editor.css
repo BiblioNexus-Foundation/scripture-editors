@@ -36,7 +36,7 @@ span.chapter {
 
 span.chapter {
   font-size: 1.7rem;
-  vertical-align: text-top;
+  vertical-align: baseline;
   font-weight: 700;
   margin-inline-end: 0.1em;
 }
