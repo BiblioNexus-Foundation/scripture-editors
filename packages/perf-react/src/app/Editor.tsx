@@ -1,11 +1,8 @@
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import scriptureNodes from "shared/nodes";
 import { useBibleBook } from "./useLexicalState";
 import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getPerfHistoryUpdater } from "shared/plugins/PerfOperations/updatePerfHistory";
 import { HistoryMergeListener, createEmptyHistoryState } from "shared/plugins/History";
 import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandlersPlugin";
@@ -22,6 +19,7 @@ import { $createNodeFromSerializedNode, $insertUsfmNode } from "./emptyNodes/emp
 import { emptyHeading } from "./emptyNodes/emptyHeading";
 
 import { $getSelection, $isRangeSelection } from "lexical";
+import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 
 const theme = {
   // Theme styling goes here
@@ -70,6 +68,7 @@ export default function Editor({
   }) as BookStore | null;
   const [lexicalState, setLexicalState] = useState("");
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
+  const editorStyles = useRef<{ nonPrintable?: HTMLElement }>({});
 
   useEffect(() => {
     (async () => {
@@ -200,17 +199,86 @@ export default function Editor({
         >
           <i>view_agenda</i>
         </Button>
+        <Button
+          onClick={(_, editor) => {
+            console.log({ editorKey: editor.getKey() }, editorStyles.current);
+
+            const { nonPrintable } = editorStyles.current || {};
+            if (nonPrintable) {
+              nonPrintable.parentElement?.removeChild(nonPrintable);
+              delete editorStyles.current.nonPrintable;
+              return;
+            }
+            const nonPrintableStyleElement = document.createElement("style");
+            const editorId = editor.getKey();
+            nonPrintableStyleElement.id = "styles-editor-" + editorId;
+            const styles = String.raw`
+            #${editorId} p.paragraph:after {
+              content: "¶";
+              display: inline-block;
+              color: var(--pilcrow-color);
+              position: absolute;
+              font-family: arial;
+              margin-inline-start: 0.05rem;
+            }
+
+            #${editorId} p[perf-type="paragraph"]:has(br)::after {
+              top: 0;
+            }
+
+            #${editorId} [data-namespace="usfm"]:before {
+              content: "\\" attr(data-marker) "";
+              display: inline;
+              font-size: 0.6rem;
+              font-weight: 600;
+              left: 0;
+              padding: 0.2em;
+              color: rgb(0 0 0 / 20%);
+              margin-inline-end: 0.1rem;
+            }
+
+            #${editorId} [data-namespace="usfm"]:hover:before {
+              color: rgb(0 0 0 / 60%);
+            }
+
+            #${editorId} span.verses:before,
+            #${editorId} span.chapter:before {
+              font-size: 0.6rem;
+              font-weight: 600;
+              left: 0;
+              padding: 0.2em;
+              color: rgb(0 0 0 / 20%);
+              margin-inline-end: 0.1rem;
+            }
+
+            #${editorId} span.verses:hover:before,
+            span.chapter:hover:before {
+              color: rgb(0 0 0 / 60%);
+            }
+
+            #${editorId} span.verses:before {
+              content: "\\v";
+            }
+
+            #${editorId} span.chapter:before {
+              content: "\\c";
+            }
+
+            #${editorId} [perf-subtype="note_caller"] > [data-namespace="usfm"]:before {
+              content: none;
+              display: none;
+            }
+            `;
+            nonPrintableStyleElement.textContent = styles;
+            document.head.appendChild(nonPrintableStyleElement);
+            editorStyles.current["nonPrintable"] = nonPrintableStyleElement;
+          }}
+        >
+          <i>format_paragraph</i>
+        </Button>
       </div>
       <div className={"editor-oce"}>
-        <RichTextPlugin
-          contentEditable={
-            <div className="editor">
-              <ContentEditable className="contentEditable" spellCheck={false} />
-            </div>
-          }
-          placeholder={<div className="placeholder">Enter some text...</div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
+        <ContentEditablePlugin />
         <PerfHandlersPlugin />
         <HistoryPlugin
           onChange={handlePerfHistory as HistoryMergeListener}
