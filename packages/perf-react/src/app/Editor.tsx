@@ -235,6 +235,7 @@ export default function Editor({
               padding: 0.2em;
               color: rgb(0 0 0 / 20%);
               margin-inline-end: 0.1rem;
+              vertical-align: bottom;
             }
 
             #${editorId} [data-namespace="usfm"]:hover:before {
@@ -249,6 +250,7 @@ export default function Editor({
               padding: 0.2em;
               color: rgb(0 0 0 / 20%);
               margin-inline-end: 0.1rem;
+              vertical-align: bottom;
             }
 
             #${editorId} span.verses:hover:before,
