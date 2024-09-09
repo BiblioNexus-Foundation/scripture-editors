@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/platform-editor",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Scripture editor used in Platform. See https://platform.bible",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform#readme",
