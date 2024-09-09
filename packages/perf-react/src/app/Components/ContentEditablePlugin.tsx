@@ -2,13 +2,14 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { forwardRef } from "react";
 
-export function ContentEditablePlugin() {
+export const ContentEditablePlugin = forwardRef<HTMLDivElement>((_props, ref) => {
   const [editor] = useLexicalComposerContext();
   return (
     <RichTextPlugin
       contentEditable={
-        <div className="editor" id={editor.getKey()}>
+        <div className="editor" ref={ref} id={editor.getKey()}>
           <ContentEditable className="contentEditable" spellCheck={false} />
         </div>
       }
@@ -16,6 +17,6 @@ export function ContentEditablePlugin() {
       ErrorBoundary={LexicalErrorBoundary}
     />
   );
-}
+});
 
 export default ContentEditablePlugin;

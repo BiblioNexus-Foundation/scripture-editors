@@ -8,7 +8,6 @@ import { HistoryMergeListener, createEmptyHistoryState } from "shared/plugins/Hi
 import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandlersPlugin";
 import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
-import { verseBlockStyle } from "shared/styles/dynamic";
 
 import Button from "./Components/Button";
 
@@ -20,6 +19,7 @@ import { emptyHeading } from "./emptyNodes/emptyHeading";
 
 import { $getSelection, $isRangeSelection } from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
+import { downloadUsfm } from "./downloadUsfm";
 
 const theme = {
   // Theme styling goes here
@@ -68,7 +68,7 @@ export default function Editor({
   }) as BookStore | null;
   const [lexicalState, setLexicalState] = useState("");
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
-  const editorStyles = useRef<{ nonPrintable?: HTMLElement }>({});
+  const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     (async () => {
@@ -99,34 +99,13 @@ export default function Editor({
     [perfDocument],
   );
 
+  const toggleClass = (element: HTMLElement | null, className: string) =>
+    element && element.classList.toggle(className);
+
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="toolbar noprint">
-        <button
-          onClick={() => {
-            async function getUsfmFromPerf() {
-              if (!bookHandler || !historyState?.current?.perfDocument) return;
-              await bookHandler.sideload(
-                bookCode,
-                historyState.current.perfDocument as PerfDocument,
-              );
-              const newUsfm: string = await bookHandler.readUsfm(bookCode);
-              console.log("NEW USFM", { output: newUsfm });
-              const downloadUsfm = (usfm: string, filename: string) => {
-                const element = document.createElement("a");
-                const file = new Blob([usfm], { type: "text/plain" });
-                element.href = URL.createObjectURL(file);
-                element.download = filename;
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
-              };
-              const timestamp = new Date().getTime();
-              downloadUsfm(newUsfm, `usfm_${bookCode}_${timestamp}.txt`);
-            }
-            getUsfmFromPerf();
-          }}
-        >
+        <button onClick={() => downloadUsfm(bookHandler, historyState, bookCode)}>
           <i>download</i>
         </button>
         <Button
@@ -192,95 +171,15 @@ export default function Editor({
         >
           \V
         </Button>
-        <Button
-          onClick={() => {
-            verseBlockStyle.toggle();
-          }}
-        >
+        <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
           <i>view_agenda</i>
-        </Button>
-        <Button
-          onClick={(_, editor) => {
-            console.log({ editorKey: editor.getKey() }, editorStyles.current);
-
-            const { nonPrintable } = editorStyles.current || {};
-            if (nonPrintable) {
-              nonPrintable.parentElement?.removeChild(nonPrintable);
-              delete editorStyles.current.nonPrintable;
-              return;
-            }
-            const nonPrintableStyleElement = document.createElement("style");
-            const editorId = editor.getKey();
-            nonPrintableStyleElement.id = "styles-editor-" + editorId;
-            const styles = String.raw`
-            #${editorId} p.paragraph:after {
-              content: "¶";
-              display: inline-block;
-              color: var(--pilcrow-color);
-              position: absolute;
-              font-family: arial;
-              margin-inline-start: 0.05rem;
-            }
-
-            #${editorId} p[perf-type="paragraph"]:has(br)::after {
-              top: 0;
-            }
-
-            #${editorId} [data-namespace="usfm"]:before {
-              content: "\\" attr(data-marker) "";
-              display: inline;
-              font-size: 0.6rem;
-              font-weight: 600;
-              left: 0;
-              padding: 0.2em;
-              color: rgb(0 0 0 / 20%);
-              margin-inline-end: 0.1rem;
-              vertical-align: bottom;
-            }
-
-            #${editorId} [data-namespace="usfm"]:hover:before {
-              color: rgb(0 0 0 / 60%);
-            }
-
-            #${editorId} span.verses:before,
-            #${editorId} span.chapter:before {
-              font-size: 0.6rem;
-              font-weight: 600;
-              left: 0;
-              padding: 0.2em;
-              color: rgb(0 0 0 / 20%);
-              margin-inline-end: 0.1rem;
-              vertical-align: bottom;
-            }
-
-            #${editorId} span.verses:hover:before,
-            span.chapter:hover:before {
-              color: rgb(0 0 0 / 60%);
-            }
-
-            #${editorId} span.verses:before {
-              content: "\\v";
-            }
-
-            #${editorId} span.chapter:before {
-              content: "\\c";
-            }
-
-            #${editorId} [perf-subtype="note_caller"] > [data-namespace="usfm"]:before {
-              content: none;
-              display: none;
-            }
-            `;
-            nonPrintableStyleElement.textContent = styles;
-            document.head.appendChild(nonPrintableStyleElement);
-            editorStyles.current["nonPrintable"] = nonPrintableStyleElement;
-          }}
-        >
+        </button>
+        <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
           <i>format_paragraph</i>
-        </Button>
+        </button>
       </div>
       <div className={"editor-oce"}>
-        <ContentEditablePlugin />
+        <ContentEditablePlugin ref={editorRef} />
         <PerfHandlersPlugin />
         <HistoryPlugin
           onChange={handlePerfHistory as HistoryMergeListener}

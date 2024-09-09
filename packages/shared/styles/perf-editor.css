@@ -436,3 +436,68 @@ span.paragraph[perf-subtype="usfm:f"] {
 }
 
 /* Non printable marks */
+.with-markers p.paragraph:after {
+  content: "¶";
+  display: inline-block;
+  color: var(--pilcrow-color);
+  position: absolute;
+  font-family: arial;
+  margin-inline-start: 0.05rem;
+}
+
+.with-markers p[perf-type="paragraph"]:has(br)::after {
+  top: 0;
+}
+
+.with-markers [data-namespace="usfm"]:before {
+  content: "\\" attr(data-marker) "";
+  display: inline;
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.2em;
+  color: rgb(0 0 0 / 20%);
+  margin-inline-end: 0.1rem;
+  vertical-align: bottom;
+}
+
+.with-markers [data-namespace="usfm"]:hover:before {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span.verses:before,
+.with-markers span.chapter:before {
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.2em;
+  color: rgb(0 0 0 / 20%);
+  margin-inline-end: 0.1rem;
+  vertical-align: bottom;
+}
+
+.with-markers span.verses:hover:before,
+span.chapter:hover:before {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span.verses:before {
+  content: "\\v";
+}
+
+.with-markers span.chapter:before {
+  content: "\\c";
+}
+
+.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:before {
+  content: none;
+  display: none;
+}
+
+/* verse as blocks */
+.verse-blocks span[perf-subtype="verses"] {
+  display: block;
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: dashed 1px #ffffff91;
+}
