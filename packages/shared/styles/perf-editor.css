@@ -443,8 +443,13 @@ span.paragraph[perf-subtype="usfm:f"] {
   margin-inline-start: 0.05rem;
 }
 
+.with-markers p[perf-type="paragraph"]:has(br) {
+  pointer-events: none;
+}
+
 .with-markers p[perf-type="paragraph"]:has(br)::after {
   top: 0;
+  left: 1.1rem;
 }
 
 .with-markers [data-namespace="usfm"]:before,
