@@ -158,6 +158,10 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
       };
     },
     "usfm:x": ({ node, children, metadata: { direction } }): SerializedUsfmElementNode => {
+      const caller =
+        children?.length === 1 && children[0].type === "text"
+          ? (children[0] as unknown as SerializedTextNode).text
+          : undefined;
       return {
         children: children ?? [],
         direction: direction.value,
@@ -165,7 +169,31 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
         indent: 0,
         type: "inline",
         version: 1,
-        attributes: { ...getAttributesFromPerfElementProps(getPerfProps(node)), class: "x" },
+        attributes: {
+          ...getAttributesFromPerfElementProps(getPerfProps(node)),
+          ...(caller && { "data-caller": caller }),
+          class: "x",
+        },
+        tag: "span",
+      };
+    },
+    "usfm:f": ({ node, children, metadata: { direction } }): SerializedUsfmElementNode => {
+      const caller =
+        children?.length === 1 && children[0].type === "text"
+          ? (children[0] as unknown as SerializedTextNode).text
+          : undefined;
+      return {
+        children: children ?? [],
+        direction: direction.value,
+        format: "",
+        indent: 0,
+        type: "inline",
+        version: 1,
+        attributes: {
+          ...getAttributesFromPerfElementProps(getPerfProps(node)),
+          ...(caller && { "data-caller": caller }),
+          class: "x",
+        },
         tag: "span",
       };
     },

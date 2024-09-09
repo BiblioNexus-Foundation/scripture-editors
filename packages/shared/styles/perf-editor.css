@@ -158,9 +158,8 @@ h3 {
   vertical-align: middle;
 }
 
-[perf-subtype="note_caller"] span[perf-type="paragraph"] span {
+[perf-subtype="note_caller"] [data-caller="+"] span {
   position: absolute;
-  width: 100%;
   text-align: center;
   opacity: 0;
 }
@@ -169,35 +168,37 @@ h3 {
   counter-set: f-counter 0 x-counter 0;
 }
 
-[perf-subtype="footnote"] {
+[perf-subtype="footnote"] [data-caller="+"] {
   counter-increment: f-counter;
 }
 
-[perf-subtype="xref"] {
+[perf-subtype="xref"] [data-caller="+"] {
   counter-increment: x-counter;
 }
 
-[perf-subtype="note_caller"] [data-marker="f"]::after {
+[perf-subtype="footnote"] [perf-subtype="note_caller"] [data-caller="+"]::after {
   content: counter(f-counter, lower-alpha);
 }
 
-[perf-subtype="note_caller"] [data-marker="x"]::after {
+[perf-subtype="xref"] [perf-subtype="note_caller"] [data-caller="+"]::after {
   content: counter(x-counter, lower-roman);
 }
 
-[perf-subtype="note_caller"] [perf-type="paragraph"]::after {
+[perf-subtype="note_caller"] [perf-type="paragraph"]::after,
+[perf-subtype="note_caller"] [data-caller] span {
   display: inline;
   color: blue;
   font-size: 0.6rem;
   vertical-align: middle;
-  line-height: 0.2rem;
   font-weight: 900;
 }
 
-[data-ui-active="true"] [perf-subtype="note_caller"] > span > span {
+[data-ui-active="true"] [perf-subtype="note_caller"] > [data-caller] > span {
   position: relative;
   text-align: center;
   opacity: 1;
+  font-size: 1rem;
+  padding-left: 0.2rem;
 }
 [data-ui-active="true"] [perf-subtype="note_caller"] > span::after {
   display: none;
@@ -245,6 +246,7 @@ h3 {
   display: inline;
   vertical-align: top;
   line-height: 1rem;
+  text-wrap: nowrap;
 }
 
 [perf-subtype="xref"],
