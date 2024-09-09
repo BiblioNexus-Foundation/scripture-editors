@@ -141,121 +141,6 @@ h3 {
   margin-bottom: 0;
 }
 
-/* [perf-type]:hover [perf-type="graft"],
-.contentEditable:hover > [perf-type="graft"] {
-  border: 1px dashed #747bff;
-  background-color: #0000001a;
-} */
-
-:where([perf-subtype="footnote"], [perf-subtype="xreg"])
-  > [perf-type="paragraph"]
-  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
-  display: none;
-}
-
-[perf-subtype="note_caller"] {
-  display: inline;
-  vertical-align: middle;
-}
-
-[perf-subtype="note_caller"] [data-caller="+"] span {
-  position: absolute;
-  text-align: center;
-  opacity: 0;
-}
-
-[perf-subtype="chapter"] {
-  counter-set: f-counter 0 x-counter 0;
-}
-
-[perf-subtype="footnote"] [data-caller="+"] {
-  counter-increment: f-counter;
-}
-
-[perf-subtype="xref"] [data-caller="+"] {
-  counter-increment: x-counter;
-}
-
-[perf-subtype="footnote"] [perf-subtype="note_caller"] [data-caller="+"]::after {
-  content: counter(f-counter, lower-alpha);
-}
-
-[perf-subtype="xref"] [perf-subtype="note_caller"] [data-caller="+"]::after {
-  content: counter(x-counter, lower-roman);
-}
-
-[perf-subtype="note_caller"] [perf-type="paragraph"]::after,
-[perf-subtype="note_caller"] [data-caller] span {
-  display: inline;
-  color: blue;
-  font-size: 0.6rem;
-  vertical-align: middle;
-  font-weight: 900;
-}
-
-[data-ui-active="true"] [perf-subtype="note_caller"] > [data-caller] > span {
-  position: relative;
-  text-align: center;
-  opacity: 1;
-  font-size: 1rem;
-  padding-left: 0.2rem;
-}
-[data-ui-active="true"] [perf-subtype="note_caller"] > span::after {
-  display: none;
-}
-
-[data-ui-active="true"] [perf-type="paragraph"] > [perf-subtype="note_caller"] ~ * {
-  background-color: rgb(0 0 0 / 6%);
-  background-clip: content-box;
-}
-
-[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
-  padding-left: 0.2rem;
-  border-radius: 0.5rem 0 0 0.5rem;
-}
-
-[perf-type="paragraph"] > [perf-subtype="note_caller"] ~ *:last-child {
-  padding-right: 0.5rem;
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-
-[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
-  margin-left: 0.23rem;
-}
-
-[perf-subtype="footnote"][data-ui-active="true"]
-  [perf-subtype="usfm:f"]
-  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
-  display: inline;
-}
-
-[perf-subtype="xref"]
-  [perf-subtype="usfm:x"]
-  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
-  display: none;
-}
-
-[perf-subtype="xref"][data-ui-active="true"]
-  [perf-subtype="usfm:x"]
-  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
-  display: inline;
-}
-
-[perf-subtype="note_caller"] {
-  border-radius: 0.4rem;
-  display: inline;
-  vertical-align: top;
-  line-height: 1rem;
-  text-wrap: nowrap;
-}
-
-[perf-subtype="xref"],
-[perf-subtype="footnote"] {
-  display: inline;
-  margin-inline-end: 0.1em;
-  border-radius: 0.5rem;
-}
-
 [perf-type="mark"] span {
   font-weight: 900;
 }
@@ -437,6 +322,117 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-size: 130%;
 }
 
+/* note caller styles */
+:where([perf-subtype="footnote"], [perf-subtype="xreg"])
+  > [perf-type="paragraph"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="note_caller"] {
+  display: inline;
+  vertical-align: middle;
+}
+
+[perf-subtype="note_caller"] [data-caller="+"] span {
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  width: 100%;
+}
+
+[perf-subtype="chapter"] {
+  counter-set: f-counter 0 x-counter 0;
+}
+
+[perf-subtype="footnote"] [data-caller="+"] {
+  counter-increment: f-counter;
+  position: relative;
+}
+
+[perf-subtype="xref"] [data-caller="+"] {
+  counter-increment: x-counter;
+}
+
+[perf-subtype="footnote"] [perf-subtype="note_caller"] [data-caller="+"]::after {
+  content: counter(f-counter, lower-alpha);
+}
+
+[perf-subtype="xref"] [perf-subtype="note_caller"] [data-caller="+"]::after {
+  content: counter(x-counter, lower-roman);
+}
+
+[perf-subtype="note_caller"] [perf-type="paragraph"]::after,
+[perf-subtype="note_caller"] [data-caller] span {
+  display: inline;
+  color: blue;
+  font-size: 0.6rem;
+  vertical-align: middle;
+  font-weight: 900;
+}
+
+[data-ui-active="true"] [perf-subtype="note_caller"] > [data-caller] > span {
+  position: relative;
+  text-align: center;
+  opacity: 1;
+  font-size: 1rem;
+  padding-left: 0.2rem;
+}
+[data-ui-active="true"] [perf-subtype="note_caller"] > span::after {
+  display: none !important;
+}
+
+[data-ui-active="true"] [perf-type="paragraph"] > [perf-subtype="note_caller"] ~ * {
+  background-color: rgb(0 0 0 / 6%);
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
+  padding-left: 0.2rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] ~ *:last-child {
+  padding-right: 0.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
+  margin-left: 0.23rem;
+}
+
+[perf-subtype="footnote"][data-ui-active="true"]
+  [perf-subtype="usfm:f"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline;
+}
+
+[perf-subtype="xref"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="xref"][data-ui-active="true"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline;
+}
+
+[perf-subtype="note_caller"] {
+  border-radius: 0.4rem;
+  display: inline;
+  vertical-align: top;
+  line-height: 1rem;
+  text-wrap: nowrap;
+}
+
+[perf-subtype="xref"],
+[perf-subtype="footnote"] {
+  display: inline;
+  margin-inline-end: 0.1em;
+  border-radius: 0.5rem;
+}
+
 /* Non printable marks */
 .with-markers p.paragraph:after {
   content: "¶";
@@ -451,8 +447,8 @@ span.paragraph[perf-subtype="usfm:f"] {
   top: 0;
 }
 
-.with-markers [data-namespace="usfm"]:before {
-  content: "\\" attr(data-marker) "";
+.with-markers [data-namespace="usfm"]:before,
+.with-markers [data-namespace="usfm"]:not(.paragraph, [data-caller]):after {
   display: inline;
   font-size: 0.6rem;
   font-weight: 600;
@@ -463,7 +459,72 @@ span.paragraph[perf-subtype="usfm:f"] {
   vertical-align: bottom;
 }
 
-.with-markers [data-namespace="usfm"]:hover:before {
+.with-markers [data-namespace="usfm"]:before {
+  content: "\\" attr(data-marker) "";
+}
+
+.with-markers
+  [data-namespace="usfm"]:where(
+    [data-marker="ior"],
+    [data-marker="iqt"],
+    [data-marker="rq"],
+    [data-marker="ca"],
+    [data-marker="va"],
+    [data-marker="vp"],
+    [data-marker="qs"],
+    [data-marker="qac"],
+    [data-marker="litl"],
+    [data-marker="lik"],
+    [data-marker="liv#"],
+    [data-marker="f"],
+    [data-marker="fe"],
+    [data-marker="fv"],
+    [data-marker="fdc"],
+    [data-marker="fm"],
+    [data-marker="x"],
+    [data-marker="xop"],
+    [data-marker="xot"],
+    [data-marker="xnt"],
+    [data-marker="xdc"],
+    [data-marker="rq"],
+    [data-marker="add"],
+    [data-marker="bk"],
+    [data-marker="dc"],
+    [data-marker="k"],
+    [data-marker="lit"],
+    [data-marker="nd"],
+    [data-marker="ord"],
+    [data-marker="pn"],
+    [data-marker="png"],
+    [data-marker="addpn"],
+    [data-marker="qt"],
+    [data-marker="sig"],
+    [data-marker="sls"],
+    [data-marker="tl"],
+    [data-marker="wj"],
+    [data-marker="em"],
+    [data-marker="bd"],
+    [data-marker="it"],
+    [data-marker="bdit"],
+    [data-marker="no"],
+    [data-marker="sc"],
+    [data-marker="sup"],
+    [data-marker="fig"],
+    [data-marker="ndx"],
+    [data-marker="rb"],
+    [data-marker="pro"],
+    [data-marker="w"],
+    [data-marker="wg"],
+    [data-marker="wh"],
+    [data-marker="wa"],
+    [data-marker="jmp"],
+
+  ):after {
+  content: "\\" attr(data-marker) "*";
+}
+
+.with-markers [data-namespace="usfm"]:hover:before,
+.with-markers [data-namespace="usfm"]:hover:after {
   color: rgb(0 0 0 / 60%);
 }
 
@@ -491,7 +552,8 @@ span.chapter:hover:before {
   content: "\\c";
 }
 
-.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:before {
+.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:before,
+.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:not([data-caller="+"]):after {
   content: none;
   display: none;
 }
