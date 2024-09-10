@@ -7,11 +7,11 @@ function App() {
       <div className="target-editor">
         <Editor
           {...{
-            serverName: "dbl",
-            organizationId: "bfbs",
-            languageCode: "fra",
-            versionId: "tpl",
-            bookCode: "tit",
+            serverName: "ebible",
+            organizationId: "web",
+            languageCode: "en",
+            versionId: "web",
+            bookCode: "rev",
           }}
         />
       </div>

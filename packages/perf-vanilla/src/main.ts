@@ -19,11 +19,11 @@ import { registerDefaultPerfHandlers } from "shared/plugins/PerfHandlers";
   };
 
   const documentData = {
-    serverName: "dbl",
-    organizationId: "bfbs",
-    languageCode: "fra",
-    versionId: "lsg",
-    bookCode: "tit",
+    serverName: "ebible",
+    organizationId: "web",
+    languageCode: "en",
+    versionId: "web",
+    bookCode: "rev",
   };
 
   const usfm = await fetchUsfm(documentData);
