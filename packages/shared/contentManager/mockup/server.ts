@@ -43,6 +43,9 @@ export const serverMap: ServerMap = {
           tit: {
             file: import("../../data/tit.usfm").then((data) => data.default),
           },
+          rev: {
+            file: import("../../data/rev.usfm").then((data) => data.default),
+          },
         },
       },
     },
@@ -53,9 +56,6 @@ export const serverMap: ServerMap = {
         web: {
           psa: {
             file: import("../../data/psa.usfm").then((data) => data.default),
-          },
-          rev: {
-            file: import("../../data/rev.usfm").then((data) => data.default),
           },
         },
       },

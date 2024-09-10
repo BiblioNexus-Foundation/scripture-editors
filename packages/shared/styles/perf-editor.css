@@ -127,7 +127,8 @@ p[data-marker="q2"] {
   padding-left: 3rem;
 }
 
-[data-marker="fr"] {
+[data-marker="fr"],
+[data-marker="xo"] {
   font-weight: 600;
 }
 
