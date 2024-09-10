@@ -93,9 +93,15 @@ p[perf-type="paragraph"] {
   margin: 0.5rem 0;
 }
 
-p[data-marker="io"] {
-  margin: 0;
-  padding-left: 1rem;
+p[data-marker="io"],
+p[data-marker="io1"] {
+  margin: 0.5rem;
+  padding-left: 0rem;
+}
+
+p[data-marker="io2"] {
+  margin: 0.5rem;
+  padding-left: 1.5rem;
 }
 
 [data-marker="ior"] {
@@ -113,11 +119,26 @@ p[data-marker="q"] {
   margin: 0;
 }
 
-p[data-marker="q"] {
+p[data-marker="q"],
+p[data-marker="q1"] {
   padding-left: 2rem;
 }
-p[data-marker="q"]:nth-child(2n) {
-  padding-left: 4rem;
+p[data-marker="q2"] {
+  padding-left: 3rem;
+}
+
+[data-marker="fr"] {
+  font-weight: 600;
+}
+
+[data-marker="fq"] {
+  font-style: italic;
+}
+
+[data-marker="fq"],
+[data-marker="fqa"] {
+  font-style: italic;
+  color: #1a1aa0;
 }
 
 [perf-subtype="introduction"] > [perf-subtype="title"] {
@@ -147,6 +168,12 @@ h3 {
 
 [perf-type="mark"].verses {
   color: var(--verse-marker-color);
+}
+
+:where([data-marker="q"], [data-marker="q1"], [data-marker="q2"], [data-marker="q3"])
+  [perf-type="mark"].verses:first-child {
+  position: absolute;
+  left: 0.5rem;
 }
 
 [perf-type="mark"].chapter {
