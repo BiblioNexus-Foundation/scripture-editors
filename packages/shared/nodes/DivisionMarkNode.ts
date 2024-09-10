@@ -44,7 +44,6 @@ export class DivisionMarkNode extends UsfmElementNode {
     Object.keys(attributes).forEach((attKey) => {
       element.setAttribute(attKey, attributes[attKey]);
     });
-    // element.setAttribute("contenteditable", "false");
     addClassNamesToElement(element, config.theme.sectionmark);
     return element;
   }

@@ -38,8 +38,6 @@ export const transformLexicalStateToPerf = (
     metadata.type = node.type;
     return metadata;
   };
-  // const nodeBuilder =
-
   const perf: ResultingPerf = { sequences: {} };
   const result = convertLexicalStateNode({
     node: lexicalStateNode,

@@ -128,7 +128,6 @@ export default function Editor({
         </Button>
         <Button
           onClick={(_, editor) => {
-            // editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
             editor.update(
               () => {
                 const selection = $getSelection();
