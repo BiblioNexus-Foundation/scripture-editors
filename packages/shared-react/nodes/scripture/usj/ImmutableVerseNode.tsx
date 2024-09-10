@@ -13,7 +13,7 @@ import {
   isHTMLElement,
   DOMConversionOutput,
 } from "lexical";
-import { JSX } from "React";
+import React from "React";
 import {
   UnknownAttributes,
   VERSE_CLASS_NAME,
@@ -39,7 +39,7 @@ export type SerializedImmutableVerseNode = Spread<
   SerializedLexicalNode
 >;
 
-export class ImmutableVerseNode extends DecoratorNode<JSX.Element> {
+export class ImmutableVerseNode extends DecoratorNode<React.JSX.Element> {
   __marker: VerseMarker;
   __number: string;
   __showMarker?: boolean;
@@ -208,7 +208,7 @@ export class ImmutableVerseNode extends DecoratorNode<JSX.Element> {
     return { element };
   }
 
-  decorate(): JSX.Element {
+  decorate(): React.JSX.Element {
     return (
       <span>
         {this.getShowMarker()
