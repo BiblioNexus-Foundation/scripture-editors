@@ -16,7 +16,6 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 
   constructor(attributes: Attributes = {}, tag?: string, key?: NodeKey) {
-    // TODO: define this value. This was added because previously `super` was passed `key` as `tag`.
     super(attributes, undefined, tag, key);
   }
 

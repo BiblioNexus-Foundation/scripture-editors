@@ -1,7 +1,6 @@
 import Epitelete from "epitelete";
 import { usfm2perf } from "../converters/perf/usfmToPerf";
 import transformPerfDocumentToSerializedLexicalState from "../converters/perf/perfToLexical";
-//TODO: import { Validator, PipelineHandler } from "proskomma-json-tools";
 
 const readOptions = { readPipeline: "stripAlignmentPipeline" };
 const writeOptions = { writePipeline: "mergeAlignmentPipeline", ...readOptions };
@@ -17,26 +16,6 @@ export class BookStore extends Epitelete {
     return this.sideloadPerf(bookCode, perf, readOptions);
   }
 }
-
-// export const getPerf = async ({
-//   usfm,
-//   serverName,
-//   organizationId,
-//   languageCode,
-//   versionId,
-//   bookCode,
-// }) => {
-//   const perf = usfm2perf(usfm, {
-//     serverName,
-//     organizationId,
-//     languageCode,
-//     versionId,
-//   });
-
-//   const markup = undefined; //TODO: Define markup
-
-//   return { perf, markup };
-// };
 
 export const getBookHandler = async ({
   usfm,

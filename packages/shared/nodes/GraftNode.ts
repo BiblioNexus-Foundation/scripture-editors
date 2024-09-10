@@ -42,8 +42,6 @@ export class GraftNode extends UsfmElementNode {
       element.setAttribute(attKey, attributes[attKey]);
     });
     addClassNamesToElement(element, config.theme.sectionmark);
-    // Setting contenteditable to false is the trick Lexical uses for decorator nodes so you can place the cursor after a span that contains editable content.
-    // element.setAttribute("contenteditable", "false");
     return element;
   }
 

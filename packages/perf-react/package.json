@@ -14,8 +14,6 @@
   "dependencies": {
     "epitelete-html": "^0.2.21-beta.2",
     "open-patcher": "1.0.0-beta.1",
-    "shared": "link:../shared",
-    "shared-react": "link:../shared-react",
     "pure-uuid": "^1.8.1",
     "base-64": "^1.0.0",
     "lexical": "^0.17.0",

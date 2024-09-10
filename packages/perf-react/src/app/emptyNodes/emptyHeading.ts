@@ -1,3 +1,5 @@
+import { generateId } from "./utils";
+
 export const emptyHeading = {
   children: [
     {
@@ -35,7 +37,7 @@ export const emptyHeading = {
   attributes: {
     "perf-type": "graft",
     "perf-subtype": "heading",
-    "perf-target": "ZDM0MmY4MTQt",
+    "perf-target": generateId(),
     class: "graft",
   },
   props: {
