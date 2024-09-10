@@ -16,10 +16,10 @@
   "dependencies": {
     "open-patcher": "1.0.0-beta.1",
     "@biblionexus-foundation/scripture-utilities": "workspace:*",
-    "@lexical/utils": "^0.17.0",
+    "@lexical/utils": "^0.17.1",
     "@xmldom/xmldom": "^0.8.10",
     "epitelete": "^0.2.20",
-    "lexical": "^0.17.0"
+    "lexical": "^0.17.1"
   },
   "devDependencies": {
     "proskomma-core": "^0.10.4",

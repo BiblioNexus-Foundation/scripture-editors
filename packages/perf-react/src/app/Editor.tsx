@@ -1,4 +1,4 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import scriptureNodes from "shared/nodes";
 import { useBibleBook } from "./useLexicalState";
 import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
@@ -83,7 +83,7 @@ export default function Editor({
     })();
   }, [bookHandler, bookCode]);
 
-  const initialConfig = {
+  const initialConfig: InitialConfigType = {
     namespace: "ScriptureEditor",
     theme,
     editorState: lexicalState,

@@ -24,16 +24,11 @@ import {
   ImmutableChapterNode,
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   ImmutableUnmatchedNode,
   SerializedImmutableUnmatchedNode,
   UNMATCHED_TAG_NAME,
 } from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
-import {
-  ImmutableVerseNode,
-  SerializedImmutableVerseNode,
-} from "shared/nodes/scripture/usj/ImmutableVerseNode";
 import {
   ImpliedParaNode,
   SerializedImpliedParaNode,
@@ -57,6 +52,11 @@ import {
   removeEndingZwsp,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  ImmutableVerseNode,
+  SerializedImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 interface EditorUsjAdaptor {

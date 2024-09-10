@@ -9,6 +9,7 @@ import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils"
 import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
 import { createBasicTestEnvironment } from "shared/nodes/test.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
@@ -31,7 +32,7 @@ import {
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
-const nodes = [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes];
+const nodes = [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes];
 const { editor } = createBasicTestEnvironment(nodes);
 
 describe("Editor USJ Adaptor", () => {

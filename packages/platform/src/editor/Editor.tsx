@@ -27,6 +27,7 @@ import {
   $getRangeFromSelection,
 } from "shared-react/annotation/selection.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import HistoryPlugin from "shared-react/plugins/HistoryPlugin";
@@ -132,7 +133,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [TypedMarkNode, ImmutableNoteCallerNode, ...scriptureUsjNodes],
+  nodes: [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
 };
 
 const defaultViewOptions = getViewOptions(undefined);
