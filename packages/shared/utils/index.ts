@@ -7,7 +7,6 @@ export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(
 
   return (...args: Parameters<F>) => {
     if (!shouldExecuteFunc(...args)) {
-      // console.log("SKIPPED DEBOUNCE", args);
       return;
     }
     clearTimeout(timeout);
