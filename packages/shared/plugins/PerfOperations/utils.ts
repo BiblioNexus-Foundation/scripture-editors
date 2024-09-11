@@ -1,9 +1,9 @@
-import { ElementNode, LexicalNode } from "lexical";
-import { PerfKind } from "./types";
 /**
  * this module provides utility functions for the Perf plugin.
  * @module
  */
+import { ElementNode, LexicalNode } from "lexical";
+import { PerfKind } from "./types";
 
 /**
  * Function to determine the perf node kind based on the node.
@@ -24,7 +24,7 @@ export function getPerfKindFromNode(node: LexicalNode | ElementNode) {
  * @returns A boolean indicating whether the node is a sequence.
  */
 export function checkIsSequence(node: LexicalNode | ElementNode) {
-  return ["root"].includes(node.getType() || "");
+  return ["root"].includes(node.getType() ?? "");
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
