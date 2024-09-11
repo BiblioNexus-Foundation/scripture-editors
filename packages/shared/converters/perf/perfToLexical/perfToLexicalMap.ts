@@ -196,7 +196,7 @@ export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) =
         attributes: {
           ...getAttributesFromPerfElementProps(getPerfProps(node)),
           ...(caller && { "data-caller": caller }),
-          class: "x",
+          class: "f",
         },
         tag: "span",
       };

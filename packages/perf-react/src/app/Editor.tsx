@@ -11,7 +11,7 @@ import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Type
 
 import Button from "./Components/Button";
 
-import { emptyCrossRefence } from "./emptyNodes/crossReference";
+import { emptyCrossRefence } from "./emptyNodes/emptyCrossReference";
 import { createEmptyDivisionMark } from "./emptyNodes/emptyVerse";
 import { emptyFootnote } from "./emptyNodes/emptyFootnote";
 import { $createNodeFromSerializedNode, $insertUsfmNode } from "./emptyNodes/emptyUsfmNodes";
@@ -128,16 +128,13 @@ export default function Editor({
         </Button>
         <Button
           onClick={(_, editor) => {
-            editor.update(
-              () => {
-                const selection = $getSelection();
-                if (!$isRangeSelection(selection)) {
-                  return false;
-                }
-                selection.insertNodes([$createNodeFromSerializedNode(emptyHeading)]);
-              },
-              { skipTransforms: true, tag: "history-merge", discrete: true },
-            );
+            editor.update(() => {
+              const selection = $getSelection();
+              if (!$isRangeSelection(selection)) {
+                return false;
+              }
+              selection.insertNodes([$createNodeFromSerializedNode(emptyHeading)]);
+            });
           }}
         >
           \S

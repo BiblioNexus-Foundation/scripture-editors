@@ -28,7 +28,7 @@ export default String.raw`\id REV REVFLS1910.PTX, Louis Segond 1910, French, 31-
 \s1 Titre et sujet du livre
 \r V. 1-3: cf. Am 3:7. Ap 22:6-10.
 \p
-\v 1 Révélation de Jésus-Christ, que Dieu lui a donnée pour montrer à ses serviteurs les choses qui doivent arriver bientôt, et qu’il a fait connaître, par l’envoi de son ange, à son serviteur Jean,
+\v 1 Révélation de Jésus-Christ, \f + \fr 1:1 \ft sample note \f* que Dieu lui a donnée pour montrer à ses serviteurs les choses qui doivent arriver bientôt, et qu’il a fait connaître, par l’envoi de son ange, à son serviteur Jean,
 \v 2 lequel a attesté la parole de Dieu et le témoignage de Jésus-Christ, tout ce qu’il a vu.
 \v 3 \x a \xo 1.3 \xt Ap 22:7.\x*Heureux celui qui lit et ceux qui entendent les paroles de la prophétie, et qui gardent les choses qui y sont écrites! \x b \xo 1.3 \xt Ap 22:10.\x*Car le temps est proche.
 \s1 Dédicace aux sept Églises d’Asie

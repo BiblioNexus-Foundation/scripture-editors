@@ -25,7 +25,10 @@ export const emptyCrossRefence = {
               version: 1,
               attributes: {
                 "perf-type": "paragraph",
+                "data-namespace": "usfm",
+                "data-marker": "x",
                 "perf-subtype": "usfm:x",
+                "data-caller": "+",
                 class: "x",
               },
               tag: "span",
@@ -42,6 +45,9 @@ export const emptyCrossRefence = {
             "perf-target": generateId(),
             class: "graft",
           },
+          props: {
+            isInline: true,
+          },
           tag: "span",
         },
         {
@@ -49,7 +55,7 @@ export const emptyCrossRefence = {
           format: 0,
           mode: "normal",
           style: "",
-          text: "",
+          text: " ",
           type: "text",
           version: 1,
         },
@@ -60,7 +66,7 @@ export const emptyCrossRefence = {
               format: 0,
               mode: "normal",
               style: "",
-              text: "",
+              text: "1:1",
               type: "text",
               version: 1,
             },
@@ -72,23 +78,15 @@ export const emptyCrossRefence = {
           version: 1,
           attributes: {
             "perf-type": "wrapper",
+            "data-namespace": "usfm",
+            "data-marker": "xo",
             "perf-subtype": "usfm:xo",
             class: "wrapper",
           },
           tag: "span",
         },
         {
-          children: [
-            {
-              detail: 0,
-              format: 0,
-              mode: "normal",
-              style: "",
-              text: "",
-              type: "text",
-              version: 1,
-            },
-          ],
+          children: [],
           direction: null,
           format: "",
           indent: 0,
@@ -96,6 +94,8 @@ export const emptyCrossRefence = {
           version: 1,
           attributes: {
             "perf-type": "wrapper",
+            "data-namespace": "usfm",
+            "data-marker": "xt",
             "perf-subtype": "usfm:xt",
             class: "wrapper",
           },
@@ -109,6 +109,8 @@ export const emptyCrossRefence = {
       version: 1,
       attributes: {
         "perf-type": "paragraph",
+        "data-namespace": "usfm",
+        "data-marker": "x",
         "perf-subtype": "usfm:x",
         class: "x",
       },
