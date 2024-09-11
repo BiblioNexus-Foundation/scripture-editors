@@ -101,6 +101,9 @@ importers:
       nx:
         specifier: 18.3.4
         version: 18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))
+      nx-cloud:
+        specifier: ^18.0.1
+        version: 18.0.1
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
@@ -1651,6 +1654,9 @@ packages:
   '@nrwl/js@18.3.4':
     resolution: {integrity: sha512-oyiMoxzDVGQe5E4UFGO/WAOU211HEIdRxSEOfs1lPhvA8lKbUa0IWDqPOugNws/YHAr+vUTU3sZDJ3uU3RJuYQ==}
 
+  '@nrwl/nx-cloud@18.0.1':
+    resolution: {integrity: sha512-uYVxoOXf0xlWJX8O5GBWajmIeL0PfIGvfqtvVNVnl7C6FiZRbmKEhXkWxEDekI6Jq+mI1G86o7d5YsIzq6e36A==}
+
   '@nrwl/react@18.3.4':
     resolution: {integrity: sha512-Pb9+t/xhBRYwbVZ5gmqXcDoHGvELUx6hRrg4+r3ygelzZDwu3r6ncWbIMPtURs670uSlAi4Q4KNyLVizL9Tfbw==}
 
@@ -2874,6 +2880,9 @@ packages:
     resolution: {integrity: sha512-Mr2ZakwQ7XUAjp7pAwQWRhhK8mQQ6JAaNWSjmjxil0R8BPioMtQsTLOolGYkji1rcL++3dCqZA3zWqpT+9Ew6g==}
     engines: {node: '>=4'}
 
+  axios@1.1.3:
+    resolution: {integrity: sha512-00tXVRwKx/FZr/IDVFt4C+f9FYairX517WoGCL6dpOntqLkZofjhu43F/Xl44UOpqa+9sLFDrG/XAnFsUYgkDA==}
+
   axios@1.7.7:
     resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
 
@@ -3062,6 +3071,10 @@ packages:
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
+
+  chownr@2.0.0:
+    resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
+    engines: {node: '>=10'}
 
   chrome-trace-event@1.0.4:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
@@ -3442,6 +3455,10 @@ packages:
   dotenv-expand@10.0.0:
     resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
     engines: {node: '>=12'}
+
+  dotenv@10.0.0:
+    resolution: {integrity: sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==}
+    engines: {node: '>=10'}
 
   dotenv@16.3.2:
     resolution: {integrity: sha512-HTlk5nmhkm8F6JcdXvHIzaorzCoziNQT9mGxLPVXW8wJF1TiGSL60ZGB4gHWabHOaMmWmhvk2/lPHfnBiT78AQ==}
@@ -3854,6 +3871,10 @@ packages:
   fs-extra@8.1.0:
     resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==}
     engines: {node: '>=6 <7 || >=8'}
+
+  fs-minipass@2.1.0:
+    resolution: {integrity: sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==}
+    engines: {node: '>= 8'}
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -4751,12 +4772,29 @@ packages:
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
+  minipass@3.3.6:
+    resolution: {integrity: sha512-DxiNidxSEK+tHG6zOIklvNOwm3hvCrbUrdtzY74U6HKTJxvIDfOUL5W5P2Ghd3DTkhhKPYGqeNUIh5qcM4YBfw==}
+    engines: {node: '>=8'}
+
+  minipass@5.0.0:
+    resolution: {integrity: sha512-3FnjYuehv9k6ovOEbyOswadCDPX1piCfhV8ncmYtHOjuPwylVWsghTLo7rabjC3Rx5xD4HDx8Wm1xnMF7S5qFQ==}
+    engines: {node: '>=8'}
+
   minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  minizlib@2.1.2:
+    resolution: {integrity: sha512-bAxsR8BVfj60DWXHE3u30oHzfl4G7khkSuPW+qvpd7jFRHm7dLxOjUk1EHACJ/hxLY8phGJ0YhYHZo7jil7Qdg==}
+    engines: {node: '>= 8'}
+
   mkdirp@0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
+    hasBin: true
+
+  mkdirp@1.0.4:
+    resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
+    engines: {node: '>=10'}
     hasBin: true
 
   mlly@1.7.1:
@@ -4840,6 +4878,10 @@ packages:
 
   nwsapi@2.2.12:
     resolution: {integrity: sha512-qXDmcVlZV4XRtKFzddidpfVP4oMSGhga+xdMc25mv8kaLUHtgzCDhUxkrN8exkGdTlLNaXj7CV3GtON7zuGZ+w==}
+
+  nx-cloud@18.0.1:
+    resolution: {integrity: sha512-nxJfz0ZmW+DKSr8evmVVm6t1XcLn9WHR5I8kiE2BFNkLVwC+nx+MimjJ53opfHOepMqQiGJAdstZ5Ks630bJgg==}
+    hasBin: true
 
   nx@18.3.4:
     resolution: {integrity: sha512-7rOHRyxpnZGJ3pHnwmpoAMHt9hNuwibWhOhPBJDhJVcbQJtGfwcWWyV/iSEnVXwKZ2lfHVE3TwE+gXFdT/GFiw==}
@@ -5681,6 +5723,10 @@ packages:
   tar-stream@2.2.0:
     resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
     engines: {node: '>=6'}
+
+  tar@6.2.1:
+    resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
+    engines: {node: '>=10'}
 
   terser-webpack-plugin@5.3.10:
     resolution: {integrity: sha512-BKFPWlPDndPs+NGGCr1U59t0XScL5317Y0UReNrHaw9/FwhPENlq6bfgs+4yPfyP51vqC1bQ4rp1EfXW5ZSH9w==}
@@ -7935,6 +7981,12 @@ snapshots:
       - typescript
       - verdaccio
 
+  '@nrwl/nx-cloud@18.0.1':
+    dependencies:
+      nx-cloud: 18.0.1
+    transitivePeerDependencies:
+      - debug
+
   '@nrwl/react@18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(js-yaml@4.1.0)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(webpack@5.94.0(@swc/core@1.4.17(@swc/helpers@0.5.13)))':
     dependencies:
       '@nx/react': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(js-yaml@4.1.0)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(webpack@5.94.0(@swc/core@1.4.17(@swc/helpers@0.5.13)))
@@ -9403,6 +9455,14 @@ snapshots:
 
   axe-core@4.10.0: {}
 
+  axios@1.1.3:
+    dependencies:
+      follow-redirects: 1.15.8
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   axios@1.7.7:
     dependencies:
       follow-redirects: 1.15.8
@@ -9667,6 +9727,8 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  chownr@2.0.0: {}
 
   chrome-trace-event@1.0.4: {}
 
@@ -10051,6 +10113,8 @@ snapshots:
       tslib: 2.7.0
 
   dotenv-expand@10.0.0: {}
+
+  dotenv@10.0.0: {}
 
   dotenv@16.3.2: {}
 
@@ -10627,6 +10691,10 @@ snapshots:
       graceful-fs: 4.2.11
       jsonfile: 4.0.0
       universalify: 0.1.2
+
+  fs-minipass@2.1.0:
+    dependencies:
+      minipass: 3.3.6
 
   fs.realpath@1.0.0: {}
 
@@ -11743,11 +11811,24 @@ snapshots:
 
   minimist@1.2.8: {}
 
+  minipass@3.3.6:
+    dependencies:
+      yallist: 4.0.0
+
+  minipass@5.0.0: {}
+
   minipass@7.1.2: {}
+
+  minizlib@2.1.2:
+    dependencies:
+      minipass: 3.3.6
+      yallist: 4.0.0
 
   mkdirp@0.5.6:
     dependencies:
       minimist: 1.2.8
+
+  mkdirp@1.0.4: {}
 
   mlly@1.7.1:
     dependencies:
@@ -11829,6 +11910,21 @@ snapshots:
       boolbase: 1.0.0
 
   nwsapi@2.2.12: {}
+
+  nx-cloud@18.0.1:
+    dependencies:
+      '@nrwl/nx-cloud': 18.0.1
+      axios: 1.1.3
+      chalk: 4.1.2
+      dotenv: 10.0.0
+      fs-extra: 11.2.0
+      node-machine-id: 1.1.12
+      open: 8.4.2
+      strip-json-comments: 3.1.1
+      tar: 6.2.1
+      yargs-parser: 21.1.1
+    transitivePeerDependencies:
+      - debug
 
   nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)):
     dependencies:
@@ -12789,6 +12885,15 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
+
+  tar@6.2.1:
+    dependencies:
+      chownr: 2.0.0
+      fs-minipass: 2.1.0
+      minipass: 5.0.0
+      minizlib: 2.1.2
+      mkdirp: 1.0.4
+      yallist: 4.0.0
 
   terser-webpack-plugin@5.3.10(@swc/core@1.4.17(@swc/helpers@0.5.13))(webpack@5.94.0(@swc/core@1.4.17(@swc/helpers@0.5.13))):
     dependencies:
