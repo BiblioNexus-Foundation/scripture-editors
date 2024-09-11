@@ -22,6 +22,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "mt2",
               "perf-subtype": "usfm:mt2",
               class: "paragraph",
             },
@@ -46,6 +48,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "mt",
               "perf-subtype": "usfm:mt",
               class: "paragraph",
             },
@@ -62,6 +66,9 @@ export default {
           "perf-subtype": "title",
           "perf-target": "ZmFkOWQ4MDQt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "h1",
       },
@@ -88,6 +95,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "imt",
                   "perf-subtype": "usfm:imt",
                   class: "paragraph",
                 },
@@ -112,6 +121,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "imt3",
                   "perf-subtype": "usfm:imt3",
                   class: "paragraph",
                 },
@@ -128,6 +139,9 @@ export default {
               "perf-subtype": "title",
               "perf-target": "MzhiYzNkYTIt",
               class: "graft",
+            },
+            props: {
+              isInline: false,
             },
             tag: "h1",
           },
@@ -150,6 +164,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -164,6 +180,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ib",
               "perf-subtype": "usfm:ib",
               class: "paragraph",
             },
@@ -199,6 +217,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "ior",
                   "perf-subtype": "usfm:ior",
                   class: "wrapper",
                 },
@@ -212,6 +232,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "io",
               "perf-subtype": "usfm:io",
               class: "paragraph",
             },
@@ -247,6 +269,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "ior",
                   "perf-subtype": "usfm:ior",
                   class: "wrapper",
                 },
@@ -260,6 +284,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "io",
               "perf-subtype": "usfm:io",
               class: "paragraph",
             },
@@ -295,6 +321,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "ior",
                   "perf-subtype": "usfm:ior",
                   class: "wrapper",
                 },
@@ -308,6 +336,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "io",
               "perf-subtype": "usfm:io",
               class: "paragraph",
             },
@@ -343,6 +373,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "ior",
                   "perf-subtype": "usfm:ior",
                   class: "wrapper",
                 },
@@ -356,6 +388,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "io",
               "perf-subtype": "usfm:io",
               class: "paragraph",
             },
@@ -370,6 +404,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ib",
               "perf-subtype": "usfm:ib",
               class: "paragraph",
             },
@@ -394,6 +430,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -429,6 +467,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "it",
                   "perf-subtype": "usfm:it",
                   class: "wrapper",
                 },
@@ -451,6 +491,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -475,6 +517,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -510,6 +554,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "wrapper",
+                  "data-namespace": "usfm",
+                  "data-marker": "it",
                   "perf-subtype": "usfm:it",
                   class: "wrapper",
                 },
@@ -532,6 +578,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -556,6 +604,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "ip",
               "perf-subtype": "usfm:ip",
               class: "paragraph",
             },
@@ -572,6 +622,9 @@ export default {
           "perf-subtype": "introduction",
           "perf-target": "MjkwYTBlMTQt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "section",
       },
@@ -596,6 +649,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "s",
               "perf-subtype": "usfm:s",
               class: "paragraph",
             },
@@ -612,6 +667,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "NGIyOTcwNzUt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -636,6 +694,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -652,6 +712,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "MzVjNTJhMmIt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -699,6 +762,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "d",
           "perf-subtype": "usfm:d",
           class: "paragraph",
         },
@@ -748,6 +813,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "po",
           "perf-subtype": "usfm:po",
           class: "paragraph",
         },
@@ -814,7 +881,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "a",
                           class: "x",
                         },
                         tag: "span",
@@ -830,6 +900,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "Y2YyZTA0ZTAt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -861,6 +934,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -885,6 +960,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -898,6 +975,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -914,6 +993,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MmI0NmRmZTEt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -951,7 +1033,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "b",
                           class: "x",
                         },
                         tag: "span",
@@ -967,6 +1052,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "OWI1NjFmZTUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -998,6 +1086,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1022,6 +1112,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1035,6 +1127,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1051,6 +1145,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "OWM1NTkxYWQt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -1122,7 +1219,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "c",
                           class: "x",
                         },
                         tag: "span",
@@ -1138,6 +1238,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MThjYmI4OWIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -1169,6 +1272,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1193,6 +1298,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1206,6 +1313,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1222,6 +1331,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MWZiNzcyNzQt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -1284,7 +1396,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "d",
                           class: "x",
                         },
                         tag: "span",
@@ -1300,6 +1415,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MjUzODE3Nzkt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -1331,6 +1449,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1355,6 +1475,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1368,6 +1490,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1384,6 +1508,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "Yzc0YzU0MjEt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -1421,7 +1548,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "e",
                           class: "x",
                         },
                         tag: "span",
@@ -1437,6 +1567,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "M2U2NDE3MzAt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -1468,6 +1601,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1492,6 +1627,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1505,6 +1642,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1521,6 +1660,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MDEyZWQ4MTQt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -1541,6 +1683,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "m",
           "perf-subtype": "usfm:m",
           class: "paragraph",
         },
@@ -1567,6 +1711,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "s",
               "perf-subtype": "usfm:s",
               class: "paragraph",
             },
@@ -1583,6 +1729,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "YWY2ODI5YjMt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -1607,6 +1756,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -1623,6 +1774,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "NjIxNjg4ZjMt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -1687,7 +1841,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "f",
                           class: "x",
                         },
                         tag: "span",
@@ -1703,6 +1860,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "YTE1YzRiYmIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -1734,6 +1894,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1758,6 +1920,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1771,6 +1935,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1787,6 +1953,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ODU3NjVjNzYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -1849,7 +2018,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "g",
                           class: "x",
                         },
                         tag: "span",
@@ -1865,6 +2037,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "OTA5OGVkOGEt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -1896,6 +2071,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -1920,6 +2097,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -1933,6 +2112,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -1949,6 +2130,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MjJiY2U2YmMt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2020,7 +2204,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "h",
                           class: "x",
                         },
                         tag: "span",
@@ -2036,6 +2223,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MGZhMzNmNmIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2067,6 +2257,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2091,6 +2283,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2104,6 +2298,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2120,6 +2316,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZDM4NmVmMjkt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2157,7 +2356,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "i",
                           class: "x",
                         },
                         tag: "span",
@@ -2173,6 +2375,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZGQ1NjRhMDgt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2204,6 +2409,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2228,6 +2435,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2241,6 +2450,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2257,6 +2468,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZDY1MGZhMDgt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2294,7 +2508,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "j",
                           class: "x",
                         },
                         tag: "span",
@@ -2310,6 +2527,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MTAyZGMyN2It",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2341,6 +2561,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2365,6 +2587,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2378,6 +2602,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2394,6 +2620,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "OTVmMzA3YjAt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2465,7 +2694,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "k",
                           class: "x",
                         },
                         tag: "span",
@@ -2481,6 +2713,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NDE3YzgzMjIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2512,6 +2747,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2536,6 +2773,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2549,6 +2788,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2565,6 +2806,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NTEyODc0MjAt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2619,6 +2863,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },
@@ -2645,6 +2891,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -2661,6 +2909,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "NzBhY2E5NTEt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -2716,7 +2967,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "l",
                           class: "x",
                         },
                         tag: "span",
@@ -2732,6 +2986,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NTNlMzMwMjct",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2763,6 +3020,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2787,6 +3046,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2800,6 +3061,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2816,6 +3079,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "YWZiYmUxOTAt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -2887,7 +3153,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "m",
                           class: "x",
                         },
                         tag: "span",
@@ -2903,6 +3172,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "YWM3ZmI0ZWMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -2934,6 +3206,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -2958,6 +3232,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -2971,6 +3247,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -2987,6 +3265,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZWQ3Y2MwZGYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3054,12 +3335,15 @@ export default {
                         direction: null,
                         format: "",
                         indent: 0,
-                        type: "usfmparagraph",
+                        type: "inline",
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "f",
                           "perf-subtype": "usfm:f",
-                          class: "paragraph",
+                          "data-caller": "+",
+                          class: "x",
                         },
                         tag: "span",
                       },
@@ -3074,6 +3358,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZTBlNjFkNmQt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -3105,6 +3392,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "fq",
                       "perf-subtype": "usfm:fq",
                       class: "wrapper",
                     },
@@ -3129,6 +3418,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "ft",
                       "perf-subtype": "usfm:ft",
                       class: "wrapper",
                     },
@@ -3153,6 +3444,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "fqa",
                       "perf-subtype": "usfm:fqa",
                       class: "wrapper",
                     },
@@ -3177,6 +3470,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "ft",
                       "perf-subtype": "usfm:ft",
                       class: "wrapper",
                     },
@@ -3186,12 +3481,14 @@ export default {
                 direction: null,
                 format: "",
                 indent: 0,
-                type: "usfmparagraph",
+                type: "inline",
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "f",
                   "perf-subtype": "usfm:f",
-                  class: "paragraph",
+                  class: "x",
                 },
                 tag: "span",
               },
@@ -3206,6 +3503,9 @@ export default {
               "perf-subtype": "footnote",
               "perf-target": "NzQ1ZDQwMzct",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3230,12 +3530,15 @@ export default {
                         direction: null,
                         format: "",
                         indent: 0,
-                        type: "usfmparagraph",
+                        type: "inline",
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "f",
                           "perf-subtype": "usfm:f",
-                          class: "paragraph",
+                          "data-caller": "+",
+                          class: "x",
                         },
                         tag: "span",
                       },
@@ -3250,6 +3553,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZGFmM2RhMmQt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -3281,6 +3587,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "fq",
                       "perf-subtype": "usfm:fq",
                       class: "wrapper",
                     },
@@ -3305,6 +3613,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "ft",
                       "perf-subtype": "usfm:ft",
                       class: "wrapper",
                     },
@@ -3329,6 +3639,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "fqa",
                       "perf-subtype": "usfm:fqa",
                       class: "wrapper",
                     },
@@ -3353,6 +3665,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "ft",
                       "perf-subtype": "usfm:ft",
                       class: "wrapper",
                     },
@@ -3362,12 +3676,14 @@ export default {
                 direction: null,
                 format: "",
                 indent: 0,
-                type: "usfmparagraph",
+                type: "inline",
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "f",
                   "perf-subtype": "usfm:f",
-                  class: "paragraph",
+                  class: "x",
                 },
                 tag: "span",
               },
@@ -3382,6 +3698,9 @@ export default {
               "perf-subtype": "footnote",
               "perf-target": "MDYxMjFjZjYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3478,7 +3797,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "n",
                           class: "x",
                         },
                         tag: "span",
@@ -3494,6 +3816,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MDEyNjRjYWMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -3525,6 +3850,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -3549,6 +3876,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -3562,6 +3891,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -3578,6 +3909,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "OTk1YzJlYjgt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3640,7 +3974,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "o",
                           class: "x",
                         },
                         tag: "span",
@@ -3656,6 +3993,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MjFhMGJmMDAt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -3687,6 +4027,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -3711,6 +4053,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -3724,6 +4068,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -3740,6 +4086,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "YTcyZTY5YjYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3777,7 +4126,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "p",
                           class: "x",
                         },
                         tag: "span",
@@ -3793,6 +4145,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MDkxNGQyNGMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -3824,6 +4179,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -3848,6 +4205,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -3861,6 +4220,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -3877,6 +4238,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZDg5N2YxZWUt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -3931,6 +4295,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },
@@ -3957,6 +4323,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "s",
               "perf-subtype": "usfm:s",
               class: "paragraph",
             },
@@ -3973,6 +4341,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "MmE5YzQwMDQt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -3997,6 +4368,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -4013,6 +4386,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "YTEzMWM0NGQt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -4170,7 +4546,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "a",
                           class: "x",
                         },
                         tag: "span",
@@ -4186,6 +4565,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZTViZmZiYjMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -4217,6 +4599,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -4241,6 +4625,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -4254,6 +4640,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -4270,6 +4658,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "Mzk0MDM3YzMt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -4307,7 +4698,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "b",
                           class: "x",
                         },
                         tag: "span",
@@ -4323,6 +4717,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZDQ1MThmNzIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -4354,6 +4751,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -4378,6 +4777,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -4391,6 +4792,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -4407,6 +4810,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "YzJhMTQ4MGEt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -4512,7 +4918,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "c",
                           class: "x",
                         },
                         tag: "span",
@@ -4528,6 +4937,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZWQ4OTkyMGMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -4559,6 +4971,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -4583,6 +4997,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -4596,6 +5012,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -4612,6 +5030,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "YWNkODM0NDMt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -4708,7 +5129,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "d",
                           class: "x",
                         },
                         tag: "span",
@@ -4724,6 +5148,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NzhkODQxMjct",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -4755,6 +5182,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -4779,6 +5208,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -4792,6 +5223,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -4808,6 +5241,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "OGIxMjdhMDct",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -4879,7 +5315,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "e",
                           class: "x",
                         },
                         tag: "span",
@@ -4895,6 +5334,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NDI0OWQ4MTMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -4926,6 +5368,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -4950,6 +5394,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -4963,6 +5409,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -4979,6 +5427,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NzhjOTRhZmMt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5041,7 +5492,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "f",
                           class: "x",
                         },
                         tag: "span",
@@ -5057,6 +5511,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "N2RmYTJkMTQt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -5088,6 +5545,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -5112,6 +5571,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -5125,6 +5586,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -5141,6 +5604,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NThmMTA4Mzkt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5195,6 +5661,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },
@@ -5221,6 +5689,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "s",
               "perf-subtype": "usfm:s",
               class: "paragraph",
             },
@@ -5237,6 +5707,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "Nzc5NWE4ZTMt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -5261,6 +5734,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -5277,6 +5752,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "NmZlZjYzMzYt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -5375,7 +5853,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "g",
                           class: "x",
                         },
                         tag: "span",
@@ -5391,6 +5872,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "YWFlN2MxMDMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -5422,6 +5906,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -5446,6 +5932,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -5459,6 +5947,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -5475,6 +5965,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NmUyYzIzNWIt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5512,7 +6005,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "h",
                           class: "x",
                         },
                         tag: "span",
@@ -5528,6 +6024,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MTI3N2UxZDgt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -5559,6 +6058,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -5583,6 +6084,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -5596,6 +6099,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -5612,6 +6117,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZWJlODk1NzYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5674,7 +6182,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "i",
                           class: "x",
                         },
                         tag: "span",
@@ -5690,6 +6201,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZDhkYTkzYWMt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -5721,6 +6235,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -5745,6 +6261,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -5758,6 +6276,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -5774,6 +6294,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ODIwMmQ2MDct",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5836,7 +6359,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "j",
                           class: "x",
                         },
                         tag: "span",
@@ -5852,6 +6378,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ODAxNzQ3Zjgt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -5883,6 +6412,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -5907,6 +6438,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -5920,6 +6453,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -5936,6 +6471,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MzNkNWQxYzIt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -5973,7 +6511,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "k",
                           class: "x",
                         },
                         tag: "span",
@@ -5989,6 +6530,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "ZmM5ODY5YzUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6020,6 +6564,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6044,6 +6590,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6057,6 +6605,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6073,6 +6623,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZGYyMjA5OWIt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -6144,7 +6697,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "l",
                           class: "x",
                         },
                         tag: "span",
@@ -6160,6 +6716,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "Y2U3MGYxMDYt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6191,6 +6750,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6215,6 +6776,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6228,6 +6791,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6244,6 +6809,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NTJhM2UyN2Mt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -6264,6 +6832,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },
@@ -6290,6 +6860,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -6306,6 +6878,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "MWYxMzUxNjIt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -6386,7 +6961,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "a",
                           class: "x",
                         },
                         tag: "span",
@@ -6402,6 +6980,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NDRjZDQ4YzUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6433,6 +7014,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6457,6 +7040,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6470,6 +7055,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6486,6 +7073,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "YmM0MTRhZjYt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -6557,7 +7147,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "b",
                           class: "x",
                         },
                         tag: "span",
@@ -6573,6 +7166,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "Nzc3ZDljMWEt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6604,6 +7200,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6628,6 +7226,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6641,6 +7241,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6657,6 +7259,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "OGM2Zjc1NjEt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -6694,7 +7299,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "c",
                           class: "x",
                         },
                         tag: "span",
@@ -6710,6 +7318,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MDY1MGY4YjUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6741,6 +7352,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6765,6 +7378,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6778,6 +7393,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6794,6 +7411,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "Mzg1OTYyYTct",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -6856,7 +7476,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "d",
                           class: "x",
                         },
                         tag: "span",
@@ -6872,6 +7495,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "YWMyNWY4NzUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -6903,6 +7529,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -6927,6 +7555,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -6940,6 +7570,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -6956,6 +7588,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NmE0Mjk0MDkt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7052,7 +7687,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "e",
                           class: "x",
                         },
                         tag: "span",
@@ -7068,6 +7706,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "OTI3ZThkOTkt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7099,6 +7740,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7123,6 +7766,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7136,6 +7781,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7152,6 +7799,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MDZlYWNiOGUt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7189,7 +7839,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "f",
                           class: "x",
                         },
                         tag: "span",
@@ -7205,6 +7858,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "OTljMTdiNzYt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7236,6 +7892,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7260,6 +7918,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7273,6 +7933,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7289,6 +7951,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NGI1ZDYwYTgt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7326,7 +7991,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "g",
                           class: "x",
                         },
                         tag: "span",
@@ -7342,6 +8010,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "NjM0ZTA1YjUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7373,6 +8044,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7397,6 +8070,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7410,6 +8085,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7426,6 +8103,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "NWUzNGU1MDAt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7488,7 +8168,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "h",
                           class: "x",
                         },
                         tag: "span",
@@ -7504,6 +8187,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "N2IzNjVhYWEt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7535,6 +8221,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7559,6 +8247,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7572,6 +8262,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7588,6 +8280,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MmZhNTkzMTkt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7693,7 +8388,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "i",
                           class: "x",
                         },
                         tag: "span",
@@ -7709,6 +8407,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MjViYjhkNzIt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7740,6 +8441,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7764,6 +8467,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7777,6 +8482,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7793,6 +8500,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "ZGJiMDkzNjAt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -7889,7 +8599,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "j",
                           class: "x",
                         },
                         tag: "span",
@@ -7905,6 +8618,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "MTQ1MTg1MWQt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -7936,6 +8652,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -7960,6 +8678,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -7973,6 +8693,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -7989,6 +8711,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "Zjg4Mjk4Njct",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -8043,6 +8768,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },
@@ -8069,6 +8796,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "s",
               "perf-subtype": "usfm:s",
               class: "paragraph",
             },
@@ -8085,6 +8814,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "ZmQwN2YzNWMt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -8109,6 +8841,8 @@ export default {
             version: 1,
             attributes: {
               "perf-type": "paragraph",
+              "data-namespace": "usfm",
+              "data-marker": "r",
               "perf-subtype": "usfm:r",
               class: "paragraph",
             },
@@ -8125,6 +8859,9 @@ export default {
           "perf-subtype": "heading",
           "perf-target": "ZWE1NjZlNTAt",
           class: "graft",
+        },
+        props: {
+          isInline: false,
         },
         tag: "div",
       },
@@ -8189,7 +8926,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "k",
                           class: "x",
                         },
                         tag: "span",
@@ -8205,6 +8945,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "Zjc3M2ZlYzkt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -8236,6 +8979,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -8260,6 +9005,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -8273,6 +9020,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -8289,6 +9038,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MDllYjI0NWMt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -8360,7 +9112,10 @@ export default {
                         version: 1,
                         attributes: {
                           "perf-type": "paragraph",
+                          "data-namespace": "usfm",
+                          "data-marker": "x",
                           "perf-subtype": "usfm:x",
+                          "data-caller": "l",
                           class: "x",
                         },
                         tag: "span",
@@ -8376,6 +9131,9 @@ export default {
                       "perf-subtype": "note_caller",
                       "perf-target": "OGQ0YmFlZDUt",
                       class: "graft",
+                    },
+                    props: {
+                      isInline: true,
                     },
                     tag: "span",
                   },
@@ -8407,6 +9165,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xo",
                       "perf-subtype": "usfm:xo",
                       class: "wrapper",
                     },
@@ -8431,6 +9191,8 @@ export default {
                     version: 1,
                     attributes: {
                       "perf-type": "wrapper",
+                      "data-namespace": "usfm",
+                      "data-marker": "xt",
                       "perf-subtype": "usfm:xt",
                       class: "wrapper",
                     },
@@ -8444,6 +9206,8 @@ export default {
                 version: 1,
                 attributes: {
                   "perf-type": "paragraph",
+                  "data-namespace": "usfm",
+                  "data-marker": "x",
                   "perf-subtype": "usfm:x",
                   class: "x",
                 },
@@ -8460,6 +9224,9 @@ export default {
               "perf-subtype": "xref",
               "perf-target": "MWM0MTdmMjIt",
               class: "graft",
+            },
+            props: {
+              isInline: true,
             },
             tag: "span",
           },
@@ -8548,6 +9315,8 @@ export default {
         version: 1,
         attributes: {
           "perf-type": "paragraph",
+          "data-namespace": "usfm",
+          "data-marker": "p",
           "perf-subtype": "usfm:p",
           class: "paragraph",
         },

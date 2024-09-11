@@ -180,12 +180,10 @@ type LexicalMap = {
 
 const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
   default: ({ lexicalNode, perfChildren, perfKind }) => {
-    console.log({ lexicalNode });
     if (lexicalNode?.type === "root") return { type: "main", blocks: perfChildren };
     throw new Error(`unhandled perfKind: ${perfKind}`);
   },
-  sequence: ({ perfChildren, perfProps, lexicalNode }) => {
-    console.log({ lexicalNode });
+  sequence: ({ perfChildren, perfProps }) => {
     return {
       type: perfProps.subtype ?? "main",
       blocks: perfChildren,
