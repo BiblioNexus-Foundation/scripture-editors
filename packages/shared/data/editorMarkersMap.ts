@@ -1,0 +1,23 @@
+export default {
+  x: [
+    "xo",
+    "xop",
+    "xt",
+    "xta",
+    "xk",
+    "xq",
+    "xot",
+    "xnt",
+    "xdc",
+    "it",
+    "bd",
+    "bdit",
+    "em",
+    "sc",
+    "sup",
+    "jmp",
+    "wh",
+    "wg",
+    "wa",
+  ],
+};
