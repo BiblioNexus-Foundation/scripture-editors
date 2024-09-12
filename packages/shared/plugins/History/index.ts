@@ -266,17 +266,6 @@ function createMergeActionGetter(
       editor.isComposing(),
     );
 
-    // console.log(
-    //   [
-    //     "OTHER",
-    //     "COMPOSING_CHARACTER",
-    //     "INSERT_CHARACTER_AFTER_SELECTION",
-    //     "DELETE_CHARACTER_BEFORE_SELECTION",
-    //     "DELETE_CHARACTER_AFTER_SELECTION",
-    //   ][changeType],
-    //   tags,
-    // );
-
     const mergeAction = (() => {
       const isSameEditor = currentHistoryEntry === null || currentHistoryEntry.editor === editor;
       const shouldPushHistory = tags.has("history-push");

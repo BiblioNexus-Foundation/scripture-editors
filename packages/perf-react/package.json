@@ -17,7 +17,6 @@
     "pure-uuid": "^1.8.1",
     "base-64": "^1.0.0",
     "lexical": "^0.17.1",
-    "@lexical/mark": "^0.17.0",
     "@lexical/headless": "^0.17.1",
     "@lexical/html": "^0.17.1",
     "@lexical/react": "^0.17.1",

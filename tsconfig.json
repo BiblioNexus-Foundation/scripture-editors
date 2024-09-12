@@ -28,5 +28,5 @@
       "@biblionexus-foundation/scripture-utilities": ["./utilities/src"]
     }
   },
-  "include": ["packages", "packages/shared/plugins/PerfOperations/epitelete.d.ts"]
+  "include": ["packages"]
 }

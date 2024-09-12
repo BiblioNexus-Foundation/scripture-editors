@@ -1,4 +1,3 @@
-// TODO: remove this file when `packages\shared\contentManager\index.js` is converted to TS.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare module "epitelete" {
   export default class Epitelete {

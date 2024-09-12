@@ -1,7 +1,10 @@
 {
-  "pluginsConfig": {
-    "@nx/js": {
-      "analyzeSourceFiles": true
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx-cloud",
+      "options": {
+        "cacheableOperations": ["build", "serve", "preview", "typecheck", "test", "lint", "dev"]
+      }
     }
   },
   "extends": "nx/presets/npm.json",
@@ -10,28 +13,16 @@
   "targetDefaults": {
     "build": {
       "inputs": ["production", "^production"],
-      "dependsOn": ["^build"],
-      "cache": true
+      "dependsOn": ["^build"]
     },
-    "dev": {
-      "dependsOn": ["^build"],
-      "cache": true
-    },
-    "devpub": {
-      "dependsOn": ["build", "^build"]
-    },
+    "dev": { "dependsOn": ["^build"] },
+    "devpub": { "dependsOn": ["build", "^build"] },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "tsc -p tsconfig.json",
-            "forwardAllArgs": false
-          }
-        ],
+        "commands": [{ "command": "tsc -p tsconfig.json", "forwardAllArgs": false }],
         "cwd": "{projectRoot}"
-      },
-      "cache": true
+      }
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -42,13 +33,7 @@
         "passWithNoTests": true,
         "silent": true
       },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      },
-      "cache": true
+      "configurations": { "ci": { "ci": true, "codeCoverage": true } }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -59,21 +44,12 @@
         "{workspaceRoot}/eslint.config.js"
       ],
       "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
-      },
-      "cache": true
+      "options": { "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"] }
     },
     "@nx/vite:build": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
-    },
-    "serve": {
-      "cache": true
-    },
-    "preview": {
-      "cache": true
     }
   },
   "namedInputs": {
@@ -118,5 +94,7 @@
         "extensions": ["ts", "tsx", "js", "jsx", "html", "vue"]
       }
     }
-  ]
+  ],
+  "pluginsConfig": { "@nx/js": { "analyzeSourceFiles": true } },
+  "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU="
 }
