@@ -125,6 +125,7 @@ export function $wrapTextSelectionInInlineNode(
 
       // Add the target node to be wrapped in the latest created mark node
       console.log({ lastCreatedNode });
+      (lastCreatedNode as ElementNode).clear();
       (lastCreatedNode as ElementNode).append(targetNode);
     } else {
       // If we don't have a target node to wrap we can clear our state and

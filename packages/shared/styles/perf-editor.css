@@ -189,6 +189,27 @@ h3 {
   font-weight: bold;
 }
 
+[data-marker="em"],
+[data-marker="it"] {
+  font-style: italic;
+}
+
+[data-marker="bdit"] {
+  font-style: italic;
+  font-weight: bold;
+}
+
+[data-marker="sc"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
+}
+
+[data-marker="no"] {
+  font-style: normal;
+  font-weight: initial;
+  text-transform: initial;
+}
+
 .info-bar {
   position: fixed;
   bottom: 5px;
