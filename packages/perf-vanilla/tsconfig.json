@@ -1,4 +1,7 @@
 {
   "extends": "../../tsconfig",
+  "compilerOptions": {
+    "moduleResolution": "Node"
+  },
   "include": ["src"]
 }

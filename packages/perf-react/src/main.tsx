@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import "./index.css";
+import "shared/styles/perf-editor.css";
 
-const container = document.getElementById("root");
+const container = document.getElementById("app");
 if (!container) {
   throw new Error("Document root element not found!");
 }

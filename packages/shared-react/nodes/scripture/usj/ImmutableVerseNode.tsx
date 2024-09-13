@@ -13,7 +13,7 @@ import {
   isHTMLElement,
   DOMConversionOutput,
 } from "lexical";
-import { JSX } from "React";
+import { JSX } from "react";
 import {
   UnknownAttributes,
   VERSE_CLASS_NAME,

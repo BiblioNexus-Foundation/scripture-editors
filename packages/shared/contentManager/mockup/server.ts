@@ -23,8 +23,14 @@ export const serverMap: ServerMap = {
           psa: {
             file: import("../../data/psa.usfm").then((data) => data.default),
           },
-          rut: {
-            file: import("../../data/rut.usfm").then((data) => data.default),
+        },
+      },
+    },
+    idiomasPuentes: {
+      "es-419": {
+        tpl: {
+          jon: {
+            file: import("../../data/jon.glt.usfm").then((data) => data.default),
           },
         },
       },
@@ -37,16 +43,19 @@ export const serverMap: ServerMap = {
           tit: {
             file: import("../../data/tit.usfm").then((data) => data.default),
           },
+          rev: {
+            file: import("../../data/rev.usfm").then((data) => data.default),
+          },
         },
       },
     },
   },
   ebible: {
-    wbt: {
+    web: {
       en: {
-        t4t: {
-          gen: {
-            file: import("../../data/gen.usfm").then((data) => data.default),
+        web: {
+          psa: {
+            file: import("../../data/psa.usfm").then((data) => data.default),
           },
         },
       },

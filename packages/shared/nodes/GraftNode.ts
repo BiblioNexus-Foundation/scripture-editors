@@ -1,12 +1,26 @@
-import { $applyNodeReplacement, EditorConfig, NodeKey } from "lexical";
-import { Attributes, SerializedUsfmElementNode, UsfmElementNode } from "./UsfmElementNode";
+import {
+  $applyNodeReplacement,
+  DOMExportOutput,
+  EditorConfig,
+  LexicalEditor,
+  NodeKey,
+  isHTMLElement,
+} from "lexical";
+import {
+  Attributes,
+  NodeProps,
+  SerializedUsfmElementNode,
+  UsfmElementNode,
+} from "./UsfmElementNode";
 import { addClassNamesToElement } from "@lexical/utils";
+
+const DEFAULT_TAG = "span";
 
 export type SerializedGraftNode = SerializedUsfmElementNode;
 
 export class GraftNode extends UsfmElementNode {
-  constructor(attributes: Attributes, data: unknown, tag?: string, key?: NodeKey) {
-    super(attributes, data, tag, key);
+  constructor(attributes: Attributes = {}, props?: NodeProps, tag?: string, key?: NodeKey) {
+    super(attributes, props, tag, key);
   }
 
   static getType(): string {
@@ -14,15 +28,15 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static clone(node: GraftNode): GraftNode {
-    return new GraftNode(node.__attributes, node.__data, node.__tag, node.__key);
+    return new GraftNode(node.__attributes, node.__props, node.__tag, node.__key);
   }
 
   isInline(): boolean {
-    return true;
+    return this.getProps()?.isInline ?? false;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const element = document.createElement(this.getTag() || "span");
+    const element = document.createElement(this.getTag() ?? DEFAULT_TAG);
     const attributes = this.getAttributes() ?? {};
     Object.keys(attributes).forEach((attKey) => {
       element.setAttribute(attKey, attributes[attKey]);
@@ -31,9 +45,37 @@ export class GraftNode extends UsfmElementNode {
     return element;
   }
 
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const { element } = super.exportDOM(editor);
+
+    if (element && isHTMLElement(element)) {
+      if (this.isEmpty()) {
+        element.append(document.createElement("br"));
+      }
+
+      const formatType = this.getFormatType();
+      element.style.textAlign = formatType;
+
+      const direction = this.getDirection();
+      if (direction) {
+        element.dir = direction;
+      }
+      const indent = this.getIndent();
+      if (indent > 0) {
+        // padding-inline-start is not widely supported in email HTML, but
+        // Lexical Reconciler uses padding-inline-start. Using text-indent instead.
+        element.style.textIndent = `${indent * 20}px`;
+      }
+    }
+
+    return {
+      element,
+    };
+  }
+
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
-    const { attributes, data, format, indent, direction, tag } = serializedNode;
-    const node = $createGraftNode(attributes, data, tag);
+    const { attributes, props, format, indent, direction, tag } = serializedNode;
+    const node = $createGraftNode(attributes, props, tag ?? DEFAULT_TAG);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -48,13 +90,15 @@ export class GraftNode extends UsfmElementNode {
     };
   }
 
-  updateDOM(): boolean {
-    // Returning false tells Lexical that this node does not need its
-    // DOM element replacing with a new copy from createDOM.
-    return false;
+  isShadowRoot(): boolean {
+    return true;
   }
 }
 
-function $createGraftNode(attributes: Attributes, data: unknown, tag?: string): GraftNode {
-  return $applyNodeReplacement(new GraftNode(attributes, data, tag));
+export function $createGraftNode(
+  attributes?: Attributes,
+  props?: NodeProps,
+  tag?: string,
+): GraftNode {
+  return $applyNodeReplacement(new GraftNode(attributes, props, tag));
 }

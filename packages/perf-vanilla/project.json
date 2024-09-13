@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "package",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
@@ -55,6 +56,5 @@
     "typecheck": {},
     "test": {},
     "lint": {}
-  },
-  "tags": []
+  }
 }

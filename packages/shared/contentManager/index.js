@@ -1,28 +1,49 @@
 import Epitelete from "epitelete";
-import { transformPerfToLexicalState } from "../converters/perfToLexical";
-import { usfm2perf } from "../converters/usfmToPerf";
+import { usfm2perf } from "../converters/perf/usfmToPerf";
+import transformPerfDocumentToSerializedLexicalState from "../converters/perf/perfToLexical";
 
-export const getLexicalState = (usfmText) => {
-  //Lots of hardcoded data here.
-  const perf = usfm2perf(usfmText, {
-    serverName: "door43",
-    organizationId: "unfoldingWord",
-    languageCode: "en",
-    versionId: "ult",
+const readOptions = { readPipeline: "stripAlignmentPipeline" };
+const writeOptions = { writePipeline: "mergeAlignmentPipeline", ...readOptions };
+
+export class BookStore extends Epitelete {
+  read(bookCode) {
+    return this.readPerf(bookCode, readOptions);
+  }
+  write(bookCode) {
+    return this.writePerf(bookCode, writeOptions);
+  }
+  sideload(bookCode, perf) {
+    return this.sideloadPerf(bookCode, perf, readOptions);
+  }
+}
+
+export const getBookHandler = async ({
+  usfm,
+  serverName,
+  organizationId,
+  languageCode,
+  versionId,
+  bookCode,
+}) => {
+  const perf = usfm2perf(usfm, {
+    serverName,
+    organizationId,
+    languageCode,
+    versionId,
   });
 
-  const bibleHandler = new Epitelete({
+  const bibleStore = new BibleStore();
+  const bookHandler = bibleStore.create({
     docSetId: perf.metadata.translation.id,
-    options: { historySize: 100 },
+    options: { historySize: 1 },
   });
+  await bookHandler.sideload(bookCode, perf);
+  return bookHandler;
+};
 
-  const readOptions = { readPipeline: "stripAlignmentPipeline" };
-
-  return bibleHandler.sideloadPerf("RUT", perf, { ...readOptions }).then((perf) => {
-    const _lexicalState = transformPerfToLexicalState(perf, perf.main_sequence_id);
-    console.log("Perf to Lexical", { perf, lexicalState: _lexicalState });
-    return JSON.stringify(_lexicalState);
-  });
+export const getLexicalState = (perf) => {
+  const _lexicalState = transformPerfDocumentToSerializedLexicalState(perf, perf.main_sequence_id);
+  return _lexicalState;
 };
 
 // export const lexicalState = getTestLexicalState();
@@ -43,7 +64,9 @@ class BibleStore {
    * and params for Epitelete's constructor
    */
   create(epiteleteParams) {
-    this.store.set(epiteleteParams.docSetId, new Epitelete(epiteleteParams));
+    const epitelete = new BookStore(epiteleteParams);
+    this.store.set(epiteleteParams.docSetId, epitelete);
+    return epitelete;
   }
 
   /** adds an Epitelete instance to the store

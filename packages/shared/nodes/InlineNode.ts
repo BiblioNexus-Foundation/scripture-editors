@@ -5,9 +5,8 @@ import { addClassNamesToElement } from "@lexical/utils";
 export type SerializedInlineNode = SerializedUsfmElementNode;
 
 export class InlineNode extends UsfmElementNode {
-  constructor(attributes: Attributes, data: unknown, key?: NodeKey) {
-    // TODO: Check default tag is correct. "span" was added to `super` because `key` was being passed to `tag`.
-    super(attributes, data, "span", key);
+  constructor(attributes: Attributes = {}, key?: NodeKey) {
+    super(attributes, undefined, "span", key);
   }
 
   static getType(): string {
@@ -15,7 +14,7 @@ export class InlineNode extends UsfmElementNode {
   }
 
   static clone(node: InlineNode): InlineNode {
-    return new InlineNode(node.__attributes, node.__data, node.__key);
+    return new InlineNode(node.__attributes, node.__key);
   }
 
   isInline(): boolean {
@@ -33,8 +32,8 @@ export class InlineNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedInlineNode): InlineNode {
-    const { attributes, data, format, indent, direction } = serializedNode;
-    const node = $createInlineNode(attributes, data);
+    const { attributes, format, indent, direction } = serializedNode;
+    const node = $createInlineNode(attributes);
     node.setFormat(format);
     node.setIndent(indent);
     node.setDirection(direction);
@@ -56,6 +55,6 @@ export class InlineNode extends UsfmElementNode {
   }
 }
 
-function $createInlineNode(attributes: Attributes, data: unknown): InlineNode {
-  return $applyNodeReplacement(new InlineNode(attributes, data));
+function $createInlineNode(attributes?: Attributes): InlineNode {
+  return $applyNodeReplacement(new InlineNode(attributes));
 }

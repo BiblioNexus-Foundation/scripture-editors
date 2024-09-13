@@ -1,0 +1,600 @@
+.editor-oce {
+  --editor-background-color: #fff;
+  --editor-text-color: rgba(40, 40, 40, 0.87);
+  --verse-marker-color: black;
+  --chapter-marker-color: black;
+  --title-color: orange;
+  --pilcrow-color: rgb(0 0 0 / 25%);
+}
+
+.editor-oce {
+  position: relative;
+  text-align: left;
+  background-color: var(--editor-background-color);
+  color: var(--editor-text-color);
+  border-radius: 0 0 1rem 1rem;
+  padding: 1em 2em;
+}
+
+.contentEditable {
+  min-height: 40em;
+  outline: none;
+  counter-reset: ts-counter f-counter x-counter;
+}
+
+.editor-paragraph {
+  margin: 0 0 15px 0;
+  position: relative;
+}
+
+span.verses,
+span.chapter {
+  position: relative;
+  visibility: visible;
+  display: inline;
+}
+
+span.chapter {
+  font-size: 1.7rem;
+  vertical-align: baseline;
+  font-weight: 700;
+  margin-inline-end: 0.1em;
+}
+
+span.verses {
+  font-size: 0.8em;
+  line-height: 1rem;
+  vertical-align: top;
+  font-weight: 600;
+  margin-inline-end: 0.1em;
+}
+
+/* Styles for inspecting nodes */
+[perf-type] {
+  position: relative;
+  box-sizing: border-box;
+}
+
+[perf-type]:hover {
+  border-color: rgb(80, 80, 80);
+}
+
+[perf-type="graft"][perf-subtype="title"] {
+  width: 100%;
+  text-align: center;
+}
+
+[perf-type="graft"][perf-subtype="heading"] {
+  width: 100%;
+  text-align: center;
+}
+
+h1 {
+  font-weight: 700;
+  font-size: 2.5em;
+}
+
+[data-marker="mt2"] {
+  font-style: italic;
+  font-size: 0.6em;
+}
+
+[perf-subtype="introduction"] {
+  color: #1a1aa0;
+}
+
+h1 span[perf-type="paragraph"] {
+  display: block;
+}
+
+p[perf-type="paragraph"] {
+  text-align: left;
+  padding: 0.1em;
+  margin: 0.5rem 0;
+}
+
+p[data-marker="io"],
+p[data-marker="io1"] {
+  margin: 0.5rem;
+  padding-left: 0rem;
+}
+
+p[data-marker="io2"] {
+  margin: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+[data-marker="ior"] {
+  font-style: italic;
+}
+
+p[data-marker="ib"],
+p[data-marker="b"] {
+  padding: 0;
+  margin: 0;
+  height: 1rem;
+}
+
+p[data-marker="q"] {
+  margin: 0;
+}
+
+p[data-marker="q"],
+p[data-marker="q1"] {
+  padding-left: 2rem;
+}
+p[data-marker="q2"] {
+  padding-left: 3rem;
+}
+
+[data-marker="fr"],
+[data-marker="xo"] {
+  font-weight: 600;
+}
+
+[data-marker="fq"] {
+  font-style: italic;
+}
+
+[data-marker="fq"],
+[data-marker="fqa"] {
+  font-style: italic;
+  color: #1a1aa0;
+}
+
+[perf-subtype="introduction"] > [perf-subtype="title"] {
+  margin-bottom: 0;
+}
+
+[data-marker="s"],
+[data-marker="imt"],
+[data-marker="imt1"] {
+  font-size: 1.17rem;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+[data-marker="imt3"],
+[data-marker="r"] {
+  font-size: 0.8rem;
+}
+
+h3 {
+  margin-bottom: 0;
+}
+
+[perf-type="mark"] span {
+  font-weight: 900;
+}
+
+[perf-type="mark"].verses {
+  color: var(--verse-marker-color);
+}
+
+:where([data-marker="q"], [data-marker="q1"], [data-marker="q2"], [data-marker="q3"])
+  [perf-type="mark"].verses:first-child {
+  position: absolute;
+  left: 0.5rem;
+}
+
+[perf-type="mark"].chapter {
+  color: var(--chapter-marker-color);
+}
+
+[perf-subtype="usfm:wj"] {
+  color: #cd0000;
+}
+
+[data-marker="bd"] {
+  font-weight: bold;
+}
+
+.info-bar {
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  background: #070707;
+  padding: 0.2em 0.6em;
+  border-radius: 0.4em;
+}
+
+.info-bar span {
+  color: #fff;
+  font-size: 0.75em;
+}
+
+[perf-type]:empty::before {
+  content: "·";
+  padding: 2px;
+  color: #b80000;
+  opacity: 0.5;
+}
+
+.unsupported {
+  color: #b80000;
+  text-decoration: underline wavy;
+  text-decoration-thickness: 0.08rem;
+}
+
+.unsupported:hover:after {
+  font-size: 0.8rem;
+  content: attr(perf-type) "/" attr(perf-subtype) " not supported";
+  position: absolute;
+  padding: 0 0.4em;
+  border-radius: 0.5em;
+  width: max-content;
+  background-color: #c50000;
+  color: #ffc0c0;
+  top: -1.4rem;
+  right: 0;
+  border: 1px solid #6b2f2f;
+  opacity: 1;
+}
+
+[perf-subtype="usfm:xo"]:empty::before {
+  content: "origin reference";
+}
+
+[perf-subtype="usfm:xt"]:empty::before {
+  content: "target references";
+}
+
+span[perf-subtype="usfm:ts"] {
+  display: flex;
+  border-bottom: 2px #a8ff9730;
+  border-style: dashed;
+  height: 2px;
+  width: 100%;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  position: relative;
+  justify-content: center;
+  opacity: 0.5;
+}
+
+span[perf-subtype="usfm:ts"]:hover {
+  opacity: 1;
+  border-color: #a8ff97;
+  cursor: pointer;
+}
+
+span[perf-subtype="usfm:ts"]:after {
+  content: none;
+  display: none;
+}
+
+span[perf-subtype="usfm:ts"]:empty::before {
+  counter-increment: ts-counter;
+  content: counter(ts-counter); /* Avoids adding extra text */
+  position: absolute; /* Position the triangle relative to the line */
+  /* top: 50%; */ /* Center the triangle vertically */
+  /* left: -5px; */ /* Offset the triangle slightly to the left of the line */
+  transform: translateY(-50%) scale(0.8); /* Adjust vertical position if needed */
+  font-weight: 900;
+  background: #242424;
+  color: white;
+  border-radius: 0.3em;
+  padding: 0em 0.5em;
+  opacity: 1;
+  display: inline-block;
+}
+
+[data-marker="sup"] {
+  vertical-align: super;
+  font-size: 70%;
+}
+
+@media print {
+  body * {
+    color: #070707 !important;
+    background-color: #c50000 !important;
+  }
+  span[perf-subtype="usfm:ts"] {
+    display: none;
+  }
+
+  p.paragraph:after {
+    content: "";
+  }
+}
+
+span.paragraph[perf-subtype="usfm:f"] {
+  display: inline;
+  box-sizing: border-box;
+  height: fit-content;
+}
+
+.target-editor {
+  max-width: 600px;
+}
+
+/* Toolbar related */
+
+.toolbar {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: #fff;
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: 0 3px 8px -6px rgb(0 0 0 / 50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  padding: 0.25rem;
+  gap: 0.2rem;
+}
+
+.toolbar button {
+  background: transparent;
+  color: inherit;
+  padding: 0.4rem;
+  border: 0.5rem;
+  border-radius: 0.7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.toolbar button:hover {
+  background: #eee;
+}
+
+.toolbar button i {
+  text-decoration: none;
+  font-style: normal;
+  font-family: "Material Symbols Outlined";
+  font-size: 1.3rem;
+  font-size: 130%;
+}
+
+/* note caller styles */
+:where([perf-subtype="footnote"], [perf-subtype="xreg"])
+  > [perf-type="paragraph"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="note_caller"] {
+  display: inline;
+  vertical-align: middle;
+}
+
+[perf-subtype="note_caller"] [data-caller="+"] span {
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  width: 100%;
+}
+
+[perf-subtype="chapter"] {
+  counter-set: f-counter 0 x-counter 0;
+}
+
+[perf-subtype="footnote"] [data-caller="+"] {
+  counter-increment: f-counter;
+  position: relative;
+}
+
+[perf-subtype="xref"] [data-caller="+"] {
+  counter-increment: x-counter;
+}
+
+[perf-subtype="footnote"] [perf-subtype="note_caller"] [data-caller="+"]::after {
+  content: counter(f-counter, lower-alpha);
+}
+
+[perf-subtype="xref"] [perf-subtype="note_caller"] [data-caller="+"]::after {
+  content: counter(x-counter, lower-roman);
+}
+
+[perf-subtype="note_caller"] [perf-type="paragraph"]::after,
+[perf-subtype="note_caller"] [data-caller] span {
+  display: inline;
+  color: blue;
+  font-size: 0.6rem;
+  vertical-align: middle;
+  font-weight: 900;
+}
+
+[data-ui-active="true"] [perf-subtype="note_caller"] > [data-caller] > span {
+  position: relative;
+  text-align: center;
+  opacity: 1;
+  font-size: 1rem;
+  padding-left: 0.2rem;
+}
+[data-ui-active="true"] [perf-subtype="note_caller"] > span::after {
+  display: none !important;
+}
+
+[data-ui-active="true"] [perf-type="paragraph"] > [perf-subtype="note_caller"] ~ * {
+  background-color: rgb(0 0 0 / 6%);
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
+  padding-left: 0.2rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] ~ *:last-child {
+  padding-right: 0.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+[perf-type="paragraph"] > [perf-subtype="note_caller"] + * {
+  margin-left: 0.23rem;
+}
+
+[perf-subtype="footnote"][data-ui-active="true"]
+  [perf-subtype="usfm:f"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline;
+}
+
+[perf-subtype="xref"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: none;
+}
+
+[perf-subtype="xref"][data-ui-active="true"]
+  [perf-subtype="usfm:x"]
+  > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
+  display: inline;
+}
+
+[perf-subtype="note_caller"] {
+  border-radius: 0.4rem;
+  display: inline;
+  vertical-align: top;
+  line-height: 1rem;
+  text-wrap: nowrap;
+}
+
+[perf-subtype="xref"],
+[perf-subtype="footnote"] {
+  display: inline;
+  margin-inline-end: 0.1em;
+  border-radius: 0.5rem;
+}
+
+/* Non printable marks */
+.with-markers p.paragraph:after {
+  content: "¶";
+  display: inline-block;
+  color: var(--pilcrow-color);
+  position: absolute;
+  font-family: arial;
+  margin-inline-start: 0.05rem;
+}
+
+.with-markers p[perf-type="paragraph"]:has(br) {
+  pointer-events: none;
+}
+
+.with-markers p[perf-type="paragraph"]:has(br)::after {
+  top: 0;
+  left: 1.1rem;
+}
+
+.with-markers [data-namespace="usfm"]:before,
+.with-markers [data-namespace="usfm"]:not(.paragraph, [data-caller]):after {
+  display: inline;
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.2em;
+  color: rgb(0 0 0 / 20%);
+  margin-inline-end: 0.1rem;
+  vertical-align: bottom;
+}
+
+.with-markers [data-namespace="usfm"]:before {
+  content: "\\" attr(data-marker) "";
+}
+
+.with-markers
+  [data-namespace="usfm"]:where(
+    [data-marker="ior"],
+    [data-marker="iqt"],
+    [data-marker="rq"],
+    [data-marker="ca"],
+    [data-marker="va"],
+    [data-marker="vp"],
+    [data-marker="qs"],
+    [data-marker="qac"],
+    [data-marker="litl"],
+    [data-marker="lik"],
+    [data-marker="liv#"],
+    [data-marker="f"],
+    [data-marker="fe"],
+    [data-marker="fv"],
+    [data-marker="fdc"],
+    [data-marker="fm"],
+    [data-marker="x"],
+    [data-marker="xop"],
+    [data-marker="xot"],
+    [data-marker="xnt"],
+    [data-marker="xdc"],
+    [data-marker="rq"],
+    [data-marker="add"],
+    [data-marker="bk"],
+    [data-marker="dc"],
+    [data-marker="k"],
+    [data-marker="lit"],
+    [data-marker="nd"],
+    [data-marker="ord"],
+    [data-marker="pn"],
+    [data-marker="png"],
+    [data-marker="addpn"],
+    [data-marker="qt"],
+    [data-marker="sig"],
+    [data-marker="sls"],
+    [data-marker="tl"],
+    [data-marker="wj"],
+    [data-marker="em"],
+    [data-marker="bd"],
+    [data-marker="it"],
+    [data-marker="bdit"],
+    [data-marker="no"],
+    [data-marker="sc"],
+    [data-marker="sup"],
+    [data-marker="fig"],
+    [data-marker="ndx"],
+    [data-marker="rb"],
+    [data-marker="pro"],
+    [data-marker="w"],
+    [data-marker="wg"],
+    [data-marker="wh"],
+    [data-marker="wa"],
+    [data-marker="jmp"],
+
+  ):after {
+  content: "\\" attr(data-marker) "*";
+}
+
+.with-markers [data-namespace="usfm"]:hover:before,
+.with-markers [data-namespace="usfm"]:hover:after {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span.verses:before,
+.with-markers span.chapter:before {
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.2em;
+  color: rgb(0 0 0 / 20%);
+  margin-inline-end: 0.1rem;
+  vertical-align: bottom;
+}
+
+.with-markers span.verses:hover:before,
+span.chapter:hover:before {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span.verses:before {
+  content: "\\v";
+}
+
+.with-markers span.chapter:before {
+  content: "\\c";
+}
+
+.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:before,
+.with-markers [perf-subtype="note_caller"] > [data-namespace="usfm"]:not([data-caller="+"]):after {
+  content: none;
+  display: none;
+}
+
+/* verse as blocks */
+.verse-blocks span[perf-subtype="verses"] {
+  display: block;
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: dashed 1px #ffffff91;
+}

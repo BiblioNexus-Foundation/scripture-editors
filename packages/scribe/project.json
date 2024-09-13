@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "{projectRoot}/src",
   "projectType": "package",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
@@ -55,11 +56,13 @@
     "devpub": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "production",
-      "options": { "command": "yalc push", "cwd": "{projectRoot}" }
+      "options": {
+        "command": "yalc push",
+        "cwd": "{projectRoot}"
+      }
     },
     "typecheck": {},
     "test": {},
     "lint": {}
-  },
-  "tags": []
+  }
 }
