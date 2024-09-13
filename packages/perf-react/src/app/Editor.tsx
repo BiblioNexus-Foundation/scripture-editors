@@ -8,18 +8,27 @@ import { HistoryMergeListener, createEmptyHistoryState } from "shared/plugins/Hi
 import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandlersPlugin";
 import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
+import editorMarkersMap from "shared/data/editorMarkersMap";
 
 import Button from "./Components/Button";
 
 import { emptyCrossRefence } from "./emptyNodes/emptyCrossReference";
 import { createEmptyDivisionMark } from "./emptyNodes/emptyVerse";
 import { emptyFootnote } from "./emptyNodes/emptyFootnote";
-import { $createNodeFromSerializedNode, $insertUsfmNode } from "./emptyNodes/emptyUsfmNodes";
+import {
+  $createNodeFromSerializedNode,
+  $insertUsfmNode,
+} from "shared/converters/usfm/emptyUsfmNodes";
 import { emptyHeading } from "./emptyNodes/emptyHeading";
 
-import { $getSelection, $isRangeSelection } from "lexical";
+import { $getNodeByKey, $getSelection, $isRangeSelection } from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
+import OnEditorUpdate from "./Components/OnSelectionChange";
+
+import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
+import { FloatingMenuPlugin } from "./Components/FloatingMenuPlugin";
+import { getMarkerData } from "shared/data/markersData";
 
 const theme = {
   // Theme styling goes here
@@ -67,6 +76,7 @@ export default function Editor({
     bookCode,
   }) as BookStore | null;
   const [lexicalState, setLexicalState] = useState("");
+  const [selectedMarker, setSelectedMarker] = useState<string>();
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -101,6 +111,15 @@ export default function Editor({
 
   const toggleClass = (element: HTMLElement | null, className: string) =>
     element && element.classList.toggle(className);
+
+  const floatingMenuItems = useMemo(() => {
+    return selectedMarker
+      ? editorMarkersMap[selectedMarker]?.CharacterStyling?.map((marker) => {
+          const { builder } = getMarkerData(marker);
+          return { label: marker, action: builder };
+        })
+      : null;
+  }, [selectedMarker]);
 
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
@@ -174,6 +193,27 @@ export default function Editor({
           <i>format_paragraph</i>
         </button>
       </div>
+      <OnEditorUpdate
+        updateListener={({ editorState }) => {
+          editorState.read(() => {
+            const selection = $getSelection();
+            if (!selection) return;
+            const startEndPoints = selection.getStartEndPoints();
+            if (!startEndPoints) return;
+            const startNode = $getNodeByKey(startEndPoints[0].key);
+            const endNode = $getNodeByKey(startEndPoints[1].key);
+            if (!startNode || !endNode) return;
+            //This is the selected elment expected to be a usfm element;
+            const selectedElement = startNode?.getCommonAncestor(endNode);
+            //This is the parentUsfmElement which can give me information of which tags can be used to replace current tag.
+            // const parentElement = selectedElement?.getParent();
+            if ($isUsfmElementNode(selectedElement)) {
+              setSelectedMarker(selectedElement.getAttribute("data-marker"));
+            }
+          });
+        }}
+      />
+      {floatingMenuItems ? <FloatingMenuPlugin items={floatingMenuItems} /> : null}
       <div className={"editor-oce"}>
         <ContentEditablePlugin ref={editorRef} />
         <PerfHandlersPlugin />

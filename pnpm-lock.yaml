@@ -134,6 +134,9 @@ importers:
 
   packages/perf-react:
     dependencies:
+      '@floating-ui/dom':
+        specifier: ^1.6.10
+        version: 1.6.10
       '@lexical/headless':
         specifier: ^0.17.1
         version: 0.17.1

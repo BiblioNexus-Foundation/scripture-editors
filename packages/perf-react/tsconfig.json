@@ -4,7 +4,7 @@
     "jsx": "react-jsx",
     "moduleResolution": "Node"
   },
-  "include": ["src"],
+  "include": ["src", "../shared/converters/usfm/emptyUsfmNodes.ts"],
   "references": [
     {
       "path": "./tsconfig.node.json"

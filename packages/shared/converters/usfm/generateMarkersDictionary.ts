@@ -1,7 +1,7 @@
 // This file contains utility functions and type definitions for getting usfm markers data.
 // It includes functions to parse marker strings, convert marker styles to CSS styles, and type definitions for various marker properties.
 
-enum TextType {
+export enum TextType {
   ChapterNumber = "ChapterNumber",
   VerseNumber = "VerseNumber",
   VerseText = "VerseText",
@@ -11,19 +11,19 @@ enum TextType {
   Other = "Other",
 }
 
-enum StyleType {
+export enum StyleType {
   Paragraph = "Paragraph",
   Character = "Character",
   Note = "Note",
 }
 
-enum Justification {
+export enum Justification {
   Left = "Left",
   Center = "Center",
   Right = "Right",
 }
 
-enum TextProperty {
+export enum TextProperty {
   Paragraph = "paragraph",
   Publishable = "publishable",
   Vernacular = "vernacular",
@@ -95,8 +95,8 @@ type MarkersDictionary = {
   };
 };
 
-type MarkersChildrenMap = {
-  [marker: string]: { [key in CategoryType]: string[] };
+export type MarkersChildrenMap = {
+  [marker: string]: Partial<{ [key in CategoryType]: string[] }>;
 };
 
 /**
@@ -244,7 +244,7 @@ export const generateMarkersChildrenMap = (
         const category = markersDictionary[childMarker].category;
         if (category) {
           markersChildrenMap[marker][category] = markersChildrenMap[marker][category] || [];
-          markersChildrenMap[marker][category].push(childMarker);
+          markersChildrenMap[marker][category]?.push(childMarker);
         }
       });
     }

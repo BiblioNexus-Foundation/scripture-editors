@@ -592,9 +592,8 @@ export default {
   p: {
     Paragraphs: ["pmo", "pm", "pmc", "pmr"],
     Poetry: ["qm", "qm1", "qm2", "qm3"],
-    TitlesHeadings: ["mte1"],
     Footnotes: ["f", "fe", "fm"],
-    CrossReferences: ["x", "xt", "rq"],
+    CrossReferences: ["x", "rq"],
     SpecialText: [
       "qt",
       "nd",
