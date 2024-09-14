@@ -70,30 +70,27 @@ export function registerCursorHandlers(editor: LexicalEditor) {
   );
 
   //remove zero width space if selection changed
-  editor.registerUpdateListener(
-    ({ editorState, prevEditorState, dirtyLeaves, dirtyElements, tags }) => {
-      //if selection changed and previous selected node was a text node, check if it has zero width space
-      if (dirtyLeaves.size !== 0 || dirtyElements.size !== 0) return;
-      console.log("SELECTION CHANGED", { tags });
-      editorState.read(() => {
-        const selection = prevEditorState._selection;
-        const currSelection = editorState._selection;
-        if (!selection || !currSelection) return;
-        const prevSelectionData = $getSelectionData(selection);
-        const currSelectionData = $getSelectionData(currSelection);
-        if (prevSelectionData.endNodeKey === currSelectionData.endNodeKey) return;
-        if (prevSelectionData.isZeroWidthSpace) {
-          if (!$isTextNode(prevSelectionData.endNode)) return;
-          console.log("REMOVING ZERO WIDTH SPACE BECAUSE SELECTION CHANGED");
-          editor.update(() => {
-            (prevSelectionData.endNode as TextNode).setTextContent(
-              prevSelectionData.endNode.getTextContent().replace(ZERO_WIDTH_SPACE, ""),
-            );
-          });
-        }
-      });
-    },
-  );
+  editor.registerUpdateListener(({ editorState, prevEditorState, dirtyLeaves, dirtyElements }) => {
+    //if selection changed and previous selected node was a text node, check if it has zero width space
+    if (dirtyLeaves.size !== 0 || dirtyElements.size !== 0) return;
+    editorState.read(() => {
+      const selection = prevEditorState._selection;
+      const currSelection = editorState._selection;
+      if (!selection || !currSelection) return;
+      const prevSelectionData = $getSelectionData(selection);
+      const currSelectionData = $getSelectionData(currSelection);
+      if (prevSelectionData.endNodeKey === currSelectionData.endNodeKey) return;
+      if (prevSelectionData.isZeroWidthSpace) {
+        if (!$isTextNode(prevSelectionData.endNode)) return;
+        console.log("REMOVING ZERO WIDTH SPACE BECAUSE SELECTION CHANGED");
+        editor.update(() => {
+          (prevSelectionData.endNode as TextNode).setTextContent(
+            prevSelectionData.endNode.getTextContent().replace(ZERO_WIDTH_SPACE, ""),
+          );
+        });
+      }
+    });
+  });
 
   const getSelectionAndNode = () => {
     const selection = $getSelection();

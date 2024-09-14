@@ -12,16 +12,7 @@ import editorMarkersMap from "shared/data/editorMarkersMap";
 
 import Button from "./Components/Button";
 
-import { emptyCrossRefence } from "./emptyNodes/emptyCrossReference";
-import { createEmptyDivisionMark } from "./emptyNodes/emptyVerse";
-import { emptyFootnote } from "./emptyNodes/emptyFootnote";
-import {
-  $createNodeFromSerializedNode,
-  $insertUsfmNode,
-} from "shared/converters/usfm/emptyUsfmNodes";
-import { emptyHeading } from "./emptyNodes/emptyHeading";
-
-import { $getNodeByKey, $getSelection, $isRangeSelection } from "lexical";
+import { $getNodeByKey, $getSelection, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnSelectionChange";
@@ -29,24 +20,12 @@ import OnEditorUpdate from "./Components/OnSelectionChange";
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { FloatingMenuPlugin } from "./Components/FloatingMenuPlugin";
 import { getMarkerData } from "shared/data/markersData";
+import ScriptureReferencePlugin, {
+  ScriptureReference,
+} from "./Components/ScriptureReferencePlugin";
 
 const theme = {
   // Theme styling goes here
-};
-
-const translationSection = {
-  indent: 0,
-  direction: null,
-  children: [],
-  format: "",
-  type: "divisionmark",
-  attributes: {
-    "perf-type": "mark",
-    "perf-subtype": "usfm:ts",
-    class: "usfm:ts",
-  },
-  version: 1,
-  tag: "span",
 };
 
 function onError(error: Error) {
@@ -78,6 +57,10 @@ export default function Editor({
   const [lexicalState, setLexicalState] = useState("");
   const [selectedMarker, setSelectedMarker] = useState<string>();
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
+  const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
+    chapter: 1,
+    verse: 1,
+  });
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,74 +107,31 @@ export default function Editor({
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="toolbar noprint">
+        <Button onClick={(_, editor) => editor.dispatchCommand(UNDO_COMMAND, undefined)}>
+          <i>undo</i>
+        </Button>
+        <Button onClick={(_, editor) => editor.dispatchCommand(REDO_COMMAND, undefined)}>
+          <i>redo</i>
+        </Button>
+        <hr />
         <button onClick={() => downloadUsfm(bookHandler, historyState, bookCode)}>
           <i>download</i>
         </button>
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              $insertUsfmNode(emptyCrossRefence);
-            });
-          }}
-        >
-          \X
-        </Button>
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              $insertUsfmNode(emptyFootnote);
-            });
-          }}
-        >
-          \F
-        </Button>
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              const selection = $getSelection();
-              if (!$isRangeSelection(selection)) {
-                return false;
-              }
-              selection.insertNodes([$createNodeFromSerializedNode(emptyHeading)]);
-            });
-          }}
-        >
-          \S
-        </Button>
-
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              $insertUsfmNode(translationSection);
-            });
-          }}
-        >
-          \TS
-        </Button>
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              $insertUsfmNode(createEmptyDivisionMark("chapter", "1"));
-            });
-          }}
-        >
-          \C
-        </Button>
-        <Button
-          onClick={(_, editor) => {
-            editor.update(() => {
-              $insertUsfmNode(createEmptyDivisionMark("verses", "1"));
-            });
-          }}
-        >
-          \V
-        </Button>
+        <hr />
         <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
           <i>view_agenda</i>
         </button>
         <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
           <i>format_paragraph</i>
         </button>
+        <hr />
+        <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
+        <span className="info">
+          {bookCode}{" "}
+          {scriptureReference
+            ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
+            : null}
+        </span>
       </div>
       <OnEditorUpdate
         updateListener={({ editorState }) => {
@@ -211,6 +151,11 @@ export default function Editor({
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }
           });
+        }}
+      />
+      <ScriptureReferencePlugin
+        onChangeReference={(reference) => {
+          setScriptureReference(reference);
         }}
       />
       {floatingMenuItems ? <FloatingMenuPlugin items={floatingMenuItems} /> : null}
