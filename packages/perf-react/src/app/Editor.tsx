@@ -111,7 +111,9 @@ export default function Editor({
     return selectedMarker && scriptureReference
       ? Object.entries(editorMarkersMap[selectedMarker] ?? {}).reduce(
           (items, [category, data]) => {
-            if (["SpecialText", "CharacterStyling"].includes(category))
+            if (
+              ["SpecialText", "CharacterStyling", "Footnotes", "CrossReferences"].includes(category)
+            )
               items[category] = data.map((marker) => {
                 const { builder } = getMarkerData(marker);
                 return {

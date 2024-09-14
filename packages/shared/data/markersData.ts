@@ -14,6 +14,8 @@ import { StyleType } from "../converters/usfm/generateMarkersDictionary";
 import { createLexicalNodeFromUsfm } from "../converters/usfm/usfmToLexical";
 import { $isMarkerNode } from "../nodes/scripture/usj/MarkerNode";
 
+const EM_SPACE = "\u0095";
+
 export const markersData: {
   [marker: string]: {
     type: StyleType;
@@ -30,11 +32,18 @@ export const markersData: {
     type: StyleType.Character,
     builder: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\f + \fr ${chapter}:${verse} \ft x\f*`;
+      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${EM_SPACE} \f*`;
+    },
+  },
+  x: {
+    type: StyleType.Character,
+    builder: (currentEditor) => {
+      const { chapter, verse } = currentEditor.reference;
+      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${EM_SPACE} \x*`;
     },
   },
 };
-const ZERO_WIDTH_SPACE = "\u200B";
+
 export function getMarkerData(marker: string) {
   const markerData = markersData[marker];
   const builder = (currentEditor: {
@@ -48,7 +57,7 @@ export function getMarkerData(marker: string) {
         typeof node === "object"
           ? node
           : createLexicalNodeFromUsfm(
-              node || `\\${marker} ${ZERO_WIDTH_SPACE}`,
+              node || `\\${marker} ${EM_SPACE}`,
               !markerData ||
                 markerData.type === StyleType.Character ||
                 markerData.type === StyleType.Note
