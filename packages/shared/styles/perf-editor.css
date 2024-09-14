@@ -357,6 +357,7 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-family: sans-serif;
   font-weight: 600;
   font-size: 0.85rem;
+  min-width: 35px;
 }
 
 .toolbar button:hover {
@@ -372,10 +373,14 @@ span.paragraph[perf-subtype="usfm:f"] {
 }
 
 .toolbar hr {
-  margin: 0.2rem;
+  margin: 0 0.2rem;
   border-color: #ddd;
   border-style: solid;
   border-width: 1px;
+}
+
+.toolbar > * {
+  height: 40px;
 }
 
 .toolbar .info {

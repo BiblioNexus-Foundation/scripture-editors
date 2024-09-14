@@ -12,7 +12,7 @@ import editorMarkersMap from "shared/data/editorMarkersMap";
 
 import Button from "./Components/Button";
 
-import { $getNodeByKey, $getSelection, REDO_COMMAND, UNDO_COMMAND } from "lexical";
+import { $getNodeByKey, $getSelection, LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnSelectionChange";
@@ -96,13 +96,16 @@ export default function Editor({
     element && element.classList.toggle(className);
 
   const floatingMenuItems = useMemo(() => {
-    return selectedMarker
+    return selectedMarker && scriptureReference
       ? editorMarkersMap[selectedMarker]?.CharacterStyling?.map((marker) => {
           const { builder } = getMarkerData(marker);
-          return { label: marker, action: builder };
+          return {
+            label: marker,
+            action: (editor: LexicalEditor) => builder({ editor, reference: scriptureReference }),
+          };
         })
       : null;
-  }, [selectedMarker]);
+  }, [selectedMarker, scriptureReference]);
 
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
@@ -132,6 +135,15 @@ export default function Editor({
             ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
             : null}
         </span>
+        <hr />
+        <Button
+          onClick={(_, editor) => {
+            const { builder } = getMarkerData("f");
+            scriptureReference && builder({ editor, reference: scriptureReference });
+          }}
+        >
+          f
+        </Button>
       </div>
       <OnEditorUpdate
         updateListener={({ editorState }) => {

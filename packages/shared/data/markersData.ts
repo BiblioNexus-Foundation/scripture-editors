@@ -7,6 +7,7 @@ import {
   LexicalEditor,
   LexicalNode,
   RangeSelection,
+  SerializedLexicalNode,
 } from "lexical";
 import { $createNodeFromSerializedNode } from "../converters/usfm/emptyUsfmNodes";
 import { StyleType } from "../converters/usfm/generateMarkersDictionary";
@@ -14,28 +15,50 @@ import { createLexicalNodeFromUsfm } from "../converters/usfm/usfmToLexical";
 import { $isMarkerNode } from "../nodes/scripture/usj/MarkerNode";
 
 export const markersData: {
-  [marker: string]: { type: StyleType; builder?: (props: unknown) => void };
+  [marker: string]: {
+    type: StyleType;
+    builder?: (currentEditor: {
+      reference: { chapter: number; verse: number };
+      editor: LexicalEditor;
+    }) => SerializedLexicalNode | string;
+  };
 } = {
   p: {
     type: StyleType.Paragraph,
+  },
+  f: {
+    type: StyleType.Character,
+    builder: (currentEditor) => {
+      const { chapter, verse } = currentEditor.reference;
+      return String.raw`\f + \fr ${chapter}:${verse} \ft x\f*`;
+    },
   },
 };
 // const ZERO_WIDTH_SPACE = "\u200B";
 export function getMarkerData(marker: string) {
   const markerData = markersData[marker];
-  const builder = (editor: LexicalEditor) => {
-    editor.update(() => {
+  const builder = (currentEditor: {
+    editor: LexicalEditor;
+    reference: { chapter: number; verse: number };
+  }) => {
+    currentEditor.editor.update(() => {
+      const node = markerData.builder?.(currentEditor);
       const selection = $getSelection();
-      const usfmSerializedNode = createLexicalNodeFromUsfm(
-        `\\${marker}`,
-        !markerData || markerData.type === StyleType.Character || markerData.type === StyleType.Note
-          ? "inline"
-          : "block",
-      );
-      if ($isRangeSelection(selection))
-        $wrapTextSelectionInInlineNode(selection, false, () =>
-          $createNodeFromSerializedNode(usfmSerializedNode),
-        );
+      const usfmSerializedNode =
+        typeof node === "object"
+          ? node
+          : createLexicalNodeFromUsfm(
+              node || `\\${marker}`,
+              !markerData ||
+                markerData.type === StyleType.Character ||
+                markerData.type === StyleType.Note
+                ? "inline"
+                : "block",
+            );
+      const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
+      if ($isRangeSelection(selection) && selection.getTextContent().length > 0)
+        $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
+      else selection?.insertNodes([usfmNode]);
     });
   };
   return { builder, type: markerData?.type ?? StyleType.Character };
