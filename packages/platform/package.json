@@ -21,8 +21,8 @@
     "src/editor"
   ],
   "scripts": {
-    "collab": "cross-env HOST=localhost PORT=1234 npx y-websocket",
-    "collab:persist": "cross-env HOST=localhost PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
+    "collab": "cross-env HOST=localhost PORT=8877 npx y-websocket",
+    "collab:persist": "cross-env HOST=localhost PORT=8877 YPERSISTENCE=./yjs-wss-db npx y-websocket",
     "dev": "vite",
     "dev:collab": "cross-env NODE_ENV=development concurrently \"npm:collab:persist\" \"vite\"",
     "dev:test": "cross-env NODE_ENV=testing vite",

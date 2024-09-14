@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { WebsocketProvider } from "y-websocket";
 import { Doc, XmlText } from "yjs";
 
-const WEBSOCKET_ENDPOINT = "ws://localhost:1234";
+const WEBSOCKET_ENDPOINT = "ws://localhost:8877";
 /** TODO: Temporarily using this until editor is split per chapter */
 const ALL_CHAPTERS = "1-end";
 
@@ -74,7 +74,8 @@ export function createWebsocketProvider(id: string, yjsDocMap: Map<string, Doc>)
  * const docId = useCollabDocId("project123", { bookNum: 1 }, "comments");
  * // Returns: "project123/GEN_1-end/comments"
  * ```
- */ export function useCollabDocId(
+ */
+export function useCollabDocId(
   projectId: string | undefined,
   scrRef: ScriptureReference | undefined,
   category = "scripture",
