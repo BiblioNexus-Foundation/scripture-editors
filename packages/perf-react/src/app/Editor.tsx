@@ -107,43 +107,77 @@ export default function Editor({
       : null;
   }, [selectedMarker, scriptureReference]);
 
+  const toolbarMarkerSections = useMemo(() => {
+    return selectedMarker && scriptureReference
+      ? Object.entries(editorMarkersMap[selectedMarker] ?? {}).reduce(
+          (items, [category, data]) => {
+            if (["SpecialText", "CharacterStyling"].includes(category))
+              items[category] = data.map((marker) => {
+                const { builder } = getMarkerData(marker);
+                return {
+                  label: marker,
+                  action: (editor: LexicalEditor) =>
+                    builder({ editor, reference: scriptureReference }),
+                };
+              });
+            return items;
+          },
+          {} as { [key: string]: { label: string; action: (editor: LexicalEditor) => void }[] },
+        )
+      : null;
+  }, [selectedMarker, scriptureReference]);
+
   return !lexicalState || !perfDocument ? null : (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="toolbar noprint">
-        <Button onClick={(_, editor) => editor.dispatchCommand(UNDO_COMMAND, undefined)}>
-          <i>undo</i>
-        </Button>
-        <Button onClick={(_, editor) => editor.dispatchCommand(REDO_COMMAND, undefined)}>
-          <i>redo</i>
-        </Button>
-        <hr />
-        <button onClick={() => downloadUsfm(bookHandler, historyState, bookCode)}>
-          <i>download</i>
-        </button>
-        <hr />
-        <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
-          <i>view_agenda</i>
-        </button>
-        <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
-          <i>format_paragraph</i>
-        </button>
-        <hr />
-        <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
-        <span className="info">
-          {bookCode}{" "}
-          {scriptureReference
-            ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
-            : null}
-        </span>
-        <hr />
-        <Button
-          onClick={(_, editor) => {
-            const { builder } = getMarkerData("f");
-            scriptureReference && builder({ editor, reference: scriptureReference });
-          }}
-        >
-          f
-        </Button>
+        <div className={"toolbar-section"}>
+          <Button onClick={(_, editor) => editor.dispatchCommand(UNDO_COMMAND, undefined)}>
+            <i>undo</i>
+          </Button>
+          <Button onClick={(_, editor) => editor.dispatchCommand(REDO_COMMAND, undefined)}>
+            <i>redo</i>
+          </Button>
+          <hr />
+          <button onClick={() => downloadUsfm(bookHandler, historyState, bookCode)}>
+            <i>download</i>
+          </button>
+          <hr />
+          <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
+            <i>view_agenda</i>
+          </button>
+          <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
+            <i>format_paragraph</i>
+          </button>
+          <hr />
+        </div>
+        <div className={"toolbar-section"}>
+          <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
+          <span className="info">
+            {bookCode}{" "}
+            {scriptureReference
+              ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
+              : null}
+          </span>
+          <hr />
+        </div>
+
+        {toolbarMarkerSections &&
+          Object.entries(toolbarMarkerSections).map(([sectionName, items]) => {
+            return (
+              <div className={"toolbar-section"}>
+                {items.map((item) => (
+                  <Button
+                    key={`${item.label}-toolbar`}
+                    className={`${sectionName}`}
+                    onClick={(_, editor) => item.action(editor)}
+                    data-marker={item.label}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
+            );
+          })}
       </div>
       <OnEditorUpdate
         updateListener={({ editorState }) => {

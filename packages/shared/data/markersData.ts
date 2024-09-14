@@ -34,7 +34,7 @@ export const markersData: {
     },
   },
 };
-// const ZERO_WIDTH_SPACE = "\u200B";
+const ZERO_WIDTH_SPACE = "\u200B";
 export function getMarkerData(marker: string) {
   const markerData = markersData[marker];
   const builder = (currentEditor: {
@@ -42,13 +42,13 @@ export function getMarkerData(marker: string) {
     reference: { chapter: number; verse: number };
   }) => {
     currentEditor.editor.update(() => {
-      const node = markerData.builder?.(currentEditor);
+      const node = markerData?.builder?.(currentEditor);
       const selection = $getSelection();
       const usfmSerializedNode =
         typeof node === "object"
           ? node
           : createLexicalNodeFromUsfm(
-              node || `\\${marker}`,
+              node || `\\${marker} ${ZERO_WIDTH_SPACE}`,
               !markerData ||
                 markerData.type === StyleType.Character ||
                 markerData.type === StyleType.Note
@@ -56,6 +56,7 @@ export function getMarkerData(marker: string) {
                 : "block",
             );
       const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
+      console.log({ usfmNode });
       if ($isRangeSelection(selection) && selection.getTextContent().length > 0)
         $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
       else selection?.insertNodes([usfmNode]);

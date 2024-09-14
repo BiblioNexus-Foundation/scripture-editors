@@ -181,8 +181,28 @@ h3 {
   color: var(--chapter-marker-color);
 }
 
-[perf-subtype="usfm:wj"] {
+[data-marker="wj"] {
   color: #cd0000;
+}
+
+[data-marker="add"],
+[data-marker="bk"],
+[data-marker="dc"],
+[data-marker="qt"],
+[data-marker="sig"],
+[data-marker="sls"],
+[data-marker="tl"] {
+  font-style: italic;
+}
+
+[data-marker="lit"] {
+  display: block;
+  font-weight: bolder;
+}
+
+[data-marker="nd"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
 }
 
 [data-marker="bd"] {
@@ -342,6 +362,14 @@ span.paragraph[perf-subtype="usfm:f"] {
   flex-wrap: wrap;
   justify-content: start;
   padding: 0.25rem;
+  gap: 0.2rem;
+}
+
+.toolbar-section {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
   gap: 0.2rem;
 }
 
