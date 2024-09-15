@@ -675,6 +675,11 @@ span.chapter:hover:before {
   border-top: dashed 1px #ffffff91;
 }
 
+[data-marker="v"]:has(+ [data-marker="v"]):after {
+  display: block;
+  content: "";
+}
+
 .floating-menu {
   background: #ededed;
   padding: 0.2em;
