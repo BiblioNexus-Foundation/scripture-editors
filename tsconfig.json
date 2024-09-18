@@ -6,27 +6,26 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-
-    /* Bundler mode */
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "declaration": true,
-
-    /* Linting */
     "strict": true,
     "allowJs": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
-    /* Workspace */
     "baseUrl": "./packages/",
     "paths": {
-      "@biblionexus-foundation/scripture-utilities": ["./utilities/src"]
+      "@biblionexus-foundation/scripture-utilities": ["./utilities/src"],
+      "usfm-markers": ["tools/usfm-markers/src/index.ts"]
     }
   },
-  "include": ["packages"]
+  "include": [
+    "packages",
+    "tools/usfm-markers/src/generators/markers-data/files/src/simplifyMarkersDictionary.ts",
+    "tools/usfm-markers/src/generators/markers-data/utils/generateMarkersDictionary.ts"
+  ]
 }

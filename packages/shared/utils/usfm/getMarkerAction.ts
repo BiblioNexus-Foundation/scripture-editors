@@ -9,69 +9,116 @@ import {
   RangeSelection,
   SerializedLexicalNode,
 } from "lexical";
-import { $createNodeFromSerializedNode } from "../converters/usfm/emptyUsfmNodes";
-import { StyleType } from "../converters/usfm/generateMarkersDictionary";
-import { createLexicalNodeFromUsfm } from "../converters/usfm/usfmToLexical";
-import { $isMarkerNode } from "../nodes/scripture/usj/MarkerNode";
+import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
+import { createLexicalNodeFromUsfm } from "./usfmToLexical";
+import { $isMarkerNode } from "../../nodes/scripture/usj/MarkerNode";
+import { MarkerType, Marker } from "./usfmTypes";
+import { TEMP_INLINE_CURSOR_PLACEHOLDER } from "../../constants/helperCharacters";
+import { $isUsfmParagraphNode } from "../../nodes/UsfmParagraphNode";
 
-const EM_SPACE = "\u0095";
-
-export const markersData: {
+export const markerActions: {
   [marker: string]: {
-    type: StyleType;
-    builder?: (currentEditor: {
+    label?: string;
+    action?: (currentEditor: {
       reference: { chapter: number; verse: number };
       editor: LexicalEditor;
     }) => SerializedLexicalNode | string;
   };
 } = {
-  p: {
-    type: StyleType.Paragraph,
+  no: {
+    label: "format_clear",
+  },
+  it: {
+    label: "format_italic",
+  },
+  bd: {
+    label: "format_bold",
+  },
+  sc: {
+    label: "uppercase",
+  },
+  sup: {
+    label: "superscript",
+  },
+  v: {
+    action: (currentEditor) => {
+      const { verse } = currentEditor.reference;
+      return String.raw`\v ${verse + 1} `;
+    },
+  },
+  c: {
+    action: (currentEditor) => {
+      const { chapter } = currentEditor.reference;
+      return String.raw`\c ${chapter + 1} `;
+    },
   },
   f: {
-    type: StyleType.Character,
-    builder: (currentEditor) => {
+    action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${EM_SPACE} \f*`;
+      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${TEMP_INLINE_CURSOR_PLACEHOLDER} \f*`;
     },
   },
   x: {
-    type: StyleType.Character,
-    builder: (currentEditor) => {
+    action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${EM_SPACE} \x*`;
+      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${TEMP_INLINE_CURSOR_PLACEHOLDER} \x*`;
     },
   },
 };
 
-export function getMarkerData(marker: string) {
-  const markerData = markersData[marker];
-  const builder = (currentEditor: {
+export function getMarkerAction(marker: string, markerData?: Marker) {
+  const markerAction = markerActions[marker];
+  const action = (currentEditor: {
     editor: LexicalEditor;
     reference: { chapter: number; verse: number };
   }) => {
     currentEditor.editor.update(() => {
-      const node = markerData?.builder?.(currentEditor);
+      const node = markerAction?.action?.(currentEditor);
       const selection = $getSelection();
       const usfmSerializedNode =
         typeof node === "object"
           ? node
           : createLexicalNodeFromUsfm(
-              node || `\\${marker} ${EM_SPACE}`,
+              node ||
+                `\\${marker} ${TEMP_INLINE_CURSOR_PLACEHOLDER}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
               !markerData ||
-                markerData.type === StyleType.Character ||
-                markerData.type === StyleType.Note
+                markerData.type === MarkerType.Character ||
+                markerData.type === MarkerType.Note
                 ? "inline"
                 : "block",
             );
       const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
       console.log({ usfmNode });
-      if ($isRangeSelection(selection) && selection.getTextContent().length > 0)
-        $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
-      else selection?.insertNodes([usfmNode]);
+
+      // Check if the selection is a range selection
+      if ($isRangeSelection(selection)) {
+        // If the selection has text content, wrap the text selection in an inline node
+        if (selection.getTextContent().length > 0) {
+          $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
+        } else {
+          if ($isUsfmParagraphNode(usfmNode)) {
+            // If the selection is empty, insert a new paragraph and replace it with the USFM node
+            const paragraph = selection.insertParagraph();
+
+            if (paragraph) {
+              // Transfer the content of the paragraph to the USFM node
+              const paragraphContent = paragraph.getChildren();
+              usfmNode.append(...paragraphContent);
+              paragraph.replace(usfmNode);
+              usfmNode.selectStart();
+            }
+          } else {
+            console.log("INSERTING NODE", usfmNode);
+            selection?.insertNodes([usfmNode]);
+          }
+        }
+      } else {
+        // If the selection is not a range selection, insert the USFM node directly
+        selection?.insertNodes([usfmNode]);
+      }
     });
   };
-  return { builder, type: markerData?.type ?? StyleType.Character };
+  return { action, label: markerAction?.label };
 }
 
 //TODO: handle edge cases for unwrapable usfm elements

@@ -1,4 +1,9 @@
 {
+  "pluginsConfig": {
+    "@nx/js": {
+      "analyzeSourceFiles": true
+    }
+  },
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx-cloud",
@@ -15,12 +20,21 @@
       "inputs": ["production", "^production"],
       "dependsOn": ["^build"]
     },
-    "dev": { "dependsOn": ["^build"] },
-    "devpub": { "dependsOn": ["build", "^build"] },
+    "dev": {
+      "dependsOn": ["^build"]
+    },
+    "devpub": {
+      "dependsOn": ["build", "^build"]
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [{ "command": "tsc -p tsconfig.json", "forwardAllArgs": false }],
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json",
+            "forwardAllArgs": false
+          }
+        ],
         "cwd": "{projectRoot}"
       }
     },
@@ -33,7 +47,12 @@
         "passWithNoTests": true,
         "silent": true
       },
-      "configurations": { "ci": { "ci": true, "codeCoverage": true } }
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -44,9 +63,16 @@
         "{workspaceRoot}/eslint.config.js"
       ],
       "outputs": ["{options.outputFile}"],
-      "options": { "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"] }
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
+      }
     },
     "@nx/vite:build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/js:tsc": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
@@ -95,6 +121,5 @@
       }
     }
   ],
-  "pluginsConfig": { "@nx/js": { "analyzeSourceFiles": true } },
   "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU="
 }

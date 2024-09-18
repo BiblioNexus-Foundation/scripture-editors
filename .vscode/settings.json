@@ -3,7 +3,7 @@
   "editor.formatOnSave": true,
   "editor.rulers": [100],
   "editor.wordWrapColumn": 100,
-  "eslint.validate": ["javascript", "javascriptreact", "html", "typescriptreact"],
+  "eslint.validate": ["javascript", "javascriptreact", "html", "typescriptreact", "json"],
   "files.associations": {
     ".eslintignore": "ignore",
     ".prettierignore": "ignore"

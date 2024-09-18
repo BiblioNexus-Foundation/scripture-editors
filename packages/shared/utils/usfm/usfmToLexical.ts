@@ -1,6 +1,6 @@
 import { FlatDocument } from "../../plugins/PerfOperations/Types/Document";
-import { usfm2perf } from "../perf/usfmToPerf";
-import { transformPerfNodeToSerializedLexicalNode } from "../perf/perfToLexical";
+import { usfm2perf } from "../../converters/perf/usfmToPerf";
+import { transformPerfNodeToSerializedLexicalNode } from "../../converters/perf/perfToLexical";
 import Sequence from "../../plugins/PerfOperations/Types/Sequence";
 import { PerfKind } from "../../plugins/PerfOperations/types";
 import { SerializedElementNode } from "lexical";
@@ -9,9 +9,10 @@ import { SerializedElementNode } from "lexical";
 export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block") => {
   const usfmDocument = String.raw`
   \mt title
-  \p
+  \p \c 1 placeholder
   ${usfm}
   `;
+  console.log({ usfmDocument });
 
   const perf = usfm2perf(usfmDocument, {
     serverName: "local",
@@ -19,6 +20,8 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
     languageCode: "any",
     versionId: "any",
   }) as FlatDocument;
+
+  console.log({ perf });
 
   const lexicalSerializedRoot = transformPerfNodeToSerializedLexicalNode({
     source: {
@@ -30,8 +33,8 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
 
   const lexicalSerializedNode =
     kind === "inline"
-      ? lexicalSerializedRoot.children[1].children[0]
-      : lexicalSerializedRoot.children[1];
+      ? lexicalSerializedRoot.children[1].children[2]
+      : lexicalSerializedRoot.children[2];
 
   return lexicalSerializedNode;
 };

@@ -10,9 +10,9 @@ import {
   LexicalEditor,
   TextNode,
 } from "lexical";
+import { TEMP_INLINE_CURSOR_PLACEHOLDER } from "../../constants/helperCharacters";
 
 const TEXT_TYPE = "text";
-const ZERO_WIDTH_SPACE = "\u200B";
 
 export function registerCursorHandlers(editor: LexicalEditor) {
   function $getSelectionData(selection: BaseSelection) {
@@ -24,7 +24,8 @@ export function registerCursorHandlers(editor: LexicalEditor) {
 
     if (endNode) {
       endNodeKey = endNode.getKey();
-      isZeroWidthSpace = $isTextNode(endNode) && endNode.getTextContent() === ZERO_WIDTH_SPACE;
+      isZeroWidthSpace =
+        $isTextNode(endNode) && endNode.getTextContent() === TEMP_INLINE_CURSOR_PLACEHOLDER;
     }
 
     return {
@@ -37,9 +38,9 @@ export function registerCursorHandlers(editor: LexicalEditor) {
   //remove zeroWidthSpace if text node is edited
   editor.registerNodeTransform(TextNode, (node) => {
     const textContent = node.getTextContent();
-    if (textContent.includes(ZERO_WIDTH_SPACE)) {
+    if (textContent.includes(TEMP_INLINE_CURSOR_PLACEHOLDER)) {
       console.log("REMOVE ZERO WIDTH SPACE BECAUSE TEXT NODE TRANSFORMED");
-      node.setTextContent(textContent.replace(ZERO_WIDTH_SPACE, ""));
+      node.setTextContent(textContent.replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""));
     }
   });
 
@@ -58,7 +59,9 @@ export function registerCursorHandlers(editor: LexicalEditor) {
           console.log("REMOVING ZERO WIDTH SPACE BECAUSE EDITOR BLURRED");
           editor.update(() => {
             (currSelectionData.endNode as TextNode).setTextContent(
-              currSelectionData.endNode.getTextContent().replace(ZERO_WIDTH_SPACE, ""),
+              currSelectionData.endNode
+                .getTextContent()
+                .replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""),
             );
           });
         }
@@ -85,7 +88,7 @@ export function registerCursorHandlers(editor: LexicalEditor) {
         console.log("REMOVING ZERO WIDTH SPACE BECAUSE SELECTION CHANGED");
         editor.update(() => {
           (prevSelectionData.endNode as TextNode).setTextContent(
-            prevSelectionData.endNode.getTextContent().replace(ZERO_WIDTH_SPACE, ""),
+            prevSelectionData.endNode.getTextContent().replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""),
           );
         });
       }
@@ -114,12 +117,12 @@ export function registerCursorHandlers(editor: LexicalEditor) {
     const textContent = textNode.getTextContent();
 
     //remove zero width space from content
-    if (textContent === ZERO_WIDTH_SPACE) {
+    if (textContent === TEMP_INLINE_CURSOR_PLACEHOLDER) {
       console.log(
         "REMOVING ZERO WIDTH SPACE BECAUSE TEXT NODE IS ZERO WIDTH SPACE AFTER ARROW LEFT",
       );
       editor.update(() => {
-        textNode.setTextContent(textContent.replace(ZERO_WIDTH_SPACE, ""));
+        textNode.setTextContent(textContent.replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""));
       });
     }
   };
@@ -132,7 +135,10 @@ export function registerCursorHandlers(editor: LexicalEditor) {
     return node;
   };
 
-  const insertTextNode = (insertFunction: (t: TextNode) => void, text = ZERO_WIDTH_SPACE) => {
+  const insertTextNode = (
+    insertFunction: (t: TextNode) => void,
+    text = TEMP_INLINE_CURSOR_PLACEHOLDER,
+  ) => {
     editor.update(
       () => {
         const textNode = $createTextNode(text);

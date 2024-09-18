@@ -1,6 +1,11 @@
 // This file contains utility functions and type definitions for getting usfm markers data.
 // It includes functions to parse marker strings, convert marker styles to CSS styles, and type definitions for various marker properties.
 
+import categoriesMap from "./categoriesMap.json";
+
+// Replace the existing type assertion with this:
+const typedCategoriesMap = categoriesMap as Record<string, CategoryType>;
+
 export enum TextType {
   ChapterNumber = "ChapterNumber",
   VerseNumber = "VerseNumber",
@@ -41,7 +46,7 @@ export enum TextProperty {
   Level_4 = "level_4",
 }
 
-enum CategoryType {
+export enum CategoryType {
   FileIdentification = "FileIdentification",
   Headers = "Headers",
   Remarks = "Remarks",
@@ -62,9 +67,10 @@ enum CategoryType {
   SpecialFeatures = "SpecialFeatures",
   PeripheralReferences = "PeripheralReferences",
   PeripheralMaterials = "PeripheralMaterials",
+  Uncategorized = "Uncategorized",
 }
 
-type MarkersDictionary = {
+export type MarkersDictionary = {
   [marker: string]: {
     marker: string;
     name: string;
@@ -109,7 +115,6 @@ export const createMarkersDictionaryFromUsfmSty = (markersString: string): Marke
   const lines = markersString.split("\n");
   let currentMarker: string | null = null;
   let currentMarkerData: Partial<MarkersDictionary[string]> = {};
-  let currentCategory: string | null = null;
 
   /**
    * Parses text properties from a string.
@@ -122,14 +127,13 @@ export const createMarkersDictionaryFromUsfmSty = (markersString: string): Marke
 
   for (const _line of lines) {
     const line = _line.trim();
-    if (line.startsWith("# ")) {
-      currentCategory = line.slice(2).trim();
-    } else if (line.startsWith("\\Marker ")) {
+    if (line.startsWith("\\Marker ")) {
       if (currentMarker) {
         markers[currentMarker] = currentMarkerData as MarkersDictionary[string];
       }
       currentMarker = line.split(" ")[1];
-      currentMarkerData = { marker: currentMarker, category: currentCategory as CategoryType };
+      const category = typedCategoriesMap[currentMarker] || CategoryType.Uncategorized;
+      currentMarkerData = { marker: currentMarker, category };
     } else if (line.startsWith("\\")) {
       const [key, ...valueParts] = line.slice(1).split(" ");
       const value = valueParts.join(" ");

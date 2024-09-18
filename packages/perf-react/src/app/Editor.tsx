@@ -2,13 +2,12 @@ import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalCompos
 import scriptureNodes from "shared/nodes";
 import { useBibleBook } from "./useLexicalState";
 import { HistoryPlugin } from "shared-react/plugins/History/HistoryPlugin";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { getPerfHistoryUpdater } from "shared/plugins/PerfOperations/updatePerfHistory";
 import { HistoryMergeListener, createEmptyHistoryState } from "shared/plugins/History";
 import { PerfHandlersPlugin } from "shared-react/plugins/PerfHandlers/PerfHandlersPlugin";
 import { BookStore, getLexicalState } from "shared/contentManager";
 import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Types/Document";
-import editorMarkersMap from "shared/data/editorMarkersMap";
 
 import Button from "./Components/Button";
 
@@ -18,11 +17,12 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnSelectionChange";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { FloatingMenuPlugin } from "./Components/FloatingMenuPlugin";
-import { getMarkerData } from "shared/data/markersData";
+import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
 import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "./Components/ScriptureReferencePlugin";
+import TypeaheadPlugin from "./Components/Typeahead/TypeaheadPlugin";
+import getMarker from "shared/utils/usfm/getMarker";
 
 const theme = {
   // Theme styling goes here
@@ -62,6 +62,15 @@ export default function Editor({
     verse: 1,
   });
   const editorRef = useRef<HTMLDivElement>(null);
+  const [contextMenuKey, setContextMenuKey] = useState<string>("\\");
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    setContextMenuKey(event.key);
+  };
+
+  const handleButtonClick = () => {
+    document.addEventListener("keydown", handleKeyPress, { once: true });
+  };
 
   useEffect(() => {
     (async () => {
@@ -96,37 +105,49 @@ export default function Editor({
     element && element.classList.toggle(className);
 
   const floatingMenuItems = useMemo(() => {
-    return selectedMarker && scriptureReference
-      ? editorMarkersMap[selectedMarker]?.CharacterStyling?.map((marker) => {
-          const { builder } = getMarkerData(marker);
-          return {
-            label: marker,
-            action: (editor: LexicalEditor) => builder({ editor, reference: scriptureReference }),
-          };
-        })
-      : null;
+    if (!selectedMarker || !scriptureReference) return undefined;
+    const marker = getMarker(selectedMarker);
+    if (!marker?.children) return undefined;
+
+    return Object.entries(marker.children).flatMap(([_, markers]) =>
+      markers.map((marker) => {
+        const markerData = getMarker(marker);
+        const { action } = getMarkerAction(marker, markerData);
+        return {
+          name: marker,
+          label: marker,
+          description: markerData?.description ?? "",
+          action: (editor: LexicalEditor) => action({ editor, reference: scriptureReference }),
+        };
+      }),
+    );
   }, [selectedMarker, scriptureReference]);
 
   const toolbarMarkerSections = useMemo(() => {
-    return selectedMarker && scriptureReference
-      ? Object.entries(editorMarkersMap[selectedMarker] ?? {}).reduce(
-          (items, [category, data]) => {
-            if (
-              ["SpecialText", "CharacterStyling", "Footnotes", "CrossReferences"].includes(category)
-            )
-              items[category] = data.map((marker) => {
-                const { builder } = getMarkerData(marker);
-                return {
-                  label: marker,
-                  action: (editor: LexicalEditor) =>
-                    builder({ editor, reference: scriptureReference }),
-                };
-              });
-            return items;
-          },
-          {} as { [key: string]: { label: string; action: (editor: LexicalEditor) => void }[] },
-        )
-      : null;
+    if (!selectedMarker || !scriptureReference) return null;
+    const marker = getMarker(selectedMarker);
+    if (!marker?.children) return null;
+
+    return Object.entries(marker.children).reduce<{
+      [key: string]: {
+        label: string | ReactElement;
+        action: (editor: LexicalEditor) => void;
+        description: string;
+      }[];
+    }>((items, [category, markers]) => {
+      if (["CharacterStyling"].includes(category)) {
+        items[category] = markers.map((marker) => {
+          const markerData = getMarker(marker);
+          const { action } = getMarkerAction(marker, markerData);
+          return {
+            label: marker,
+            description: markerData?.description ?? "",
+            action: (editor: LexicalEditor) => action({ editor, reference: scriptureReference }),
+          };
+        });
+      }
+      return items;
+    }, {});
   }, [selectedMarker, scriptureReference]);
 
   return !lexicalState || !perfDocument ? null : (
@@ -153,6 +174,9 @@ export default function Editor({
           <hr />
         </div>
         <div className={"toolbar-section"}>
+          <button onClick={handleButtonClick}>
+            <i>keyboard_command_key</i>: {contextMenuKey}
+          </button>
           <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
           <span className="info">
             {bookCode}{" "}
@@ -173,6 +197,7 @@ export default function Editor({
                     className={`${sectionName}`}
                     onClick={(_, editor) => item.action(editor)}
                     data-marker={item.label}
+                    title={item.description}
                   >
                     {item.label}
                   </Button>
@@ -206,7 +231,7 @@ export default function Editor({
           setScriptureReference(reference);
         }}
       />
-      {floatingMenuItems ? <FloatingMenuPlugin items={floatingMenuItems} /> : null}
+      <TypeaheadPlugin trigger={contextMenuKey} items={floatingMenuItems} />
       <div className={"editor-oce"}>
         <ContentEditablePlugin ref={editorRef} />
         <PerfHandlersPlugin />

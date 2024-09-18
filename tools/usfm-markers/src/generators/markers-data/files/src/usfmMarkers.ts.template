@@ -1,0 +1,5 @@
+import { CategoryType, MarkerType, Marker } from './usfmTypes';
+
+export const usfmMarkers: Record<string, Marker> = {
+<%- simplifiedDictionaryString %>
+};
