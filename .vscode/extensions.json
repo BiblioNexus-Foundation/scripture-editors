@@ -4,7 +4,6 @@
     "editorconfig.editorconfig",
     "esbenp.prettier-vscode",
     "firsttris.vscode-jest-runner",
-    "nrwl.angular-console",
-    "digitalbrainstem.javascript-ejs-support"
+    "nrwl.angular-console"
   ]
 }
