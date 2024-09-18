@@ -6,7 +6,6 @@ export function executeSelectedItem(
   editor: LexicalEditor,
   selectedItem: AutoCompleteItem,
   typeaheadMatch: SuggestionsTextMatch,
-  onItemSelect: () => void,
 ) {
   editor.update(() => {
     const selection = $getSelection();
@@ -21,5 +20,4 @@ export function executeSelectedItem(
     }
     selectedItem.action(editor);
   });
-  onItemSelect();
 }

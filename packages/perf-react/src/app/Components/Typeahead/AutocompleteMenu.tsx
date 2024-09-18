@@ -16,16 +16,12 @@ export default function AutocompleteMenu({
   phrase,
   items,
   filter,
-  onItemSelect,
   typeaheadMatch,
-  // children: _children,
 }: {
   phrase?: string;
   items: AutoCompleteItem[];
   filter: (item: AutoCompleteItem, phrase: string) => boolean;
-  onItemSelect: () => void;
   typeaheadMatch: SuggestionsTextMatch | null;
-  // children?: ReactNode | ((props: { filteredItems: Item[]; selectedIndex: number }) => ReactNode);
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [editor] = useLexicalComposerContext();
@@ -40,7 +36,7 @@ export default function AutocompleteMenu({
 
     const handleExecuteSelectedItem = () => {
       if (filteredItems[selectedIndex] && typeaheadMatch) {
-        executeSelectedItem(editor, filteredItems[selectedIndex], typeaheadMatch, onItemSelect);
+        executeSelectedItem(editor, filteredItems[selectedIndex], typeaheadMatch);
         return true;
       }
       return false;
@@ -92,15 +88,7 @@ export default function AutocompleteMenu({
     );
 
     return unregisterNavigation;
-  }, [
-    editor,
-    isMenuOpen,
-    filteredItems,
-    selectedIndex,
-    setSelectedIndex,
-    onItemSelect,
-    typeaheadMatch,
-  ]);
+  }, [editor, isMenuOpen, filteredItems, selectedIndex, setSelectedIndex, typeaheadMatch]);
 
   useEffect(() => {
     if (menuRef.current) {
@@ -130,7 +118,7 @@ export default function AutocompleteMenu({
           key={`${item.name}-ac`}
           className={selectedIndex === index ? "active" : undefined}
           onClick={() => {
-            item.action(editor);
+            typeaheadMatch && executeSelectedItem(editor, item, typeaheadMatch);
           }}
           title={item.description}
         >
