@@ -12,7 +12,6 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
   \p \c 1 placeholder
   ${usfm}
   `;
-  console.log({ usfmDocument });
 
   const perf = usfm2perf(usfmDocument, {
     serverName: "local",
@@ -20,8 +19,6 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
     languageCode: "any",
     versionId: "any",
   }) as FlatDocument;
-
-  console.log({ perf });
 
   const lexicalSerializedRoot = transformPerfNodeToSerializedLexicalNode({
     source: {

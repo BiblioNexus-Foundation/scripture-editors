@@ -1,3 +1,16 @@
+/**
+ * This file contains code adapted from the Lexical project:
+ * https://github.com/facebook/lexical/blob/510720e727a6bdd86a10ebc2da03fa916746bbd4/packages/lexical-react/src/LexicalTypeaheadMenuPlugin.tsx
+ *
+ * Lexical is licensed under the MIT License.
+ *
+ * Changes made to the original code:
+ * - Removed React-specific code and dependencies
+ * - Adapted the typeahead functionality for use in a non-React environment
+ * - Modified the trigger function to accept a custom trigger string
+ * - Added additional utility functions for text manipulation
+ */
+
 import { $getSelection, $isTextNode, LexicalEditor, RangeSelection, TextNode } from "lexical";
 
 import { $isRangeSelection } from "lexical";

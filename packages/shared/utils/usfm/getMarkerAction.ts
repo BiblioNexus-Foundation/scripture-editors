@@ -88,7 +88,6 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
                 : "block",
             );
       const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
-      console.log({ usfmNode });
 
       // Check if the selection is a range selection
       if ($isRangeSelection(selection)) {
@@ -108,7 +107,6 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
               usfmNode.selectStart();
             }
           } else {
-            console.log("INSERTING NODE", usfmNode);
             selection?.insertNodes([usfmNode]);
           }
         }
@@ -204,7 +202,6 @@ export function $wrapTextSelectionInInlineNode(
       }
 
       // Add the target node to be wrapped in the latest created mark node
-      console.log({ lastCreatedNode });
       (lastCreatedNode as ElementNode).clear();
       (lastCreatedNode as ElementNode).append(targetNode);
     } else {

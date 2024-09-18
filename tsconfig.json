@@ -20,12 +20,8 @@
     "baseUrl": "./packages/",
     "paths": {
       "@biblionexus-foundation/scripture-utilities": ["./utilities/src"],
-      "usfm-markers": ["tools/usfm-markers/src/index.ts"]
+      "usfm-markers": ["tools/usfm-markers/src"]
     }
   },
-  "include": [
-    "packages",
-    "tools/usfm-markers/src/generators/markers-data/files/src/simplifyMarkersDictionary.ts",
-    "tools/usfm-markers/src/generators/markers-data/utils/generateMarkersDictionary.ts"
-  ]
+  "include": ["packages", "tools"]
 }

@@ -6,6 +6,9 @@
     "prepare": "husky install"
   },
   "private": true,
+  "dependencies": {
+    "@nx/devkit": "18.3.4"
+  },
   "devDependencies": {
     "@nx/eslint-plugin": "18.3.4",
     "@nx/jest": "18.3.4",
@@ -55,8 +58,5 @@
   "volta": {
     "node": "20.12.2",
     "pnpm": "9.9.0"
-  },
-  "dependencies": {
-    "@nx/devkit": "18.3.4"
   }
 }

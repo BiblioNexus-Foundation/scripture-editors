@@ -3,10 +3,6 @@
   "compilerOptions": {
     "moduleResolution": "Node"
   },
-  "include": [
-    ".",
-    "../../tools/usfm-markers/src/generators/markers-data/files/src/simplifyMarkersDictionary.ts",
-    "../../tools/usfm-markers/src/generators/markers-data/utils/generateMarkersDictionary.ts"
-  ],
+  "include": ["."],
   "exclude": ["node_modules", "jest.config.ts"]
 }

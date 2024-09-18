@@ -4,7 +4,7 @@ import "shared/styles/perf-app.css";
 function App() {
   return (
     <div className="editors">
-      <div className="target-editor">
+      <div className="editor">
         <Editor
           {...{
             serverName: "dbl",
