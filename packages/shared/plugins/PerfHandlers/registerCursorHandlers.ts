@@ -1,213 +1,217 @@
 import {
   $createTextNode,
+  $getPreviousSelection,
   $getSelection,
+  $isElementNode,
+  $isRangeSelection,
   $isTextNode,
-  BLUR_COMMAND,
   BaseSelection,
-  ElementNode,
-  KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   LexicalEditor,
   TextNode,
 } from "lexical";
-import { TEMP_INLINE_CURSOR_PLACEHOLDER } from "../../constants/helperCharacters";
+import { CURSOR_POSITION_HELPER_CHAR } from "../../constants/helperCharacters";
 
-const TEXT_TYPE = "text";
+enum CursorPosition {
+  Middle = 0,
+  Start = 1,
+  End = 2,
+}
 
 export function registerCursorHandlers(editor: LexicalEditor) {
-  function $getSelectionData(selection: BaseSelection) {
-    const nodes = selection?.getNodes() ?? [];
-    const endNode = nodes[nodes.length - 1] ?? null;
-
-    let endNodeKey = null;
-    let isZeroWidthSpace = false;
-
-    if (endNode) {
-      endNodeKey = endNode.getKey();
-      isZeroWidthSpace =
-        $isTextNode(endNode) && endNode.getTextContent() === TEMP_INLINE_CURSOR_PLACEHOLDER;
-    }
-
-    return {
-      endNode,
-      endNodeKey,
-      isZeroWidthSpace,
-    };
-  }
-
-  //remove zeroWidthSpace if text node is edited
   editor.registerNodeTransform(TextNode, (node) => {
     const textContent = node.getTextContent();
-    if (textContent.includes(TEMP_INLINE_CURSOR_PLACEHOLDER)) {
+    const previousSelectionData = $getSelectionData($getPreviousSelection());
+    if (!previousSelectionData) return;
+
+    handleHelperCharEdgeCases(textContent, previousSelectionData.position, (helperPosition) => {
       console.log("REMOVE ZERO WIDTH SPACE BECAUSE TEXT NODE TRANSFORMED");
-      node.setTextContent(textContent.replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""));
-    }
+      const { selection } = $getSelectionData($getSelection()) ?? {};
+      const anchorOffset = selection?.anchor.offset;
+      const focusOffset = selection?.focus.offset;
+      node.setTextContent(textContent.replace(CURSOR_POSITION_HELPER_CHAR, ""));
+      if (focusOffset && anchorOffset && helperPosition < focusOffset) {
+        node.select(anchorOffset - 1, focusOffset - 1);
+      }
+    });
   });
 
-  // //remove zeroWidthSpace if editor is blurred
-  editor.registerCommand(
-    BLUR_COMMAND,
-    () => {
-      console.log("blurring graft");
-      const editorSate = editor.getEditorState();
-      editorSate.read(() => {
-        const selection = $getSelection();
-        if (!selection) return false;
-        const currSelectionData = $getSelectionData(selection);
-        if (currSelectionData.isZeroWidthSpace) {
-          if (!$isTextNode(currSelectionData.endNode)) return false;
-          console.log("REMOVING ZERO WIDTH SPACE BECAUSE EDITOR BLURRED");
-          editor.update(() => {
-            (currSelectionData.endNode as TextNode).setTextContent(
-              currSelectionData.endNode
-                .getTextContent()
-                .replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""),
-            );
-          });
-        }
-      });
-
-      return false;
-    },
-    0,
-  );
-
-  //remove zero width space if selection changed
   editor.registerUpdateListener(({ editorState, prevEditorState, dirtyLeaves, dirtyElements }) => {
-    //if selection changed and previous selected node was a text node, check if it has zero width space
-    if (dirtyLeaves.size !== 0 || dirtyElements.size !== 0) return;
+    const previousSelectionData = prevEditorState.read(() => $getSelectionData($getSelection()));
+    if (!previousSelectionData) return;
     editorState.read(() => {
-      const selection = prevEditorState._selection;
-      const currSelection = editorState._selection;
-      if (!selection || !currSelection) return;
-      const prevSelectionData = $getSelectionData(selection);
-      const currSelectionData = $getSelectionData(currSelection);
-      if (prevSelectionData.endNodeKey === currSelectionData.endNodeKey) return;
-      if (prevSelectionData.isZeroWidthSpace) {
-        if (!$isTextNode(prevSelectionData.endNode)) return;
-        console.log("REMOVING ZERO WIDTH SPACE BECAUSE SELECTION CHANGED");
-        editor.update(() => {
-          (prevSelectionData.endNode as TextNode).setTextContent(
-            prevSelectionData.endNode.getTextContent().replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""),
+      if (dirtyLeaves.size === 0 && dirtyElements.size === 0) {
+        const selection = $getSelection();
+        const selectionData = $getSelectionData(selection);
+        if (!selectionData) return;
+
+        const node = selectionData.currentNode;
+        const textContent = node.getTextContent();
+        const prevContent = previousSelectionData.currentNode.getTextContent();
+
+        if (prevContent.indexOf(CURSOR_POSITION_HELPER_CHAR) !== -1) {
+          //TODO: Study cases. Probably just need to update the selection to remove the Cursor Helper.
+          editor.update(
+            () => {
+              previousSelectionData.currentNode.setTextContent(
+                prevContent.replace(CURSOR_POSITION_HELPER_CHAR, ""),
+              );
+            },
+            { tag: "history-merge" },
+          );
+        }
+
+        handleHelperCharEdgeCases(textContent, previousSelectionData.position, () => {
+          editor.update(
+            () => {
+              const anchorOffset = previousSelectionData.selection?.anchor.offset;
+              const focusOffset = previousSelectionData.selection.focus.offset;
+              node.setTextContent(textContent.replace(CURSOR_POSITION_HELPER_CHAR, ""));
+              node.select(anchorOffset, focusOffset);
+            },
+            { tag: "history-merge" },
           );
         });
       }
     });
   });
 
-  const getSelectionAndNode = () => {
-    const selection = $getSelection();
-    if (!selection?.isCollapsed()) {
-      console.log("NOT COLLAPSED");
-      return null;
-    }
+  editor.registerCommand(
+    KEY_ARROW_RIGHT_COMMAND,
+    () => {
+      const selection = $getSelection();
+      const selectionData = $getSelectionData(selection);
+      if (!selectionData) {
+        console.log("NO SELECTION DATA");
+        return false;
+      }
 
-    const nodes = selection?.getNodes();
-    const currentNode = nodes?.[nodes.length - 1];
+      const { currentNode, position } = selectionData;
 
-    if (!$isTextNode(currentNode)) {
-      console.log("NOT TEXT NODE");
-      return null;
-    }
+      if (position !== CursorPosition.End) {
+        console.log("CURSOR NOT AT END");
+        return false;
+      }
 
-    return { selection, currentNode };
-  };
+      const nextSibling = currentNode.getNextSibling();
+      if ($isElementNode(nextSibling)) {
+        if (nextSibling.isInline()) {
+          //EDGE CASE 1: NEXT SIBLING IS AN INLINE ELEMENT
+          const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
+          editor.update(
+            () =>
+              nextSibling.isEmpty()
+                ? nextSibling.append(cursorPositionHelperNode)
+                : nextSibling.getFirstChild()?.insertBefore(cursorPositionHelperNode),
+            { tag: "history-merge" },
+          );
 
-  const removeZeroWidthSpace = (textNode: TextNode) => {
-    const textContent = textNode.getTextContent();
+          return true;
+        } else {
+          //EDGE CASE 2: NEXT SIBLING IS A BLOCK ELEMENT
+          console.log("SIBLING IS BLOCK", nextSibling);
+          return false;
+        }
+      }
 
-    //remove zero width space from content
-    if (textContent === TEMP_INLINE_CURSOR_PLACEHOLDER) {
-      console.log(
-        "REMOVING ZERO WIDTH SPACE BECAUSE TEXT NODE IS ZERO WIDTH SPACE AFTER ARROW LEFT",
-      );
-      editor.update(() => {
-        textNode.setTextContent(textContent.replace(TEMP_INLINE_CURSOR_PLACEHOLDER, ""));
-      });
-    }
-  };
+      if (!nextSibling) {
+        //EDGE CASE 3: THERE ARE NO NEXT SIBLINGS
+        console.log("NO NEXT SIBLING", currentNode);
+        const parent = currentNode.getParent();
+        if ($isElementNode(parent)) {
+          if (parent.isInline()) {
+            console.log("PARENT IS INLINE", parent);
+            if (parent?.canInsertTextAfter()) {
+              const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
+              editor.update(
+                () => {
+                  parent.insertAfter(cursorPositionHelperNode);
+                },
+                { tag: "history-merge" },
+              );
+              return true;
+            }
+            //TODO: STUDY WHICH USFM NODES SHOULD NOT ACCEPT TEXT CHILDREN AND SET THEM UP IN THAT WAY E.G. Footnote wrapper "\f"
+            console.log("CANNOT INSERT AFTER");
+            return false;
+          }
+        }
+        console.log("NO PARENT");
 
-  const getValidParent = (node: ElementNode): ElementNode | null => {
-    const parent = node?.getParent();
-    if (parent && ["root", "graft"].includes(parent.getType())) {
-      return getValidParent(parent);
-    }
-    return node;
-  };
+        return false;
+      }
 
-  const insertTextNode = (
-    insertFunction: (t: TextNode) => void,
-    text = TEMP_INLINE_CURSOR_PLACEHOLDER,
-  ) => {
-    editor.update(
-      () => {
-        const textNode = $createTextNode(text);
-        insertFunction(textNode);
-      },
-      { skipTransforms: true },
-    );
+      console.log("SOMETHING ELSE");
+
+      //EDGE CASE 2: NEXT SIBLING IS AN ELEMENT
+
+      //EDGE CASE 3: NEXT SIBLING IS A TEXT NODE
+
+      //EDGE CASE 4: NEXT SIBLING IS A ZERO WIDTH SPACE
+      return false;
+    },
+    0,
+  );
+}
+
+function handleHelperCharEdgeCases(
+  textContent: string,
+  previousPosition: CursorPosition,
+  onHelperCharFound: (helperPosition: number) => void,
+): boolean {
+  const helperOffset = textContent.indexOf(CURSOR_POSITION_HELPER_CHAR);
+
+  // EDGE CASE 0: Transform occurred after a cursor movement forward
+  if (
+    previousPosition === CursorPosition.End &&
+    textContent.at(0) === CURSOR_POSITION_HELPER_CHAR
+  ) {
     return true;
-  };
+  }
 
-  const $insertTextBefore = () => {
-    const result = getSelectionAndNode();
-    if (!result) return false;
+  // EDGE CASE 1: Transform occurred after a cursor movement backward
+  if (
+    previousPosition === CursorPosition.Start &&
+    textContent.at(-1) === CURSOR_POSITION_HELPER_CHAR
+  ) {
+    return true;
+  }
 
-    const { selection, currentNode } = result;
+  // EDGE CASE 2: Text node is a CURSOR_POSITION_HELPER_CHAR
+  if (textContent === CURSOR_POSITION_HELPER_CHAR) {
+    return true;
+  }
 
-    removeZeroWidthSpace(currentNode);
+  // EDGE CASE 3: Text node contains a CURSOR_POSITION_HELPER_CHAR
+  if (helperOffset !== -1) {
+    onHelperCharFound(helperOffset);
+    return true;
+  }
 
-    const offset = 0;
-    if (selection.getStartEndPoints()?.[1].offset !== offset) {
-      console.log("OFFSET", selection.getStartEndPoints()?.[1].offset, offset);
-      return false;
-    }
+  return false;
+}
+function $getSelectionData(selection: BaseSelection | null) {
+  if (!selection?.isCollapsed() || !$isRangeSelection(selection)) {
+    return null;
+  }
 
-    const refNode = currentNode.getParent();
-    const parent = refNode ? getValidParent(refNode) : null;
-    if (!parent) {
-      console.log("NO PARENT", parent);
-      return false;
-    }
+  const currentNode = (selection.isBackward() ? selection.focus : selection.anchor).getNode();
 
-    const parentSibling = parent.getPreviousSibling();
-    if (!parentSibling || parentSibling.getType() !== TEXT_TYPE) {
-      return insertTextNode((zeroWidthSpace: TextNode) => parent.insertBefore(zeroWidthSpace));
-    }
+  if (!$isTextNode(currentNode)) {
+    console.log("NOT TEXT NODE");
+    return null;
+  }
 
-    console.log("NO SIBLING", { parentSibling });
-    return false;
-  };
+  const textContentSize = currentNode.getTextContentSize();
 
-  const $insertTextAfter = () => {
-    const result = getSelectionAndNode();
-    if (!result) return false;
+  const offset = selection.anchor.offset;
+  let position: CursorPosition = CursorPosition.Middle;
+  if (offset === 1) {
+    position = CursorPosition.Start;
+  }
+  if (offset === textContentSize) {
+    position = CursorPosition.End;
+  }
 
-    const { selection, currentNode } = result;
-
-    removeZeroWidthSpace(currentNode);
-
-    const offset = currentNode.getTextContent().length;
-    if (selection.getStartEndPoints()?.[1].offset !== offset) {
-      return false;
-    }
-
-    const refNode = currentNode.getParent();
-    const parent = refNode ? getValidParent(refNode) : null;
-    if (!parent) {
-      console.log("NO PARENT", parent);
-      return false;
-    }
-
-    const parentSibling = parent.getNextSibling();
-    if (!parentSibling || parentSibling.getType() !== TEXT_TYPE) {
-      return insertTextNode((zeroWidthSpace: TextNode) => parent.insertAfter(zeroWidthSpace));
-    }
-
-    console.log("NO SIBLING", { parentSibling });
-    return false;
-  };
-
-  editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, () => $insertTextAfter(), 1);
-  editor.registerCommand(KEY_ARROW_LEFT_COMMAND, () => $insertTextBefore(), 1);
+  return { selection, currentNode, position };
 }

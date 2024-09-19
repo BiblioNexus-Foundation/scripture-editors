@@ -190,7 +190,7 @@ export default function Editor({
         {toolbarMarkerSections &&
           Object.entries(toolbarMarkerSections).map(([sectionName, items]) => {
             return (
-              <div className={"toolbar-section"}>
+              <div key={sectionName} className={"toolbar-section"}>
                 {items.map((item) => (
                   <Button
                     key={`${item.label}-toolbar`}
