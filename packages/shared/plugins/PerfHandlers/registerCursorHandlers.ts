@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger */
 import {
   $createTextNode,
   $getPreviousSelection,
@@ -6,8 +7,12 @@ import {
   $isRangeSelection,
   $isTextNode,
   BaseSelection,
+  BLUR_COMMAND,
+  ElementNode,
+  KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   LexicalEditor,
+  LexicalNode,
   TextNode,
 } from "lexical";
 import { CURSOR_POSITION_HELPER_CHAR } from "../../constants/helperCharacters";
@@ -19,190 +24,231 @@ enum CursorPosition {
 }
 
 export function registerCursorHandlers(editor: LexicalEditor) {
+  // //REMOVES CURSOR POSITION HELPER CHARS WHEN TEXT NODE TRANSFORMS
   editor.registerNodeTransform(TextNode, (node) => {
     const textContent = node.getTextContent();
     const previousSelectionData = $getSelectionData($getPreviousSelection());
     if (!previousSelectionData) return;
 
-    handleHelperCharEdgeCases(textContent, previousSelectionData.position, (helperPosition) => {
+    const helperOffset = textContent.indexOf(CURSOR_POSITION_HELPER_CHAR);
+    if (helperOffset === -1) return;
+
+    if (previousSelectionData.node.getKey() !== node.getKey()) return;
+
+    if (previousSelectionData.position === CursorPosition.Start) {
       console.log("REMOVE ZERO WIDTH SPACE BECAUSE TEXT NODE TRANSFORMED");
-      const { selection } = $getSelectionData($getSelection()) ?? {};
-      const anchorOffset = selection?.anchor.offset;
-      const focusOffset = selection?.focus.offset;
-      node.setTextContent(textContent.replace(CURSOR_POSITION_HELPER_CHAR, ""));
-      if (focusOffset && anchorOffset && helperPosition < focusOffset) {
+      const currentSelectionData = $getSelectionData($getSelection());
+      if (!currentSelectionData) return;
+
+      const { selection } = currentSelectionData;
+      const anchorOffset = selection.anchor.offset;
+      const focusOffset = selection.focus.offset;
+
+      node.setTextContent(textContent.replaceAll(CURSOR_POSITION_HELPER_CHAR, ""));
+      if (helperOffset < focusOffset) {
         node.select(anchorOffset - 1, focusOffset - 1);
       }
-    });
+    }
   });
 
-  editor.registerUpdateListener(({ editorState, prevEditorState, dirtyLeaves, dirtyElements }) => {
-    const previousSelectionData = prevEditorState.read(() => $getSelectionData($getSelection()));
-    if (!previousSelectionData) return;
-    editorState.read(() => {
-      if (dirtyLeaves.size === 0 && dirtyElements.size === 0) {
+  //REMOVES CURSOR POSITION HELPER CHARS WHEN SELECTION CHANGES
+  editor.registerUpdateListener(
+    ({ editorState, prevEditorState, dirtyLeaves, dirtyElements, tags }) => {
+      console.log("UPDATE LISTENER", { tags });
+
+      // if (editor) return;
+      const previousSelectionData = prevEditorState.read(() => $getSelectionData($getSelection()));
+      if (!previousSelectionData) return;
+      if (dirtyLeaves.size > 0 || dirtyElements.size > 0) {
+        console.log("SKIPPING CHAR REMOVAL");
+        return;
+      }
+
+      editorState.read(() => {
         const selection = $getSelection();
         const selectionData = $getSelectionData(selection);
         if (!selectionData) return;
 
-        const node = selectionData.currentNode;
-        const textContent = node.getTextContent();
-        const prevContent = previousSelectionData.currentNode.getTextContent();
+        // if (selection?.dirty || previousSelectionData.selection.dirty) return;
+        console.log("START CHAR REMOVAL", { dirtyLeaves, dirtyElements });
 
+        const node = selectionData.node;
+        const textContent = node.getTextContent();
+        const prevContent = previousSelectionData.node.getTextContent();
+        if (
+          selectionData.selection.anchor.offset === 1 &&
+          previousSelectionData.selection.anchor.offset === 2 &&
+          prevContent.includes(CURSOR_POSITION_HELPER_CHAR) &&
+          textContent.includes(CURSOR_POSITION_HELPER_CHAR)
+        )
+          return;
         if (prevContent.indexOf(CURSOR_POSITION_HELPER_CHAR) !== -1) {
-          //TODO: Study cases. Probably just need to update the selection to remove the Cursor Helper.
+          // TODO: Study cases. Probably just need to update the selection to remove the Cursor Helper.
           editor.update(
             () => {
-              previousSelectionData.currentNode.setTextContent(
-                prevContent.replace(CURSOR_POSITION_HELPER_CHAR, ""),
+              // const offset = previousSelectionData.selection.anchor.offset;
+              // const currentOffset = selectionData.selection.anchor.offset;
+              // const newOffset = currentOffset - 1;
+              previousSelectionData.node.setTextContent(
+                prevContent.replaceAll(CURSOR_POSITION_HELPER_CHAR, ""),
               );
+              if (prevContent.length === 2) selectionData.node.selectEnd();
+              !selectionData.position && selectionData.node.select(1, 1);
             },
             { tag: "history-merge" },
           );
         }
-
-        handleHelperCharEdgeCases(textContent, previousSelectionData.position, () => {
-          editor.update(
-            () => {
-              const anchorOffset = previousSelectionData.selection?.anchor.offset;
-              const focusOffset = previousSelectionData.selection.focus.offset;
-              node.setTextContent(textContent.replace(CURSOR_POSITION_HELPER_CHAR, ""));
-              node.select(anchorOffset, focusOffset);
-            },
-            { tag: "history-merge" },
-          );
-        });
-      }
-    });
-  });
+      });
+    },
+  );
 
   editor.registerCommand(
-    KEY_ARROW_RIGHT_COMMAND,
+    BLUR_COMMAND,
     () => {
-      const selection = $getSelection();
-      const selectionData = $getSelectionData(selection);
-      if (!selectionData) {
-        console.log("NO SELECTION DATA");
-        return false;
-      }
+      console.log("blurring graft");
+      const editorSate = editor.getEditorState();
+      editorSate.read(() => {
+        const selection = $getSelection();
+        if (!selection) return false;
 
-      const { currentNode, position } = selectionData;
+        const selectionData = $getSelectionData(selection);
+        if (!selectionData) return false;
 
-      if (position !== CursorPosition.End) {
-        console.log("CURSOR NOT AT END");
-        return false;
-      }
-
-      const nextSibling = currentNode.getNextSibling();
-      if ($isElementNode(nextSibling)) {
-        if (nextSibling.isInline()) {
-          //EDGE CASE 1: NEXT SIBLING IS AN INLINE ELEMENT
-          const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
+        const node = selectionData.node;
+        const textContent = node.getTextContent();
+        if (textContent.includes(CURSOR_POSITION_HELPER_CHAR)) {
           editor.update(
-            () =>
-              nextSibling.isEmpty()
-                ? nextSibling.append(cursorPositionHelperNode)
-                : nextSibling.getFirstChild()?.insertBefore(cursorPositionHelperNode),
+            () => {
+              node.setTextContent(textContent.replaceAll(CURSOR_POSITION_HELPER_CHAR, ""));
+            },
             { tag: "history-merge" },
           );
-
-          return true;
-        } else {
-          //EDGE CASE 2: NEXT SIBLING IS A BLOCK ELEMENT
-          console.log("SIBLING IS BLOCK", nextSibling);
-          return false;
         }
-      }
+      });
 
-      if (!nextSibling) {
-        //EDGE CASE 3: THERE ARE NO NEXT SIBLINGS
-        console.log("NO NEXT SIBLING", currentNode);
-        const parent = currentNode.getParent();
-        if ($isElementNode(parent)) {
-          if (parent.isInline()) {
-            console.log("PARENT IS INLINE", parent);
-            if (parent?.canInsertTextAfter()) {
-              const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
-              editor.update(
-                () => {
-                  parent.insertAfter(cursorPositionHelperNode);
-                },
-                { tag: "history-merge" },
-              );
-              return true;
-            }
-            //TODO: STUDY WHICH USFM NODES SHOULD NOT ACCEPT TEXT CHILDREN AND SET THEM UP IN THAT WAY E.G. Footnote wrapper "\f"
-            console.log("CANNOT INSERT AFTER");
-            return false;
-          }
-        }
-        console.log("NO PARENT");
-
-        return false;
-      }
-
-      console.log("SOMETHING ELSE");
-
-      //EDGE CASE 2: NEXT SIBLING IS AN ELEMENT
-
-      //EDGE CASE 3: NEXT SIBLING IS A TEXT NODE
-
-      //EDGE CASE 4: NEXT SIBLING IS A ZERO WIDTH SPACE
       return false;
     },
     0,
   );
+
+  editor.registerCommand(
+    KEY_ARROW_RIGHT_COMMAND,
+    (e) => {
+      console.log(e);
+      return handleArrowCommand(editor, CursorPosition.End, "right");
+    },
+    0,
+  );
+
+  editor.registerCommand(
+    KEY_ARROW_LEFT_COMMAND,
+    () => handleArrowCommand(editor, CursorPosition.Start, "left"),
+    0,
+  );
 }
 
-function handleHelperCharEdgeCases(
-  textContent: string,
-  previousPosition: CursorPosition,
-  onHelperCharFound: (helperPosition: number) => void,
+function handleArrowCommand(
+  editor: LexicalEditor,
+  targetPosition: CursorPosition,
+  direction: "left" | "right",
 ): boolean {
-  const helperOffset = textContent.indexOf(CURSOR_POSITION_HELPER_CHAR);
-
-  // EDGE CASE 0: Transform occurred after a cursor movement forward
+  const selectionData = $getSelectionData($getSelection());
+  if (!selectionData || selectionData.position !== targetPosition) {
+    return false;
+  }
   if (
-    previousPosition === CursorPosition.End &&
-    textContent.at(0) === CURSOR_POSITION_HELPER_CHAR
+    direction === "left" &&
+    targetPosition === CursorPosition.Start &&
+    selectionData.node.getTextContent().at(0) === CURSOR_POSITION_HELPER_CHAR
   ) {
-    return true;
+    return false;
   }
 
-  // EDGE CASE 1: Transform occurred after a cursor movement backward
-  if (
-    previousPosition === CursorPosition.Start &&
-    textContent.at(-1) === CURSOR_POSITION_HELPER_CHAR
-  ) {
-    return true;
+  const { node: currentNode } = selectionData;
+  const siblingNode =
+    direction === "right" ? currentNode.getNextSibling() : currentNode.getPreviousSibling();
+
+  if ($isElementNode(siblingNode)) {
+    return handleElementSibling(siblingNode, editor, direction);
   }
 
-  // EDGE CASE 2: Text node is a CURSOR_POSITION_HELPER_CHAR
-  if (textContent === CURSOR_POSITION_HELPER_CHAR) {
-    return true;
+  if (!siblingNode) {
+    return handleNoSibling(currentNode, editor, direction);
   }
 
-  // EDGE CASE 3: Text node contains a CURSOR_POSITION_HELPER_CHAR
-  if (helperOffset !== -1) {
-    onHelperCharFound(helperOffset);
-    return true;
-  }
-
+  console.warn("UNHANDLED CURSOR HELPER CASE");
   return false;
 }
+
+function handleElementSibling(
+  siblingNode: ElementNode,
+  editor: LexicalEditor,
+  direction: "left" | "right",
+): boolean {
+  if (siblingNode.isInline()) {
+    const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
+    editor.update(
+      () => {
+        if (siblingNode.isEmpty()) {
+          siblingNode.append(cursorPositionHelperNode);
+        } else {
+          const targetChild = direction === "right" ? siblingNode.getFirstChild() : siblingNode;
+          console.log("TARGET CHILD", targetChild);
+          direction === "right"
+            ? targetChild?.insertBefore(cursorPositionHelperNode)
+            : targetChild?.insertAfter(cursorPositionHelperNode);
+        }
+      },
+      { tag: "history-merge" },
+    );
+    return true;
+  } else {
+    console.log("SIBLING IS BLOCK", siblingNode);
+    return false;
+  }
+}
+
+function handleNoSibling(
+  currentNode: LexicalNode,
+  editor: LexicalEditor,
+  direction: "left" | "right",
+): boolean {
+  console.log(`NO ${direction.toUpperCase()} SIBLING`, currentNode);
+  const parent = currentNode.getParent();
+  if ($isElementNode(parent) && parent.isInline()) {
+    console.log("PARENT IS INLINE", parent);
+    const canInsert = direction === "right" ? parent.canInsertTextAfter() : true;
+    if (canInsert) {
+      const cursorPositionHelperNode = $createTextNode(CURSOR_POSITION_HELPER_CHAR);
+      editor.update(
+        () => {
+          direction === "right"
+            ? parent.insertAfter(cursorPositionHelperNode)
+            : currentNode.insertBefore(cursorPositionHelperNode);
+        },
+        { tag: "history-merge" },
+      );
+      return true;
+    }
+    console.log("CANNOT INSERT");
+  }
+  console.log("NO PARENT");
+  return false;
+}
+
 function $getSelectionData(selection: BaseSelection | null) {
   if (!selection?.isCollapsed() || !$isRangeSelection(selection)) {
     return null;
   }
 
-  const currentNode = (selection.isBackward() ? selection.focus : selection.anchor).getNode();
+  const node = (selection.isBackward() ? selection.focus : selection.anchor).getNode();
 
-  if (!$isTextNode(currentNode)) {
+  if (!$isTextNode(node)) {
     console.log("NOT TEXT NODE");
     return null;
   }
 
-  const textContentSize = currentNode.getTextContentSize();
+  const textContentSize = node.getTextContentSize();
 
   const offset = selection.anchor.offset;
   let position: CursorPosition = CursorPosition.Middle;
@@ -213,5 +259,5 @@ function $getSelectionData(selection: BaseSelection | null) {
     position = CursorPosition.End;
   }
 
-  return { selection, currentNode, position };
+  return { selection, node, position };
 }

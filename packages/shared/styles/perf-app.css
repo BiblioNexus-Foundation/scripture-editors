@@ -29,7 +29,6 @@ body {
   width: 100%;
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
 }
 
 h1 {
@@ -72,9 +71,12 @@ button:focus-visible {
 }
 
 .editors {
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1em;
+  justify-items: center;
 }
 
 @media print {

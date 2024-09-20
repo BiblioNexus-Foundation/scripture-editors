@@ -15,6 +15,17 @@ function App() {
           }}
         />
       </div>
+      <div className="editor">
+        <Editor
+          {...{
+            serverName: "door43",
+            organizationId: "idiomasPuentes",
+            languageCode: "es-419",
+            versionId: "tpl",
+            bookCode: "rev",
+          }}
+        />
+      </div>
     </div>
   );
 }
