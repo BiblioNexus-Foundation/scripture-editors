@@ -33,10 +33,9 @@ export function typeaheadTriggerMatch(
   { minLength = 1, maxLength = 75 }: { minLength?: number; maxLength?: number },
 ): TriggerFn {
   return (text: string) => {
-    console.log("TRIGGER:", trigger, escapeRegExp(trigger));
     const validChars = `[^${escapeRegExp(trigger)}${PUNCTUATION}\\s]`;
     const typeaheadTriggerRegex = new RegExp(
-      `(^|\\s|\\()([${escapeRegExp(trigger)}]((?:${validChars}){0,${maxLength}}))$`,
+      `(^|\\s|\\(|.)([${escapeRegExp(trigger)}]((?:${validChars}){0,${maxLength}}))$`,
     );
 
     const match = typeaheadTriggerRegex.exec(text);

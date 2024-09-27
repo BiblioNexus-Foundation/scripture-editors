@@ -49,7 +49,7 @@ export const markerActions: {
   c: {
     action: (currentEditor) => {
       const { chapter } = currentEditor.reference;
-      return String.raw`\c ${chapter + 1} `;
+      return String.raw`\p \c ${chapter + 1} `;
     },
   },
   f: {
