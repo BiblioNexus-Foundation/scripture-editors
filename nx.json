@@ -4,14 +4,6 @@
       "analyzeSourceFiles": true
     }
   },
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx-cloud",
-      "options": {
-        "cacheableOperations": ["build", "serve", "preview", "typecheck", "test", "lint", "dev"]
-      }
-    }
-  },
   "extends": "nx/presets/npm.json",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",

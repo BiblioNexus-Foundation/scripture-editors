@@ -216,10 +216,8 @@ export default function Editor({
             const startNode = $getNodeByKey(startEndPoints[0].key);
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
-            //This is the selected elment expected to be a usfm element;
+            //This is the selected element expected to be a usfm element;
             const selectedElement = startNode?.getCommonAncestor(endNode);
-            //This is the parentUsfmElement which can give me information of which tags can be used to replace current tag.
-            // const parentElement = selectedElement?.getParent();
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }

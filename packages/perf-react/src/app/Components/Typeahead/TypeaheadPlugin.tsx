@@ -7,7 +7,7 @@ type TypeaheadPluginProps = {
   items?: AutoCompleteItem[];
 };
 
-const filterFunction: (item: AutoCompleteItem, phrase: string) => boolean = (item, phrase) =>
+const filterFunction = (item: AutoCompleteItem, phrase: string): boolean =>
   item.label?.toLowerCase().includes(phrase.toLowerCase()) ||
   item.name.toLowerCase().includes(phrase.toLowerCase());
 
