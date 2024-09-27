@@ -1,10 +1,7 @@
 // This file contains utility functions and type definitions for getting usfm markers data.
 // It includes functions to parse marker strings, convert marker styles to CSS styles, and type definitions for various marker properties.
 
-import categoriesMap from "./categoriesMap.json";
-
-// Replace the existing type assertion with this:
-const typedCategoriesMap = categoriesMap as Record<string, CategoryType>;
+import categoriesMap, { CategoryType } from "./categoriesMap.ts";
 
 export enum TextType {
   ChapterNumber = "ChapterNumber",
@@ -44,30 +41,6 @@ export enum TextProperty {
   Level_2 = "level_2",
   Level_3 = "level_3",
   Level_4 = "level_4",
-}
-
-export enum CategoryType {
-  FileIdentification = "FileIdentification",
-  Headers = "Headers",
-  Remarks = "Remarks",
-  Introduction = "Introduction",
-  DivisionMarks = "DivisionMarks",
-  Paragraphs = "Paragraphs",
-  Poetry = "Poetry",
-  TitlesHeadings = "TitlesHeadings",
-  Tables = "Tables",
-  CenterTables = "CenterTables",
-  RightTables = "RightTables",
-  Lists = "Lists",
-  Footnotes = "Footnotes",
-  CrossReferences = "CrossReferences",
-  SpecialText = "SpecialText",
-  CharacterStyling = "CharacterStyling",
-  Breaks = "Breaks",
-  SpecialFeatures = "SpecialFeatures",
-  PeripheralReferences = "PeripheralReferences",
-  PeripheralMaterials = "PeripheralMaterials",
-  Uncategorized = "Uncategorized",
 }
 
 export type MarkersDictionary = {
@@ -132,12 +105,13 @@ export const createMarkersDictionaryFromUsfmSty = (markersString: string): Marke
         markers[currentMarker] = currentMarkerData as MarkersDictionary[string];
       }
       currentMarker = line.split(" ")[1];
-      const category = typedCategoriesMap[currentMarker] || CategoryType.Uncategorized;
+      const category = categoriesMap[currentMarker] || CategoryType.Uncategorized;
       currentMarkerData = { marker: currentMarker, category };
     } else if (line.startsWith("\\")) {
       const [key, ...valueParts] = line.slice(1).split(" ");
       const value = valueParts.join(" ");
 
+      if (!currentMarkerData.styles) currentMarkerData.styles = {};
       switch (key) {
         case "Name":
           currentMarkerData.name = value;
@@ -172,28 +146,42 @@ export const createMarkersDictionaryFromUsfmSty = (markersString: string): Marke
           currentMarkerData.endMarker = value;
           break;
         case "FontSize":
+          currentMarkerData.styles.fontSize = parseInt(value);
+          break;
         case "SpaceBefore":
+          currentMarkerData.styles.spaceBefore = parseInt(value);
+          break;
         case "SpaceAfter":
+          currentMarkerData.styles.spaceAfter = parseInt(value);
+          break;
         case "LeftMargin":
+          currentMarkerData.styles.leftMargin = parseFloat(value);
+          break;
         case "RightMargin":
+          currentMarkerData.styles.rightMargin = parseFloat(value);
+          break;
         case "FirstLineIndent":
-          if (!currentMarkerData.styles) currentMarkerData.styles = {};
           currentMarkerData.styles.firstLineIndent = parseFloat(value);
           break;
         case "Bold":
+          currentMarkerData.styles.bold = true;
+          break;
         case "Italic":
+          currentMarkerData.styles.italic = true;
+          break;
         case "Underline":
+          currentMarkerData.styles.underline = true;
+          break;
         case "Smallcaps":
+          currentMarkerData.styles.smallcaps = true;
+          break;
         case "Superscript":
-          if (!currentMarkerData.styles) currentMarkerData.styles = {};
           currentMarkerData.styles.superscript = true;
           break;
         case "Justification":
-          if (!currentMarkerData.styles) currentMarkerData.styles = {};
           currentMarkerData.styles.justification = value as Justification;
           break;
         case "Color":
-          if (!currentMarkerData.styles) currentMarkerData.styles = {};
           currentMarkerData.styles.color = parseInt(value);
           break;
       }

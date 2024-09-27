@@ -447,7 +447,9 @@ function CommentsPanelListComment({
   rtf: Intl.RelativeTimeFormat;
   thread?: Thread;
 }): JSX.Element {
-  const seconds = Math.round((comment.timeStamp - performance.now()) / 1000);
+  const seconds = Math.round(
+    (comment.timeStamp - (performance.timeOrigin + performance.now())) / 1000,
+  );
   const minutes = Math.round(seconds / 60);
   const [modal, showModal] = useModal();
 
@@ -704,12 +706,6 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   const { yjsDocMap } = collabContext;
 
   useEffect(() => {
-    if (!editor.hasNodes([TypedMarkNode])) {
-      throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
-    }
-  }, [editor]);
-
-  useEffect(() => {
     if (providerFactory) {
       const provider = providerFactory("comments", yjsDocMap);
       return commentStore.registerCollaboration(provider);
@@ -807,9 +803,8 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   }, [activeIDs, editor, markNodeMap]);
 
   useEffect(() => {
-    if (!editor.hasNodes([TypedMarkNode])) {
+    if (!editor.hasNodes([TypedMarkNode]))
       throw new Error("CommentPlugin: TypedMarkNode not registered on editor!");
-    }
 
     const markNodeKeysToIDs: Map<NodeKey, Array<string>> = new Map();
 

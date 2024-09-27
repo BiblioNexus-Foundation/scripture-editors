@@ -3,11 +3,9 @@ import * as path from "path";
 import { MarkersDataGeneratorSchema } from "./schema";
 
 import axios from "axios";
-import {
-  CategoryType,
-  createMarkersDictionaryFromUsfmSty,
-} from "./utils/generateMarkersDictionary";
+import { createMarkersDictionaryFromUsfmSty } from "./utils/generateMarkersDictionary";
 import { simplifyMarkersDictionary } from "./utils/simplifyMarkersDictionary";
+import { CategoryType } from "./utils/categoriesMap";
 
 export async function markersDataGenerator(tree: Tree, options: MarkersDataGeneratorSchema) {
   const projectRoot = options.outputPath;

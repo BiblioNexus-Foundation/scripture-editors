@@ -14,6 +14,7 @@
 import { $getSelection, $isTextNode, LexicalEditor, RangeSelection, TextNode } from "lexical";
 
 import { $isRangeSelection } from "lexical";
+//TODO: This list is very language specific and probably should be externally supplied perhaps by the UI language setting.
 export const PUNCTUATION = "\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%'\"~=<>_:;";
 
 export type SuggestionsTextMatch = {
@@ -33,10 +34,9 @@ export function typeaheadTriggerMatch(
   { minLength = 1, maxLength = 75 }: { minLength?: number; maxLength?: number },
 ): TriggerFn {
   return (text: string) => {
-    console.log("TRIGGER:", trigger, escapeRegExp(trigger));
     const validChars = `[^${escapeRegExp(trigger)}${PUNCTUATION}\\s]`;
     const typeaheadTriggerRegex = new RegExp(
-      `(^|\\s|\\()([${escapeRegExp(trigger)}]((?:${validChars}){0,${maxLength}}))$`,
+      `(^|\\s|\\(|.)([${escapeRegExp(trigger)}]((?:${validChars}){0,${maxLength}}))$`,
     );
 
     const match = typeaheadTriggerRegex.exec(text);
