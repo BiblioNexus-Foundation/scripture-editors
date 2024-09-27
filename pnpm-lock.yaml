@@ -7,11 +7,10 @@ settings:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@nx/devkit':
         specifier: 18.3.4
         version: 18.3.4(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))
-    devDependencies:
       '@nx/eslint-plugin':
         specifier: 18.3.4
         version: 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.4.5))(eslint-config-prettier@9.1.0(eslint@8.57.0))(eslint@8.57.0)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)
@@ -426,7 +425,7 @@ importers:
         version: 0.17.1
 
   tools/usfm-markers:
-    dependencies:
+    devDependencies:
       '@nx/devkit':
         specifier: 18.3.4
         version: 18.3.4(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.7.23(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.7.23(@swc/helpers@0.5.13)))
