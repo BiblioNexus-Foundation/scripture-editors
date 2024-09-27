@@ -1,7 +1,7 @@
 {
   "name": "usfm-markers",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "tools/usfm-markers/src",
+  "sourceRoot": "{projectRoot}/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -9,28 +9,28 @@
       "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/tools/usfm-markers",
-        "main": "tools/usfm-markers/src/index.ts",
-        "tsConfig": "tools/usfm-markers/tsconfig.lib.json",
+        "outputPath": "dist/{projectRoot}",
+        "main": "{projectRoot}/src/index.ts",
+        "tsConfig": "{projectRoot}/tsconfig.lib.json",
         "assets": [
-          "tools/usfm-markers/*.md",
+          "{projectRoot}/*.md",
           {
-            "input": "./tools/usfm-markers/src",
+            "input": "./{projectRoot}/src",
             "glob": "**/!(*.ts)",
             "output": "./src"
           },
           {
-            "input": "./tools/usfm-markers/src",
+            "input": "./{projectRoot}/src",
             "glob": "**/*.d.ts",
             "output": "./src"
           },
           {
-            "input": "./tools/usfm-markers",
+            "input": "./{projectRoot}",
             "glob": "generators.json",
             "output": "."
           },
           {
-            "input": "./tools/usfm-markers",
+            "input": "./{projectRoot}",
             "glob": "executors.json",
             "output": "."
           }
@@ -41,7 +41,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "tools/usfm-markers/jest.config.ts"
+        "jestConfig": "{projectRoot}/jest.config.ts"
       }
     }
   }

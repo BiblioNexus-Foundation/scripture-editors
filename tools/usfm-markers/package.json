@@ -1,7 +1,7 @@
 {
   "name": "usfm-markers",
   "version": "0.0.1",
-  "dependencies": {
+  "devDependencies": {
     "@nx/devkit": "18.3.4",
     "tslib": "^2.3.0"
   },

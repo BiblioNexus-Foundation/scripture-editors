@@ -14,7 +14,7 @@ import Button from "./Components/Button";
 import { $getNodeByKey, $getSelection, LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
-import OnEditorUpdate from "./Components/OnSelectionChange";
+import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";

@@ -1,4 +1,5 @@
-import { CategoryType, MarkersDictionary, StyleType } from "./generateMarkersDictionary";
+import { CategoryType } from "./categoriesMap";
+import { MarkersDictionary, StyleType } from "./generateMarkersDictionary";
 
 export interface SimplifiedMarker {
   category: CategoryType;
@@ -8,11 +9,13 @@ export interface SimplifiedMarker {
   children?: Partial<Record<CategoryType, string[]>>;
 }
 
+type SimplifiedDictionary = { [marker: string]: SimplifiedMarker };
+
 export function simplifyMarkersDictionary(
   markersDictionary: MarkersDictionary,
   excludeCategories: CategoryType[] = [],
-): Record<string, SimplifiedMarker> {
-  const simplifiedDictionary: Record<string, SimplifiedMarker> = {};
+): SimplifiedDictionary {
+  const simplifiedDictionary: SimplifiedDictionary = {};
 
   for (const [marker, markerData] of Object.entries(markersDictionary)) {
     if (excludeCategories.includes(markerData.category)) continue;

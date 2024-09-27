@@ -6,22 +6,27 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+
+    /* Bundler mode */
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "declaration": true,
+
+    /* Linting */
     "strict": true,
     "allowJs": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+
+    /* Workspace */
     "baseUrl": "./packages/",
     "paths": {
-      "@biblionexus-foundation/scripture-utilities": ["./utilities/src"],
-      "usfm-markers": ["tools/usfm-markers/src"]
+      "@biblionexus-foundation/scripture-utilities": ["./utilities/src"]
     }
   },
-  "include": ["packages", "tools"]
+  "include": ["packages"]
 }
