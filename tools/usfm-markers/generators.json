@@ -1,0 +1,9 @@
+{
+  "generators": {
+    "markers-data": {
+      "factory": "./src/generators/markers-data/generator",
+      "schema": "./src/generators/markers-data/schema.json",
+      "description": "markers-data generator"
+    }
+  }
+}

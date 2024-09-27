@@ -1,18 +1,37 @@
 {
+  "pluginsConfig": {
+    "@nx/js": {
+      "analyzeSourceFiles": true
+    }
+  },
   "extends": "nx/presets/npm.json",
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultBase": "main",
   "targetDefaults": {
-    "build": { "cache": true, "inputs": ["production", "^production"], "dependsOn": ["^build"] },
-    "dev": { "cache": true, "dependsOn": ["^build"] },
-    "devpub": { "dependsOn": ["build", "^build"] },
+    "build": {
+      "cache": true,
+      "inputs": ["production", "^production"],
+      "dependsOn": ["^build"]
+    },
+    "dev": {
+      "cache": true,
+      "dependsOn": ["^build"]
+    },
+    "devpub": {
+      "dependsOn": ["build", "^build"]
+    },
     "preview": { "cache": true, "dependsOn": ["^build"] },
     "serve": { "cache": true, "dependsOn": ["^build"] },
     "typecheck": {
       "executor": "nx:run-commands",
       "cache": true,
       "options": {
-        "commands": [{ "command": "tsc -p tsconfig.json", "forwardAllArgs": false }],
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json",
+            "forwardAllArgs": false
+          }
+        ],
         "cwd": "{projectRoot}"
       }
     },
@@ -26,7 +45,12 @@
         "passWithNoTests": true,
         "silent": true
       },
-      "configurations": { "ci": { "ci": true, "codeCoverage": true } }
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -38,9 +62,16 @@
         "{workspaceRoot}/eslint.config.js"
       ],
       "outputs": ["{options.outputFile}"],
-      "options": { "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"] }
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
+      }
     },
     "@nx/vite:build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/js:tsc": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
@@ -89,6 +120,5 @@
       }
     }
   ],
-  "pluginsConfig": { "@nx/js": { "analyzeSourceFiles": true } },
   "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU="
 }

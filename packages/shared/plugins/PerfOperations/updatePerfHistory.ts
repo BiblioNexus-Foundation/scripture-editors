@@ -182,7 +182,7 @@ export const getPerfHistoryUpdater: (
     } catch (e) {
       console.error(e);
       currentEditor.dispatchCommand(UNDO_COMMAND, undefined);
-      alert("An error occurred. Changes have been reverted.");
+      console.error("An error occurred. Changes have been reverted.");
     }
 
     console.log("=================================");

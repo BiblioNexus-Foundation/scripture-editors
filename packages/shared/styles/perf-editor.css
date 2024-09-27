@@ -1,4 +1,5 @@
-.editor-oce {
+/* Variables */
+:root {
   --editor-background-color: #fff;
   --editor-text-color: rgba(40, 40, 40, 0.87);
   --verse-marker-color: black;
@@ -7,6 +8,7 @@
   --pilcrow-color: rgb(0 0 0 / 25%);
 }
 
+/* General Editor Styles */
 .editor-oce {
   position: relative;
   text-align: left;
@@ -22,11 +24,13 @@
   counter-reset: ts-counter f-counter x-counter;
 }
 
+/* Paragraph Styles */
 .editor-paragraph {
   margin: 0 0 15px 0;
   position: relative;
 }
 
+/* Chapter and Verse Styles */
 span.verses,
 span.chapter {
   position: relative;
@@ -49,7 +53,7 @@ span.verses {
   margin-inline-end: 0.1em;
 }
 
-/* Styles for inspecting nodes */
+/* Node Inspection Styles */
 [perf-type] {
   position: relative;
   box-sizing: border-box;
@@ -59,6 +63,7 @@ span.verses {
   border-color: rgb(80, 80, 80);
 }
 
+/* Specific Marker Styles */
 [perf-type="graft"][perf-subtype="title"] {
   width: 100%;
   text-align: center;
@@ -181,12 +186,53 @@ h3 {
   color: var(--chapter-marker-color);
 }
 
-[perf-subtype="usfm:wj"] {
+[data-marker="wj"] {
   color: #cd0000;
+}
+
+[data-marker="add"],
+[data-marker="bk"],
+[data-marker="dc"],
+[data-marker="qt"],
+[data-marker="sig"],
+[data-marker="sls"],
+[data-marker="tl"] {
+  font-style: italic;
+}
+
+[data-marker="lit"] {
+  display: block;
+  font-weight: bolder;
+}
+
+[data-marker="nd"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
 }
 
 [data-marker="bd"] {
   font-weight: bold;
+}
+
+[data-marker="em"],
+[data-marker="it"] {
+  font-style: italic;
+}
+
+[data-marker="bdit"] {
+  font-style: italic;
+  font-weight: bold;
+}
+
+[data-marker="sc"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
+}
+
+[data-marker="no"] {
+  font-style: normal;
+  font-weight: initial;
+  text-transform: initial;
 }
 
 .info-bar {
@@ -203,6 +249,7 @@ h3 {
   font-size: 0.75em;
 }
 
+/* Empty Node Styles */
 [perf-type]:empty::before {
   content: "·";
   padding: 2px;
@@ -210,6 +257,7 @@ h3 {
   opacity: 0.5;
 }
 
+/* Unsupported Element Styles */
 .unsupported {
   color: #b80000;
   text-decoration: underline wavy;
@@ -284,6 +332,7 @@ span[perf-subtype="usfm:ts"]:empty::before {
   font-size: 70%;
 }
 
+/* Print Styles */
 @media print {
   body * {
     color: #070707 !important;
@@ -304,12 +353,11 @@ span.paragraph[perf-subtype="usfm:f"] {
   height: fit-content;
 }
 
-.target-editor {
-  max-width: 600px;
+.editor {
+  max-width: 700px;
 }
 
-/* Toolbar related */
-
+/* Toolbar Styles */
 .toolbar {
   position: sticky;
   z-index: 1;
@@ -321,6 +369,14 @@ span.paragraph[perf-subtype="usfm:f"] {
   flex-wrap: wrap;
   justify-content: start;
   padding: 0.25rem;
+  gap: 0.2rem;
+}
+
+.toolbar-section {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
   gap: 0.2rem;
 }
 
@@ -336,6 +392,7 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-family: sans-serif;
   font-weight: 600;
   font-size: 0.85rem;
+  min-width: 35px;
 }
 
 .toolbar button:hover {
@@ -350,7 +407,33 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-size: 130%;
 }
 
-/* note caller styles */
+.toolbar hr {
+  margin: 0 0.2rem;
+  border-color: #ddd;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.toolbar > * {
+  height: 40px;
+}
+
+.toolbar .info {
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  background: #0000000f;
+  color: inherit;
+  outline: none;
+  border: none;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* Note Caller Styles */
 :where([perf-subtype="footnote"], [perf-subtype="xreg"])
   > [perf-type="paragraph"]
   > *:not([perf-subtype="note_caller"], [perf-subtype="note_caller"] *) {
@@ -461,7 +544,7 @@ span.paragraph[perf-subtype="usfm:f"] {
   border-radius: 0.5rem;
 }
 
-/* Non printable marks */
+/* Non-printable Marks */
 .with-markers p.paragraph:after {
   content: "¶";
   display: inline-block;
@@ -591,10 +674,63 @@ span.chapter:hover:before {
   display: none;
 }
 
-/* verse as blocks */
+/* Verse as Blocks */
 .verse-blocks span[perf-subtype="verses"] {
   display: block;
   margin-top: 1em;
   padding-top: 1em;
   border-top: dashed 1px #ffffff91;
+}
+
+[data-marker="v"]:has(+ [data-marker="v"]):after {
+  display: block;
+  content: "";
+}
+
+/* Floating Menu Styles */
+.floating-box:has(> .autocomplete-menu) {
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+}
+
+.floating-box .autocomplete-menu {
+  display: block;
+  text-align: left;
+  width: fit-content;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+}
+
+.autocomplete-menu button {
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: min-content minmax(0, 90vw);
+  align-items: baseline;
+  max-width: 400px;
+  gap: 1rem;
+  width: 100%;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  border-radius: 0;
+  border: 0;
+}
+
+.autocomplete-menu button:hover {
+  background: rgb(0 0 0 / 5%);
+}
+
+.autocomplete-menu button.active {
+  background: rgb(189, 232, 255);
+}
+
+.autocomplete-menu button .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  text-align: right;
+  align-items: baseline;
+  font-size: 0.7rem;
+  opacity: 0.8;
 }

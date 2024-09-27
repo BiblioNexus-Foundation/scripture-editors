@@ -9,7 +9,7 @@ export const emptyHeading = {
           format: 0,
           mode: "normal",
           style: "",
-          text: "",
+          text: "​",
           type: "text",
           version: 1,
         },
