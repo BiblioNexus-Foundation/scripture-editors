@@ -1,8 +1,8 @@
 import { memo, ReactNode, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { FloatingBox } from "../FloatingBox";
+import { FloatingBox } from "../FloatingBox/FloatingBox";
 import { TriggerFn } from "shared/plugins/Typeahead";
-import { useFloatingPosition } from "./useFloatingPosition";
+import { useFloatingPosition } from "../FloatingBox/useFloatingPosition";
 import { TypeaheadData, useTypeaheadData } from "./useTypeaheadData";
 
 const DOM_ELEMENT = document.body;

@@ -2,6 +2,7 @@ import { usfmMarkers } from "./usfmMarkers";
 import usfmMarkersOverwrites from "./usfmMarkersOverwrites";
 import { Marker, CategoryType } from "./usfmTypes";
 
+//NOTE: We can make this reusable if we agree on a common usfmMarkers object for all editors and use the overwrites objects as a parameter for this function.
 function getMarker(marker: string): Marker | undefined {
   const baseMarker = usfmMarkers[marker];
   const overwrite = usfmMarkersOverwrites[marker];
