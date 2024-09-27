@@ -1,0 +1,72 @@
+name: Publish Scribe Package (scribe-v1 branch)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build on ${{ matrix.os }}, node ${{ matrix.node_version }}, PNPM ${{ matrix.pnpm_version }}
+    runs-on: ${{ matrix.os }}
+    if: github.ref == 'refs/heads/scribe-v1'
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node_version: [20]
+        pnpm_version: [9]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ matrix.pnpm_version }}
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v4
+        with:
+          registry-url: "https://registry.npmjs.org/"
+          node-version: ${{ matrix.node_version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: |
+          pnpm prettier --check .
+          pnpm nx format:check
+
+      - name: Check linting
+        run: pnpm nx run-many -t lint
+
+      - name: Check types
+        run: pnpm nx run-many -t typecheck
+
+      - name: Check tests
+        run: pnpm nx run-many -t test
+
+      - name: Production build
+        run: pnpm nx run-many -t build
+
+      - name: Publish scribe package
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          cd ./packages/scribe
+          pnpm publish --no-git-checks --access public --tag scribe-v1
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Error handling and file content
+        if: failure()
+        run: |
+          echo "An error occurred during the workflow execution."
+          echo "Current branch: ${{ github.ref }}"
+          echo "Current workflow file content:"
+          cat ${{ github.workflow }}
+          echo "Directory structure:"
+          ls -R
+          echo "Workflow run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
