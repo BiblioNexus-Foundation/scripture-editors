@@ -189,10 +189,9 @@ const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
       blocks: perfChildren,
     };
   },
-  block: ({ perfChildren, perfProps, lexicalNode }) => {
+  block: ({ perfChildren, perfProps }) => {
     const block = getBlockIfValid(perfProps);
     if (!block) {
-      console.log(lexicalNode);
       throw new Error("Block is not valid");
     }
     if (isBlockGraft(block)) {
@@ -208,10 +207,9 @@ const createLexicalMap = (perf: ResultingPerf): LexicalMap => ({
       content: perfChildren,
     };
   },
-  contentElement: ({ perfChildren, perfProps, lexicalNode, metadata }) => {
+  contentElement: ({ perfChildren, perfProps }) => {
     const element = getContentElementifValid(perfProps);
     if (!element) {
-      console.log({ lexicalNode, metadata });
       throw new Error("ContentElement is not valid");
     }
     if (isContentElementGraft(element))

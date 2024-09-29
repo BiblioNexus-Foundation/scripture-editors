@@ -1,3 +1,4 @@
 export const ZERO_WIDTH_SPACE = "\u200B";
+export const CARET = "\u2038";
 
-export const TEMP_INLINE_CURSOR_PLACEHOLDER = "‸";
+export const CURSOR_POSITION_HELPER_CHAR = CARET;

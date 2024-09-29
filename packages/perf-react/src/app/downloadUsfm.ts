@@ -11,7 +11,7 @@ export const downloadUsfm = (
     if (!bookHandler || !historyState?.current?.perfDocument) return;
     await bookHandler.sideload(bookCode, historyState.current.perfDocument as PerfDocument);
     const newUsfm: string = await bookHandler.readUsfm(bookCode);
-    console.log("NEW USFM", { output: newUsfm });
+
     const downloadUsfm = (usfm: string, filename: string) => {
       const element = document.createElement("a");
       const file = new Blob([usfm], { type: "text/plain" });

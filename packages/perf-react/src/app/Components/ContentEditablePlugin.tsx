@@ -7,7 +7,7 @@ export const ContentEditablePlugin = forwardRef<HTMLDivElement>((_props, ref) =>
   return (
     <RichTextPlugin
       contentEditable={
-        <div className="editor" ref={ref}>
+        <div className="editor with-markers" ref={ref}>
           <ContentEditable className="contentEditable" spellCheck={false} />
         </div>
       }

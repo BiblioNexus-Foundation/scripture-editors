@@ -36,6 +36,11 @@ const usfmMarkersOverwrites: Record<string, MarkerOverwrite> = {
       },
     },
   },
+  qm: {
+    children: {
+      Paragraphs: { add: ["p"], remove: [] },
+    },
+  },
   c: {
     type: MarkerType.Paragraph,
     children: null,

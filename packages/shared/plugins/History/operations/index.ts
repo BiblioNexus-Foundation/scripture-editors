@@ -36,7 +36,6 @@ export const getOperations = ({
   operationBuilder = buildOperation,
   pathBuilder = getNodePath,
 }: GetOperationsParams): Operation[] => {
-  console.log({ dirtyNodes });
   const operations = [];
   for (const dirtyNode of dirtyNodes) {
     const nodeKey = Array.isArray(dirtyNode) ? dirtyNode[0] : dirtyNode;
