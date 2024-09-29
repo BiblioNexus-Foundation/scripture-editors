@@ -398,6 +398,10 @@ span.paragraph[perf-subtype="usfm:f"] {
   min-width: 35px;
 }
 
+.toolbar button.active {
+  background: #dadada;
+}
+
 .toolbar button:hover {
   background: #eee;
 }

@@ -23,6 +23,7 @@ import ScriptureReferencePlugin, {
 } from "./Components/ScriptureReferencePlugin";
 import TypeaheadPlugin from "./Components/Typeahead/TypeaheadPlugin";
 import getMarker from "shared/utils/usfm/getMarker";
+import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
 
 const theme = {
   // Theme styling goes here
@@ -61,6 +62,7 @@ export default function Editor({
     chapter: 1,
     verse: 1,
   });
+  const [shouldUseCursorHelper, setShouldUseCursorHelper] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
   const [contextMenuKey, setContextMenuKey] = useState<string>("\\");
 
@@ -77,9 +79,9 @@ export default function Editor({
       if (bookHandler) {
         const perf = await bookHandler.read(bookCode);
         setPerfDocument(perf);
-        console.log(perf);
+
         const lexicalState = getLexicalState(perf);
-        console.log({ lexicalState });
+
         setLexicalState(JSON.stringify(lexicalState));
       }
     })();
@@ -171,6 +173,12 @@ export default function Editor({
           <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
             <i>format_paragraph</i>
           </button>
+          <button
+            className={shouldUseCursorHelper ? "active" : undefined}
+            onClick={() => setShouldUseCursorHelper((current) => !current)}
+          >
+            <i>highlight_text_cursor</i>
+          </button>
           <hr />
         </div>
         <div className={"toolbar-section"}>
@@ -206,6 +214,7 @@ export default function Editor({
             );
           })}
       </div>
+      {shouldUseCursorHelper && <CursorHandlerPlugin />}
       <OnEditorUpdate
         updateListener={({ editorState }) => {
           editorState.read(() => {

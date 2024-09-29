@@ -60,14 +60,11 @@ export const getPerfHistoryUpdater: (
       (currentEntry as HistoryStateEntry<{
         perfDocument: PerfDocument;
       }>) || {};
-    console.log("=================================");
     // History initialization
     if (!canUndo && !prevPerfDocument) {
-      console.log("Initializing Perf History", { tags });
       mergeHistory({ perfDocument: perfSource });
       return;
     }
-    console.log("Updating Perf History", { tags, editorChanged, dirtyElements });
     // If the editor has not changed, return
     if (!editorChanged) return;
 
@@ -90,7 +87,6 @@ export const getPerfHistoryUpdater: (
           pathBuilder: getPathBuilder(prevPerfDocument["main_sequence_id"] ?? "main_sequence"),
           operationBuilder: getOperationBuilder(extraData),
         }) as Operation[];
-        console.log("PERF ELEMENT OPERATIONS", perfElementOperations);
 
         // Apply the operations to the previous perf document sequences
         const patchedSequences = applyPatch({
@@ -100,8 +96,6 @@ export const getPerfHistoryUpdater: (
 
         // Patch the sequences in the previous perf document
         const patchedPerfDocument = { ...prevPerfDocument, sequences: patchedSequences };
-
-        console.log({ patchedPerfDocument });
 
         // Merge the history with the patched perf document
         mergeHistory({
@@ -159,7 +153,7 @@ export const getPerfHistoryUpdater: (
                 { tag: "history-merge" },
               );
             } else {
-              console.log(
+              console.info(
                 "%cNode roundtrip successful",
                 "color: white;background-color:#46b46b;padding:4px;",
               );
@@ -176,7 +170,7 @@ export const getPerfHistoryUpdater: (
         });
         const end = performance.now();
         const duration = end - start;
-        console.log(`Function Execution Time: ${duration / 1000} seconds`);
+        console.info(`Function Execution Time: ${duration / 1000} seconds`);
         if (!roundtripped) throw new Error("File roundtrip failed.");
       }
     } catch (e) {
@@ -184,8 +178,6 @@ export const getPerfHistoryUpdater: (
       currentEditor.dispatchCommand(UNDO_COMMAND, undefined);
       console.error("An error occurred. Changes have been reverted.");
     }
-
-    console.log("=================================");
   };
 
 const $restoreSelection = (prevRootNode: LexicalNode, newRootNode: LexicalNode) => {

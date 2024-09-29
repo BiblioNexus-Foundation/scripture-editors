@@ -8,7 +8,6 @@ export function registerFocusableGrafts(
 ) {
   const $removeFocusedGrafts = () => {
     if (focusedGrafts.length === 0) return;
-    console.log("removing focused grafts");
     editor.update(
       () => {
         focusedGrafts.forEach((focusedGraft) => {
@@ -41,12 +40,10 @@ export function registerFocusableGrafts(
         return;
       }
       if (focusedGrafts.includes(graft.getKey())) {
-        console.log("already focused, skipping");
         return;
       }
       editor.update(
         () => {
-          console.log("focusing graft");
           focusedGrafts.forEach((focusedGraft) => {
             try {
               const node = $getNodeByKey<GraftNode>(focusedGraft);
