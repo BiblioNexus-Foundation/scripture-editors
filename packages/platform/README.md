@@ -105,8 +105,8 @@ export default function App() {
         defaultUsj={defaultUsj}
         scrRef={scrRef}
         onScrRefChange={setScrRef}
-        options={options}
         onUsjChange={handleUsjChange}
+        options={options}
         logger={console}
       />
     </>
@@ -165,8 +165,9 @@ If using the **commenting features** in the `<Marginal />` component:
  * @param props.defaultUsj - Initial Scripture data in USJ format.
  * @param props.scrRef - Scripture reference that links the general cursor location of the Scripture.
  * @param props.onScrRefChange - Callback function when the Scripture reference changes in the editor as the cursor moves.
- * @param props.options - Options to configure the editor.
+ * @param props.onSelectionChange - Callback function when the cursor selection changes.
  * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
+ * @param props.options - Options to configure the editor.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
@@ -179,6 +180,8 @@ If using the **commenting features** in the `<Marginal />` component:
 export type EditorRef = {
   /** Focus the editor. */
   focus(): void;
+  /** Get USJ Scripture data. */
+  getUsj(): Usj | undefined;
   /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
   /**
@@ -237,6 +240,22 @@ export type EditorOptions = {
 ## `<Marginal />` API
 
 These are the same as Editorial except where noted below. See [Editorial API](#editorial--api).
+
+### Marginal Properties
+
+Inherits from the [Editorial Properties](#editorial-properties).
+
+```ts
+export type MarginalProps<TLogger extends LoggerBasic> = Omit<
+  EditorProps<TLogger>,
+  "onUsjChange"
+> & {
+  /** Callback function when comments have changed. */
+  onCommentChange?: (comments: Comments | undefined) => void;
+  /** Callback function when USJ Scripture data has changed. */
+  onUsjChange?: (usj: Usj, comments: Comments | undefined) => void;
+};
+```
 
 ### Marginal Ref
 

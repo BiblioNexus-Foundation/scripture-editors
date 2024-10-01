@@ -37,6 +37,7 @@ import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
 import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
@@ -46,12 +47,13 @@ import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-o
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
-import useDeferredState from "./use-deferred-state.hook";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
   /** Focus the editor. */
   focus(): void;
+  /** Get USJ Scripture data. */
+  getUsj(): Usj | undefined;
   /** Set the USJ Scripture data. */
   setUsj(usj: Usj): void;
   /**
@@ -112,10 +114,12 @@ export type EditorProps<TLogger extends LoggerBasic> = {
   scrRef?: ScriptureReference;
   /** Callback function when the Scripture reference has changed. */
   onScrRefChange?: (scrRef: ScriptureReference) => void;
-  /** Options to configure the editor. */
-  options?: EditorOptions;
+  /** Callback function when the cursor selection changes. */
+  onSelectionChange?: (selection: SelectionRange | undefined) => void;
   /** Callback function when USJ Scripture data has changed. */
   onUsjChange?: (usj: Usj) => void;
+  /** Options to configure the editor. */
+  options?: EditorOptions;
   /** Logger instance. */
   logger?: TLogger;
 };
@@ -149,10 +153,11 @@ function Placeholder(): JSX.Element {
  * @param props.ref - Forward reference for the editor.
  * @param props.defaultUsj - Default USJ Scripture data.
  * @param props.scrRef - Scripture reference that controls the cursor in the Scripture.
- * @param props.onScrRefChange - Scripture reference set callback function when the reference changes in
- *   the editor as the cursor moves.
- * @param props.options - Options to configure the editor.
+ * @param props.onScrRefChange - Scripture reference set callback function when the reference
+ *   changes in the editor as the cursor moves.
+ * @param props.onSelectionChange - Callback function when the cursor selection changes.
  * @param props.onUsjChange - Callback function when USJ Scripture data has changed.
+ * @param props.options - Options to configure the editor.
  * @param props.logger - Logger instance.
  * @returns the editor element.
  */
@@ -161,8 +166,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     defaultUsj,
     scrRef,
     onScrRefChange,
-    options,
+    onSelectionChange,
     onUsjChange,
+    options,
     logger,
     children,
   }: PropsWithChildren<EditorProps<TLogger>>,
@@ -171,8 +177,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const editorRef = useRef<LexicalEditor | null>(null);
   const annotationRef = useRef<AnnotationRef | null>(null);
   const toolbarEndRef = useRef<HTMLDivElement>(null);
+  const editedUsjRef = useRef(defaultUsj);
   const [usj, setUsj] = useState(defaultUsj);
-  const [loadedUsj, editedUsj, setEditedUsj] = useDeferredState(usj);
   const {
     isReadonly = false,
     hasSpellCheck = false,
@@ -189,8 +195,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     focus() {
       editorRef.current?.focus();
     },
-    setUsj(usj) {
-      setUsj(usj);
+    getUsj() {
+      return editedUsjRef.current;
+    },
+    setUsj(incomingUsj) {
+      if (!deepEqual(editedUsjRef.current, incomingUsj) && !deepEqual(usj, incomingUsj)) {
+        editedUsjRef.current = incomingUsj;
+        setUsj(incomingUsj);
+      }
     },
     getSelection() {
       return editorRef.current?.read(() => $getRangeFromEditor());
@@ -221,12 +233,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 
       const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
       if (newUsj) {
-        const isEdited = !deepEqual(editedUsj, newUsj);
-        if (isEdited) setEditedUsj(newUsj);
-        if (isEdited || !deepEqual(loadedUsj, newUsj)) onUsjChange?.(newUsj);
+        const isEdited = !deepEqual(editedUsjRef.current, newUsj);
+        if (isEdited) editedUsjRef.current = newUsj;
+        if (isEdited || !deepEqual(usj, newUsj)) onUsjChange?.(newUsj);
       }
     },
-    [editedUsj, loadedUsj, onUsjChange, setEditedUsj],
+    [usj, onUsjChange],
   );
 
   return (
@@ -255,12 +267,13 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             />
           )}
           <UpdateStatePlugin
-            scripture={loadedUsj}
+            scripture={usj}
             nodeOptions={nodeOptions}
             editorAdaptor={usjEditorAdaptor}
             viewOptions={viewOptions}
             logger={logger}
           />
+          <OnSelectionChangePlugin onChange={onSelectionChange} />
           <OnChangePlugin
             onChange={handleChange}
             ignoreSelectionChange
