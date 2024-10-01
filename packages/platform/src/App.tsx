@@ -230,8 +230,10 @@ export default function App() {
         defaultUsj={defaultUsj}
         scrRef={scrRef}
         onScrRefChange={setScrRef}
-        options={options}
+        onSelectionChange={(selection) => console.log({ selection })}
+        onCommentChange={(comments) => console.log({ comments })}
         onUsjChange={handleUsjChange}
+        options={options}
         logger={console}
       />
     </>

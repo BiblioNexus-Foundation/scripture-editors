@@ -678,12 +678,14 @@ function useCollabAuthorName(): string {
 export default function CommentPlugin<TLogger extends LoggerBasic>({
   providerFactory,
   setCommentStore,
+  onChange,
   showCommentsContainerRef,
   commentContainerRef,
   logger,
 }: {
   providerFactory?: (id: string, yjsDocMap: Map<string, Doc>) => Provider;
   setCommentStore?: (commentStore: CommentStore) => void;
+  onChange?: () => void;
   showCommentsContainerRef?: React.RefObject<HTMLElement> | null;
   commentContainerRef?: React.RefObject<HTMLElement>;
   logger?: TLogger;
@@ -692,9 +694,10 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
   const [editor] = useLexicalComposerContext();
   const commentStore = useMemo(() => {
     const cs = new CommentStore(editor, logger);
+    if (onChange) cs.registerOnChange(onChange);
     setCommentStore?.(cs);
     return cs;
-  }, [editor, logger, setCommentStore]);
+  }, [editor, logger, onChange, setCommentStore]);
   const comments = useCommentStore(commentStore);
   const markNodeMap = useMemo<Map<string, Set<NodeKey>>>(() => {
     return new Map();
