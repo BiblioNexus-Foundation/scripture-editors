@@ -113,6 +113,9 @@ function registerCursorSelectionReconciler(editor: LexicalEditor): () => void {
         currentSelectionData?.offset,
         currentSelectionData?.selection.anchor.offset,
       );
+      if ([1, 2].includes(currentSelectionData?.node.getTextContentSize() ?? 0)) {
+        console.log({ previousSelectionData, currentSelectionData });
+      }
     });
   });
 }
@@ -195,17 +198,23 @@ function handleArrowCommand(
 ): boolean {
   const selectionData = $getSelectionData($getSelection());
   if (!selectionData) return false;
-  const { node: currentNode, offset, isEdge, isCursorPlaceHolder, position } = selectionData;
+  const {
+    node: currentNode,
+    offset,
+    isEdge,
+    isCursorPlaceHolder,
+    cleanContentSize,
+    position,
+  } = selectionData;
 
+  const textContent = currentNode.getTextContent();
   // If current node already contains a cursor placeholder it should be removed
   if (isCursorPlaceHolder) {
-    const textContent = currentNode.getTextContent();
     const isMovingAwayFromEdge =
       (direction === "right" && position === CursorPosition.Start) ||
       (direction === "left" && position === CursorPosition.End);
-
     //node only has a cursor placeholder
-    const nodeIsEmpty = textContent.length === 1;
+    const nodeIsEmpty = cleanContentSize === 0;
 
     if (nodeIsEmpty) {
       editor.update(
@@ -219,7 +228,7 @@ function handleArrowCommand(
         () => {
           const placeholderIndex = textContent.indexOf(CURSOR_PLACEHOLDER_CHAR);
           currentNode.spliceText(placeholderIndex, 1, "");
-          if (isMovingAwayFromEdge) {
+          if (isMovingAwayFromEdge && cleanContentSize > 1) {
             const newOffset = direction === "left" ? offset - 1 : offset + 1;
             const selection = $createRangeSelection();
             selection.anchor.set(currentNode.getKey(), newOffset, "text");
@@ -230,11 +239,12 @@ function handleArrowCommand(
         { tag: "history-merge" },
       );
     }
-    if (isMovingAwayFromEdge) return true;
+
+    if (isMovingAwayFromEdge && cleanContentSize > 1) return true;
     //If is not moving away from edge execution should continue
   }
 
-  if (selectionData.position !== targetPosition) {
+  if (selectionData.position !== targetPosition && cleanContentSize > 1) {
     return false;
   }
 
@@ -266,6 +276,28 @@ function handleArrowCommand(
     }
   }
 
+  if (cleanContentSize === 1) {
+    const newNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
+    if (position === CursorPosition.Start && direction === "right") {
+      editor.update(
+        () => {
+          currentNode.insertAfter(newNode);
+          newNode.select(1, 1);
+        },
+        { tag: "history-merge" },
+      );
+      return true;
+    } else if (position === CursorPosition.End && direction === "left") {
+      editor.update(
+        () => {
+          currentNode.insertBefore(newNode);
+          newNode.select(1, 1);
+        },
+        { tag: "history-merge" },
+      );
+      return true;
+    }
+  }
   //Cursor is at an edge and moving out of node
 
   const siblingNode =
@@ -327,7 +359,6 @@ function handleNoSibling(
 ): boolean {
   const parent = currentNode.getParent();
   if (!$isElementNode(parent) || !parent.isInline()) {
-    debugger;
     return false;
   }
   const parentSibling =
@@ -335,7 +366,6 @@ function handleNoSibling(
 
   const canInsert = direction === "right" ? parent.canInsertTextAfter() : true;
   if (!parentSibling && !canInsert) {
-    debugger;
     return false;
   }
 
@@ -358,7 +388,6 @@ function handleNoSibling(
         return;
       }
       if ($isElementNode(parentSibling)) {
-        // debugger;
         direction === "right"
           ? parent.insertAfter(cursorPositionHelperNode, false)
           : parent.insertBefore(cursorPositionHelperNode, false);
@@ -407,12 +436,23 @@ function $getSelectionData(selection: BaseSelection | null) {
     selection.anchor.offset,
   );
 
+  //calculate position
   let position: CursorPosition = CursorPosition.Middle;
-  if (offset === 1 || offset === 0) {
-    position = CursorPosition.Start;
-  }
-  if (offset === cleanContentSize || offset === cleanContentSize - 1) {
-    position = CursorPosition.End;
+  if (cleanContentSize === 1) {
+    if (offset === 0) {
+      position = CursorPosition.Start;
+    } else {
+      position = CursorPosition.End;
+    }
+  } else {
+    //is at starting edge or near starting edge
+    if (offset === 1 || offset === 0) {
+      position = CursorPosition.Start;
+    }
+    //is at ending edge or near ending edge
+    if (offset === cleanContentSize || offset === cleanContentSize - 1) {
+      position = CursorPosition.End;
+    }
   }
 
   /**
@@ -426,5 +466,15 @@ function $getSelectionData(selection: BaseSelection | null) {
    * Cursor or Cursor Placeholder is at the very end or start of the node
    */
   const isEdge = offset === 0 || offset === cleanContentSize || isCursorPlaceHolder;
-  return { selection, offset, node, position, isEdge, isCursorPlaceHolder, placeholderData };
+  return {
+    selection,
+    offset,
+    node,
+    position,
+    isEdge,
+    isCursorPlaceHolder,
+    placeholderData,
+    cleanContent,
+    cleanContentSize,
+  };
 }
