@@ -1,6 +1,4 @@
 /* eslint-disable no-debugger */
-//TODO: FIX SELECTION UPDATE WHEN TARGET NODE TEXTCONTENT SIZE IS 1
-
 import {
   $createTextNode,
   $getPreviousSelection,
@@ -28,25 +26,46 @@ enum CursorPosition {
   End = 2,
 }
 
-export function registerCursorHandlers(editor: LexicalEditor) {
+export function registerCursorHandlers(
+  editor: LexicalEditor,
+  canHavePlaceholder?: (node: LexicalNode) => boolean,
+  // updateTags: string[],
+) {
+  const defaultCanHavePlaceholder = (node: LexicalNode) => node.getType() !== "graft";
+  const checkPlaceholder = canHavePlaceholder || defaultCanHavePlaceholder;
+
+  // function editorUpdate(
+  //   editor: LexicalEditor,
+  //   update: (() => void) | (() => void),
+  //   updateTags: string[],
+  // ) {
+  //   editor.update(() => {
+  //     update();
+  //     updateTags.forEach((tag) => $addUpdateTag(tag));
+  //   });
+  // }
+
   return mergeRegister(
     registerCursorSelectionReconciler(editor),
     registerCursorRemovalOnEditorBlur(editor),
     registerCursorRemovalOnTextTransform(editor),
     registerCursorRemovalOnSelectionChange(editor),
-    registerCursorInsertOnRightArrowDown(editor),
-    registerCursorInsertOnLeftArrowDown(editor),
+    registerCursorInsertOnRightArrowDown(editor, checkPlaceholder),
+    registerCursorInsertOnLeftArrowDown(editor, checkPlaceholder),
   );
 }
 
-function registerCursorInsertOnLeftArrowDown(editor: LexicalEditor): () => void {
+function registerCursorInsertOnLeftArrowDown(
+  editor: LexicalEditor,
+  canHavePlaceholder: (node: LexicalNode) => boolean,
+): () => void {
   return editor.registerCommand(
     KEY_ARROW_LEFT_COMMAND,
     (e) => {
       if (e.repeat) {
         return false;
       }
-      const result = handleArrowCommand(editor, CursorPosition.Start, "left");
+      const result = handleArrowCommand(editor, CursorPosition.Start, "left", canHavePlaceholder);
       if (result) {
         e.preventDefault();
       }
@@ -56,14 +75,17 @@ function registerCursorInsertOnLeftArrowDown(editor: LexicalEditor): () => void 
   );
 }
 
-function registerCursorInsertOnRightArrowDown(editor: LexicalEditor): () => void {
+function registerCursorInsertOnRightArrowDown(
+  editor: LexicalEditor,
+  canHavePlaceholder: (node: LexicalNode) => boolean,
+): () => void {
   return editor.registerCommand(
     KEY_ARROW_RIGHT_COMMAND,
     (e) => {
       if (e.repeat) {
         return false;
       }
-      const result = handleArrowCommand(editor, CursorPosition.End, "right");
+      const result = handleArrowCommand(editor, CursorPosition.End, "right", canHavePlaceholder);
       if (result) {
         e.preventDefault();
       }
@@ -181,20 +203,27 @@ function registerCursorRemovalOnTextTransform(editor: LexicalEditor): () => void
   });
 }
 
-function insertPlaceholder(node: LexicalNode, position: CursorPosition, restoreSelection = false) {
+function insertPlaceholder(
+  node: LexicalNode,
+  position: CursorPosition.Start | CursorPosition.End,
+  restoreSelection = false,
+) {
+  const newNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
   if (position === CursorPosition.Start) {
-    const newNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
     node.insertBefore(newNode, restoreSelection);
+    return newNode;
   } else if (position === CursorPosition.End) {
-    const newNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
     node.insertAfter(newNode, restoreSelection);
+    return newNode;
   }
+  throw new Error("Wrong position for cursor placeholder");
 }
 
 function handleArrowCommand(
   editor: LexicalEditor,
   targetPosition: CursorPosition,
   direction: "left" | "right",
+  canHavePlaceholder: (node: LexicalNode) => boolean,
 ): boolean {
   const selectionData = $getSelectionData($getSelection());
   if (!selectionData) return false;
@@ -206,6 +235,11 @@ function handleArrowCommand(
     cleanContentSize,
     position,
   } = selectionData;
+
+  // Check if the node can have a placeholder
+  if (!canHavePlaceholder(currentNode)) {
+    return false;
+  }
 
   const textContent = currentNode.getTextContent();
   // If current node already contains a cursor placeholder it should be removed
@@ -282,7 +316,7 @@ function handleArrowCommand(
       editor.update(
         () => {
           currentNode.insertAfter(newNode);
-          newNode.select(1, 1);
+          newNode.select(0, 0);
         },
         { tag: "history-merge" },
       );
@@ -303,12 +337,59 @@ function handleArrowCommand(
   const siblingNode =
     direction === "right" ? currentNode.getNextSibling() : currentNode.getPreviousSibling();
 
-  if ($isElementNode(siblingNode)) {
-    return handleElementSibling(siblingNode, editor, direction);
+  if (!siblingNode) {
+    return handleNoSibling(currentNode, editor, direction, canHavePlaceholder);
   }
 
-  if (!siblingNode) {
-    return handleNoSibling(currentNode, editor, direction);
+  if (!canHavePlaceholder(siblingNode)) {
+    const findEligibleDescendant = (node: LexicalNode): LexicalNode | null => {
+      if (canHavePlaceholder(node)) {
+        return node;
+      }
+      if ($isElementNode(node)) {
+        const child = direction === "right" ? node.getFirstChild() : node.getLastChild();
+        if (child) {
+          return findEligibleDescendant(child);
+        }
+      }
+      return null;
+    };
+
+    const eligibleDescendant = findEligibleDescendant(siblingNode);
+    if (eligibleDescendant) {
+      editor.update(
+        () => {
+          const cursorPositionHelperNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
+          if ($isTextNode(eligibleDescendant)) {
+            insertPlaceholder(
+              eligibleDescendant,
+              direction === "right" ? CursorPosition.Start : CursorPosition.End,
+              true,
+            );
+          } else if ($isElementNode(eligibleDescendant)) {
+            handleElementSibling(eligibleDescendant, editor, direction);
+          }
+          const offset = direction === "right" ? 1 : 0;
+          cursorPositionHelperNode.select(offset, offset);
+        },
+        { tag: "history-merge" },
+      );
+      return true;
+    }
+    // If no eligible descendant is found, continue with the default behavior
+    return false;
+  }
+
+  if ($isTextNode(siblingNode)) {
+    insertPlaceholder(
+      siblingNode,
+      direction === "right" ? CursorPosition.Start : CursorPosition.End,
+      true,
+    );
+  }
+
+  if ($isElementNode(siblingNode)) {
+    return handleElementSibling(siblingNode, editor, direction);
   }
 
   console.warn("UNHANDLED CURSOR HELPER CASE");
@@ -334,7 +415,8 @@ function handleElementSibling(
     } else {
       editor.update(
         () => {
-          const targetChild = siblingNode.getFirstChild();
+          const targetChild =
+            direction === "right" ? siblingNode.getFirstChild() : siblingNode.getLastChild();
           if (!targetChild) return;
           direction === "right"
             ? targetChild.insertBefore(cursorPositionHelperNode) &&
@@ -356,29 +438,44 @@ function handleNoSibling(
   currentNode: LexicalNode,
   editor: LexicalEditor,
   direction: "left" | "right",
+  canHavePlaceholder: (node: LexicalNode) => boolean,
 ): boolean {
-  const parent = currentNode.getParent();
-  if (!$isElementNode(parent) || !parent.isInline()) {
+  const currentParent = currentNode.getParent();
+  if (!$isElementNode(currentParent) || !currentParent.isInline()) {
     return false;
   }
   const parentSibling =
-    direction === "right" ? parent.getNextSibling() : parent.getPreviousSibling();
+    direction === "right" ? currentParent.getNextSibling() : currentParent.getPreviousSibling();
 
-  const canInsert = direction === "right" ? parent.canInsertTextAfter() : true;
+  const canInsert = direction === "right" ? currentParent.canInsertTextAfter() : true;
+
   if (!parentSibling && !canInsert) {
     return false;
   }
 
-  editor.update(
-    () => {
-      const cursorPositionHelperNode = $createTextNode(CURSOR_PLACEHOLDER_CHAR);
-      if (!parentSibling) {
-        direction === "right"
-          ? parent.insertAfter(cursorPositionHelperNode, true)
-          : parent.insertBefore(cursorPositionHelperNode, true);
-        return;
-      }
-      if ($isTextNode(parentSibling)) {
+  if (!parentSibling) {
+    editor.update(
+      () => {
+        const placeHolderNode =
+          direction === "right"
+            ? insertPlaceholder(currentParent, CursorPosition.End)
+            : insertPlaceholder(currentParent, CursorPosition.Start);
+        if (!placeHolderNode) return;
+        const offset = direction === "right" ? 1 : 0;
+        placeHolderNode.select(offset, offset);
+      },
+      { tag: "history-merge" },
+    );
+    return true;
+  }
+
+  if ($isTextNode(parentSibling)) {
+    const textNodeParent = parentSibling.getParent();
+    if (textNodeParent && !canHavePlaceholder(textNodeParent)) {
+      return false;
+    }
+    editor.update(
+      () => {
         insertPlaceholder(
           parentSibling,
           direction === "right" ? CursorPosition.Start : CursorPosition.End,
@@ -386,19 +483,56 @@ function handleNoSibling(
         const offset = direction === "right" ? 0 : parentSibling.getTextContentSize();
         parentSibling.select(offset, offset);
         return;
+      },
+      { tag: "history-merge" },
+    );
+    return true;
+  }
+
+  if ($isElementNode(parentSibling)) {
+    debugger;
+    const nodeParent = parentSibling.getParent();
+    if (nodeParent && canHavePlaceholder(nodeParent)) {
+      editor.update(
+        () => {
+          const placeholder =
+            direction === "right"
+              ? insertPlaceholder(currentParent, CursorPosition.End, false)
+              : insertPlaceholder(currentParent, CursorPosition.Start, false);
+          debugger;
+          placeholder.select(1, 1);
+        },
+        { tag: "history-merge" },
+      );
+      return true;
+    }
+    const findEligibleDescendant = (node: LexicalNode): LexicalNode | null => {
+      if (canHavePlaceholder(node)) {
+        return node;
       }
-      if ($isElementNode(parentSibling)) {
-        direction === "right"
-          ? parent.insertAfter(cursorPositionHelperNode, false)
-          : parent.insertBefore(cursorPositionHelperNode, false);
-        cursorPositionHelperNode.select(1, 1);
-        return;
+      if ($isElementNode(node)) {
+        const child = direction === "right" ? node.getFirstChild() : node.getLastChild();
+        if (child) {
+          return findEligibleDescendant(child);
+        }
       }
-      console.warn("UNHANDLED NO SIBLING CURSOR HELPER CASE");
-    },
-    { tag: "history-merge" },
-  );
-  return true;
+      return null;
+    };
+    const targetNode = findEligibleDescendant(parentSibling);
+    if (!targetNode) return false;
+    editor.update(
+      () => {
+        const placeholder =
+          direction === "right"
+            ? insertPlaceholder(targetNode, CursorPosition.Start, false)
+            : insertPlaceholder(targetNode, CursorPosition.End, false);
+        placeholder.select(1, 1);
+      },
+      { tag: "history-merge" },
+    );
+    return true;
+  }
+  return false;
 }
 
 function $getSelectionData(selection: BaseSelection | null) {
