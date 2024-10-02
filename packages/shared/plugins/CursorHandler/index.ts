@@ -5,6 +5,7 @@ import {
   $getSelection,
   $isElementNode,
   $isRangeSelection,
+  $isRootNode,
   $isTextNode,
   BaseSelection,
   BLUR_COMMAND,
@@ -33,17 +34,6 @@ export function registerCursorHandlers(
 ) {
   const defaultCanHavePlaceholder = (node: LexicalNode) => node.getType() !== "graft";
   const checkPlaceholder = canHavePlaceholder || defaultCanHavePlaceholder;
-
-  // function editorUpdate(
-  //   editor: LexicalEditor,
-  //   update: (() => void) | (() => void),
-  //   updateTags: string[],
-  // ) {
-  //   editor.update(() => {
-  //     update();
-  //     updateTags.forEach((tag) => $addUpdateTag(tag));
-  //   });
-  // }
 
   return mergeRegister(
     registerCursorSelectionReconciler(editor),
@@ -440,26 +430,50 @@ function handleNoSibling(
   direction: "left" | "right",
   canHavePlaceholder: (node: LexicalNode) => boolean,
 ): boolean {
-  const currentParent = currentNode.getParent();
-  if (!$isElementNode(currentParent) || !currentParent.isInline()) {
+  function getValidAncestor(node: LexicalNode, direction: "left" | "right") {
+    const ancestor = node.getParent();
+    if (!ancestor) return { ancestor: null, ancestorSibling: null };
+    if (!$isElementNode(ancestor) || !ancestor.isInline()) {
+      return { ancestor: null, ancestorSibling: null };
+    }
+    const ancestorParent = ancestor.getParent();
+    if (!ancestorParent || $isRootNode(ancestorParent))
+      return { ancestor: null, ancestorSibling: null };
+
+    const parentCanHavePlaceholder = canHavePlaceholder(ancestorParent);
+    const canHavePlaceholderAsSibling =
+      direction === "right" ? ancestor.canInsertTextAfter() : ancestor.canInsertTextBefore();
+
+    //check that ancestor can have a placeholder and insert after or before depending on direction
+    const canInsert = parentCanHavePlaceholder && canHavePlaceholderAsSibling;
+
+    //check that ancestor has a previous sibling or next sibling depending on direction
+    const ancestorSibling =
+      direction === "right" ? ancestor.getNextSibling() : ancestor.getPreviousSibling();
+
+    if (!ancestorSibling && !canInsert) {
+      return getValidAncestor(ancestor, direction);
+    }
+
+    if ($isTextNode(ancestorSibling) && !canInsert) {
+      return { ancestor: null, ancestorSibling: null };
+    }
+
+    return { ancestor, ancestorSibling };
+  }
+  const { ancestor, ancestorSibling } = getValidAncestor(currentNode, direction);
+
+  if (!ancestor && !ancestorSibling) {
     return false;
   }
-  const parentSibling =
-    direction === "right" ? currentParent.getNextSibling() : currentParent.getPreviousSibling();
 
-  const canInsert = direction === "right" ? currentParent.canInsertTextAfter() : true;
-
-  if (!parentSibling && !canInsert) {
-    return false;
-  }
-
-  if (!parentSibling) {
+  if (!ancestorSibling) {
     editor.update(
       () => {
         const placeHolderNode =
           direction === "right"
-            ? insertPlaceholder(currentParent, CursorPosition.End)
-            : insertPlaceholder(currentParent, CursorPosition.Start);
+            ? insertPlaceholder(ancestor, CursorPosition.End)
+            : insertPlaceholder(ancestor, CursorPosition.Start);
         if (!placeHolderNode) return;
         const offset = direction === "right" ? 1 : 0;
         placeHolderNode.select(offset, offset);
@@ -469,19 +483,15 @@ function handleNoSibling(
     return true;
   }
 
-  if ($isTextNode(parentSibling)) {
-    const textNodeParent = parentSibling.getParent();
-    if (textNodeParent && !canHavePlaceholder(textNodeParent)) {
-      return false;
-    }
+  if ($isTextNode(ancestorSibling)) {
     editor.update(
       () => {
         insertPlaceholder(
-          parentSibling,
+          ancestorSibling,
           direction === "right" ? CursorPosition.Start : CursorPosition.End,
         );
-        const offset = direction === "right" ? 0 : parentSibling.getTextContentSize();
-        parentSibling.select(offset, offset);
+        const offset = direction === "right" ? 0 : ancestorSibling.getTextContentSize();
+        ancestorSibling.select(offset, offset);
         return;
       },
       { tag: "history-merge" },
@@ -489,17 +499,15 @@ function handleNoSibling(
     return true;
   }
 
-  if ($isElementNode(parentSibling)) {
-    debugger;
-    const nodeParent = parentSibling.getParent();
+  if ($isElementNode(ancestorSibling)) {
+    const nodeParent = ancestorSibling.getParent();
     if (nodeParent && canHavePlaceholder(nodeParent)) {
       editor.update(
         () => {
           const placeholder =
             direction === "right"
-              ? insertPlaceholder(currentParent, CursorPosition.End, false)
-              : insertPlaceholder(currentParent, CursorPosition.Start, false);
-          debugger;
+              ? insertPlaceholder(ancestor, CursorPosition.End, false)
+              : insertPlaceholder(ancestor, CursorPosition.Start, false);
           placeholder.select(1, 1);
         },
         { tag: "history-merge" },
@@ -518,7 +526,7 @@ function handleNoSibling(
       }
       return null;
     };
-    const targetNode = findEligibleDescendant(parentSibling);
+    const targetNode = findEligibleDescendant(ancestorSibling);
     if (!targetNode) return false;
     editor.update(
       () => {
