@@ -23,8 +23,6 @@ export function registerFocusableGrafts(
 
   const focusedGrafts: NodeKey[] = [];
   editor.registerUpdateListener(({ editorState }) => {
-    // if (tags.has("history-merge")) return;
-
     editorState.read(() => {
       const selection = $getSelection();
       const nodes = selection?.getNodes();
