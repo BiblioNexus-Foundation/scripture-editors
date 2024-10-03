@@ -21,6 +21,13 @@ import { $createRangeSelection } from "lexical";
 import { $setSelection } from "lexical";
 import { $processSelection, CursorData, CursorPosition } from "./processSelection";
 
+const CURSOR_PLACEHOLDER_OFFSET = {
+  BEFORE: 0,
+  AFTER: 1,
+};
+
+const COMMAND_PRIORITY = 0;
+
 export function registerCursorHandlers(
   editor: LexicalEditor,
   canHavePlaceholder: (node: LexicalNode) => boolean = () => true,
@@ -63,7 +70,7 @@ export function registerCursorHandlers(
         });
         return false;
       },
-      0,
+      COMMAND_PRIORITY,
     );
   }
 
@@ -148,7 +155,7 @@ export function registerCursorHandlers(
         }
         return result;
       },
-      0,
+      COMMAND_PRIORITY,
     );
   }
 
@@ -157,113 +164,95 @@ export function registerCursorHandlers(
     if (!selectionData) return false;
     const { node: currentNode, cursor, content } = selectionData;
 
-    // Check if the node can have a placeholder
-    if (!canHavePlaceholder(currentNode)) {
-      return false;
-    }
+    if (!canHavePlaceholder(currentNode)) return false;
 
-    function handleCursorIsAtPlaceholder() {
-      if (cursor.isMovingAwayFromEdge) {
-        editorUpdate(() => {
-          $removeCursorPlaceholder(currentNode);
-          const newOffset = direction === "left" ? cursor.offset - 1 : cursor.offset + 1;
-          const selection = $createRangeSelection();
-          selection.anchor.set(currentNode.getKey(), newOffset, "text");
-          selection.focus.set(currentNode.getKey(), newOffset, "text");
-          $setSelection(selection);
-        });
-        return true;
-      }
-
-      editorUpdate(() => {
-        if (content.isEmpty) {
-          currentNode.setTextContent("");
-        } else {
-          $removeCursorPlaceholder(currentNode);
-        }
-      });
-      //If is not moving away from edge execution should continue
-    }
-
-    // If current node already contains a cursor placeholder it should be removed
     if (cursor.isPlaceholder) {
-      const isHandleCompleted = handleCursorIsAtPlaceholder();
-      if (isHandleCompleted) return true;
+      const isHandled = handleExistingPlaceholder(currentNode, cursor, content);
+      if (isHandled) return true;
     }
 
-    // Prevent unnecessary cursor handling when the cursor is not at an edge or one character away from edge
     if (cursor.position === CursorPosition.Middle || cursor.isMovingAwayFromEdge) {
       return false;
     }
 
     if (cursor.isMovingTowardsEdge) {
-      editorUpdate(() => {
-        const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
-        const selectOffset = cursor.isMovingLeft ? 1 : 0;
-        const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
-        cursorPlaceholderNode.select(selectOffset, selectOffset);
-      });
-      return true;
+      return handleMovingTowardsEdge(currentNode, cursor);
     }
 
     if (cursor.isSwitchingEdge) {
-      editorUpdate(() => {
-        const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
-        const selectOffset = cursor.isMovingRight ? 0 : 1;
-        const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
-        cursorPlaceholderNode.select(selectOffset, selectOffset);
-      });
-      return true;
+      return handleSwitchingEdge(currentNode, cursor);
     }
 
-    const siblingNode = cursor.isMovingRight
-      ? currentNode.getNextSibling()
-      : currentNode.getPreviousSibling();
-
+    const siblingNode = getSiblingNode(currentNode, cursor);
     if (!siblingNode) {
       return handleNoSibling(currentNode, cursor);
     }
 
-    if (!canHavePlaceholder(siblingNode)) {
-      const eligibleDescendant = findDescendantEligibleForPlaceholder(siblingNode, cursor);
-      if (eligibleDescendant) {
-        if ($isTextNode(eligibleDescendant)) {
-          if (cursor.isMovingOutwards) {
-            editorUpdate(() => {
-              const cursorPosition = cursor.isMovingToNextNode
-                ? CursorPosition.Start
-                : CursorPosition.End;
-              const selectOffset = cursor.isMovingToNextNode ? 1 : 0;
-              const cursorPlaceholderNode = $insertCursorPlaceholder(
-                eligibleDescendant,
-                cursorPosition,
-              );
-              cursorPlaceholderNode.select(selectOffset, selectOffset);
-            });
-            return true; // Prevent default behavior
-          }
-        } else if ($isElementNode(eligibleDescendant)) {
-          return handleElementSibling(eligibleDescendant, cursor);
-        }
+    return handleSiblingNode(siblingNode, cursor);
+  }
 
-        return true;
-      }
-      // If no eligible descendant is found, continue with the default behavior
-      return false;
+  function handleExistingPlaceholder(
+    currentNode: TextNode,
+    cursor: CursorData,
+    content: { isEmpty: boolean },
+  ): boolean {
+    if (cursor.isMovingAwayFromEdge) {
+      editorUpdate(() => {
+        $removeCursorPlaceholder(currentNode);
+        const newOffset = cursor.isMovingLeft ? cursor.offset - 1 : cursor.offset + 1;
+        const selection = $createRangeSelection();
+        selection.anchor.set(currentNode.getKey(), newOffset, "text");
+        selection.focus.set(currentNode.getKey(), newOffset, "text");
+        $setSelection(selection);
+      });
+      return true;
     }
 
-    if ($isTextNode(siblingNode)) {
-      if (cursor.isMovingOutwards) {
-        editorUpdate(() => {
-          const cursorPosition = cursor.isMovingToNextNode
-            ? CursorPosition.Start
-            : CursorPosition.End;
-          const selectOffset = cursor.isMovingToNextNode ? 1 : 0;
-          const cursorPlaceholderNode = $insertCursorPlaceholder(siblingNode, cursorPosition);
-          cursorPlaceholderNode.select(selectOffset, selectOffset);
-        });
-        return true;
+    editorUpdate(() => {
+      if (content.isEmpty) {
+        currentNode.setTextContent("");
+      } else {
+        $removeCursorPlaceholder(currentNode);
       }
+    });
+    return false;
+  }
+
+  function handleMovingTowardsEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
+      const selectOffset = cursor.isMovingLeft
+        ? CURSOR_PLACEHOLDER_OFFSET.AFTER
+        : CURSOR_PLACEHOLDER_OFFSET.BEFORE;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
+  }
+
+  function handleSwitchingEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
+      const selectOffset = cursor.isMovingRight
+        ? CURSOR_PLACEHOLDER_OFFSET.BEFORE
+        : CURSOR_PLACEHOLDER_OFFSET.AFTER;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
+  }
+
+  function getSiblingNode(currentNode: LexicalNode, cursor: CursorData): LexicalNode | null {
+    return cursor.isMovingRight ? currentNode.getNextSibling() : currentNode.getPreviousSibling();
+  }
+
+  function handleSiblingNode(siblingNode: LexicalNode, cursor: CursorData): boolean {
+    if (!canHavePlaceholder(siblingNode)) {
+      return handleNonPlaceholderSibling(siblingNode, cursor);
+    }
+
+    if ($isTextNode(siblingNode) && cursor.isMovingOutwards) {
+      return handleTextSibling(siblingNode, cursor);
     }
 
     if ($isElementNode(siblingNode)) {
@@ -272,6 +261,45 @@ export function registerCursorHandlers(
 
     console.warn("UNHANDLED CURSOR HELPER CASE");
     return false;
+  }
+
+  function handleNonPlaceholderSibling(siblingNode: LexicalNode, cursor: CursorData): boolean {
+    const eligibleDescendant = findDescendantEligibleForPlaceholder(siblingNode, cursor);
+    if (!eligibleDescendant) return false;
+
+    if ($isTextNode(eligibleDescendant) && cursor.isMovingOutwards) {
+      return handleTextDescendant(eligibleDescendant, cursor);
+    }
+
+    if ($isElementNode(eligibleDescendant)) {
+      return handleElementSibling(eligibleDescendant, cursor);
+    }
+
+    return true;
+  }
+
+  function handleTextSibling(siblingNode: TextNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
+      const selectOffset = cursor.isMovingToNextNode
+        ? CURSOR_PLACEHOLDER_OFFSET.AFTER
+        : CURSOR_PLACEHOLDER_OFFSET.BEFORE;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(siblingNode, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
+  }
+
+  function handleTextDescendant(descendant: TextNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
+      const selectOffset = cursor.isMovingToNextNode
+        ? CURSOR_PLACEHOLDER_OFFSET.AFTER
+        : CURSOR_PLACEHOLDER_OFFSET.BEFORE;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(descendant, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
   }
 
   function handleElementSibling(siblingNode: ElementNode, cursor: CursorData): boolean {
@@ -291,7 +319,9 @@ export function registerCursorHandlers(
           if (!targetChild) return;
 
           const cursorPosition = cursor.isMovingRight ? CursorPosition.Start : CursorPosition.End;
-          const selectOffset = cursor.isMovingRight ? 1 : 0;
+          const selectOffset = cursor.isMovingRight
+            ? CURSOR_PLACEHOLDER_OFFSET.AFTER
+            : CURSOR_PLACEHOLDER_OFFSET.BEFORE;
           const cursorPlaceholderNode = $insertCursorPlaceholder(targetChild, cursorPosition);
           cursorPlaceholderNode.select(selectOffset, selectOffset);
         });
@@ -320,39 +350,6 @@ export function registerCursorHandlers(
   }
 
   function handleNoSibling(currentNode: LexicalNode, cursor: CursorData): boolean {
-    function getValidAncestor(node: LexicalNode, cursor: CursorData) {
-      const ancestor = node.getParent();
-      if (!ancestor) return { ancestor: null, ancestorSibling: null };
-      if (!$isElementNode(ancestor) || !ancestor.isInline()) {
-        return { ancestor: null, ancestorSibling: null };
-      }
-      const ancestorParent = ancestor.getParent();
-      if (!ancestorParent || $isRootNode(ancestorParent))
-        return { ancestor: null, ancestorSibling: null };
-
-      const parentCanHavePlaceholder = canHavePlaceholder(ancestorParent);
-      const canHavePlaceholderAsSibling = cursor.isMovingRight
-        ? ancestor.canInsertTextAfter()
-        : ancestor.canInsertTextBefore();
-
-      //check that ancestor can have a placeholder and insert after or before depending on direction
-      const canInsert = parentCanHavePlaceholder && canHavePlaceholderAsSibling;
-
-      //check that ancestor has a previous sibling or next sibling depending on direction
-      const ancestorSibling = cursor.isMovingRight
-        ? ancestor.getNextSibling()
-        : ancestor.getPreviousSibling();
-
-      if (!ancestorSibling && !canInsert) {
-        return getValidAncestor(ancestor, cursor);
-      }
-
-      if ($isTextNode(ancestorSibling) && !canInsert) {
-        return { ancestor: null, ancestorSibling: null };
-      }
-
-      return { ancestor, ancestorSibling };
-    }
     const { ancestor, ancestorSibling } = getValidAncestor(currentNode, cursor);
 
     if (!ancestor && !ancestorSibling) {
@@ -360,47 +357,101 @@ export function registerCursorHandlers(
     }
 
     if (!ancestorSibling) {
-      editorUpdate(() => {
-        const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
-        const selectOffset = cursor.isMovingLeft ? 0 : 1;
-        const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition);
-        cursorPlaceholderNode.select(selectOffset, selectOffset);
-      });
-      return true;
+      return handleAncestorWithoutSibling(ancestor, cursor);
     }
 
     if ($isTextNode(ancestorSibling)) {
-      editorUpdate(() => {
-        const cursorPosition = cursor.isMovingLeft ? CursorPosition.End : CursorPosition.Start;
-        const selectOffset = cursor.isMovingLeft ? 0 : 1;
-        const cursorPlaceholderNode = $insertCursorPlaceholder(ancestorSibling, cursorPosition);
-        cursorPlaceholderNode.select(selectOffset, selectOffset);
-      });
-      return true;
+      return handleTextAncestorSibling(ancestorSibling, cursor);
     }
 
     if ($isElementNode(ancestorSibling)) {
-      const nodeParent = ancestorSibling.getParent();
-      if (nodeParent && canHavePlaceholder(nodeParent)) {
-        editorUpdate(() => {
-          const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
-          const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition, false);
-          cursorPlaceholderNode.select(1, 1);
-        });
-        return true;
-      }
+      return handleElementAncestorSibling(ancestor, ancestorSibling, cursor);
+    }
 
-      const targetNode = findDescendantEligibleForPlaceholder(ancestorSibling, cursor);
-      if (!targetNode) return false;
+    return false;
+  }
+
+  function getValidAncestor(node: LexicalNode, cursor: CursorData) {
+    const ancestor = node.getParent();
+    if (!ancestor || !$isElementNode(ancestor) || !ancestor.isInline()) {
+      return { ancestor: null, ancestorSibling: null };
+    }
+
+    const ancestorParent = ancestor.getParent();
+    if (!ancestorParent || $isRootNode(ancestorParent)) {
+      return { ancestor: null, ancestorSibling: null };
+    }
+
+    const parentCanHavePlaceholder = canHavePlaceholder(ancestorParent);
+    const canHavePlaceholderAsSibling = cursor.isMovingRight
+      ? ancestor.canInsertTextAfter()
+      : ancestor.canInsertTextBefore();
+
+    const canInsert = parentCanHavePlaceholder && canHavePlaceholderAsSibling;
+
+    const ancestorSibling = cursor.isMovingRight
+      ? ancestor.getNextSibling()
+      : ancestor.getPreviousSibling();
+
+    if (!ancestorSibling && !canInsert) {
+      return getValidAncestor(ancestor, cursor);
+    }
+
+    if ($isTextNode(ancestorSibling) && !canInsert) {
+      return { ancestor: null, ancestorSibling: null };
+    }
+
+    return { ancestor, ancestorSibling };
+  }
+
+  function handleAncestorWithoutSibling(ancestor: ElementNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
+      const selectOffset = cursor.isMovingLeft
+        ? CURSOR_PLACEHOLDER_OFFSET.BEFORE
+        : CURSOR_PLACEHOLDER_OFFSET.AFTER;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
+  }
+
+  function handleTextAncestorSibling(ancestorSibling: TextNode, cursor: CursorData): boolean {
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingLeft ? CursorPosition.End : CursorPosition.Start;
+      const selectOffset = cursor.isMovingLeft
+        ? CURSOR_PLACEHOLDER_OFFSET.BEFORE
+        : CURSOR_PLACEHOLDER_OFFSET.AFTER;
+      const cursorPlaceholderNode = $insertCursorPlaceholder(ancestorSibling, cursorPosition);
+      cursorPlaceholderNode.select(selectOffset, selectOffset);
+    });
+    return true;
+  }
+
+  function handleElementAncestorSibling(
+    ancestor: ElementNode,
+    ancestorSibling: ElementNode,
+    cursor: CursorData,
+  ): boolean {
+    const nodeParent = ancestorSibling.getParent();
+    if (nodeParent && canHavePlaceholder(nodeParent)) {
       editorUpdate(() => {
-        const placeholder = cursor.isMovingRight
-          ? $insertCursorPlaceholder(targetNode, CursorPosition.Start, false)
-          : $insertCursorPlaceholder(targetNode, CursorPosition.End, false);
-        placeholder.select(1, 1);
+        const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
+        const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition, false);
+        cursorPlaceholderNode.select(1, 1);
       });
       return true;
     }
-    return false;
+
+    const targetNode = findDescendantEligibleForPlaceholder(ancestorSibling, cursor);
+    if (!targetNode) return false;
+
+    editorUpdate(() => {
+      const cursorPosition = cursor.isMovingRight ? CursorPosition.Start : CursorPosition.End;
+      const placeholder = $insertCursorPlaceholder(targetNode, cursorPosition, false);
+      placeholder.select(1, 1);
+    });
+    return true;
   }
 
   return unRegisterCursorHandlers;
