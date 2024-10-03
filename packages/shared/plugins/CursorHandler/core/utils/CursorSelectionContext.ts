@@ -1,5 +1,5 @@
 import { $isTextNode, $isRangeSelection, BaseSelection, TextNode, RangeSelection } from "lexical";
-import { CURSOR_POSITION_HELPER_CHAR as CURSOR_PLACEHOLDER_CHAR } from "../../constants/helperCharacters";
+import { CURSOR_PLACEHOLDER_CHAR as CURSOR_PLACEHOLDER_CHAR } from "./constants";
 
 export enum CursorPosition {
   Start,
@@ -70,7 +70,7 @@ interface LazyProcessedSelection {
   placeholders: PlaceholdersData;
 }
 
-export function $processSelection(
+export function $getCursorSelectionContext(
   selection: BaseSelection | null,
   targetDirection?: Direction,
 ): LazyProcessedSelection | null {

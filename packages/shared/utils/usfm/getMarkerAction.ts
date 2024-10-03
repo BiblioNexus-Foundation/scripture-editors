@@ -13,7 +13,7 @@ import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNo
 import { createLexicalNodeFromUsfm } from "./usfmToLexical";
 import { $isMarkerNode } from "../../nodes/scripture/usj/MarkerNode";
 import { MarkerType, Marker } from "./usfmTypes";
-import { CURSOR_POSITION_HELPER_CHAR } from "../../constants/helperCharacters";
+import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
 import { $isUsfmParagraphNode } from "../../nodes/UsfmParagraphNode";
 
 export const markerActions: {
@@ -55,13 +55,13 @@ export const markerActions: {
   f: {
     action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${CURSOR_POSITION_HELPER_CHAR} \f*`;
+      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${CURSOR_PLACEHOLDER_CHAR} \f*`;
     },
   },
   x: {
     action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${CURSOR_POSITION_HELPER_CHAR} \x*`;
+      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${CURSOR_PLACEHOLDER_CHAR} \x*`;
     },
   },
 };
@@ -80,7 +80,7 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
           ? node
           : createLexicalNodeFromUsfm(
               node ||
-                `\\${marker} ${CURSOR_POSITION_HELPER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
+                `\\${marker} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
               !markerData ||
                 markerData.type === MarkerType.Character ||
                 markerData.type === MarkerType.Note
