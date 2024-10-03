@@ -1,5 +1,5 @@
 import { $isTextNode, $isRangeSelection, BaseSelection, TextNode, RangeSelection } from "lexical";
-import { CURSOR_PLACEHOLDER_CHAR as CURSOR_PLACEHOLDER_CHAR } from "./constants";
+import { CURSOR_PLACEHOLDER_CHAR, CursorMovementDirection } from "./constants";
 
 export enum CursorPosition {
   Start,
@@ -7,7 +7,7 @@ export enum CursorPosition {
   End,
 }
 
-type Direction = "left" | "right" | undefined;
+type Direction = CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT | undefined;
 
 interface PlaceholdersData {
   char: string;
@@ -191,10 +191,10 @@ export function $getCursorSelectionContext(
         return _isPlaceholder;
       },
       get isMovingRight() {
-        return targetDirection === "right";
+        return targetDirection === CursorMovementDirection.RIGHT;
       },
       get isMovingLeft() {
-        return targetDirection === "left";
+        return targetDirection === CursorMovementDirection.LEFT;
       },
       get isAtStart() {
         return getPosition() === CursorPosition.Start;

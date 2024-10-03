@@ -16,7 +16,7 @@ import {
   CursorPosition,
 } from "../utils/CursorSelectionContext";
 import { $insertCursorPlaceholder, $removeCursorPlaceholder } from "../utils";
-import { charSelectionOffset } from "../utils/constants";
+import { charSelectionOffset, CursorMovementDirection } from "../utils/constants";
 import { handleNoSibling } from "./noSibling";
 import { handleSiblingNode } from "./sibling";
 
@@ -26,12 +26,15 @@ export function registerCursorInsertion(
   editorUpdate: (update: (() => void) | (() => void), tag?: string) => void,
 ) {
   const unregisterInsertionHandlers = mergeRegister(
-    registerCursorInsertOnArrowDown("right"),
-    registerCursorInsertOnArrowDown("left"),
+    registerCursorInsertOnArrowDown(CursorMovementDirection.RIGHT),
+    registerCursorInsertOnArrowDown(CursorMovementDirection.LEFT),
   );
 
-  function registerCursorInsertOnArrowDown(direction: "left" | "right"): () => void {
-    const command = direction === "left" ? KEY_ARROW_LEFT_COMMAND : KEY_ARROW_RIGHT_COMMAND;
+  function registerCursorInsertOnArrowDown(
+    direction: CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT,
+  ): () => void {
+    const command =
+      direction === CursorMovementDirection.LEFT ? KEY_ARROW_LEFT_COMMAND : KEY_ARROW_RIGHT_COMMAND;
 
     return editor.registerCommand(
       command,
@@ -49,7 +52,9 @@ export function registerCursorInsertion(
     );
   }
 
-  function handleArrowCommand(direction: "left" | "right"): boolean {
+  function handleArrowCommand(
+    direction: CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT,
+  ): boolean {
     const selectionData = $getCursorSelectionContext($getSelection(), direction);
     if (!selectionData) return false;
     const { node: currentNode, cursor, content } = selectionData;
