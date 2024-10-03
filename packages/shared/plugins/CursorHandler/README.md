@@ -7,7 +7,7 @@ The CursorHandler is a plugin for Lexical Editor that manages cursor behavior an
 To use the CursorHandler in your project, import the necessary functions and constants:
 
 ```ts
-import { registerCursorHandlers } from "@shared/plugins/CursorHandler";
+import { registerCursorHandlers } from "shared/plugins/CursorHandler";
 ```
 
 ## Configuration
@@ -52,6 +52,10 @@ As the user navigates the document using the keyboard, the CursorHandler identif
 ### Dynamic Adjustment
 
 As the user moves the cursor, the CursorHandler checks the current position. If the placeholder is no longer needed, it's removed. If the cursor moves to a location that requires a placeholder, one is inserted or repositioned accordingly.
+
+### Customizable behavior
+
+The CursorHandler is designed to be flexible and can be configured by passing a `canHavePlaceholder` filter callback function to determine if a node can have a placeholder and an `updateTags` parameter which declares tags that will be attached to the editor update when a placeholder is inserted or removed, allowing for external handling of the placeholder insertion/removal events.
 
 ## Benefits
 
