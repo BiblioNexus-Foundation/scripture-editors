@@ -74,9 +74,10 @@ button:focus-visible {
   width: 100%;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(480px, 70vw));
   gap: 1em;
   justify-items: center;
+  justify-content: center;
 }
 
 @media print {
