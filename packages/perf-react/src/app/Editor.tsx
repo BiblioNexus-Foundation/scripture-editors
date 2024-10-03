@@ -11,7 +11,14 @@ import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Type
 
 import Button from "./Components/Button";
 
-import { $getNodeByKey, $getSelection, LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
+import {
+  $getNodeByKey,
+  $getSelection,
+  LexicalEditor,
+  LexicalNode,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+} from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
@@ -214,7 +221,12 @@ export default function Editor({
             );
           })}
       </div>
-      {shouldUseCursorHelper && <CursorHandlerPlugin />}
+      {shouldUseCursorHelper && (
+        <CursorHandlerPlugin
+          updateTags={["history-merge"]}
+          canContainPlaceHolder={(node: LexicalNode) => node.getType() !== "graft"}
+        />
+      )}
       <OnEditorUpdate
         updateListener={({ editorState }) => {
           editorState.read(() => {
