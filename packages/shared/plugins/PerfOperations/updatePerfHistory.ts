@@ -94,7 +94,7 @@ export const getPerfHistoryUpdater: (
 
         // Apply the operations to the previous perf document sequences
         const patchedSequences = applyPatch({
-          source: { ...extraData.sequences, ...prevPerfDocument.sequences } ?? {},
+          source: { ...extraData.sequences, ...prevPerfDocument.sequences },
           operations: [...perfElementOperations],
         });
 
