@@ -8,15 +8,15 @@
     "dev": "vite"
   },
   "dependencies": {
-    "open-patcher": "1.0.0-beta.1",
-    "lexical": "^0.18.0",
     "@lexical/rich-text": "^0.18.0",
-    "@lexical/utils": "^0.18.0"
+    "@lexical/utils": "^0.18.0",
+    "lexical": "^0.18.0",
+    "open-patcher": "1.0.0-beta.1"
   },
   "devDependencies": {
-    "shared": "link:../shared",
+    "@types/deep-equal": "^1.0.4",
     "deep-equal": "^2.2.3",
-    "@types/deep-equal": "^1.0.4"
+    "shared": "link:../shared"
   },
   "volta": {
     "extends": "../../package.json"
