@@ -31,7 +31,7 @@ importers:
         version: 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(js-yaml@4.1.0)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(webpack@5.94.0(@swc/core@1.4.17(@swc/helpers@0.5.13)))
       '@nx/vite':
         specifier: 18.3.4
-        version: 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3)
+        version: 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3(@types/node@20.16.4)(@vitest/ui@1.5.3)(jsdom@24.0.0)(terser@5.31.6))
       '@nx/web':
         specifier: 18.3.4
         version: 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)
@@ -268,7 +268,7 @@ importers:
         version: 18.3.0
       platform-bible-react:
         specifier: file:./lib/platform-bible-react
-        version: file:packages/platform/lib/platform-bible-react(@types/react-dom@18.3.0)(@types/react@18.3.5)(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
+        version: file:packages/platform/lib/platform-bible-react(@types/react-dom@18.3.0)(@types/react@18.3.5)(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
       platform-bible-utils:
         specifier: file:./lib/platform-bible-utils
         version: file:packages/platform/lib/platform-bible-utils
@@ -286,10 +286,10 @@ importers:
         version: link:../shared-react
       tailwindcss:
         specifier: 3.4.3
-        version: 3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
+        version: 3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
       tailwindcss-animate:
         specifier: 1.0.7
-        version: 1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
+        version: 1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
 
   packages/scribe:
     dependencies:
@@ -344,7 +344,7 @@ importers:
         version: 3.0.2
       tailwindcss:
         specifier: ^3.4.1
-        version: 3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
+        version: 3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
 
   packages/shared:
     dependencies:
@@ -3801,6 +3801,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -8347,9 +8348,9 @@ snapshots:
       - '@swc/core'
       - debug
 
-  '@nrwl/vite@18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3)':
+  '@nrwl/vite@18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3(@types/node@20.16.4)(@vitest/ui@1.5.3)(jsdom@24.0.0)(terser@5.31.6))':
     dependencies:
-      '@nx/vite': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3)
+      '@nx/vite': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3(@types/node@20.16.4)(@vitest/ui@1.5.3)(jsdom@24.0.0)(terser@5.31.6))
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -8633,9 +8634,9 @@ snapshots:
       - verdaccio
       - webpack
 
-  '@nx/vite@18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3)':
+  '@nx/vite@18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3(@types/node@20.16.4)(@vitest/ui@1.5.3)(jsdom@24.0.0)(terser@5.31.6))':
     dependencies:
-      '@nrwl/vite': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3)
+      '@nrwl/vite': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)(vite@5.4.3(@types/node@20.16.4)(terser@5.31.6))(vitest@1.5.3(@types/node@20.16.4)(@vitest/ui@1.5.3)(jsdom@24.0.0)(terser@5.31.6))
       '@nx/devkit': 18.3.4(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))
       '@nx/js': 18.3.4(@babel/traverse@7.25.6)(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(nx@18.3.4(@swc-node/register@1.8.0(@swc/core@1.4.17(@swc/helpers@0.5.13))(@swc/types@0.1.12)(typescript@5.4.5))(@swc/core@1.4.17(@swc/helpers@0.5.13)))(typescript@5.4.5)
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.4.5)
@@ -12796,7 +12797,7 @@ snapshots:
       mlly: 1.7.1
       pathe: 1.1.2
 
-  platform-bible-react@file:packages/platform/lib/platform-bible-react(@types/react-dom@18.3.0)(@types/react@18.3.5)(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))):
+  platform-bible-react@file:packages/platform/lib/platform-bible-react(@types/react-dom@18.3.0)(@types/react@18.3.5)(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))):
     dependencies:
       '@emotion/react': 11.13.3(@types/react@18.3.5)(react@18.3.1)
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react@18.3.1)
@@ -12811,7 +12812,7 @@ snapshots:
       react-data-grid: 7.0.0-beta.46(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
       tailwind-merge: 2.5.2
-      tailwindcss-animate: 1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
+      tailwindcss-animate: 1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)))
     transitivePeerDependencies:
       - '@mui/material-pigment-css'
       - '@types/react'
@@ -12846,13 +12847,13 @@ snapshots:
       camelcase-css: 2.0.1
       postcss: 8.4.45
 
-  postcss-load-config@4.0.2(postcss@8.4.45)(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)):
+  postcss-load-config@4.0.2(postcss@8.4.45)(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)):
     dependencies:
       lilconfig: 3.1.2
       yaml: 2.5.1
     optionalDependencies:
       postcss: 8.4.45
-      ts-node: 10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)
+      ts-node: 10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)
 
   postcss-nested@6.2.0(postcss@8.4.45):
     dependencies:
@@ -13531,11 +13532,11 @@ snapshots:
 
   tailwind-merge@2.5.2: {}
 
-  tailwindcss-animate@1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))):
+  tailwindcss-animate@1.0.7(tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))):
     dependencies:
-      tailwindcss: 3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
+      tailwindcss: 3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
 
-  tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)):
+  tailwindcss@3.4.3(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5)):
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
@@ -13554,7 +13555,7 @@ snapshots:
       postcss: 8.4.45
       postcss-import: 15.1.0(postcss@8.4.45)
       postcss-js: 4.0.1(postcss@8.4.45)
-      postcss-load-config: 4.0.2(postcss@8.4.45)(ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
+      postcss-load-config: 4.0.2(postcss@8.4.45)(ts-node@10.9.2(@swc/core@1.4.17(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5))
       postcss-nested: 6.2.0(postcss@8.4.45)
       postcss-selector-parser: 6.1.2
       resolve: 1.22.8
@@ -13723,27 +13724,6 @@ snapshots:
       yn: 3.1.1
     optionalDependencies:
       '@swc/core': 1.4.17(@swc/helpers@0.5.13)
-
-  ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@20.16.4)(typescript@5.4.5):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.11
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
-      '@types/node': 20.16.4
-      acorn: 8.12.1
-      acorn-walk: 8.3.3
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.2
-      make-error: 1.3.6
-      typescript: 5.4.5
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-    optionalDependencies:
-      '@swc/core': 1.7.23(@swc/helpers@0.5.13)
-    optional: true
 
   tsconfig-paths@3.15.0:
     dependencies:
