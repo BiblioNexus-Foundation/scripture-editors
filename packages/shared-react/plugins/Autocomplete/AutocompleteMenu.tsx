@@ -118,7 +118,7 @@ export default function AutocompleteMenu({
           key={`${item.name}-ac`}
           className={selectedIndex === index ? "active" : undefined}
           onClick={() => {
-            typeaheadMatch && executeSelectedItem(editor, item, typeaheadMatch);
+            if (typeaheadMatch) executeSelectedItem(editor, item, typeaheadMatch);
           }}
           title={item.description}
         >

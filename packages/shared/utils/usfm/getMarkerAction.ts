@@ -213,7 +213,7 @@ export function $wrapTextSelectionInInlineNode(
   }
   // Make selection collapsed at the end
   if ($isElementNode(lastCreatedNode)) {
-    // eslint-disable-next-line no-unused-expressions
-    isBackward ? lastCreatedNode.selectStart() : lastCreatedNode.selectEnd();
+    if (isBackward) lastCreatedNode.selectStart();
+    else lastCreatedNode.selectEnd();
   }
 }

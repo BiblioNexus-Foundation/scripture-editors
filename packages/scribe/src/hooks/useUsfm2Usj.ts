@@ -10,7 +10,7 @@ export const useUsfm2Usj = () => {
     await USFMParser.init();
     const usfmParser = new USFMParser();
     const usj = usfmParser.usfmToUsj(usfm);
-    usj && setUsj(usj);
+    if (usj) setUsj(usj);
   };
 
   useEffect(() => {

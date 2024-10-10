@@ -337,7 +337,8 @@ export function $wrapSelectionInTypedMarkNode(
   }
   // Make selection collapsed at the end for comments.
   if (type === COMMENT_MARK_TYPE && $isElementNode(lastCreatedMarkNode)) {
-    isBackward ? lastCreatedMarkNode.selectStart() : lastCreatedMarkNode.selectEnd();
+    if (isBackward) lastCreatedMarkNode.selectStart();
+    else lastCreatedMarkNode.selectEnd();
   }
 }
 
