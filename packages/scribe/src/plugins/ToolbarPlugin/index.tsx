@@ -26,7 +26,7 @@ export default function ToolbarPlugin({ font, fontSize }: { font?: string; fontS
   }, [editor, font, fontSize]);
 
   return (
-    <div className="sticky top-0 flex w-full items-center justify-between border-b border-gray-200 bg-secondary px-2 py-1 text-white">
+    <div className="sticky top-0 flex w-full  flex-shrink-0 items-center justify-between border-b border-gray-200 bg-secondary px-2 py-1 text-white">
       <EditButtons />
       <InsertButtons />
     </div>

@@ -183,10 +183,14 @@ const Editor = forwardRef(function Editor(
   }, [onScroll]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col overflow-hidden">
       <LexicalComposer initialConfig={initialConfig}>
         {!IsRefEditor && <ToolbarPlugin font={font} fontSize={fontSize} />}
-        <div className="flex-grow overflow-y-auto" onScroll={handleScroll} ref={contentEditableRef}>
+        <div
+          className="max-h-[calc(100vh-40px)] flex-grow overflow-y-auto"
+          onScroll={handleScroll}
+          ref={contentEditableRef}
+        >
           <RichTextPlugin
             contentEditable={
               <ContentEditable
