@@ -26,7 +26,7 @@ function App() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      usj && editorRef.current?.setUsj(usj);
+      if (usj) editorRef.current?.setUsj(usj);
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [usj]);

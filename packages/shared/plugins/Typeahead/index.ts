@@ -115,7 +115,7 @@ function tryToPositionRange(leadOffset: number, range: Range, editorWindow: Wind
   try {
     range.setStart(anchorNode, startOffset);
     range.setEnd(anchorNode, endOffset);
-  } catch (error) {
+  } catch {
     return false;
   }
 

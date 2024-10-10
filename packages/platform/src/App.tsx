@@ -76,21 +76,18 @@ const defaultAnnotations: Annotations = {
 };
 
 function getOptions(
-  definedOptions: boolean,
   isReadonly: boolean,
   hasSpellCheck: boolean,
   textDirection: TextDirection,
   viewMode: string | undefined,
 ): EditorOptions {
-  return definedOptions
-    ? {
-        isReadonly,
-        hasSpellCheck,
-        textDirection,
-        view: getViewOptions(viewMode),
-        nodes: nodeOptions,
-      }
-    : {};
+  return {
+    isReadonly,
+    hasSpellCheck,
+    textDirection,
+    view: getViewOptions(viewMode),
+    nodes: nodeOptions,
+  };
 }
 
 export default function App() {
@@ -105,7 +102,7 @@ export default function App() {
   const [annotationType, setAnnotationType] = useState("spelling");
 
   const options = useMemo<EditorOptions>(
-    () => getOptions(definedOptions, isReadonly, hasSpellCheck, textDirection, viewMode),
+    () => (definedOptions ? getOptions(isReadonly, hasSpellCheck, textDirection, viewMode) : {}),
     [definedOptions, isReadonly, hasSpellCheck, textDirection, viewMode],
   );
 
