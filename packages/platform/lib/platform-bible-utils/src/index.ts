@@ -13,7 +13,6 @@ export { default as UnsubscriberAsyncList } from "./unsubscriber-async-list";
 // Consts
 export {
   getChaptersForBook,
-  getLocalizedIdFromBookNumber,
   offsetBook,
   offsetChapter,
   offsetVerse,
@@ -21,8 +20,11 @@ export {
   LAST_SCR_BOOK_NUM,
   FIRST_SCR_CHAPTER_NUM,
   FIRST_SCR_VERSE_NUM,
+  getLocalizeKeyForScrollGroupId,
+  getLocalizeKeysForScrollGroupIds,
 } from "./scripture-util";
 export { aggregateUnsubscribers, aggregateUnsubscriberAsyncs } from "./unsubscriber";
+export { CHAPTER_TYPE, VERSE_TYPE } from "./usj-reader-writer.model";
 
 // Functions
 export {
@@ -38,12 +40,21 @@ export {
   createSyncProxyForAsyncObject,
 } from "./util";
 export {
+  compareScrRefs,
+  formatScrRef,
+  getLocalizedIdFromBookNumber,
+  scrRefToBBBCCCVVV,
+} from "./scripture-util";
+export {
   at,
   charAt,
   codePointAt,
   endsWith,
+  escapeStringRegexp,
+  formatReplacementString,
   includes,
   indexOf,
+  isLocalizeKey,
   lastIndexOf,
   stringLength,
   normalize,
@@ -55,14 +66,18 @@ export {
   substring,
   toArray,
   ordinalCompare,
+  transformAndEnsureRegExpRegExpArray,
+  transformAndEnsureRegExpArray,
 } from "./string-util";
 export { default as deepEqual } from "./equality-checking";
 export { default as isSubset } from "./subset-checking";
 export { serialize, deserialize, isSerializable, htmlEncode } from "./serialization";
 export { default as getCurrentLocale } from "./intl-util";
+export { default as formatBytes } from "./number-utils";
+export { default as ensureArray } from "./array-util";
 
 // Types
-export type { DeepPartial, ReplaceType } from "./util";
+export type { DeepPartial, ReplaceType, UnionToIntersection } from "./util";
 export type {
   Dispose,
   OnDidDispose,
@@ -70,7 +85,14 @@ export type {
   CanHaveOnDidDispose,
 } from "./disposal.model";
 export type { PlatformEventHandler, PlatformEvent, PlatformEventAsync } from "./platform-event";
-export type { ScriptureReference, BookInfo } from "./scripture.model";
+export type {
+  BookInfo,
+  ScriptureReference,
+  ScrollGroupId,
+  ScriptureNode,
+  ScriptureSelection,
+  ScriptureTextAnchor,
+} from "./scripture.model";
 export type { Unsubscriber, UnsubscriberAsync } from "./unsubscriber";
 export type { DocumentCombinerOptions, JsonDocumentLike } from "./document-combiner";
 export type {
@@ -125,3 +147,9 @@ export type {
   UserStateContribution,
 } from "./settings.model";
 export { projectSettingsDocumentSchema, settingsDocumentSchema } from "./settings.model";
+export type {
+  IUsjReaderWriter,
+  UsjContentLocation,
+  VerseRefOffset,
+} from "./usj-reader-writer.model";
+export { default as UsjReaderWriter } from "./usj-reader-writer";
