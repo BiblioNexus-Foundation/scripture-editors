@@ -12,7 +12,7 @@ import {
 import { UnknownAttributes } from "./node.utils";
 
 export const BOOK_MARKER = "id";
-export const BOOK_VERSION = 1;
+export const BOOK_VERSION = 2;
 export type BookMarker = typeof BOOK_MARKER;
 
 export type SerializedBookNode = Spread<

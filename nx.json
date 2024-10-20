@@ -53,17 +53,12 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "cache": true,
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore",
-        "{workspaceRoot}/eslint.config.js"
-      ],
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["{projectRoot}/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["!**/node_modules/**", "{projectRoot}/**/*.{ts,tsx,js,jsx}"],
+        "eslintConfig": "{workspaceRoot}/eslint.config.mjs"
       }
     },
     "@nx/vite:build": {
@@ -83,8 +78,7 @@
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
       "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.js",
+      "!{projectRoot}/eslint.config.mjs",
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
@@ -115,8 +109,7 @@
     {
       "plugin": "@nx/eslint/plugin",
       "options": {
-        "targetName": "eslint:lint",
-        "extensions": ["ts", "tsx", "js", "jsx", "html", "vue"]
+        "targetName": "lint"
       }
     }
   ],
