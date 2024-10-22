@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { autoUpdate, computePosition, flip, shift } from "@floating-ui/dom";
+import { autoUpdate, computePosition, shift } from "@floating-ui/dom";
 
 export function useFloatingPosition() {
   const [coords, setCoords] = useState<{ x: number; y: number } | undefined>(undefined);
@@ -13,7 +13,7 @@ export function useFloatingPosition() {
     cleanupRef.current = autoUpdate(domRange, anchorElement, () => {
       computePosition(domRange, anchorElement, {
         placement: "bottom-start",
-        middleware: [flip(), shift()],
+        middleware: [shift()],
       })
         .then((pos) => {
           setCoords((prevCoords) =>
