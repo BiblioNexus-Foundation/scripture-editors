@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { autocomplete, Item } from "./autocomplete";
+import { filterAndRankOptions, Item } from "./filterAndRankOptions";
 import { LexicalEditor } from "lexical";
 
 export type AutoCompleteItem = Item & {
@@ -12,7 +12,7 @@ export function useAutocompleteItems(
   filter: (item: AutoCompleteItem, phrase: string) => boolean,
 ) {
   return useMemo(
-    () => (phrase ? autocomplete(phrase, items, filter) : items),
+    () => (phrase ? filterAndRankOptions(phrase, items, filter) : items),
     [phrase, items, filter],
   );
 }

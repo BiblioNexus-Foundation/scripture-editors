@@ -1,9 +1,8 @@
 import { memo, ReactNode, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { FloatingBox } from "../FloatingBox/FloatingBox";
-import { TriggerFn } from "shared/plugins/Typeahead";
-import { TypeaheadData, useTypeaheadData } from "./useTypeaheadData";
 import useCursorCoords from "../FloatingBox/useCursorCoords";
+import { Placement } from "@floating-ui/dom";
 
 const DOM_ELEMENT = document.body;
 
@@ -11,22 +10,20 @@ const MemoizedFloatingBox = memo(FloatingBox);
 
 export type FloatingMenuCoords = { x: number; y: number } | undefined;
 
-type TypeaheadPluginProps = {
-  trigger?: string | TriggerFn;
-  children: ReactNode | ((props: { typeaheadData: TypeaheadData | undefined }) => ReactNode);
+type CursorFloatingBox = {
+  isOpen?: boolean;
+  children:
+    | ReactNode
+    | ((props: { isOpen: boolean | undefined; placement?: Placement }) => ReactNode);
 };
 
 /**
- * TypeaheadPlugin component is responsible for rendering a floating menu
- * when the user's typing matches a trigger function or string
+ * FloatingBoxAtCursor component is responsible for rendering a floating menu
+ * at the cursor position when the isOpen prop is true
  */
-export default function TypeaheadFloatingBox({ trigger, children }: TypeaheadPluginProps) {
+export default function FloatingBoxAtCursor({ isOpen = false, children }: CursorFloatingBox) {
   const floatingBoxRef = useRef<HTMLDivElement>(null);
-  const typeaheadData = useTypeaheadData(trigger);
-  const { coords } = useCursorCoords({
-    isOpen: !!typeaheadData,
-    floatingBoxRef,
-  });
+  const { coords, placement } = useCursorCoords({ isOpen, floatingBoxRef });
 
   const renderChildren = useMemo(
     () => (coords ? (typeof children === "function" ? children : () => children) : () => null),
@@ -39,7 +36,7 @@ export default function TypeaheadFloatingBox({ trigger, children }: TypeaheadPlu
       coords={coords}
       style={coords ? undefined : { display: "none" }}
     >
-      {renderChildren({ typeaheadData })}
+      {renderChildren({ isOpen, placement })}
     </MemoizedFloatingBox>,
     DOM_ELEMENT,
   );

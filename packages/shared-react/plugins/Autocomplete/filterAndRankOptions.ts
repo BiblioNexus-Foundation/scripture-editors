@@ -3,14 +3,14 @@ export type Item = {
   label?: string;
   description?: string;
 };
-export function autocomplete<T extends Item>(
-  phrase: string,
+export function filterAndRankOptions<T extends Item>(
+  query: string,
   options: T[],
   filter: (item: T, phrase: string) => boolean,
 ): T[] {
-  const lowerPhrase = phrase.toLowerCase();
+  const lowerPhrase = query.toLowerCase();
   return options
-    .filter((item) => filter(item, phrase))
+    .filter((item) => filter(item, query))
     .sort((a, b) => {
       const textA = a.name.toLowerCase();
       const textB = b.name.toLowerCase();
