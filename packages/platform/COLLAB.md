@@ -29,6 +29,9 @@
 
 5. Open the second editor in a browser at http://localhost:5174/.
 
+> [!WARNING]
+> Running `tsc watch` for the Collab Host (npm script `collab:host:watch`) doesn't quit cleanly using _ctrl + c_ on Windows. Also using `nx collab:host platform` doesn't quit cleanly on Windows. (So probably need to revise the above instructions to run `collab:persist` and `collab:host` in their own terminal.)
+
 ### Features
 
 - Use the **Disconnect** button to simulate being offline.
@@ -36,4 +39,4 @@
 - You can see user presence (name and cursor).
 
 > [!NOTE]
-> You can switch from collaborative editing back to normal editing by setting `projectId` to an empty string in `App.tsx`.
+> You can switch from collaborative editing back to normal editing by setting `projectId` to an empty string or undefined in `App.tsx`.

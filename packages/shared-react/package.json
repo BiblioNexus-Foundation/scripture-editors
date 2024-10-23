@@ -16,10 +16,10 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.6.11",
     "@lexical/react": "^0.18.0",
     "@lexical/utils": "^0.18.0",
-    "lexical": "^0.18.0",
-    "@floating-ui/dom": "^1.6.11"
+    "lexical": "^0.18.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.11",
