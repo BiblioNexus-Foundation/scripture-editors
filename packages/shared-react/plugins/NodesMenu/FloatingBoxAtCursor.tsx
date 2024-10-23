@@ -2,6 +2,7 @@ import { memo, ReactNode, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { FloatingBox } from "../FloatingBox/FloatingBox";
 import useCursorCoords from "../FloatingBox/useCursorCoords";
+import { Placement } from "@floating-ui/dom";
 
 const DOM_ELEMENT = document.body;
 
@@ -11,7 +12,9 @@ export type FloatingMenuCoords = { x: number; y: number } | undefined;
 
 type CursorFloatingBox = {
   isOpen?: boolean;
-  children: ReactNode | ((props: { isOpen: boolean | undefined }) => ReactNode);
+  children:
+    | ReactNode
+    | ((props: { isOpen: boolean | undefined; placement?: Placement }) => ReactNode);
 };
 
 /**
@@ -20,7 +23,7 @@ type CursorFloatingBox = {
  */
 export default function FloatingBoxAtCursor({ isOpen = false, children }: CursorFloatingBox) {
   const floatingBoxRef = useRef<HTMLDivElement>(null);
-  const { coords } = useCursorCoords({ isOpen, floatingBoxRef });
+  const { coords, placement } = useCursorCoords({ isOpen, floatingBoxRef });
 
   const renderChildren = useMemo(
     () => (coords ? (typeof children === "function" ? children : () => children) : () => null),
@@ -33,7 +36,7 @@ export default function FloatingBoxAtCursor({ isOpen = false, children }: Cursor
       coords={coords}
       style={coords ? undefined : { display: "none" }}
     >
-      {renderChildren({ isOpen })}
+      {renderChildren({ isOpen, placement })}
     </MemoizedFloatingBox>,
     DOM_ELEMENT,
   );

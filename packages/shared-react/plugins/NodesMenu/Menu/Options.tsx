@@ -26,7 +26,6 @@ export function MenuOptions({ children, autoIndex = true, ...divProps }: MenuOpt
   } = useMenuContext();
 
   useEffect(() => {
-    console.log("optionsCount", optionsCount);
     updateOptionsCount(optionsCount);
   }, [optionsCount, updateOptionsCount]);
 

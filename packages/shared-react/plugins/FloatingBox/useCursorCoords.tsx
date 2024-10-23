@@ -8,7 +8,7 @@ export default function useCursorCoords({
   isOpen: boolean;
   floatingBoxRef: React.RefObject<HTMLDivElement>;
 }) {
-  const { coords, updatePosition, cleanup } = useFloatingPosition();
+  const { coords, updatePosition, cleanup, placement } = useFloatingPosition();
 
   useEffect(() => {
     if (!isOpen || !floatingBoxRef.current) {
@@ -23,5 +23,5 @@ export default function useCursorCoords({
     }
   }, [isOpen, updatePosition, cleanup]);
 
-  return { coords };
+  return { coords, placement };
 }

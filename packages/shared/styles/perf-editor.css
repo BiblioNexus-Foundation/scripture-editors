@@ -755,3 +755,7 @@ span.chapter:hover:before {
   display: flex;
   flex-direction: column;
 }
+
+.autocomplete-menu-container.inverse {
+    flex-direction: column-reverse;
+}
