@@ -12,6 +12,7 @@ const filterFunction = (item: AutoCompleteItem, phrase: string): boolean =>
   item.label?.toLowerCase().includes(phrase.toLowerCase()) ||
   item.name.toLowerCase().includes(phrase.toLowerCase());
 
+//TODO: Replace AutocompleteMenu with the new NodeMenu component
 /**
  * A plugin that renders an autocomplete floating menu when the user triggers it
  * by typing in a trigger character or phrase
