@@ -1,4 +1,5 @@
 import { $isElementNode, LexicalNode } from "lexical";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { LoggerBasic } from "../../../plugins/logger-basic.model";
@@ -197,7 +198,10 @@ export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
   if (node.getType() === VerseNodeClass.getType()) return node as T;
 
   // is one of the previous sibling nodes a verse
-  let previousSibling = node.getPreviousSibling();
+  const isWrappedInMark = node.getParent()?.getType() === TypedMarkNode.getType();
+  let previousSibling = isWrappedInMark
+    ? node.getParent()?.getPreviousSibling()
+    : node.getPreviousSibling();
   while (previousSibling && previousSibling.getType() !== VerseNodeClass.getType()) {
     previousSibling = previousSibling.getPreviousSibling();
   }
