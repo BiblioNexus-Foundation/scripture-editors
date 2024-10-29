@@ -37,6 +37,7 @@
     "@lexical/text": "^0.18.0",
     "@lexical/utils": "^0.18.0",
     "@lexical/yjs": "^0.18.0",
+    "@sillsdev/scripture": "^2.0.2",
     "fast-equals": "^5.0.1",
     "lexical": "^0.18.0",
     "yjs": "^13.6.19"

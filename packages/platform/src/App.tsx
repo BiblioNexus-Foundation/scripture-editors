@@ -1,8 +1,8 @@
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
+import { Canon } from "@sillsdev/scripture";
 import { BookChapterControl, ScriptureReference } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
-// import { PSA_USX as usx } from "shared/data/psa.usfm.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -25,7 +25,11 @@ type Annotations = {
 };
 
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
-const defaultScrRef: ScriptureReference = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
+const defaultScrRef: ScriptureReference = {
+  bookNum: Canon.bookIdToNumber("PSA"),
+  chapterNum: 1,
+  verseNum: 1,
+};
 const nodeOptions: UsjNodeOptions = {
   [immutableNoteCallerNodeName]: { onClick: () => console.log("note node clicked") },
 };
