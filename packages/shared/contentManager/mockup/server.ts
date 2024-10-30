@@ -32,6 +32,9 @@ export const serverMap: ServerMap = {
           jon: {
             file: import("../../data/jon.glt.usfm").then((data) => data.default),
           },
+          rev: {
+            file: import("../../data/blank.usfm").then((data) => data.default),
+          },
         },
       },
     },

@@ -118,7 +118,6 @@ export default function ScriptureReferencePlugin({
         if (dirtyLeaves.size === 0 || dirtyElements.size === 0)
           editorState.read(() => {
             const selectedNode = $getSelection()?.getNodes()?.[0];
-            if (selectedNode) console.log({ nodeDepth: getNodeDepth(selectedNode) });
             if (!selectedNode) return;
             const verseNode = $getCurrentVerseNode(selectedNode);
             const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode);

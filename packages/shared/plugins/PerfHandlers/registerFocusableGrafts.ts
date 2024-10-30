@@ -8,7 +8,6 @@ export function registerFocusableGrafts(
 ) {
   const $removeFocusedGrafts = () => {
     if (focusedGrafts.length === 0) return;
-    console.log("removing focused grafts");
     editor.update(
       () => {
         focusedGrafts.forEach((focusedGraft) => {
@@ -23,9 +22,7 @@ export function registerFocusableGrafts(
   };
 
   const focusedGrafts: NodeKey[] = [];
-  editor.registerUpdateListener(({ editorState, tags }) => {
-    if (tags.has("history-merge")) return;
-
+  editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
       const selection = $getSelection();
       const nodes = selection?.getNodes();
@@ -41,12 +38,10 @@ export function registerFocusableGrafts(
         return;
       }
       if (focusedGrafts.includes(graft.getKey())) {
-        console.log("already focused, skipping");
         return;
       }
       editor.update(
         () => {
-          console.log("focusing graft");
           focusedGrafts.forEach((focusedGraft) => {
             try {
               const node = $getNodeByKey<GraftNode>(focusedGraft);

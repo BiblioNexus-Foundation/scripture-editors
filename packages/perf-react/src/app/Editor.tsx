@@ -11,7 +11,14 @@ import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Type
 
 import Button from "./Components/Button";
 
-import { $getNodeByKey, $getSelection, LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
+import {
+  $getNodeByKey,
+  $getSelection,
+  LexicalEditor,
+  LexicalNode,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+} from "lexical";
 import ContentEditablePlugin from "./Components/ContentEditablePlugin";
 import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
@@ -22,6 +29,7 @@ import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
+import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
 import PerfTypeaheadPlugin from "shared-react/plugins/PerfTypeahead";
 
 const theme = {
@@ -61,6 +69,7 @@ export default function Editor({
     chapter: 1,
     verse: 1,
   });
+  const [shouldUseCursorHelper, setShouldUseCursorHelper] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
   const [contextMenuKey, setContextMenuKey] = useState<string>("\\");
 
@@ -77,9 +86,9 @@ export default function Editor({
       if (bookHandler) {
         const perf = await bookHandler.read(bookCode);
         setPerfDocument(perf);
-        console.log(perf);
+
         const lexicalState = getLexicalState(perf);
-        console.log({ lexicalState });
+
         setLexicalState(JSON.stringify(lexicalState));
       }
     })();
@@ -146,11 +155,28 @@ export default function Editor({
             <i>download</i>
           </button>
           <hr />
-          <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
+          <button
+            onClick={(e) => {
+              toggleClass(editorRef.current, "verse-blocks");
+              toggleClass(e.currentTarget, "active");
+            }}
+          >
             <i>view_agenda</i>
           </button>
-          <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
+          <button
+            className="active"
+            onClick={(e) => {
+              toggleClass(editorRef.current, "with-markers");
+              toggleClass(e.currentTarget, "active");
+            }}
+          >
             <i>format_paragraph</i>
+          </button>
+          <button
+            className={shouldUseCursorHelper ? "active" : undefined}
+            onClick={() => setShouldUseCursorHelper((current) => !current)}
+          >
+            <i>highlight_text_cursor</i>
           </button>
           <hr />
         </div>
@@ -171,7 +197,7 @@ export default function Editor({
         {toolbarMarkerSections &&
           Object.entries(toolbarMarkerSections).map(([sectionName, items]) => {
             return (
-              <div className={"toolbar-section"}>
+              <div key={sectionName} className={"toolbar-section"}>
                 {items.map((item) => (
                   <Button
                     key={`${item.label}-toolbar`}
@@ -187,6 +213,12 @@ export default function Editor({
             );
           })}
       </div>
+      {shouldUseCursorHelper && (
+        <CursorHandlerPlugin
+          updateTags={["history-merge"]}
+          canContainPlaceHolder={(node: LexicalNode) => node.getType() !== "graft"}
+        />
+      )}
       <OnEditorUpdate
         updateListener={({ editorState }) => {
           editorState.read(() => {
