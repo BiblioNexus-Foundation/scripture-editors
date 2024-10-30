@@ -8,30 +8,30 @@ import {
 } from "../utils";
 import { CharSelectionOffset } from "../utils/constants";
 
-export function handleSiblingNode(
+export function $handleSiblingNode(
   siblingNode: LexicalNode,
   cursor: CursorData,
   editorUpdate: (update: (() => void) | (() => void), tag?: string) => void,
   canHavePlaceholder: (node: LexicalNode) => boolean = () => true,
 ): boolean {
-  const handle = () => {
+  const $handle = () => {
     if (!canHavePlaceholder(siblingNode)) {
-      return handleNonPlaceholderSibling(siblingNode, cursor);
+      return $handleNonPlaceholderSibling(siblingNode, cursor);
     }
 
     if ($isTextNode(siblingNode) && cursor.isMovingOutwards) {
-      return handleTextSibling(siblingNode, cursor);
+      return $handleTextSibling(siblingNode, cursor);
     }
 
     if ($isElementNode(siblingNode)) {
-      return handleElementSibling(siblingNode, cursor);
+      return $handleElementSibling(siblingNode, cursor);
     }
 
     console.warn("UNHANDLED CURSOR HELPER CASE");
     return false;
   };
 
-  function handleNonPlaceholderSibling(siblingNode: LexicalNode, cursor: CursorData): boolean {
+  function $handleNonPlaceholderSibling(siblingNode: LexicalNode, cursor: CursorData): boolean {
     const eligibleDescendant = $findDescendantEligibleForPlaceholder(
       siblingNode,
       cursor,
@@ -40,17 +40,17 @@ export function handleSiblingNode(
     if (!eligibleDescendant) return false;
 
     if ($isTextNode(eligibleDescendant) && cursor.isMovingOutwards) {
-      return handleTextDescendant(eligibleDescendant, cursor);
+      return $handleTextDescendant(eligibleDescendant, cursor);
     }
 
     if ($isElementNode(eligibleDescendant)) {
-      return handleElementSibling(eligibleDescendant, cursor);
+      return $handleElementSibling(eligibleDescendant, cursor);
     }
 
     return true;
   }
 
-  function handleTextSibling(siblingNode: TextNode, cursor: CursorData): boolean {
+  function $handleTextSibling(siblingNode: TextNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingToNextNode
@@ -62,7 +62,7 @@ export function handleSiblingNode(
     return true;
   }
 
-  function handleTextDescendant(descendant: TextNode, cursor: CursorData): boolean {
+  function $handleTextDescendant(descendant: TextNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingToNextNode
@@ -74,7 +74,7 @@ export function handleSiblingNode(
     return true;
   }
 
-  function handleElementSibling(siblingNode: ElementNode, cursor: CursorData): boolean {
+  function $handleElementSibling(siblingNode: ElementNode, cursor: CursorData): boolean {
     if (siblingNode.isInline()) {
       if (siblingNode.isEmpty()) {
         editorUpdate(() => {
@@ -105,5 +105,5 @@ export function handleSiblingNode(
     }
   }
 
-  return handle();
+  return $handle();
 }

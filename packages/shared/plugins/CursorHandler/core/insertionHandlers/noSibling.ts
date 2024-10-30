@@ -7,13 +7,13 @@ import {
   $insertCursorPlaceholder,
 } from "../utils";
 
-export function handleNoSibling(
+export function $handleNoSibling(
   currentNode: LexicalNode,
   cursor: CursorData,
   editorUpdate: (update: (() => void) | (() => void), tag?: string) => void,
   canHavePlaceholder: (node: LexicalNode) => boolean,
 ): boolean {
-  const handle = () => {
+  const $handle = () => {
     const { ancestor, ancestorSibling } = $getValidAncestor(
       currentNode,
       cursor,
@@ -25,21 +25,21 @@ export function handleNoSibling(
     }
 
     if (!ancestorSibling) {
-      return handleAncestorWithoutSibling(ancestor, cursor);
+      return $handleAncestorWithoutSibling(ancestor, cursor);
     }
 
     if ($isTextNode(ancestorSibling)) {
-      return handleTextAncestorSibling(ancestorSibling, cursor);
+      return $handleTextAncestorSibling(ancestorSibling, cursor);
     }
 
     if ($isElementNode(ancestorSibling)) {
-      return handleElementAncestorSibling(ancestor, ancestorSibling, cursor);
+      return $handleElementAncestorSibling(ancestor, ancestorSibling, cursor);
     }
 
     return false;
   };
 
-  function handleAncestorWithoutSibling(ancestor: ElementNode, cursor: CursorData): boolean {
+  function $handleAncestorWithoutSibling(ancestor: ElementNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingLeft
@@ -51,7 +51,7 @@ export function handleNoSibling(
     return true;
   }
 
-  function handleTextAncestorSibling(ancestorSibling: TextNode, cursor: CursorData): boolean {
+  function $handleTextAncestorSibling(ancestorSibling: TextNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.End : CursorPosition.Start;
       const selectOffset = cursor.isMovingLeft
@@ -63,7 +63,7 @@ export function handleNoSibling(
     return true;
   }
 
-  function handleElementAncestorSibling(
+  function $handleElementAncestorSibling(
     ancestor: ElementNode,
     ancestorSibling: ElementNode,
     cursor: CursorData,
@@ -93,5 +93,5 @@ export function handleNoSibling(
     return true;
   }
 
-  return handle();
+  return $handle();
 }

@@ -17,8 +17,8 @@ import {
 } from "../utils/CursorSelectionContext";
 import { $insertCursorPlaceholder, $removeCursorPlaceholder } from "../utils";
 import { CharSelectionOffset, CursorMovementDirection } from "../utils/constants";
-import { handleNoSibling } from "./noSibling";
-import { handleSiblingNode } from "./sibling";
+import { $handleNoSibling } from "./noSibling";
+import { $handleSiblingNode } from "./sibling";
 
 export function registerCursorInsertion(
   editor: LexicalEditor,
@@ -33,6 +33,7 @@ export function registerCursorInsertion(
   function registerCursorInsertOnArrowDown(
     direction: CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT,
   ): () => void {
+    //TODO: Test for RTL direction
     const command =
       direction === CursorMovementDirection.LEFT ? KEY_ARROW_LEFT_COMMAND : KEY_ARROW_RIGHT_COMMAND;
 
@@ -42,7 +43,7 @@ export function registerCursorInsertion(
         if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
           return false;
         }
-        const result = handleArrowCommand(direction);
+        const result = $handleArrowCommand(direction);
         if (result) {
           event.preventDefault();
         }
@@ -52,7 +53,7 @@ export function registerCursorInsertion(
     );
   }
 
-  function handleArrowCommand(
+  function $handleArrowCommand(
     direction: CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT,
   ): boolean {
     const selectionData = $getCursorSelectionContext($getSelection(), direction);
@@ -62,7 +63,7 @@ export function registerCursorInsertion(
     if (!canHavePlaceholder(currentNode)) return false;
 
     if (cursor.isPlaceholder) {
-      const isHandled = handleExistingPlaceholder(currentNode, cursor, content);
+      const isHandled = $handleExistingPlaceholder(currentNode, cursor, content);
       if (isHandled) return true;
     }
 
@@ -71,22 +72,22 @@ export function registerCursorInsertion(
     }
 
     if (cursor.isMovingTowardsEdge) {
-      return handleMovingTowardsEdge(currentNode, cursor);
+      return $handleMovingTowardsEdge(currentNode, cursor);
     }
 
     if (cursor.isSwitchingEdge) {
-      return handleSwitchingEdge(currentNode, cursor);
+      return $handleSwitchingEdge(currentNode, cursor);
     }
 
     const siblingNode = getSiblingNode(currentNode, cursor);
     if (!siblingNode) {
-      return handleNoSibling(currentNode, cursor, editorUpdate, canHavePlaceholder);
+      return $handleNoSibling(currentNode, cursor, editorUpdate, canHavePlaceholder);
     }
 
-    return handleSiblingNode(siblingNode, cursor, editorUpdate, canHavePlaceholder);
+    return $handleSiblingNode(siblingNode, cursor, editorUpdate, canHavePlaceholder);
   }
 
-  function handleExistingPlaceholder(
+  function $handleExistingPlaceholder(
     currentNode: TextNode,
     cursor: CursorData,
     content: { isEmpty: boolean },
@@ -113,7 +114,7 @@ export function registerCursorInsertion(
     return false;
   }
 
-  function handleMovingTowardsEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
+  function $handleMovingTowardsEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingLeft
@@ -125,7 +126,7 @@ export function registerCursorInsertion(
     return true;
   }
 
-  function handleSwitchingEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
+  function $handleSwitchingEdge(currentNode: LexicalNode, cursor: CursorData): boolean {
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
       const selectOffset = cursor.isMovingRight
