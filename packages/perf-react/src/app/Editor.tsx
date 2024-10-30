@@ -174,10 +174,21 @@ export default function Editor({
             <i>download</i>
           </button>
           <hr />
-          <button onClick={() => toggleClass(editorRef.current, "verse-blocks")}>
+          <button
+            onClick={(e) => {
+              toggleClass(editorRef.current, "verse-blocks");
+              toggleClass(e.currentTarget, "active");
+            }}
+          >
             <i>view_agenda</i>
           </button>
-          <button onClick={() => toggleClass(editorRef.current, "with-markers")}>
+          <button
+            className="active"
+            onClick={(e) => {
+              toggleClass(editorRef.current, "with-markers");
+              toggleClass(e.currentTarget, "active");
+            }}
+          >
             <i>format_paragraph</i>
           </button>
           <button
