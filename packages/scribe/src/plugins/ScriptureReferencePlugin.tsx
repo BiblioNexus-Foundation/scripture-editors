@@ -116,7 +116,7 @@ function $findAndSetChapterAndVerse(
   bookCode: BookCode,
   chapterNum: number,
   verseNum: number,
-  setScrRef: (scrRef: ScriptureReference) => void,
+  onScrRefChange: (scrRef: ScriptureReference) => void,
   viewOptions?: ViewOptions,
 ) {
   const startNode = $getSelection()?.getNodes()[0];
@@ -125,16 +125,19 @@ function $findAndSetChapterAndVerse(
   if (!startNode || !ChapterNodeClass || !VerseNodeClass) return false;
 
   const chapterNode = findThisChapter(startNode, ChapterNodeClass);
+  const selectedChapterNum = parseInt(chapterNode?.getNumber() ?? "0", 10);
   const verseNode = findThisVerse(startNode, VerseNodeClass);
+  // For combined verses this returns the first number.
+  const selectedVerseNum = parseInt(verseNode?.getNumber() ?? "0", 10);
   hasSelectionChanged = !!(
-    (chapterNode && +chapterNode.getNumber() !== chapterNum) ||
-    (verseNode && +verseNode.getNumber() !== verseNum)
+    (chapterNode && selectedChapterNum !== chapterNum) ||
+    (verseNode && selectedVerseNum !== verseNum)
   );
   if (hasSelectionChanged)
-    setScrRef({
+    onScrRefChange({
       bookCode,
-      chapterNum: +(chapterNode?.getNumber() ?? chapterNum),
-      verseNum: +(verseNode?.getNumber() ?? verseNum),
+      chapterNum: selectedChapterNum || chapterNum,
+      verseNum: selectedVerseNum || verseNum,
     });
 
   return false;
