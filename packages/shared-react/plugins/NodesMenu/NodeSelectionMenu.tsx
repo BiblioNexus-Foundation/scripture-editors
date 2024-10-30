@@ -15,9 +15,9 @@ export type NodeOption = {
 interface NodeSelectionMenuProps {
   options: Array<NodeOption>;
   onSelectOption?: (option: NodeOption) => void;
-  onClose?: () => void; // New prop added
+  onClose?: () => void;
   inverse?: boolean;
-  query?: string; // New prop added
+  query?: string;
 }
 
 export function NodeSelectionMenu({
