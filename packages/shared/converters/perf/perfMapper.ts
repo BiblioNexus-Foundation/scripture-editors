@@ -36,10 +36,10 @@ export type PerfMap<TargetNode> = {
 } & {
   [key in TypeKey]?: PerfSubtypeMap<TargetNode, key>;
 };
-
 /** Maps types and subtypes of a PERF element (sequence,block, contentElement)
  * given map object (perfMap) and returns a transformation of that element.
  */
+
 export const mapPerf = <ResultType, SourceType extends PerfKind = PerfKind>({
   buildSource,
   perfMap,
@@ -61,7 +61,7 @@ export const mapPerf = <ResultType, SourceType extends PerfKind = PerfKind>({
     perfMap[type]?.[subtype],
     perfMap["*"]?.[subtype],
     perfMap[type]?.["*"],
-    perfMap["*"]["*"],
+    perfMap["*"]["*"], //this will never be undefined,
   ];
 
   return ((map) =>
