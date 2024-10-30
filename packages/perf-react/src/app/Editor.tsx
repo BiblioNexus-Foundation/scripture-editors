@@ -27,10 +27,10 @@ import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
 import ScriptureReferencePlugin, {
   ScriptureReference,
-} from "./Components/ScriptureReferencePlugin";
-import TypeaheadPlugin from "./Components/Typeahead/TypeaheadPlugin";
+} from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
+import PerfTypeaheadPlugin from "shared-react/plugins/PerfTypeahead";
 
 const theme = {
   // Theme styling goes here
@@ -112,25 +112,6 @@ export default function Editor({
 
   const toggleClass = (element: HTMLElement | null, className: string) =>
     element && element.classList.toggle(className);
-
-  const floatingMenuItems = useMemo(() => {
-    if (!selectedMarker || !scriptureReference) return undefined;
-    const marker = getMarker(selectedMarker);
-    if (!marker?.children) return undefined;
-
-    return Object.entries(marker.children).flatMap(([_, markers]) =>
-      markers.map((marker) => {
-        const markerData = getMarker(marker);
-        const { action } = getMarkerAction(marker, markerData);
-        return {
-          name: marker,
-          label: marker,
-          description: markerData?.description ?? "",
-          action: (editor: LexicalEditor) => action({ editor, reference: scriptureReference }),
-        };
-      }),
-    );
-  }, [selectedMarker, scriptureReference]);
 
   const toolbarMarkerSections = useMemo(() => {
     if (!selectedMarker || !scriptureReference) return null;
@@ -261,7 +242,13 @@ export default function Editor({
           setScriptureReference(reference);
         }}
       />
-      <TypeaheadPlugin trigger={contextMenuKey} items={floatingMenuItems} />
+      {scriptureReference && selectedMarker ? (
+        <PerfTypeaheadPlugin
+          trigger={contextMenuKey}
+          scriptureReference={scriptureReference}
+          contextMarker={selectedMarker}
+        />
+      ) : null}
       <div className={"editor-oce"}>
         <ContentEditablePlugin ref={editorRef} />
         <PerfHandlersPlugin />

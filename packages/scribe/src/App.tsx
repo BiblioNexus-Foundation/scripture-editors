@@ -52,7 +52,7 @@ function App() {
     console.log({ scrRef });
   }, [scrRef]);
   return (
-    <div className="flex-center m-2 flex h-editor   justify-center p-8">
+    <div className="flex-center m-2 flex h-editor justify-center p-8">
       <div className="relative w-2/3 overflow-hidden rounded-md border-2 border-secondary">
         <div className="left-0 right-0 top-0 z-10 flex items-center justify-between bg-gray-200 px-4 py-2">
           <span className="text-lg font-semibold">Editor</span>
@@ -64,7 +64,7 @@ function App() {
           </button>
         </div>
 
-        <div className=" h-editor overflow-y-auto p-2">
+        <div className="h-editor overflow-y-auto p-2">
           <Editor
             usjInput={defaultUsj}
             ref={editorRef}

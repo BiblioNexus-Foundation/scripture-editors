@@ -30,24 +30,24 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:^",
-    "@lexical/mark": "^0.17.1",
-    "@lexical/react": "^0.17.1",
-    "@lexical/selection": "^0.17.1",
-    "@lexical/utils": "^0.17.1",
+    "@lexical/mark": "^0.18.0",
+    "@lexical/react": "^0.18.0",
+    "@lexical/selection": "^0.18.0",
+    "@lexical/utils": "^0.18.0",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.17.1"
+    "lexical": "^0.18.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.0",
-    "postcss": "^8.4.35",
-    "prettier-plugin-tailwindcss": "^0.5.11",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "postcss": "^8.4.47",
+    "prettier-plugin-tailwindcss": "^0.6.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "shared": "link:../shared",
     "shared-react": "link:../shared-react",
     "sj-usfm-grammar": "^3.0.0",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.14"
   },
   "volta": {
     "extends": "../../package.json"

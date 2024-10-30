@@ -4,21 +4,19 @@ import {
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
-  COMMAND_PRIORITY_LOW,
   KEY_DOWN_COMMAND,
   LexicalEditor,
 } from "lexical";
 import { useEffect } from "react";
 import { getNodeElementTagName } from "shared/nodes/scripture/usj/node.utils";
-import { SET_DIRECTION_COMMAND, TextDirection } from "./text-direction.model";
+import { TextDirection } from "./text-direction.model";
 
 function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
   useEffect(() => {
-    return editor.registerCommand(
-      SET_DIRECTION_COMMAND,
-      () => {
+    return editor.registerUpdateListener(({ dirtyElements }) => {
+      if (dirtyElements.size > 0) {
         const rootElement = editor.getRootElement();
-        if (!rootElement || textDirection === "auto") return false;
+        if (!rootElement || textDirection === "auto") return;
 
         rootElement.dir = textDirection;
         const placeholderClassName = editor._config.theme.placeholder;
@@ -26,19 +24,9 @@ function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
           placeholderClassName,
         )[0] as HTMLElement;
         if (placeholderElement) placeholderElement.dir = textDirection;
-        return true;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-  }, [editor, textDirection]);
-
-  useEffect(() => {
-    return editor.registerUpdateListener(({ dirtyElements }) => {
-      if (dirtyElements.size > 0) {
-        editor.dispatchCommand(SET_DIRECTION_COMMAND, undefined);
       }
     });
-  }, [editor]);
+  }, [editor, textDirection]);
 }
 
 /**

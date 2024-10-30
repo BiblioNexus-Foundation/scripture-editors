@@ -3,12 +3,30 @@
 @tailwind utilities;
 
 @layer base {
+  /* Adding the preflight selector (pr-twp) to components was not changing the font as desired.
+  So this piece of code adds tw-font-sans everywhere we include preflight. */
+  .pr-twp {
+    @apply tw-font-sans;
+  }
+}
+
+/* #region shared with https://github.com/paranext/paranext-extension-template/blob/main/tailwind.scss */
+
+@layer base {
   @font-face {
     font-family: "Inter";
     font-display: "swap";
     src: url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
   }
 
+  /*
+   * Theme colors in Platform.Bible. These are applied in CSS properties using `hsl(var(--varName))`
+   * or Tailwind classes like `tw-bg-primary`
+   *
+   * See the wiki's
+   * [Matching Application Theme](https://github.com/paranext/paranext-extension-template/wiki/Extension-Anatomy#matching-application-theme)
+   * section for more information
+   */
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -70,14 +88,61 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  /* using color palette https://supercolorpalette.com/?scp=G0-hsl-99827A-E7DDD0-FEF4E7-FEFAF1-FFFFFF-D8E9E3-719892-07463D-0A433D-083030-041616-000000-85DBB8-F2F52E-CD3737 */
+  .paratext-light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --muted: 33.9 32.4% 86.1%;
+    --muted-foreground: 15.5 13.2% 53.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --border: 220 13% 91%;
+    --input: 161.3 26.7% 88.2%;
+    --primary: 173.4 82.1% 15.3%;
+    --primary-foreground: 40 85.7% 97.3%;
+    --secondary: 161.3 26.7% 88.2%;
+    --secondary-foreground: 173.4 82.1% 15.3%;
+    --accent: 161.3 26.7% 88.2%;
+    --accent-foreground: 173.4 82.1% 15.3%;
+    --destructive: 0 60% 51%;
+    --destructive-foreground: 210 20% 98%;
+    --ring: 13.5 13.2% 53.9%;
+  }
+
+  .paratext-dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --muted: 15.5 13.2% 53.9%;
+    --muted-foreground: 33.9 32.4% 86.1%;
+    --popover: 180 71.4% 5%;
+    --popover-foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --primary: 161.3 26.7% 88.2%;
+    --primary-foreground: 173.4 82.1% 15.3%;
+    --secondary: 180 71.4% 11%;
+    --secondary-foreground: 161.3 26.7% 88.2%;
+    --accent: 180 71.4% 11%;
+    --accent-foreground: 161.3 26.7% 88.2%;
+    --destructive: 0 60% 51%;
+    --destructive-foreground: 210 20% 98%;
+    --ring: 13.5 13.2% 53.9%;
+  }
 }
 
 @layer base {
   * {
-    @apply pr-border-border;
+    @apply tw-border-border;
   }
 
   body {
-    @apply pr-bg-background pr-text-foreground;
+    @apply tw-bg-background tw-text-foreground;
   }
 }
+
+/* #endregion */

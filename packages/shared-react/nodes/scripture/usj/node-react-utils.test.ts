@@ -1,4 +1,5 @@
 import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
+import { $createTypedMarkNode, TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { $createVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { createBasicTestEnvironment } from "shared/nodes/test.utils";
@@ -56,6 +57,12 @@ describe("Editor Node Utilities", () => {
     it("should find the last verse in node", async () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
+      /*
+       *      R
+       *     p1
+       * v1 t1 v2 t2
+       *          ^^
+       */
       await editor.update(() => {
         const root = $getRoot();
         const p1 = $createParaNode();
@@ -77,13 +84,46 @@ describe("Editor Node Utilities", () => {
       });
     });
 
+    it("should find the last verse in node when the text is in a mark", async () => {
+      let t2Key: string;
+      const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode, TypedMarkNode]);
+      /*
+       *      R
+       *     p1
+       * v1 t1 v2 m1(t2)
+       *             ^^
+       */
+      await editor.update(() => {
+        const root = $getRoot();
+        const p1 = $createParaNode();
+        const v1 = $createImmutableVerseNode("1");
+        const v2 = $createImmutableVerseNode("2");
+        const t1 = $createTextNode("text1");
+        const m1 = $createTypedMarkNode({ ["testType1"]: ["testID1"] });
+        const t2 = $createTextNode("text2");
+        root.append(p1);
+        p1.append(v1, t1, v2, m1);
+        m1.append(t2);
+        t2Key = t2.getKey();
+      });
+
+      await editor.getEditorState().read(() => {
+        const t2 = $getNodeByKey(t2Key);
+        const verseNode = findThisVerse(t2);
+
+        expect(verseNode).toBeDefined();
+        expect(verseNode?.getNumber()).toEqual("2");
+      });
+    });
+
     it("should find the verse in a previous parent node", async () => {
       let t3Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
-      /**
+      /*
        *          R
-       *   p1     p2     p3
-       * v1 t1    t2     t3
+       *   p1     p2    p3
+       * v1 t1    t2    t3
+       *                ^^
        */
       await editor.update(() => {
         const root = $getRoot();
@@ -113,10 +153,11 @@ describe("Editor Node Utilities", () => {
     it("should find the last verse in the previous parent node", async () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
-      /**
+      /*
        *         R
        *    p1       p2
        * v1 t1 v2    t2
+       *             ^^
        */
       await editor.update(() => {
         const root = $getRoot();
