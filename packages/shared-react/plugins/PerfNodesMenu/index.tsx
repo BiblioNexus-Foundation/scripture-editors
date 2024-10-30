@@ -1,4 +1,4 @@
-import useUsfmMakersForMenu from "../PerfTypeahead/useUsfmMarkersForMenu";
+import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ScriptureReference } from "../ScriptureReferencePlugin";
 import NodesMenu from "../NodesMenu";

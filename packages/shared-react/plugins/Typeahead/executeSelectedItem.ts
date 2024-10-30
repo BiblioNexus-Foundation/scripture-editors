@@ -1,10 +1,10 @@
 import { LexicalEditor, $getSelection, $isRangeSelection, $isTextNode } from "lexical";
 import { SuggestionsTextMatch } from "shared/plugins/Typeahead";
-import { AutoCompleteItem } from "./useAutocompleteItems";
+import { NodeOption } from "../NodesMenu/NodeSelectionMenu";
 
 export function executeSelectedItem(
   editor: LexicalEditor,
-  selectedItem: AutoCompleteItem,
+  selectedItem: NodeOption,
   typeaheadMatch: SuggestionsTextMatch,
 ) {
   editor.update(() => {

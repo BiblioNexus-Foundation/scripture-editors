@@ -1,18 +1,15 @@
-import TypeaheadFloatingBox from "./TypeaheadFLoatingBox";
-import AutocompleteMenu from "../Autocomplete/AutocompleteMenu";
-import { AutoCompleteItem } from "../Autocomplete/useAutocompleteItems";
+import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
+import { useTypeaheadData } from "./useTypeaheadData";
+import { NodeOption, NodeSelectionMenu } from "../NodesMenu/NodeSelectionMenu";
+import { executeSelectedItem } from "./executeSelectedItem";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 type TypeaheadPluginProps = {
   /** the string that will trigger the floatingMenu */
   trigger: string;
-  items?: AutoCompleteItem[];
+  items?: Array<NodeOption>;
 };
 
-const filterFunction = (item: AutoCompleteItem, phrase: string): boolean =>
-  item.label?.toLowerCase().includes(phrase.toLowerCase()) ||
-  item.name.toLowerCase().includes(phrase.toLowerCase());
-
-//TODO: Replace AutocompleteMenu with the new NodeMenu component
 /**
  * A plugin that renders an autocomplete floating menu when the user triggers it
  * by typing in a trigger character or phrase
@@ -22,18 +19,24 @@ const filterFunction = (item: AutoCompleteItem, phrase: string): boolean =>
  * @returns
  */
 export default function TypeaheadPlugin({ trigger, items }: TypeaheadPluginProps) {
+  const [editor] = useLexicalComposerContext();
+  const typeaheadData = useTypeaheadData(trigger);
   return (
-    <TypeaheadFloatingBox trigger={trigger}>
-      {({ typeaheadData }) => {
-        return items ? (
-          <AutocompleteMenu
-            phrase={typeaheadData?.match.matchingString}
-            items={items}
-            filter={filterFunction}
-            typeaheadMatch={typeaheadData?.match ?? null}
-          />
-        ) : null;
+    <FloatingBoxAtCursor isOpen={!!typeaheadData && !!items}>
+      {({ placement }) => {
+        return (
+          items && (
+            <NodeSelectionMenu
+              query={typeaheadData?.match.matchingString}
+              onSelectOption={(item) =>
+                typeaheadData?.match && executeSelectedItem(editor, item, typeaheadData?.match)
+              }
+              options={items}
+              inverse={placement === "top-start"}
+            />
+          )
+        );
       }}
-    </TypeaheadFloatingBox>
+    </FloatingBoxAtCursor>
   );
 }

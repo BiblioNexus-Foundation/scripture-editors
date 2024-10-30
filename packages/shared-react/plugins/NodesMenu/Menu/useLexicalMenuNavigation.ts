@@ -16,48 +16,24 @@ export const useLexicalMenuNavigation = (menu: ReturnType<typeof useMenuActions>
   useEffect(() => {
     if (!menu) return;
 
+    const handleCommand = (action: () => void, event?: KeyboardEvent): boolean => {
+      action();
+      if (!event) return false;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return true;
+    };
+
+    const commands = [
+      { key: KEY_ARROW_DOWN_COMMAND, action: () => menu.moveDown() },
+      { key: KEY_ARROW_UP_COMMAND, action: () => menu.moveUp() },
+      { key: KEY_ENTER_COMMAND, action: () => menu.select() },
+      { key: KEY_TAB_COMMAND, action: () => menu.select() },
+    ];
+
     const unregisterNavigation = mergeRegister(
-      editor.registerCommand(
-        KEY_ARROW_DOWN_COMMAND,
-        (event) => {
-          menu.moveDown();
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return true;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_ARROW_UP_COMMAND,
-        (event) => {
-          menu.moveUp();
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return true;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_ENTER_COMMAND,
-        (event) => {
-          menu.select();
-          if (!event) return false;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return true;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_TAB_COMMAND,
-        (event) => {
-          menu.select();
-          if (!event) return false;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          return true;
-        },
-        COMMAND_PRIORITY_LOW,
+      ...commands.map(({ key, action }) =>
+        editor.registerCommand(key, (event) => handleCommand(action, event), COMMAND_PRIORITY_LOW),
       ),
     );
 

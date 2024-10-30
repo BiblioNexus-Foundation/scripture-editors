@@ -1,10 +1,9 @@
-import { useState } from "react";
-// import { useAutocompleteItems } from "../Autocomplete/useAutocompleteItems";
+import { useEffect, useState } from "react";
 import Menu from "./Menu";
 import { useFilteredItems } from "./Menu/useFilteredItems";
-import { LexicalEditor } from "lexical";
+import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND, LexicalEditor } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { LexicalInput } from "./LexicalInput";
+import NodeNavigation from "./NodeNavigation";
 
 export type NodeOption = {
   name: string;
@@ -18,6 +17,7 @@ interface NodeSelectionMenuProps {
   onSelectOption?: (option: NodeOption) => void;
   onClose?: () => void; // New prop added
   inverse?: boolean;
+  query?: string; // New prop added
 }
 
 export function NodeSelectionMenu({
@@ -25,28 +25,62 @@ export function NodeSelectionMenu({
   onSelectOption,
   onClose,
   inverse,
+  query: controlledQuery,
 }: NodeSelectionMenuProps) {
   const [editor] = useLexicalComposerContext();
+  const isControlled = controlledQuery !== undefined;
   const [query, setQuery] = useState("");
-  const filteredOptions = useFilteredItems({ query, items: options, filterBy: "name" });
+  const localQuery = isControlled ? controlledQuery : query;
+
+  const filteredOptions = useFilteredItems({ query: localQuery, items: options, filterBy: "name" });
 
   const handleOptionSelection = (option: NodeOption) => {
-    option.action(editor);
-    onSelectOption && onSelectOption(option);
+    onSelectOption ? onSelectOption(option) : option.action(editor);
     onClose && onClose();
   };
 
+  useEffect(() => {
+    const unregisterCommand = editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      (event) => {
+        if (isControlled) return false;
+        const actions: { [key: string]: () => void } = {
+          Escape: () => onClose?.(),
+          Backspace: () => {
+            if (localQuery.length === 0) {
+              onClose?.();
+            } else {
+              setQuery((prev) => prev.slice(0, -1));
+            }
+          },
+        };
+        const action = actions[event.key];
+        if (action) {
+          event.stopPropagation();
+          event.preventDefault();
+          action();
+          return true;
+        } else {
+          if (event.key.length === 1) {
+            event.stopPropagation();
+            event.preventDefault();
+            setQuery((prev) => prev + event.key);
+            return true;
+          }
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+    return () => {
+      unregisterCommand();
+    };
+  }, [editor, onClose, localQuery]);
+
   return (
     <Menu.Root className={`autocomplete-menu-container ${inverse ? "inverse" : ""}`}>
-      <LexicalInput
-        value={query}
-        type="text"
-        onChange={setQuery}
-        onEmpty={onClose}
-        onExit={onClose}
-        disabled
-      />
-
+      {!isControlled && <input value={localQuery} type="text" disabled />}
+      <NodeNavigation />
       <Menu.Options className="autocomplete-menu-options" autoIndex={false}>
         {filteredOptions.map((option, index) => (
           <Menu.Option

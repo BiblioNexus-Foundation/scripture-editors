@@ -22,7 +22,6 @@ import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
-import PerfTypeaheadPlugin from "shared-react/plugins/PerfTypeahead";
 import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu/index";
 
 const theme = {
@@ -212,18 +211,11 @@ export default function Editor({
         }}
       />
       {scriptureReference && selectedMarker ? (
-        <>
-          <PerfNodesMenu
-            trigger={"/"}
-            scriptureReference={scriptureReference}
-            contextMarker={selectedMarker}
-          />
-          <PerfTypeaheadPlugin
-            trigger={contextMenuKey}
-            scriptureReference={scriptureReference}
-            contextMarker={selectedMarker}
-          />
-        </>
+        <PerfNodesMenu
+          trigger={contextMenuKey}
+          scriptureReference={scriptureReference}
+          contextMarker={selectedMarker}
+        />
       ) : null}
 
       <div className={"editor-oce"}>
