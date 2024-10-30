@@ -16,7 +16,7 @@ import {
   CursorPosition,
 } from "../utils/CursorSelectionContext";
 import { $insertCursorPlaceholder, $removeCursorPlaceholder } from "../utils";
-import { charSelectionOffset, CursorMovementDirection } from "../utils/constants";
+import { CharSelectionOffset, CursorMovementDirection } from "../utils/constants";
 import { handleNoSibling } from "./noSibling";
 import { handleSiblingNode } from "./sibling";
 
@@ -117,8 +117,8 @@ export function registerCursorInsertion(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingLeft
-        ? charSelectionOffset.AFTER
-        : charSelectionOffset.BEFORE;
+        ? CharSelectionOffset.AFTER
+        : CharSelectionOffset.BEFORE;
       const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });
@@ -129,8 +129,8 @@ export function registerCursorInsertion(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingRight ? CursorPosition.End : CursorPosition.Start;
       const selectOffset = cursor.isMovingRight
-        ? charSelectionOffset.BEFORE
-        : charSelectionOffset.AFTER;
+        ? CharSelectionOffset.BEFORE
+        : CharSelectionOffset.AFTER;
       const cursorPlaceholderNode = $insertCursorPlaceholder(currentNode, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });

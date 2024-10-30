@@ -6,7 +6,7 @@ import {
   $findDescendantEligibleForPlaceholder,
   $insertCursorPlaceholder,
 } from "../utils";
-import { charSelectionOffset } from "../utils/constants";
+import { CharSelectionOffset } from "../utils/constants";
 
 export function handleSiblingNode(
   siblingNode: LexicalNode,
@@ -54,8 +54,8 @@ export function handleSiblingNode(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingToNextNode
-        ? charSelectionOffset.AFTER
-        : charSelectionOffset.BEFORE;
+        ? CharSelectionOffset.AFTER
+        : CharSelectionOffset.BEFORE;
       const cursorPlaceholderNode = $insertCursorPlaceholder(siblingNode, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });
@@ -66,8 +66,8 @@ export function handleSiblingNode(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingToNextNode ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingToNextNode
-        ? charSelectionOffset.AFTER
-        : charSelectionOffset.BEFORE;
+        ? CharSelectionOffset.AFTER
+        : CharSelectionOffset.BEFORE;
       const cursorPlaceholderNode = $insertCursorPlaceholder(descendant, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });
@@ -92,8 +92,8 @@ export function handleSiblingNode(
 
           const cursorPosition = cursor.isMovingRight ? CursorPosition.Start : CursorPosition.End;
           const selectOffset = cursor.isMovingRight
-            ? charSelectionOffset.AFTER
-            : charSelectionOffset.BEFORE;
+            ? CharSelectionOffset.AFTER
+            : CharSelectionOffset.BEFORE;
           const cursorPlaceholderNode = $insertCursorPlaceholder(targetChild, cursorPosition);
           cursorPlaceholderNode.select(selectOffset, selectOffset);
         });

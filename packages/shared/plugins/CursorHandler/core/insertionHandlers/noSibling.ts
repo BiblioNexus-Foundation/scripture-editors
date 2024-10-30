@@ -1,6 +1,6 @@
 import { $isElementNode, $isTextNode, ElementNode, LexicalNode, TextNode } from "lexical";
 import { CursorData, CursorPosition } from "../utils/CursorSelectionContext";
-import { charSelectionOffset } from "../utils/constants";
+import { CharSelectionOffset } from "../utils/constants";
 import {
   $findDescendantEligibleForPlaceholder,
   $getValidAncestor,
@@ -43,8 +43,8 @@ export function handleNoSibling(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.Start : CursorPosition.End;
       const selectOffset = cursor.isMovingLeft
-        ? charSelectionOffset.BEFORE
-        : charSelectionOffset.AFTER;
+        ? CharSelectionOffset.BEFORE
+        : CharSelectionOffset.AFTER;
       const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });
@@ -55,8 +55,8 @@ export function handleNoSibling(
     editorUpdate(() => {
       const cursorPosition = cursor.isMovingLeft ? CursorPosition.End : CursorPosition.Start;
       const selectOffset = cursor.isMovingLeft
-        ? charSelectionOffset.BEFORE
-        : charSelectionOffset.AFTER;
+        ? CharSelectionOffset.BEFORE
+        : CharSelectionOffset.AFTER;
       const cursorPlaceholderNode = $insertCursorPlaceholder(ancestorSibling, cursorPosition);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });

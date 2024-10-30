@@ -38,7 +38,7 @@ registerCursorHandlers(
 #### Parameters
 
 - `editor`: The LexicalEditor instance to register the CursorHandler with.
-- `canHavePlaceholder`: A function that determines if a node can have a placeholder. Defaults to `() => true`.
+- `canHavePlaceholder`: A function that returns boolean value indicating whether a node can contain a cursor placeholder. Defaults to `() => true`.
 - `updateTags`: An array of update tags to be added to the editor update when a placeholder is inserted or removed.
 
 ## How It Works

@@ -8,7 +8,7 @@ export enum CursorMovementDirection {
   RIGHT = "right",
 }
 
-export enum charSelectionOffset {
+export enum CharSelectionOffset {
   BEFORE = 0,
   AFTER = 1,
 }
