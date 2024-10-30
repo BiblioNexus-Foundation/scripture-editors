@@ -22,7 +22,7 @@ import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
-import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu/index";
+import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu";
 
 const theme = {
   // Theme styling goes here

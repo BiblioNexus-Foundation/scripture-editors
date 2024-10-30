@@ -15,7 +15,5 @@ export default function PerfNodesMenu({
   const [editor] = useLexicalComposerContext();
   const { markersMenuItems } = useUsfmMakersForMenu({ editor, scriptureReference, contextMarker });
 
-  console.log({ markersMenuItems });
-
   return <NodesMenu trigger={trigger} items={markersMenuItems} />;
 }

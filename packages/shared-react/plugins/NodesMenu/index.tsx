@@ -12,7 +12,6 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
   const hideMenu = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        console.log("hiding");
         setIsOpen(false);
         editor.focus();
       }
@@ -24,7 +23,6 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
     if (isOpen) {
       document.addEventListener("keydown", hideMenu);
       return () => {
-        console.log("removing");
         document.removeEventListener("keydown", hideMenu);
       };
     }
@@ -35,16 +33,6 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
     const showMenu = (e: KeyboardEvent) => {
       if (e.key === trigger) {
         e.preventDefault();
-        editor.getEditorState().read(() => {
-          const selection = $getSelection();
-          if (!$isRangeSelection(selection)) return;
-          if (selection.anchor.key === selection.focus.key && selection.anchor.type === "text") {
-            const textNode = selection.anchor.getNode();
-            const text = textNode.getTextContent();
-            const selectedText = text.slice(selection.anchor.offset, selection.focus.offset);
-            console.log({ selectedText });
-          }
-        });
         setIsOpen(true);
       }
     };

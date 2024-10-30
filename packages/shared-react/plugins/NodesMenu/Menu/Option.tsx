@@ -18,7 +18,6 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
     } = useMenuContext();
 
     useEffect(() => {
-      console.log("option selectedIndex", selectedIndex);
       if (index !== undefined && selectedIndex === index) {
         onSelect?.(index);
         setSelectedIndex(-1);
