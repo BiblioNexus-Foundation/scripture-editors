@@ -757,5 +757,5 @@ span.chapter:hover:before {
 }
 
 .autocomplete-menu-container.inverse {
-    flex-direction: column-reverse;
+  flex-direction: column-reverse;
 }
