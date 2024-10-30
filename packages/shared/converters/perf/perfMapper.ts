@@ -27,7 +27,6 @@ type PerfSubtypeMap<TargetType, PerfNodeType extends string = TypeKey> = {
     | MappedNodeBuilder<TypeKeyMap<PerfNodeType>, TargetType, PerfNodeType, key>
     | TargetType;
 };
-
 export type PerfMap<TargetNode> = {
   "*": PerfSubtypeMap<TargetNode, "*"> & {
     "*": MappedNodeBuilder<TypeKeyMap<"*">, TargetNode> | TargetNode;
