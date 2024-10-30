@@ -16,6 +16,7 @@
   color: var(--editor-text-color);
   border-radius: 0 0 1rem 1rem;
   padding: 1em 2em;
+  overflow: auto;
 }
 
 .contentEditable {
@@ -354,7 +355,9 @@ span.paragraph[perf-subtype="usfm:f"] {
 }
 
 .editor {
-  max-width: 700px;
+  width: 100%;
+  height: 80vh;
+  height: 80dvh;
 }
 
 /* Toolbar Styles */
@@ -393,6 +396,10 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-weight: 600;
   font-size: 0.85rem;
   min-width: 35px;
+}
+
+.toolbar button.active {
+  background: #dadada;
 }
 
 .toolbar button:hover {
@@ -569,9 +576,8 @@ span.paragraph[perf-subtype="usfm:f"] {
   font-size: 0.6rem;
   font-weight: 600;
   left: 0;
-  padding: 0.2em;
+  padding: 0.1em;
   color: rgb(0 0 0 / 20%);
-  margin-inline-end: 0.1rem;
   vertical-align: bottom;
 }
 
@@ -682,7 +688,8 @@ span.chapter:hover:before {
   border-top: dashed 1px #ffffff91;
 }
 
-[data-marker="v"]:has(+ [data-marker="v"]):after {
+[data-marker="v"]:has(+ [data-marker="v"], + [data-marker="c"]):after,
+[data-marker="c"]:has(+ [data-marker="v"] + [data-marker="v"]):after {
   display: block;
   content: "";
 }

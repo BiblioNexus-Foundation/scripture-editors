@@ -276,7 +276,6 @@ function createMergeActionGetter(
       }
 
       if (prevEditorState === null) {
-        console.log("PUSH SET");
         return HISTORY_PUSH;
       }
 
@@ -309,7 +308,6 @@ function createMergeActionGetter(
           return HISTORY_MERGE;
         }
       }
-      console.log("PUSH SET");
       return HISTORY_PUSH;
     })();
 
@@ -367,7 +365,6 @@ export function registerHistory(
       dirtyElements,
       tags,
     );
-    console.log("MERGE ACTION: ", ["MERGE", "PUSH", "DISCARD"][mergeAction]);
     if (mergeAction === HISTORY_PUSH) {
       dirtyNodes.reset();
       editor.dispatchCommand(PUSH_COMMAND, { historyManager });
