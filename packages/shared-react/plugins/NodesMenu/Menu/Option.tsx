@@ -10,7 +10,7 @@ type OptionProps = {
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
-  ({ index, onSelect, children, onClick, onMouseEnter, ...props }, ref) => {
+  ({ index, onSelect, children, onMouseEnter, ...props }, ref) => {
     const {
       state: { selectedIndex, activeIndex },
       setActiveIndex,
@@ -28,7 +28,7 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
       if (index !== undefined) {
         setSelectedIndex(index);
       }
-    }, [index, setSelectedIndex, onClick]);
+    }, [index, setSelectedIndex]);
 
     const handleMouseEnter = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {

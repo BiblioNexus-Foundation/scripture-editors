@@ -3,7 +3,7 @@ import Menu from "./Menu";
 import { useFilteredItems } from "./Menu/useFilteredItems";
 import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND, LexicalEditor } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import NodeNavigation from "./NodeNavigation";
+import LexicalMenuNavigation from "./LexicalMenuNavigation";
 
 export type NodeOption = {
   name: string;
@@ -36,11 +36,11 @@ export function NodeSelectionMenu({
 
   const handleOptionSelection = (option: NodeOption) => {
     onSelectOption ? onSelectOption(option) : option.action(editor);
-    onClose && onClose();
+    onClose?.();
   };
 
   useEffect(() => {
-    const unregisterCommand = editor.registerCommand(
+    return editor.registerCommand(
       KEY_DOWN_COMMAND,
       (event) => {
         if (isControlled) return false;
@@ -72,15 +72,12 @@ export function NodeSelectionMenu({
       },
       COMMAND_PRIORITY_HIGH,
     );
-    return () => {
-      unregisterCommand();
-    };
   }, [editor, onClose, localQuery]);
 
   return (
     <Menu.Root className={`autocomplete-menu-container ${inverse ? "inverse" : ""}`}>
       {!isControlled && <input value={localQuery} type="text" disabled />}
-      <NodeNavigation />
+      <LexicalMenuNavigation />
       <Menu.Options className="autocomplete-menu-options" autoIndex={false}>
         {filteredOptions.map((option, index) => (
           <Menu.Option

@@ -8,45 +8,28 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Close the menu when the escape key is pressed
-  const hideMenu = useCallback(
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && isOpen) {
         setIsOpen(false);
         editor.focus();
-      }
-    },
-    [editor],
-  );
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", hideMenu);
-      return () => {
-        document.removeEventListener("keydown", hideMenu);
-      };
-    }
-  }, [isOpen, hideMenu]);
-
-  // Open the menu when the trigger key is pressed
-  useEffect(() => {
-    const showMenu = (e: KeyboardEvent) => {
-      if (e.key === trigger) {
+      } else if (e.key === trigger && !isOpen) {
         e.preventDefault();
         setIsOpen(true);
       }
-    };
-    const unregisterRootListener = editor.registerRootListener((root) => {
+    },
+    [editor, trigger, isOpen],
+  );
+
+  useEffect(() => {
+    return editor.registerRootListener((root) => {
       if (!root) return;
-      root.addEventListener("keydown", showMenu);
+      root.addEventListener("keydown", handleKeyDown);
       return () => {
-        root.removeEventListener("keydown", showMenu);
+        root.removeEventListener("keydown", handleKeyDown);
       };
     });
-    return () => {
-      unregisterRootListener();
-    };
-  }, [editor, trigger]);
+  }, [editor, handleKeyDown]);
 
   // Close the menu when the selection changes
   useEffect(() => {
