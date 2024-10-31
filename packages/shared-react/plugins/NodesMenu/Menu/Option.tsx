@@ -18,23 +18,27 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
     } = useMenuContext();
 
     useEffect(() => {
-      if (index !== undefined && selectedIndex === index) {
-        onSelect?.(index);
+      if (selectedIndex === index) {
+        try {
+          onSelect?.(index);
+        } catch (error) {
+          console.error("Error in onSelect callback:", error);
+        }
         setSelectedIndex(-1);
       }
-    }, [index, selectedIndex, onSelect]);
+    }, [index, selectedIndex]);
 
-    const handleClick = useCallback(() => {
-      if (index !== undefined) {
+    const handleClick = useCallback(
+      (event: React.MouseEvent<HTMLButtonElement>) => {
         setSelectedIndex(index);
-      }
-    }, [index, setSelectedIndex]);
+        props.onClick?.(event);
+      },
+      [index, setSelectedIndex, props.onClick],
+    );
 
     const handleMouseEnter = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
-        if (index !== undefined) {
-          setActiveIndex(index);
-        }
+        setActiveIndex(index);
         onMouseEnter?.(event);
       },
       [index, setActiveIndex, onMouseEnter],
