@@ -1261,7 +1261,7 @@ export const editorStateMarks = {
 /** para index where the note exists */
 export const NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX = 2;
 
-export const usjWithUnknownItems = {
+export const usjWithUnknownItems: Usj = {
   type: "USJ",
   version: "0.2.1",
   content: [
