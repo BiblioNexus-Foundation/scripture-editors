@@ -27,7 +27,7 @@ type Annotations = {
 const defaultUsj = usxStringToUsj('<usx version="3.0" />');
 const projectId = "projectId";
 const defaultScrRef: ScriptureReference = {
-  bookNum: Canon.bookIdToNumber("PSA"),
+  bookNum: Canon.bookIdToNumber("RUT"),
   chapterNum: 1,
   verseNum: 1,
 };

@@ -21,10 +21,11 @@
     "src/editor"
   ],
   "scripts": {
-    "collab": "cross-env HOST=localhost PORT=1234 npx y-websocket",
-    "collab:persist": "cross-env HOST=localhost PORT=1234 YPERSISTENCE=./yjs-wss-db npx y-websocket",
+    "collab": "concurrently \"npm:collab:persist\" \"npm:collab:host\"",
+    "collab:persist": "cross-env HOST=localhost PORT=8877 YPERSISTENCE=./yjs-wss-db npx y-websocket-server",
+    "collab:host": "tsx src/servers/collab.host.ts",
     "dev": "vite",
-    "dev:collab": "cross-env NODE_ENV=development concurrently \"npm:collab:persist\" \"vite\"",
+    "dev:collab": "cross-env NODE_ENV=development concurrently \"npm:collab\" \"vite\"",
     "dev:test": "cross-env NODE_ENV=testing vite",
     "files:smash": "cd scripts && python3 ./consolidate_files.py",
     "prepublish": "cd ../.. && nx build platform"
@@ -35,7 +36,9 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:^",
+    "@lexical/headless": "^0.20.0",
     "@lexical/react": "^0.20.0",
+    "@lexical/rich-text": "^0.20.0",
     "@lexical/selection": "^0.20.0",
     "@lexical/text": "^0.20.0",
     "@lexical/utils": "^0.20.0",
@@ -49,6 +52,7 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@types/ws": "^8.5.12",
     "concurrently": "^8.2.2",
     "platform-bible-react": "file:./lib/platform-bible-react",
     "platform-bible-utils": "file:./lib/platform-bible-utils",
@@ -57,7 +61,9 @@
     "shared": "link:../shared",
     "shared-react": "link:../shared-react",
     "tailwindcss": "3.4.15",
-    "tailwindcss-animate": "1.0.7"
+    "tailwindcss-animate": "1.0.7",
+    "tsx": "^4.19.1",
+    "ws": "^8.18.0"
   },
   "volta": {
     "extends": "../../package.json"
