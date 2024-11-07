@@ -16,7 +16,6 @@ import {
   NBSP,
   getEditableCallerText,
   parseNumberFromMarkerText,
-  removeEndingZwsp,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
@@ -172,7 +171,6 @@ function createNoteMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category, unknownAttributes } = node;
-  removeEndingZwsp(content);
   return removeUndefinedProperties({
     type,
     marker,

@@ -2,7 +2,6 @@ import type { SerializedEditorState } from "lexical";
 import { MarkerContent, Usj } from "./usj.model";
 
 const NBSP = "\u00A0";
-const ZWSP = "\u200B";
 
 export const usxEmpty = '<usx version="3.0" />';
 
@@ -271,7 +270,7 @@ export const editorStateGen1v1 = {
                 style: "display: none",
                 detail: 0,
                 format: 0,
-                mode: "normal",
+                mode: "token",
                 version: 1,
               },
               {
@@ -281,16 +280,7 @@ export const editorStateGen1v1 = {
                 style: "display: none",
                 detail: 0,
                 format: 0,
-                mode: "normal",
-                version: 1,
-              },
-              {
-                type: "text",
-                text: ZWSP,
-                detail: 0,
-                format: 0,
-                mode: "normal",
-                style: "",
+                mode: "token",
                 version: 1,
               },
             ],
@@ -667,15 +657,6 @@ export const editorStateGen1v1Editable = {
                 marker: "f",
                 isOpening: false,
                 text: "",
-                detail: 0,
-                format: 0,
-                mode: "normal",
-                style: "",
-                version: 1,
-              },
-              {
-                type: "text",
-                text: ZWSP,
                 detail: 0,
                 format: 0,
                 mode: "normal",
@@ -1424,16 +1405,7 @@ export const editorStateWithUnknownItems = {
                 style: "display: none",
                 detail: 0,
                 format: 0,
-                mode: "normal",
-                version: 1,
-              },
-              {
-                type: "text",
-                text: ZWSP,
-                detail: 0,
-                format: 0,
-                mode: "normal",
-                style: "",
+                mode: "token",
                 version: 1,
               },
             ],

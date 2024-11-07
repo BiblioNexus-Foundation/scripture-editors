@@ -12,6 +12,7 @@ import {
   SerializedLexicalNode,
   SerializedLineBreakNode,
   SerializedTextNode,
+  TextModeType,
   TextNode,
 } from "lexical";
 import {
@@ -85,7 +86,6 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
-  addEndingZwspIfMissing,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -421,7 +421,10 @@ function createNote(
     const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
     callerNode = createNoteCaller(noteCaller, childNodes);
     childNodes.forEach((node) => {
-      (node as SerializedTextNode).style = "display: none";
+      if (node.type === CharNode.getType()) {
+        (node as SerializedCharNode).mode = "token";
+        (node as SerializedCharNode).style = "display: none";
+      }
     });
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
@@ -436,7 +439,6 @@ function createNote(
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  addEndingZwspIfMissing(children, TextNode.getType(), createText);
 
   return removeUndefinedProperties({
     type: NoteNode.getType(),
@@ -527,13 +529,13 @@ function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
   };
 }
 
-function createText(text: string): SerializedTextNode {
+function createText(text: string, mode: TextModeType = "normal"): SerializedTextNode {
   return {
     type: TextNode.getType(),
     text,
     detail: 0,
     format: 0,
-    mode: "normal",
+    mode,
     style: "",
     version: 1,
   };

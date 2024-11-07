@@ -76,7 +76,6 @@ import {
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
-  addEndingZwspIfMissing,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -410,9 +409,14 @@ function createNote(
   } else {
     const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
     callerNode = createNoteCaller(noteCaller, childNodes);
-    // childNodes.forEach((node) => {
-    //   (node as SerializedTextNode).style = "display: none";
-    // });
+    /*
+    childNodes.forEach((node) => {
+      if (node.type === CharNode.getType()) {
+        (node as SerializedCharNode).mode = "token";
+        (node as SerializedCharNode).style = "display: none";
+      }
+    });
+    */
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
@@ -426,7 +430,6 @@ function createNote(
   if (openingMarkerNode) children.push(openingMarkerNode);
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
-  addEndingZwspIfMissing(children, TextNode.getType(), createText);
 
   return {
     type: NoteNode.getType(),

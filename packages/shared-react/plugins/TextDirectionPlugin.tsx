@@ -39,39 +39,33 @@ function useArrowKeys(editor: LexicalEditor) {
     const $handleKeyDown = (event: KeyboardEvent): boolean => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return false;
 
-      return editor.getEditorState().read(() => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return false;
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return false;
 
-        // Find the closest paragraph element
-        const anchorNode = selection.anchor.getNode();
-        const paragraphNode = $findMatchingParent(
-          anchorNode,
-          (node) => getNodeElementTagName(node, editor) === "p",
-        );
-        if (!paragraphNode) return false;
+      // Find the closest paragraph element
+      const anchorNode = selection.anchor.getNode();
+      const paragraphNode = $findMatchingParent(
+        anchorNode,
+        (node) => getNodeElementTagName(node, editor) === "p",
+      );
+      if (!paragraphNode) return false;
 
-        // Get the DOM element corresponding to the paragraph node
-        const paragraphElement = editor.getElementByKey(paragraphNode.getKey());
-        if (!paragraphElement) return false;
+      // Get the DOM element corresponding to the paragraph node
+      const paragraphElement = editor.getElementByKey(paragraphNode.getKey());
+      if (!paragraphElement) return false;
 
-        // Check if directions are different
-        const inputDiv = paragraphElement.parentElement;
-        if (!inputDiv || paragraphElement.dir === inputDiv.dir) return false;
+      // Check if directions are different
+      const inputDiv = paragraphElement.parentElement;
+      if (!inputDiv || paragraphElement.dir === inputDiv.dir) return false;
 
-        editor.update(() => {
-          const updatedSelection = $getSelection();
-          if ($isRangeSelection(updatedSelection)) {
-            // Move in the opposite direction
-            const isBackward =
-              (inputDiv.dir === "rtl" && event.key === "ArrowLeft") ||
-              (inputDiv.dir === "ltr" && event.key === "ArrowRight");
-            updatedSelection.modify("move", isBackward, "character");
-          }
-        });
-        event.preventDefault();
-        return true;
-      });
+      // Move in the opposite direction
+      const isBackward =
+        (inputDiv.dir === "rtl" && event.key === "ArrowLeft") ||
+        (inputDiv.dir === "ltr" && event.key === "ArrowRight");
+      selection.modify("move", isBackward, "character");
+
+      event.preventDefault();
+      return true;
     };
 
     return editor.registerCommand(KEY_DOWN_COMMAND, $handleKeyDown, COMMAND_PRIORITY_HIGH);

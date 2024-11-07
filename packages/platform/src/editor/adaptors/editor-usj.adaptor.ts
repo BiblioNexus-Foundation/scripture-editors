@@ -49,7 +49,6 @@ import {
   NBSP,
   getEditableCallerText,
   parseNumberFromMarkerText,
-  removeEndingZwsp,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -188,7 +187,6 @@ function createNoteMarker(
   content: MarkerContent[] | undefined,
 ): MarkerObject {
   const { type, marker, caller, category, unknownAttributes } = node;
-  removeEndingZwsp(content);
   return removeUndefinedProperties({
     type,
     marker,

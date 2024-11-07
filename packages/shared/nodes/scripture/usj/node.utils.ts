@@ -1,11 +1,7 @@
 /** Utility functions for editor nodes */
 
-import {
-  MARKER_OBJECT_PROPS,
-  MarkerContent,
-  MarkerObject,
-} from "@biblionexus-foundation/scripture-utilities";
-import { LexicalEditor, LexicalNode, SerializedLexicalNode, SerializedTextNode } from "lexical";
+import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
+import { LexicalEditor, LexicalNode, SerializedLexicalNode } from "lexical";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ChapterNode } from "./ChapterNode";
 import { CharNode, SerializedCharNode } from "./CharNode";
@@ -274,61 +270,6 @@ export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
     )
     .trim();
   return previewText;
-}
-
-/**
- * Adds a Zero-Width Space (ZWSP) character to the end of an array of serialized Lexical nodes if
- * it's not already present.
- *
- * @param children - The array of serialized Lexical nodes to process.
- * @param textNodeType - The type identifier for text nodes in the Lexical structure.
- * @param createTextNodeFn - A function that creates a new serialized text node given a string.
- * @returns This function doesn't return a value; it modifies the input array in place if necessary.
- *
- * @remarks
- * - This function mutates the input array if a ZWSP needs to be added.
- * - The function only adds a ZWSP if the last child is not already a text node with ZWSP content.
- *
- * @example
- * const nodes: SerializedLexicalNode[] = [{ type: 'text', text: 'Hello' }];
- * const createTextNode = (text: string) => ({ type: 'text', text });
- * addEndingZwspIfMissing(nodes, 'text', createTextNode);
- * // nodes is now [{ type: 'text', text: 'Hello' }, { type: 'text', text: ZWSP }]
- */
-export function addEndingZwspIfMissing(
-  children: SerializedLexicalNode[] = [],
-  textNodeType: string,
-  createTextNodeFn: (text: string) => SerializedTextNode,
-) {
-  const lastChild = children.length > 0 ? children[children.length - 1] : undefined;
-  if (
-    lastChild &&
-    lastChild.type === textNodeType &&
-    (lastChild as SerializedTextNode).text === ZWSP
-  )
-    return;
-
-  children.push(createTextNodeFn(ZWSP));
-}
-
-/**
- * Removes the Zero-Width Space (ZWSP) character from the end of a MarkerContent array if present.
- *
- * @param content - The array of MarkerContent to process.
- * @returns This function doesn't return a value; it modifies the input array in place.
- *
- * @remarks
- * - This function mutates the input array.
- * - It only removes the ZWSP if it's the last element and is a string.
- *
- * @example
- * const content: MarkerContent[] = ['Some text', 'More text', ZWSP];
- * removeEndingZwsp(content);
- * // content is now ['Some text', 'More text']
- */
-export function removeEndingZwsp(content: MarkerContent[] = []) {
-  const lastChild = content.length > 0 ? content[content.length - 1] : undefined;
-  if (lastChild && typeof lastChild === "string" && lastChild === ZWSP) content.pop();
 }
 
 /**
