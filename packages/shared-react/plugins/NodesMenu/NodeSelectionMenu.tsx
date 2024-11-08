@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react";
 import Menu from "./Menu";
 import { useFilteredItems } from "./Menu/useFilteredItems";
-import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND, LexicalEditor } from "lexical";
+import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalMenuNavigation from "./LexicalMenuNavigation";
-
-export type NodeOption = {
-  name: string;
-  label: string;
-  description: string;
-  action: (editor: LexicalEditor) => void;
-};
+import { OptionItem } from "./Menu";
 
 interface NodeSelectionMenuProps {
-  options: Array<NodeOption>;
-  onSelectOption?: (option: NodeOption) => void;
+  options: Array<OptionItem>;
+  onSelectOption?: (option: OptionItem) => void;
   onClose?: () => void;
   inverse?: boolean;
   query?: string;
@@ -34,9 +28,9 @@ export function NodeSelectionMenu({
 
   const filteredOptions = useFilteredItems({ query: localQuery, items: options, filterBy: "name" });
 
-  const handleOptionSelection = (option: NodeOption) => {
-    onSelectOption ? onSelectOption(option) : option.action(editor);
+  const handleOptionSelection = (option: OptionItem) => {
     onClose?.();
+    onSelectOption ? onSelectOption(option) : option.action(editor);
   };
 
   useEffect(() => {
@@ -75,20 +69,23 @@ export function NodeSelectionMenu({
   }, [editor, onClose, localQuery]);
 
   return (
-    <Menu.Root className={`autocomplete-menu-container ${inverse ? "inverse" : ""}`}>
+    <Menu.Root
+      className={`autocomplete-menu-container ${inverse ? "inverse" : ""}`}
+      menuItems={filteredOptions}
+      onSelectOption={(item) => handleOptionSelection(item)}
+    >
       {!isControlled && <input value={localQuery} type="text" disabled />}
       <LexicalMenuNavigation />
       <Menu.Options className="autocomplete-menu-options" autoIndex={false}>
-        {filteredOptions.map((option, index) => (
-          <Menu.Option
-            index={index}
-            key={option.name}
-            onSelect={() => handleOptionSelection(option)}
-          >
-            <span className="label">{option.label ?? option.name}</span>
-            <span className="description">{option.description}</span>
-          </Menu.Option>
-        ))}
+        {(options) => {
+          const mappedOptions = options.map((option, index) => (
+            <Menu.Option index={index} key={option.name}>
+              <span className="label">{option.label ?? option.name}</span>
+              <span className="description">{option.description}</span>
+            </Menu.Option>
+          ));
+          return mappedOptions;
+        }}
       </Menu.Options>
     </Menu.Root>
   );

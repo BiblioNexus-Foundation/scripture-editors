@@ -30,7 +30,6 @@ export default function useUsfmMakersForMenu({
           label: marker,
           description: markerData?.description ?? "",
           action: (editor: LexicalEditor) => {
-            console.trace("action", action);
             action({ editor, reference: scriptureReference });
           },
         };

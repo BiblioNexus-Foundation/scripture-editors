@@ -9,36 +9,44 @@ import React, {
 } from "react";
 import { useMenuContext } from "./MenuContext";
 import { MenuOption } from "./Option";
+import { OptionItem } from "./types";
 
 type OptionElement = ReactElement<React.ComponentProps<typeof MenuOption>, typeof MenuOption>;
 
-type MenuOptionsProps = {
-  children: OptionElement | OptionElement[];
+type MenuOptionsProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  children:
+    | OptionElement
+    | OptionElement[]
+    | ((menuItems: OptionItem[]) => OptionElement | OptionElement[]);
   autoIndex?: boolean;
-} & React.HTMLAttributes<HTMLDivElement>;
+};
 
 export function MenuOptions({ children, autoIndex = true, ...divProps }: MenuOptionsProps) {
-  const optionsCount = Children.count(children);
   const menuRef = useRef<HTMLDivElement>(null);
   const {
-    updateOptionsCount,
-    state: { activeIndex },
+    state: { activeIndex, menuItems },
   } = useMenuContext();
 
-  useEffect(() => {
-    updateOptionsCount(optionsCount);
-  }, [optionsCount, updateOptionsCount]);
+  const renderChildren = useMemo(
+    () => (menuItems ? (typeof children === "function" ? children : () => children) : () => null),
+    [children, menuItems],
+  );
 
   const mappedChildren = useMemo(() => {
+    const children = renderChildren(menuItems);
     if (!autoIndex) return children;
 
     return Children.map(children, (child, index) => {
-      if (isValidElement(child) && child.type === MenuOption && child.props.index === undefined) {
+      if (
+        isValidElement<React.ComponentProps<typeof MenuOption>>(child) &&
+        child.type === MenuOption &&
+        child.props.index === undefined
+      ) {
         return cloneElement(child, { index });
       }
       return child;
     });
-  }, [children, autoIndex]);
+  }, [renderChildren, autoIndex, menuItems]);
 
   useEffect(() => {
     if (menuRef.current) {

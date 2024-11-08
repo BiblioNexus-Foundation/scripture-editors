@@ -2,9 +2,10 @@ import { $getSelection, $isRangeSelection } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useCallback, useEffect, useState } from "react";
 import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
-import { NodeOption, NodeSelectionMenu } from "./NodeSelectionMenu";
+import { NodeSelectionMenu } from "./NodeSelectionMenu";
+import { OptionItem } from "./Menu";
 
-export default function NodesMenu({ trigger, items }: { trigger: string; items?: NodeOption[] }) {
+export default function NodesMenu({ trigger, items }: { trigger: string; items?: OptionItem[] }) {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
 

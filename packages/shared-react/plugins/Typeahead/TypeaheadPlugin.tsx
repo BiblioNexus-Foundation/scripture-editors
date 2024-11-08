@@ -1,13 +1,14 @@
 import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
 import { useTypeaheadData } from "./useTypeaheadData";
-import { NodeOption, NodeSelectionMenu } from "../NodesMenu/NodeSelectionMenu";
+import { NodeSelectionMenu } from "../NodesMenu/NodeSelectionMenu";
 import { executeSelectedItem } from "./executeSelectedItem";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { OptionItem } from "../NodesMenu/Menu";
 
 type TypeaheadPluginProps = {
   /** the string that will trigger the floatingMenu */
   trigger: string;
-  items?: Array<NodeOption>;
+  items?: Array<OptionItem>;
 };
 
 /**
