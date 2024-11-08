@@ -29,8 +29,8 @@ import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
+import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu";
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
-import PerfTypeaheadPlugin from "shared-react/plugins/PerfTypeahead";
 
 const theme = {
   // Theme styling goes here
@@ -197,7 +197,7 @@ export default function Editor({
         {toolbarMarkerSections &&
           Object.entries(toolbarMarkerSections).map(([sectionName, items]) => {
             return (
-              <div key={sectionName} className={"toolbar-section"}>
+              <div key={"toolbar-" + sectionName} className={"toolbar-section"}>
                 {items.map((item) => (
                   <Button
                     key={`${item.label}-toolbar`}
@@ -243,12 +243,13 @@ export default function Editor({
         }}
       />
       {scriptureReference && selectedMarker ? (
-        <PerfTypeaheadPlugin
+        <PerfNodesMenu
           trigger={contextMenuKey}
           scriptureReference={scriptureReference}
           contextMarker={selectedMarker}
         />
       ) : null}
+
       <div className={"editor-oce"}>
         <ContentEditablePlugin ref={editorRef} />
         <PerfHandlersPlugin />

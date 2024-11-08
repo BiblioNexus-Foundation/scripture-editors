@@ -1,9 +1,9 @@
 import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ScriptureReference } from "../ScriptureReferencePlugin";
-import TypeaheadPlugin from "../Typeahead/TypeaheadPlugin";
+import NodesMenu from "../NodesMenu";
 
-export default function PerfTypeaheadPlugin({
+export default function PerfNodesMenu({
   trigger,
   scriptureReference,
   contextMarker,
@@ -15,5 +15,5 @@ export default function PerfTypeaheadPlugin({
   const [editor] = useLexicalComposerContext();
   const { markersMenuItems } = useUsfmMakersForMenu({ editor, scriptureReference, contextMarker });
 
-  return <TypeaheadPlugin trigger={trigger} items={markersMenuItems} />;
+  return <NodesMenu trigger={trigger} items={markersMenuItems} />;
 }

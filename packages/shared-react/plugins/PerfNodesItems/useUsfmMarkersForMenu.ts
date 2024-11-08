@@ -29,7 +29,9 @@ export default function useUsfmMakersForMenu({
           name: marker,
           label: marker,
           description: markerData?.description ?? "",
-          action: (editor: LexicalEditor) => action({ editor, reference: scriptureReference }),
+          action: (editor: LexicalEditor) => {
+            action({ editor, reference: scriptureReference });
+          },
         };
       }),
     );
