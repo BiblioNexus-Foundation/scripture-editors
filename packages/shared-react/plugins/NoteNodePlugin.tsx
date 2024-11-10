@@ -1,10 +1,24 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { mergeRegister } from "@lexical/utils";
-import { $createTextNode, $getNodeByKey, $getRoot, $isTextNode, LexicalEditor } from "lexical";
+import { $findMatchingParent, mergeRegister } from "@lexical/utils";
+import {
+  $createRangeSelection,
+  $getNodeByKey,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $setSelection,
+  COMMAND_PRIORITY_HIGH,
+  KEY_DOWN_COMMAND,
+  LexicalEditor,
+} from "lexical";
 import { useEffect } from "react";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, GENERATOR_NOTE_CALLER, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { getNoteCallerPreviewText, ZWSP } from "shared/nodes/scripture/usj/node.utils";
+import {
+  getNodeElementTagName,
+  getNoteCallerPreviewText,
+} from "shared/nodes/scripture/usj/node.utils";
 import {
   $isImmutableNoteCallerNode,
   ImmutableNoteCallerNode,
@@ -36,18 +50,28 @@ function $noteCharNodeTransform(node: CharNode): void {
 }
 
 /**
- * Ensure the note has an ending ZWSP so a double click on a word after only selects that word and
- * does not include this note in the selection.
- * @param node - NoteNode thats needs a ZWSP as its last child.
+ * Ensure that when double-clicking on a word after a note node (no space between) that it only
+ * selects that word and does not include the note in the selection.
+ * @param event - The MouseEvent triggered by the double-click interaction
  */
-function $noteNodeTransform(node: NoteNode): void {
-  if (!$isNoteNode(node)) return;
+function $handleDoubleClick(event: MouseEvent) {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) return;
 
-  const children = node.getChildren();
-  const lastChild = children.length > 0 ? children[children.length - 1] : undefined;
-  if ($isTextNode(lastChild) && lastChild.getTextContent() === ZWSP) return;
+  const anchor = selection.anchor;
+  const focus = selection.focus;
+  const anchorNode = anchor.getNode();
+  const focusNode = focus.getNode();
 
-  node.append($createTextNode(ZWSP));
+  if ($isNoteNode(anchorNode) && $isTextNode(focusNode)) {
+    event.preventDefault();
+
+    // Create new selection only including the TextNode
+    const newSelection = $createRangeSelection();
+    newSelection.anchor.set(focusNode.getKey(), 0, "text");
+    newSelection.focus.set(focusNode.getKey(), focus.offset, "text");
+    $setSelection(newSelection);
+  }
 }
 
 /**
@@ -83,9 +107,24 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
       );
     }
 
+    const doubleClickListener = (event: MouseEvent) =>
+      editor.update(() => $handleDoubleClick(event));
+
     return mergeRegister(
+      // Update NoteNodeCaller preview text when NoteNode children text are changed.
       editor.registerNodeTransform(CharNode, $noteCharNodeTransform),
-      editor.registerNodeTransform(NoteNode, $noteNodeTransform),
+
+      // Handle double-click of a word immediately following a NoteNode (no space between).
+      editor.registerRootListener(
+        (rootElement: HTMLElement | null, prevRootElement: HTMLElement | null) => {
+          if (prevRootElement !== null) {
+            prevRootElement.removeEventListener("dblclick", doubleClickListener);
+          }
+          if (rootElement !== null) {
+            rootElement.addEventListener("dblclick", doubleClickListener);
+          }
+        },
+      ),
 
       // Re-generate all note callers when a note is added or removed.
       editor.registerMutationListener(ImmutableNoteCallerNode, (nodeMutations) => {
@@ -108,6 +147,61 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
   }, [editor]);
 }
 
+/**
+ * When moving forward with arrow keys, if a note node is next, move to the following node.
+ * @param editor - The LexicalEditor instance used to access the DOM.
+ */
+function useArrowKeys(editor: LexicalEditor) {
+  useEffect(() => {
+    const $handleKeyDown = (event: KeyboardEvent): boolean => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return false;
+
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return false;
+
+      const anchorNode = selection.anchor.getNode();
+      const isAtEnd = selection.anchor.offset === anchorNode.getTextContent().length;
+
+      // Find the closest paragraph element to get the text direction
+      const paragraphNode = $findMatchingParent(
+        anchorNode,
+        (node) => getNodeElementTagName(node, editor) === "p",
+      );
+      if (!paragraphNode) return false;
+
+      const paragraphElement = editor.getElementByKey(paragraphNode.getKey());
+      if (!paragraphElement) return false;
+
+      const inputDiv = paragraphElement.parentElement;
+      if (!inputDiv) return false;
+
+      // If moving forward from the end of a text node and a note follows
+      if (
+        isAtEnd &&
+        ((inputDiv.dir === "ltr" && event.key === "ArrowRight") ||
+          (inputDiv.dir === "rtl" && event.key === "ArrowLeft"))
+      ) {
+        const nextSibling = anchorNode.getNextSibling();
+        if ($isNoteNode(nextSibling)) {
+          // Find the next text node after the NoteNode
+          const nodeAfterNote = nextSibling.getNextSibling();
+          if (nodeAfterNote) {
+            // Move to the start of the next text node
+            selection.anchor.set(nodeAfterNote.getKey(), 0, "text");
+            selection.focus.set(nodeAfterNote.getKey(), 0, "text");
+            event.preventDefault();
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    return editor.registerCommand(KEY_DOWN_COMMAND, $handleKeyDown, COMMAND_PRIORITY_HIGH);
+  }, [editor]);
+}
+
 export default function NoteNodePlugin<TLogger extends LoggerBasic>({
   nodeOptions,
   logger,
@@ -117,5 +211,6 @@ export default function NoteNodePlugin<TLogger extends LoggerBasic>({
 }): null {
   const [editor] = useLexicalComposerContext();
   useNoteNode(editor, nodeOptions, logger);
+  useArrowKeys(editor);
   return null;
 }
