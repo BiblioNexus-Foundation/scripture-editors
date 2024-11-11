@@ -35,7 +35,7 @@
     "@xmldom/xmldom": "^0.8.10"
   },
   "devDependencies": {
-    "lexical": "^0.18.0"
+    "lexical": "^0.20.0"
   },
   "volta": {
     "extends": "../../package.json"

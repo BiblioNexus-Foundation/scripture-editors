@@ -8,9 +8,9 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@lexical/rich-text": "^0.18.0",
-    "@lexical/utils": "^0.18.0",
-    "lexical": "^0.18.0",
+    "@lexical/rich-text": "^0.20.0",
+    "@lexical/utils": "^0.20.0",
+    "lexical": "^0.20.0",
     "open-patcher": "1.0.0-beta.1"
   },
   "devDependencies": {
