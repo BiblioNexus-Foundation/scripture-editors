@@ -6,7 +6,14 @@ import { peerDependencies, dependencies } from "./package.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), dts({ rollupTypes: true, exclude: ["src/App.tsx", "src/main.tsx"] })],
+  plugins: [
+    react(),
+    dts({
+      rollupTypes: true,
+      exclude: ["src/App.tsx", "src/main.tsx"],
+      aliasesExclude: ["@biblionexus-foundation/scripture-utilities"],
+    }),
+  ],
   build: {
     sourcemap: true,
     lib: {
