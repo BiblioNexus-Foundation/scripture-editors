@@ -1,3 +1,4 @@
+import { BookCode } from "@biblionexus-foundation/scripture-utilities";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getNodeByKey,
@@ -17,7 +18,6 @@ import {
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
 import { findThisVerse, findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
-import { BookCode } from "utilities/src/converters/usj/usj.model.ts";
 import {
   getChapterNodeClass,
   getVerseNodeClass,
