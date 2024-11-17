@@ -35,7 +35,7 @@ import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
@@ -47,6 +47,8 @@ import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-o
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
+import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
+import { Canon } from "@sillsdev/scripture";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -179,6 +181,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
   const [usj, setUsj] = useState(defaultUsj);
+
+  const localOnScrRefChange = (scrRef: ScriptureReference) => {
+    console.log("localOnScrRefChange", scrRef);
+    onScrRefChange?.(scrRef);
+  };
+
+  console.log("usj", usj);
+
   const {
     isReadonly = false,
     hasSpellCheck = false,
@@ -262,10 +272,20 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           {scrRef && onScrRefChange && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
-              onScrRefChange={onScrRefChange}
+              onScrRefChange={localOnScrRefChange}
               viewOptions={viewOptions}
             />
           )}
+          <UsjNodesMenuPlugin
+            trigger="\"
+            scriptureReference={{
+              book: Canon.bookNumberToId(scrRef?.bookNum ?? 0),
+              chapter: scrRef?.chapterNum ?? 0,
+              verse: scrRef?.verseNum ?? 0,
+            }}
+            contextMarker="p"
+            editorAdaptor={usjEditorAdaptor}
+          />
           <UpdateStatePlugin
             scripture={usj}
             nodeOptions={nodeOptions}

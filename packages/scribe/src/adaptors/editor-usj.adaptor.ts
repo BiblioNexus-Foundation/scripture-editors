@@ -40,7 +40,7 @@ import {
   ImmutableVerseNode,
   SerializedImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;
