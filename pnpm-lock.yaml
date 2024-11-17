@@ -385,6 +385,9 @@ importers:
       proskomma-json-tools:
         specifier: ^0.8.21
         version: 0.8.21
+      sj-usfm-grammar:
+        specifier: ^3.0.8
+        version: 3.0.8
 
   packages/shared-react:
     dependencies:
@@ -7040,6 +7043,9 @@ packages:
   sj-usfm-grammar@3.0.2:
     resolution: {integrity: sha512-LBOx33vtU0gnUi/pAVxAqVMoGxD57c5itW650BaYGGD3Di2wweNHcQBD+XlQyGFXSoXoi3bn3gxfnNQG0oNGtg==}
 
+  sj-usfm-grammar@3.0.8:
+    resolution: {integrity: sha512-GThlgmxJKcs+abG/az0YVlTesGEAHkuRH5yy5Sj/Y5Xzq6SCL4EnZl2mdoemFEzvSjfPDE0tohKtHzCnmrohTQ==}
+
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -10422,21 +10428,6 @@ snapshots:
       - typescript
       - verdaccio
 
-  '@nrwl/js@19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.4.5)':
-    dependencies:
-      '@nx/js': 19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.4.5)
-    transitivePeerDependencies:
-      - '@babel/traverse'
-      - '@swc-node/register'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - debug
-      - nx
-      - supports-color
-      - typescript
-      - verdaccio
-
   '@nrwl/js@19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.5.4)':
     dependencies:
       '@nx/js': 19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.5.4)
@@ -10737,7 +10728,7 @@ snapshots:
       '@babel/preset-env': 7.26.0(@babel/core@7.26.0)
       '@babel/preset-typescript': 7.26.0(@babel/core@7.26.0)
       '@babel/runtime': 7.26.0
-      '@nrwl/js': 19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.4.5)
+      '@nrwl/js': 19.8.13(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))(typescript@5.5.4)
       '@nx/devkit': 19.8.13(nx@19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15)))
       '@nx/workspace': 19.8.13(@swc-node/register@1.10.9(@swc/core@1.9.3(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.9.3(@swc/helpers@0.5.15))
       babel-plugin-const-enum: 1.2.0(@babel/core@7.26.0)
@@ -16689,7 +16680,11 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  sj-usfm-grammar@3.0.2: {}
+  sj-usfm-grammar@3.0.2:
+    dependencies:
+      sj-usfm-grammar: 3.0.8
+
+  sj-usfm-grammar@3.0.8: {}
 
   slash@3.0.0: {}
 

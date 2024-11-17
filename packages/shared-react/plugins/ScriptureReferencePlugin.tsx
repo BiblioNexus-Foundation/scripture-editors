@@ -100,13 +100,16 @@ export function $getCurrentVerseNode(selectedNode: LexicalNode) {
 }
 
 export type ScriptureReference = {
+  book: string;
   chapter: number;
   verse: number;
 };
 
 export default function ScriptureReferencePlugin({
+  book,
   onChangeReference,
 }: {
+  book?: string;
   onChangeReference?: (reference: ScriptureReference) => void;
 }) {
   const [editor] = useLexicalComposerContext();
@@ -122,6 +125,7 @@ export default function ScriptureReferencePlugin({
             const verseNode = $getCurrentVerseNode(selectedNode);
             const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode);
             onChangeReference({
+              book: book ?? "",
               chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),
               verse: Number(verseNode?.getAttribute("data-number") ?? 0),
             });

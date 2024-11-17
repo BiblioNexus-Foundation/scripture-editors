@@ -2,8 +2,8 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { useEffect } from "react";
 import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node.utils";
-import { LoggerBasic } from "./logger-basic.model";
-import { EditorAdaptor, NodeOptions } from "../adaptors/editor-adaptor.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { EditorAdaptor, NodeOptions } from "shared/adaptors/editor-adaptor.model";
 
 /**
  * A plugin component that updates the state of the lexical editor when incoming Scripture changes.

@@ -11,11 +11,9 @@ import {
   SerializedLexicalNode,
 } from "lexical";
 import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
-import { createLexicalNodeFromUsfm } from "./usfmToLexical";
-import { MarkerType, Marker } from "./usfmTypes";
+import { Marker } from "./usfmTypes";
 import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
-import { $isUsfmParagraphNode } from "../../nodes/UsfmParagraphNode";
 
 export const markerActions: {
   [marker: string]: {
@@ -67,28 +65,40 @@ export const markerActions: {
   },
 };
 
-export function getMarkerAction(marker: string, markerData?: Marker) {
+//A function that returns a marker action for a given usfm marker
+export function getMarkerAction(
+  marker: string,
+  usfmToSerializedLexicalConverter: (
+    usfm: string,
+    reference: { book: string; chapter: number; verse: number },
+    markerData?: Marker,
+  ) => SerializedLexicalNode,
+  markerData?: Marker,
+) {
   const markerAction = markerActions[marker];
   const action = (currentEditor: {
     editor: LexicalEditor;
-    reference: { chapter: number; verse: number };
+    reference: { book: string; chapter: number; verse: number };
   }) => {
+    const isSerializedNode = (node: unknown): node is SerializedLexicalNode =>
+      typeof node === "object" && node !== null && "type" in node;
+    console.log("getMarkerAction", currentEditor);
     currentEditor.editor.update(() => {
       const node = markerAction?.action?.(currentEditor);
       const selection = $getSelection();
-      const usfmSerializedNode =
-        typeof node === "object"
-          ? node
-          : createLexicalNodeFromUsfm(
+      const serializedLexicalNode = isSerializedNode(node)
+        ? node
+        : (() => {
+            const r = usfmToSerializedLexicalConverter(
               node ||
                 `\\${marker} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
-              !markerData ||
-                markerData.type === MarkerType.Character ||
-                markerData.type === MarkerType.Note
-                ? "inline"
-                : "block",
+              currentEditor.reference,
+              markerData,
             );
-      const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
+            console.log(r);
+            return r;
+          })();
+      const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode);
 
       // Check if the selection is a range selection
       if ($isRangeSelection(selection)) {
@@ -96,7 +106,7 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
         if (selection.getTextContent().length > 0) {
           $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
         } else {
-          if ($isUsfmParagraphNode(usfmNode)) {
+          if ($isElementNode(usfmNode) && !usfmNode.isInline()) {
             // If the selection is empty, insert a new paragraph and replace it with the USFM node
             const paragraph = selection.insertParagraph();
 
