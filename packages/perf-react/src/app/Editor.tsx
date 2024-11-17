@@ -29,8 +29,10 @@ import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
-import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu";
+import PerfNodesMenuPlugin from "shared-react/plugins/PerfNodesMenuPlugin";
+
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
+import { usfmToLexicalAdapter } from "shared/utils/usfm/usfmToLexicalPerf";
 
 const theme = {
   // Theme styling goes here
@@ -66,6 +68,7 @@ export default function Editor({
   const [selectedMarker, setSelectedMarker] = useState<string>();
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
   const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
+    book: bookCode,
     chapter: 1,
     verse: 1,
   });
@@ -128,7 +131,7 @@ export default function Editor({
       if (["CharacterStyling"].includes(category)) {
         items[category] = markers.map((marker) => {
           const markerData = getMarker(marker);
-          const { action } = getMarkerAction(marker, markerData);
+          const { action } = getMarkerAction(marker, usfmToLexicalAdapter, markerData);
           return {
             label: marker,
             description: markerData?.description ?? "",
@@ -238,12 +241,13 @@ export default function Editor({
         }}
       />
       <ScriptureReferencePlugin
+        book={bookCode}
         onChangeReference={(reference) => {
           setScriptureReference(reference);
         }}
       />
       {scriptureReference && selectedMarker ? (
-        <PerfNodesMenu
+        <PerfNodesMenuPlugin
           trigger={contextMenuKey}
           scriptureReference={scriptureReference}
           contextMarker={selectedMarker}

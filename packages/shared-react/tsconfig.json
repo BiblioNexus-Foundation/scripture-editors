@@ -4,6 +4,6 @@
     "jsx": "react-jsx",
     "moduleResolution": "Node"
   },
-  "include": ["."],
+  "include": [".", "../shared/adaptors"],
   "exclude": ["node_modules", "jest.config.ts"]
 }

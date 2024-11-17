@@ -5,8 +5,6 @@
     }
   },
   "extends": "nx/presets/npm.json",
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "defaultBase": "main",
   "targetDefaults": {
     "build": {
       "cache": true,
@@ -20,8 +18,14 @@
     "devpub": {
       "dependsOn": ["build", "^build"]
     },
-    "preview": { "cache": true, "dependsOn": ["^build"] },
-    "serve": { "cache": true, "dependsOn": ["^build"] },
+    "preview": {
+      "cache": true,
+      "dependsOn": ["^build"]
+    },
+    "serve": {
+      "cache": true,
+      "dependsOn": ["^build"]
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "cache": true,
@@ -98,6 +102,9 @@
         "linter": "eslint",
         "bundler": "vite",
         "babel": true
+      },
+      "library": {
+        "unitTestRunner": "vitest"
       }
     }
   },

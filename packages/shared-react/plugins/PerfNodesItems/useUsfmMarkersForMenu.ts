@@ -1,8 +1,9 @@
-import { LexicalEditor } from "lexical";
+import { LexicalEditor, SerializedLexicalNode } from "lexical";
 import { useMemo } from "react";
 import { ScriptureReference } from "../ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
 import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
+import { Marker } from "shared/utils/usfm/usfmTypes";
 
 // getMarker() takes a marker string and gets its data from a usfm markers map object that is merged with overwrites that fit the PERF editor context.
 // getMarkerAction() returns a function to generate a LexicalNode and insert it in the editor, this lexical node is a custom node made for the PERF editor
@@ -11,10 +12,16 @@ export default function useUsfmMakersForMenu({
   editor,
   scriptureReference,
   contextMarker,
+  usfmToLexicalAdapter,
 }: {
   editor: LexicalEditor;
   scriptureReference: ScriptureReference;
   contextMarker: string;
+  usfmToLexicalAdapter: (
+    usfm: string,
+    reference: ScriptureReference,
+    markerData?: Marker,
+  ) => SerializedLexicalNode;
 }) {
   const markersMenuItems = useMemo(() => {
     if (!contextMarker || !scriptureReference) return undefined;
@@ -24,7 +31,7 @@ export default function useUsfmMakersForMenu({
     return Object.values(marker.children).flatMap((markers) =>
       markers.map((marker) => {
         const markerData = getMarker(marker);
-        const { action } = getMarkerAction(marker, markerData);
+        const { action } = getMarkerAction(marker, usfmToLexicalAdapter, markerData);
         return {
           name: marker,
           label: marker,

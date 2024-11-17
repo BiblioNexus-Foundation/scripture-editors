@@ -11,7 +11,7 @@ import {
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
 import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
-import { LoggerBasic } from "../plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { AnnotationRange } from "./selection.model";
 import { $getRangeFromSelection } from "./selection.utils";
 

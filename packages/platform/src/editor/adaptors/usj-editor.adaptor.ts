@@ -100,7 +100,7 @@ import {
   getVisibleOpenMarkerText,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
@@ -119,7 +119,7 @@ import {
   MarkNodeName,
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
