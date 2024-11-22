@@ -18,9 +18,9 @@
     "@nx/vite": "18.3.5",
     "@nx/web": "18.3.5",
     "@swc-node/register": "~1.10.9",
-    "@swc/cli": "~0.4.0",
-    "@swc/core": "~1.7.42",
-    "@swc/helpers": "~0.5.15",
+    "@swc/cli": "^0.5.1",
+    "@swc/core": "^1.9.2",
+    "@swc/helpers": "^0.5.15",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.17.6",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -56,6 +56,6 @@
   },
   "volta": {
     "node": "20.18.0",
-    "pnpm": "9.12.3"
+    "pnpm": "9.14.2"
   }
 }
