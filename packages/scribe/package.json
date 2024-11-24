@@ -29,7 +29,7 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@biblionexus-foundation/scripture-utilities": "workspace:^",
+    "@biblionexus-foundation/scripture-utilities": "workspace:~",
     "@lexical/mark": "^0.20.0",
     "@lexical/react": "^0.20.0",
     "@lexical/selection": "^0.20.0",
