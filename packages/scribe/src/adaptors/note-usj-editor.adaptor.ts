@@ -16,6 +16,12 @@ import {
   TextNode,
 } from "lexical";
 import {
+  SerializedUnknownNode,
+  UNKNOWN_VERSION,
+  UnknownNode,
+} from "shared/nodes/features/UnknownNode";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
+import {
   BOOK_MARKER,
   BOOK_VERSION,
   BookMarker,
@@ -62,18 +68,12 @@ import {
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import {
-  SerializedUnknownNode,
-  UNKNOWN_VERSION,
-  UnknownNode,
-} from "shared/nodes/scripture/usj/UnknownNode";
-import {
   SerializedVerseNode,
   VERSE_MARKER,
   VERSE_VERSION,
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
   getEditableCallerText,

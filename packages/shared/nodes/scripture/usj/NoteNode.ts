@@ -1,4 +1,4 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#note */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/note/index.html */
 
 import {
   type NodeKey,

@@ -1,4 +1,4 @@
-/** Conforms with USX v3.0 and adapted from @see https://ubsicap.github.io/usx/elements.html#para */
+/** Conforms with USJ v3.1 and adapted from @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 
 import {
   type LexicalNode,

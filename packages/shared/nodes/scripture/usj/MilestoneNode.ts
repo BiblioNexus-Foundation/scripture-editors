@@ -1,4 +1,4 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#ms */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/ms/index.html */
 
 import {
   type LexicalNode,
@@ -33,8 +33,6 @@ const VALID_MILESTONE_MARKERS = [
   "qt4-e",
   "qt5-s",
   "qt5-e",
-  "qts",
-  "qte",
   "qt-s",
   "qt-e",
   // custom markers used for annotations

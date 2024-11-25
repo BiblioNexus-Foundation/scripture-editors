@@ -8,7 +8,7 @@
 
 </div>
 
-A Scripture editor React component that works on USJ Scripture data. A utility that converts USX to USJ is also included. It is expected that data conforms to [USX v3.0](https://ubsicap.github.io/usx/).
+A Scripture editor React component that works on USJ Scripture data. A utility that converts USX to USJ is also included. It is expected that data conforms to [USJ v3.1](https://docs.usfm.bible/usfm/3.1/).
 
 ```mermaid
 ---
@@ -40,10 +40,10 @@ npm install @biblionexus-foundation/platform-editor
 import { EditorOptions, immutableNoteCallerNodeName, Marginal, MarginalRef, usxStringToUsj, UsjNodeOptions } from '@biblionexus-foundation/platform-editor';
 import { BookChapterControl } from 'platform-bible-react';
 
-const emptyUsx = '<usx version="3.0" />';
+const emptyUsx = '<usx version="3.1" />';
 const usx = `
 <?xml version="1.0" encoding="utf-8"?>
-<usx version="3.0">
+<usx version="3.1">
   <book code="PSA" style="id">World English Bible (WEB)</book>
   <para style="mt1">The Psalms</para>
   <chapter number="1" style="c" sid="PSA 1" />

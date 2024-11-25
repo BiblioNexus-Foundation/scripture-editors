@@ -11,7 +11,7 @@ import {
 } from "lexical";
 import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
 import { createLexicalNodeFromUsfm } from "./usfmToLexical";
-import { $isMarkerNode } from "../../nodes/scripture/usj/MarkerNode";
+import { $isMarkerNode } from "../../nodes/features/MarkerNode";
 import { MarkerType, Marker } from "./usfmTypes";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
 import { $isUsfmParagraphNode } from "../../nodes/UsfmParagraphNode";
@@ -167,7 +167,7 @@ export function $wrapTextSelectionInInlineNode(
     } else if ($isMarkerNode(node)) {
       // Case 2: the node is a mark node and we can ignore it as a target,
       // moving on to its children. Note that when we make a mark inside
-      // another mark, it may utlimately be unnested by a call to
+      // another mark, it may ultimately be unnested by a call to
       // `registerNestedElementResolver<MarkNode>` somewhere else in the
       // codebase.
 
