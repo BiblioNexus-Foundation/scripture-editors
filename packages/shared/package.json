@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:*",
+    "@lexical/mark": "^0.20.0",
     "@lexical/utils": "^0.20.0",
     "epitelete": "^0.2.20",
     "lexical": "^0.20.0",

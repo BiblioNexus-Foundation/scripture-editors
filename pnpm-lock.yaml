@@ -354,6 +354,9 @@ importers:
       '@biblionexus-foundation/scripture-utilities':
         specifier: workspace:*
         version: link:../utilities
+      '@lexical/mark':
+        specifier: ^0.20.0
+        version: 0.20.0
       '@lexical/utils':
         specifier: ^0.20.0
         version: 0.20.0
