@@ -3,9 +3,9 @@ import { MarkerContent, Usj } from "./usj.model";
 
 const NBSP = "\u00A0";
 
-export const usxEmpty = '<usx version="3.0" />';
+export const usxEmpty = '<usx version="3.1" />';
 
-export const usjEmpty: Usj = { type: "USJ", version: "0.2.1", content: [] };
+export const usjEmpty: Usj = { type: "USJ", version: "3.1", content: [] };
 
 export const editorStateEmpty = {
   root: {
@@ -35,7 +35,7 @@ export const editorStateEmpty = {
  * @see https://github.com/mvh-solutions/nice-usfm-json/blob/main/samples/character/origin.xml
  */
 export const usxGen1v1 = `
-<usx version="3.0">
+<usx version="3.1">
   <book style="id" code="GEN">Some Scripture Version</book>
   <chapter style="c" number="1" sid="GEN 1" />
     <para style="p">
@@ -73,7 +73,7 @@ export const VERSE_2_EDITABLE_INDEX = 6;
  */
 export const usjGen1v1: Usj = {
   type: "USJ",
-  version: "0.2.1",
+  version: "3.1",
   content: [
     { type: "book", marker: "id", code: "GEN", content: ["Some Scripture Version"] },
     { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
@@ -727,7 +727,7 @@ export const editorStateGen1v1Editable = {
 } as unknown as SerializedEditorState;
 
 export const usxGen1v1ImpliedPara = `
-<usx version="3.0">
+<usx version="3.1">
   <book style="id" code="GEN" />
   <chapter style="c" number="1" sid="GEN 1" />
     <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
@@ -739,7 +739,7 @@ export const usxGen1v1ImpliedPara = `
 
 export const usjGen1v1ImpliedPara: Usj = {
   type: "USJ",
-  version: "0.2.1",
+  version: "3.1",
   content: [
     { type: "book", marker: "id", code: "GEN" },
     { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
@@ -855,7 +855,7 @@ export const editorStateGen1v1ImpliedPara = {
 
 export const usjMarks: Usj = {
   type: "USJ",
-  version: "0.2.1",
+  version: "3.1",
   content: [
     {
       type: "para",
@@ -1263,7 +1263,7 @@ export const NOTE_PARA_WITH_UNKNOWN_ITEMS_INDEX = 2;
 
 export const usjWithUnknownItems = {
   type: "USJ",
-  version: "0.2.1",
+  version: "3.1",
   content: [
     // unknown attributes
     { type: "book", marker: "id", code: "GEN", "attr-unknown": "watAttr" },

@@ -1,4 +1,4 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#book */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/doc/id.html */
 
 import { BookCode, isValidBookCode } from "@biblionexus-foundation/scripture-utilities";
 import {

@@ -24,7 +24,7 @@ type Annotations = {
   };
 };
 
-const defaultUsj = usxStringToUsj('<usx version="3.0" />');
+const defaultUsj = usxStringToUsj('<usx version="3.1" />');
 const defaultScrRef: ScriptureReference = {
   bookNum: Canon.bookIdToNumber("PSA"),
   chapterNum: 1,

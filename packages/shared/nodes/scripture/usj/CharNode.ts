@@ -1,4 +1,4 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#char */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 
 import {
   type LexicalNode,
@@ -22,14 +22,26 @@ import {
   isValidNumberedMarker,
 } from "./node.utils";
 
-const VALID_CHAR_FOOTNOTE_MARKERS = ["fr", "ft", "fk", "fq", "fqa", "fl", "fw", "fp", "fv", "fdc"];
+const VALID_CHAR_FOOTNOTE_MARKERS = [
+  "fr",
+  "fq",
+  "fqa",
+  "fk",
+  "ft",
+  "fl",
+  "fw",
+  "fp",
+  "fv",
+  "fdc",
+  "fm",
+];
 const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
   "xo",
   "xop",
-  "xt",
-  "xta",
   "xk",
   "xq",
+  "xt",
+  "xta",
   "xot",
   "xnt",
   "xdc",
@@ -39,46 +51,47 @@ const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
  * @see https://ubsicap.github.io/usx/notes.html
  */
 const VALID_CHAR_MARKERS = [
-  // Special Text
+  // Text Features
   "add",
   "bk",
   "dc",
-  "ior",
-  "iqt",
+  "em",
+  "jmp",
   "k",
-  "litl",
   "nd",
   "ord",
   "pn",
   "png",
-  "qac",
-  "qs",
   "qt",
+  "rb",
   "rq",
+  // "ref", // This is its own tag and not a Char
   "sig",
   "sls",
   "tl",
+  "w",
+  "wa",
+  "wg",
+  "wh",
   "wj",
-  // Character Styling
-  "em",
+  // Note there are 2 deprecated markers not listed here: "addpn", "pro"
+  // Text Formatting
   "bd",
-  "bdit",
   "it",
+  "bdit",
   "no",
   "sc",
   "sup",
-  // Special Features
-  "rb",
-  "pro",
-  "w",
-  "wg",
-  "wh",
-  "wa",
-  // Structured List Entries
+  // Introductions
+  "ior",
+  "iqt",
+  // Poetry
+  "qac",
+  "qs",
+  // Lists
+  "litl",
   "lik",
   "liv#",
-  // Linking
-  "jmp",
 
   ...VALID_CHAR_FOOTNOTE_MARKERS,
   ...VALID_CHAR_CROSS_REFERENCE_MARKERS,

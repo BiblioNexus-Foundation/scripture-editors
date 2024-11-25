@@ -7,7 +7,7 @@
 /** The USJ spec type */
 export const USJ_TYPE = "USJ";
 /** The USJ spec version */
-export const USJ_VERSION = "0.2.1";
+export const USJ_VERSION = "3.1";
 /** List of known properties of `MarkerObject` */
 export const MARKER_OBJECT_PROPS: (keyof MarkerObject)[] = [
   "type",
