@@ -9,7 +9,7 @@ import {
   Spread,
   EditorConfig,
 } from "lexical";
-import { closingMarkerText, openingMarkerText } from "./node.utils";
+import { closingMarkerText, openingMarkerText } from "../scripture/usj/node.utils";
 
 export const MARKER_VERSION = 1;
 

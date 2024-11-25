@@ -6,11 +6,11 @@ import { VerseNode } from "./VerseNode";
 import { CharNode } from "./CharNode";
 import { NoteNode } from "./NoteNode";
 import { MilestoneNode } from "./MilestoneNode";
-import { MarkerNode } from "./MarkerNode";
 import { ImpliedParaNode } from "./ImpliedParaNode";
 import { ParaNode } from "./ParaNode";
-import { UnknownNode } from "./UnknownNode";
-import { ImmutableUnmatchedNode } from "./ImmutableUnmatchedNode";
+import { MarkerNode } from "../../features/MarkerNode";
+import { UnknownNode } from "../../features/UnknownNode";
+import { ImmutableUnmatchedNode } from "../../features/ImmutableUnmatchedNode";
 
 const scriptureUsjNodes = [
   BookNode,

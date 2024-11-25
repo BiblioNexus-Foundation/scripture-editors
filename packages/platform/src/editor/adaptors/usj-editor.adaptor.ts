@@ -21,6 +21,17 @@ import {
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
 import {
+  IMMUTABLE_UNMATCHED_VERSION,
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
+import {
+  SerializedUnknownNode,
+  UNKNOWN_VERSION,
+  UnknownNode,
+} from "shared/nodes/features/UnknownNode";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
+import {
   BOOK_MARKER,
   BOOK_VERSION,
   BookMarker,
@@ -40,11 +51,6 @@ import {
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
-  IMMUTABLE_UNMATCHED_VERSION,
-  ImmutableUnmatchedNode,
-  SerializedImmutableUnmatchedNode,
-} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
 import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
@@ -72,18 +78,12 @@ import {
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
 import {
-  SerializedUnknownNode,
-  UNKNOWN_VERSION,
-  UnknownNode,
-} from "shared/nodes/scripture/usj/UnknownNode";
-import {
   SerializedVerseNode,
   VERSE_MARKER,
   VERSE_VERSION,
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   NBSP,
   getEditableCallerText,

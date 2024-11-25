@@ -17,6 +17,13 @@ import {
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
+import {
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+  UNMATCHED_TAG_NAME,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
+import { MarkerNode } from "shared/nodes/features/MarkerNode";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
 import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
@@ -25,15 +32,9 @@ import {
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  ImmutableUnmatchedNode,
-  SerializedImmutableUnmatchedNode,
-  UNMATCHED_TAG_NAME,
-} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
-import {
   ImpliedParaNode,
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { MarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   ENDING_MS_COMMENT_MARKER,
   MILESTONE_VERSION,
@@ -43,7 +44,6 @@ import {
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import {
   NBSP,

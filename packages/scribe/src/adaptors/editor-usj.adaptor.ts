@@ -12,6 +12,8 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { MarkerNode } from "shared/nodes/features/MarkerNode";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
 import {
   NBSP,
   getEditableCallerText,
@@ -29,11 +31,9 @@ import {
   ImpliedParaNode,
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { MarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import { MilestoneNode, SerializedMilestoneNode } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
 import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {

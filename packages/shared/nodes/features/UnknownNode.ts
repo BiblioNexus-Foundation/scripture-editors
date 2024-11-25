@@ -7,7 +7,7 @@ import {
   SerializedElementNode,
   DOMExportOutput,
 } from "lexical";
-import { UnknownAttributes } from "./node.utils";
+import { UnknownAttributes } from "../scripture/usj/node.utils";
 
 export type SerializedUnknownNode = Spread<
   {
