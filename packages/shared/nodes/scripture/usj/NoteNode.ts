@@ -15,7 +15,7 @@ import {
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
-/** @see https://ubsicap.github.io/usx/notes.html */
+/** @see https://docs.usfm.bible/usfm/3.1/note/index.html */
 const VALID_NOTE_MARKERS = [
   // Footnote
   "f",

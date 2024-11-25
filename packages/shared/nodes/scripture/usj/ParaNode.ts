@@ -24,7 +24,7 @@ import {
 
 export const PARA_MARKER_DEFAULT = "p";
 
-/** @see https://ubsicap.github.io/usx/parastyles.html */
+/** @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 const VALID_PARA_MARKERS = [
   // Identification
   "ide",

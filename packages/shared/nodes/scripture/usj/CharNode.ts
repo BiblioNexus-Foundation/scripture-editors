@@ -22,6 +22,7 @@ import {
   isValidNumberedMarker,
 } from "./node.utils";
 
+/** @see https://docs.usfm.bible/usfm/3.1/char/notes/footnote/index.html */
 const VALID_CHAR_FOOTNOTE_MARKERS = [
   "fr",
   "fq",
@@ -35,6 +36,7 @@ const VALID_CHAR_FOOTNOTE_MARKERS = [
   "fdc",
   "fm",
 ];
+/** @see https://docs.usfm.bible/usfm/3.1/char/notes/crossref/index.html */
 const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
   "xo",
   "xop",
@@ -46,10 +48,7 @@ const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
   "xnt",
   "xdc",
 ];
-/**
- * @see https://ubsicap.github.io/usx/charstyles.html
- * @see https://ubsicap.github.io/usx/notes.html
- */
+/** @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 const VALID_CHAR_MARKERS = [
   // Text Features
   "add",
@@ -91,7 +90,12 @@ const VALID_CHAR_MARKERS = [
   // Lists
   "litl",
   "lik",
-  "liv#",
+  "liv",
+  "liv1",
+  "liv2",
+  "liv3",
+  "liv4",
+  "liv5",
 
   ...VALID_CHAR_FOOTNOTE_MARKERS,
   ...VALID_CHAR_CROSS_REFERENCE_MARKERS,

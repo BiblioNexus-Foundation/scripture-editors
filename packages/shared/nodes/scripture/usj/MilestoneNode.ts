@@ -16,7 +16,7 @@ export const ENDING_MS_COMMENT_MARKER = "zmsc-e";
 /** Milestone markers used to mark a comment annotation */
 const milestoneCommentMarkers = [STARTING_MS_COMMENT_MARKER, ENDING_MS_COMMENT_MARKER];
 
-/** @see https://ubsicap.github.io/usx/msstyles.html */
+/** @see https://docs.usfm.bible/usfm/3.1/ms/index.html */
 const VALID_MILESTONE_MARKERS = [
   "ts-s",
   "ts-e",
