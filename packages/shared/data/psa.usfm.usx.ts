@@ -1,7 +1,6 @@
 // Used PT9 to convert from USFM (with `custom.sty` file) to USX.
 // Minor manual fixup of USX by removing '/>|' and replacing '\* ' with ' />'.
-export const PSA_USX = `
-<?xml version="1.0" encoding="utf-8"?>
+export const PSA_USX = `<?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
   <book code="PSA" style="id">EN_ULT en_English_ltr Mon Oct 09 2023 16:39:14 GMT-0500 (Central Daylight Time) tc</book>
   <para style="ide">UTF-8</para>
