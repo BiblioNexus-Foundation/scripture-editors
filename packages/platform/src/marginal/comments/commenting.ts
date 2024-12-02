@@ -277,7 +277,7 @@ export class CommentStore<TLogger extends LoggerBasic = LoggerBasic> {
     const disconnect = () => {
       try {
         provider.disconnect();
-      } catch (e) {
+      } catch {
         // Do nothing
       }
     };

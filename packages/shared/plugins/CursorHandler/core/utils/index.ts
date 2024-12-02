@@ -19,9 +19,8 @@ export function $insertCursorPlaceholder(
   restoreSelection = false,
 ) {
   const cursorPlaceholderNode = $createCursorPlaceholderNode();
-  position === CursorPosition.Start
-    ? node.insertBefore(cursorPlaceholderNode, restoreSelection)
-    : node.insertAfter(cursorPlaceholderNode, restoreSelection);
+  if (position === CursorPosition.Start) node.insertBefore(cursorPlaceholderNode, restoreSelection);
+  else node.insertAfter(cursorPlaceholderNode, restoreSelection);
   return cursorPlaceholderNode;
 }
 
