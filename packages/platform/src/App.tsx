@@ -16,7 +16,6 @@ import Marginal, { MarginalRef } from "./marginal/Marginal";
 import TextDirectionDropDown from "./TextDirectionDropDown";
 import ViewModeDropDown from "./ViewModeDropDown";
 import "./App.css";
-import "shared/styles/nodes-menu.css";
 
 type Annotations = {
   [buttonId: string]: {

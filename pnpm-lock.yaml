@@ -400,6 +400,9 @@ importers:
       '@lexical/utils':
         specifier: ^0.21.0
         version: 0.21.0
+      '@sillsdev/scripture':
+        specifier: ^2.0.2
+        version: 2.0.2
       lexical:
         specifier: ^0.21.0
         version: 0.21.0
