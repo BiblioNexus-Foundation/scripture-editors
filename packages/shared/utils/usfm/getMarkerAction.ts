@@ -65,7 +65,7 @@ export const markerActions: {
   },
 };
 
-//A function that returns a marker action for a given usfm marker
+/** A function that returns a marker action for a given usfm marker */
 export function getMarkerAction(
   marker: string,
   usfmToSerializedLexicalConverter: (
@@ -81,7 +81,7 @@ export function getMarkerAction(
     reference: { book: string; chapter: number; verse: number };
   }) => {
     const isSerializedNode = (node: unknown): node is SerializedLexicalNode =>
-      typeof node === "object" && node !== null && "type" in node;
+      typeof node === "object" && node !== null && "type" in node && "version" in node;
     console.log("getMarkerAction", currentEditor);
     currentEditor.editor.update(() => {
       const node = markerAction?.action?.(currentEditor);
@@ -130,7 +130,7 @@ export function getMarkerAction(
   return { action, label: markerAction?.label };
 }
 
-//TODO: handle edge cases for unwrapable usfm elements
+// TODO: handle edge cases for unwrap-able usfm elements
 export function $wrapTextSelectionInInlineNode(
   selection: RangeSelection,
   isBackward: boolean,

@@ -182,13 +182,6 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const editedUsjRef = useRef(defaultUsj);
   const [usj, setUsj] = useState(defaultUsj);
 
-  const localOnScrRefChange = (scrRef: ScriptureReference) => {
-    console.log("localOnScrRefChange", scrRef);
-    onScrRefChange?.(scrRef);
-  };
-
-  console.log("usj", usj);
-
   const {
     isReadonly = false,
     hasSpellCheck = false,
@@ -272,7 +265,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           {scrRef && onScrRefChange && (
             <ScriptureReferencePlugin
               scrRef={scrRef}
-              onScrRefChange={localOnScrRefChange}
+              onScrRefChange={onScrRefChange}
               viewOptions={viewOptions}
             />
           )}
