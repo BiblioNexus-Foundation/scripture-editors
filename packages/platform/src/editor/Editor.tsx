@@ -49,6 +49,7 @@ import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import { Canon } from "@sillsdev/scripture";
+import TreeViewPlugin from "./TreeViewPlugin";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -300,6 +301,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <TextDirectionPlugin textDirection={textDirection} />
           {children}
         </div>
+        <TreeViewPlugin />
       </div>
     </LexicalComposer>
   );
