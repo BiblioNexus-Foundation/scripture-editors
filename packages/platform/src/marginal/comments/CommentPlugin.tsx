@@ -42,7 +42,7 @@ import {
   COMMENT_MARK_TYPE,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import {
   Comment,
   Comments,

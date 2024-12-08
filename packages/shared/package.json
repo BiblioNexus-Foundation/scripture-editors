@@ -26,7 +26,8 @@
     "deep-equal": "^2.2.3",
     "json-difference": "^1.16.1",
     "proskomma-core": "^0.10.10",
-    "proskomma-json-tools": "^0.8.21"
+    "proskomma-json-tools": "^0.8.21",
+    "sj-usfm-grammar": "^3.0.8"
   },
   "repository": {
     "type": "git",
