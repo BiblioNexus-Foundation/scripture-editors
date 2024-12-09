@@ -24,6 +24,7 @@
   },
   "files": [
     "dist",
+    "!dist/package.json",
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.data.ts"
