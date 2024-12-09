@@ -1,3 +1,5 @@
+/** Generated file using `nx generate markers-data` with 'https://raw.githubusercontent.com/ubsicap/usfm/refs/heads/master/sty/usfm.sty' */
+
 export enum CategoryType {
   FileIdentification = "FileIdentification",
   Headers = "Headers",
@@ -26,6 +28,7 @@ export enum MarkerType {
   Paragraph = "Paragraph",
   Character = "Character",
   Note = "Note",
+  Unknown = "Unknown",
 }
 
 export interface Marker {
