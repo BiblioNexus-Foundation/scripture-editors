@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:*",
-    "@lexical/mark": "^0.20.0",
-    "@lexical/utils": "^0.20.0",
+    "@lexical/mark": "^0.21.0",
+    "@lexical/utils": "^0.21.0",
     "epitelete": "^0.2.20",
-    "lexical": "^0.20.0",
+    "lexical": "^0.21.0",
     "open-patcher": "1.0.0-beta.1"
   },
   "devDependencies": {
