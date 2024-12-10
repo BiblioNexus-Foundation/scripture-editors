@@ -33,10 +33,10 @@
     "prepublish": "cd ../.. && nx build utilities"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.9.5"
+    "@xmldom/xmldom": "^0.9.6"
   },
   "devDependencies": {
-    "lexical": "^0.20.0"
+    "lexical": "^0.21.0"
   },
   "volta": {
     "extends": "../../package.json"

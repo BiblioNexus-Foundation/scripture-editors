@@ -17,13 +17,13 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.12",
-    "@lexical/react": "^0.20.0",
-    "@lexical/utils": "^0.20.0",
-    "lexical": "^0.20.0"
+    "@lexical/react": "^0.21.0",
+    "@lexical/utils": "^0.21.0",
+    "lexical": "^0.21.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^18.3.14",
+    "@types/react-dom": "^18.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "shared": "link:../shared"
