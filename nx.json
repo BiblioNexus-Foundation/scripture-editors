@@ -20,8 +20,14 @@
     "devpub": {
       "dependsOn": ["build", "^build"]
     },
-    "preview": { "cache": true, "dependsOn": ["^build"] },
-    "serve": { "cache": true, "dependsOn": ["^build"] },
+    "preview": {
+      "cache": true,
+      "dependsOn": ["^build"]
+    },
+    "serve": {
+      "cache": true,
+      "dependsOn": ["^build"]
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "cache": true,
@@ -120,5 +126,6 @@
       }
     }
   ],
-  "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU="
+  "nxCloudAccessToken": "M2JmNzczODYtOGZjMy00YmI5LWFiNmItMDk2OWIwNGYzYTQyfHJlYWQtd3JpdGU=",
+  "useLegacyCache": true
 }

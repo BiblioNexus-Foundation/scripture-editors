@@ -7,10 +7,10 @@
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "{projectRoot}/dist"
+        "outputPath": "dist/{projectRoot}"
       },
       "configurations": {
         "development": {
@@ -25,15 +25,15 @@
       "executor": "@nx/vite:dev-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "platform:build"
+        "buildTarget": "{projectName}:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "platform:build:development",
+          "buildTarget": "{projectName}:build:development",
           "hmr": true
         },
         "production": {
-          "buildTarget": "platform:build:production",
+          "buildTarget": "{projectName}:build:production",
           "hmr": false
         }
       }
@@ -42,14 +42,14 @@
       "executor": "@nx/vite:preview-server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "platform:build"
+        "buildTarget": "{projectName}:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "platform:build:development"
+          "buildTarget": "{projectName}:build:development"
         },
         "production": {
-          "buildTarget": "platform:build:production"
+          "buildTarget": "{projectName}:build:production"
         }
       }
     },
