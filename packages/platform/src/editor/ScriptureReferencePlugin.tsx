@@ -6,8 +6,8 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import type { ScriptureReference } from "platform-bible-utils";
 import { useEffect } from "react";
+import { ScriptureReference } from "shared/adaptors/scr-ref.model";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
   CURSOR_CHANGE_TAG,

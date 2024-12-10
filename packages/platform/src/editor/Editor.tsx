@@ -16,7 +16,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { ScriptureReference } from "platform-bible-utils";
+import { ScriptureReference } from "shared/adaptors/scr-ref.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
@@ -35,12 +35,13 @@ import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
+import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
@@ -179,6 +180,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
   const [usj, setUsj] = useState(defaultUsj);
+
   const {
     isReadonly = false,
     hasSpellCheck = false,
@@ -264,6 +266,14 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               scrRef={scrRef}
               onScrRefChange={onScrRefChange}
               viewOptions={viewOptions}
+            />
+          )}
+          {scrRef && (
+            <UsjNodesMenuPlugin
+              trigger="\"
+              scrRef={scrRef}
+              contextMarker="p"
+              editorAdaptor={usjEditorAdaptor}
             />
           )}
           <UpdateStatePlugin
