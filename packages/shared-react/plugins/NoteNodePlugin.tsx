@@ -131,7 +131,7 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
         editor.update(() => {
           for (const [nodeKey, mutation] of nodeMutations) {
             const node = $getNodeByKey(nodeKey);
-            const parent = node && node.getParentOrThrow();
+            const parent = node?.getParentOrThrow();
             if (
               (mutation === "created" || mutation === "destroyed") &&
               $isImmutableNoteCallerNode(node) &&

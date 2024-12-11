@@ -783,8 +783,7 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
 
   useEffect(() => {
     const changedElems: Array<HTMLElement> = [];
-    for (let i = 0; i < activeIDs.length; i++) {
-      const id = activeIDs[i];
+    for (const id of activeIDs) {
       const keys = markNodeMap.get(id);
       if (keys !== undefined) {
         for (const key of keys) {
@@ -798,8 +797,7 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
       }
     }
     return () => {
-      for (let i = 0; i < changedElems.length; i++) {
-        const changedElem = changedElems[i];
+      for (const changedElem of changedElems) {
         changedElem.classList.remove("selected");
       }
     };
@@ -827,43 +825,46 @@ export default function CommentPlugin<TLogger extends LoggerBasic>({
           }
         },
       ),
-      editor.registerMutationListener(TypedMarkNode, (mutations) => {
-        editor.getEditorState().read(() => {
-          for (const [key, mutation] of mutations) {
-            const node: TypedMarkNode | null = $getNodeByKey(key);
-            let ids: NodeKey[] = [];
-
-            if (mutation === "destroyed") {
-              ids = markNodeKeysToIDs.get(key) ?? [];
-            } else if ($isTypedMarkNode(node)) {
-              ids = node.getTypedIDs()[COMMENT_MARK_TYPE] ?? [];
-            }
-
-            for (let i = 0; i < ids.length; i++) {
-              const id = ids[i];
-              let markNodeKeys = markNodeMap.get(id);
-              markNodeKeysToIDs.set(key, ids);
+      editor.registerMutationListener(
+        TypedMarkNode,
+        (mutations) => {
+          editor.getEditorState().read(() => {
+            for (const [key, mutation] of mutations) {
+              const node: TypedMarkNode | null = $getNodeByKey(key);
+              let ids: NodeKey[] = [];
 
               if (mutation === "destroyed") {
-                if (markNodeKeys !== undefined) {
-                  markNodeKeys.delete(key);
-                  if (markNodeKeys.size === 0) {
-                    markNodeMap.delete(id);
+                ids = markNodeKeysToIDs.get(key) ?? [];
+              } else if ($isTypedMarkNode(node)) {
+                ids = node.getTypedIDs()[COMMENT_MARK_TYPE] ?? [];
+              }
+
+              for (const id of ids) {
+                let markNodeKeys = markNodeMap.get(id);
+                markNodeKeysToIDs.set(key, ids);
+
+                if (mutation === "destroyed") {
+                  if (markNodeKeys !== undefined) {
+                    markNodeKeys.delete(key);
+                    if (markNodeKeys.size === 0) {
+                      markNodeMap.delete(id);
+                    }
                   }
-                }
-              } else {
-                if (markNodeKeys === undefined) {
-                  markNodeKeys = new Set();
-                  markNodeMap.set(id, markNodeKeys);
-                }
-                if (!markNodeKeys.has(key)) {
-                  markNodeKeys.add(key);
+                } else {
+                  if (markNodeKeys === undefined) {
+                    markNodeKeys = new Set();
+                    markNodeMap.set(id, markNodeKeys);
+                  }
+                  if (!markNodeKeys.has(key)) {
+                    markNodeKeys.add(key);
+                  }
                 }
               }
             }
-          }
-        });
-      }),
+          });
+        },
+        { skipInitialization: false },
+      ),
       editor.registerUpdateListener(({ editorState, tags }) => {
         editorState.read(() => {
           const selection = $getSelection();
