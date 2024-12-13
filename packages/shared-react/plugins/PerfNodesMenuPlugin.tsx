@@ -1,5 +1,5 @@
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
-import { usfmToLexicalAdapter } from "shared/utils/usfm/usfmToLexicalPerf";
+import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import { ScriptureReference } from "./ScriptureReferencePlugin";
 
 export default function PerfNodesMenuPlugin({
@@ -16,7 +16,7 @@ export default function PerfNodesMenuPlugin({
       trigger={trigger}
       scriptureReference={scriptureReference}
       contextMarker={contextMarker}
-      usfmToLexicalAdapter={usfmToLexicalAdapter}
+      getMarkerAction={getUsfmMarkerAction}
     />
   );
 }

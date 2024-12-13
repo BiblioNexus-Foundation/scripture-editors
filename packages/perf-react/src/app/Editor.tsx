@@ -24,7 +24,7 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
+import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
@@ -32,7 +32,6 @@ import getMarker from "shared/utils/usfm/getMarker";
 import PerfNodesMenuPlugin from "shared-react/plugins/PerfNodesMenuPlugin";
 
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
-import { usfmToLexicalAdapter } from "shared/utils/usfm/usfmToLexicalPerf";
 
 const theme = {
   // Theme styling goes here
@@ -131,7 +130,7 @@ export default function Editor({
       if (["CharacterStyling"].includes(category)) {
         items[category] = markers.map((marker) => {
           const markerData = getMarker(marker);
-          const { action } = getMarkerAction(marker, usfmToLexicalAdapter, markerData);
+          const { action } = getUsfmMarkerAction(marker, markerData);
           return {
             label: marker,
             description: markerData?.description ?? "",

@@ -1,31 +1,26 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { SerializedLexicalNode } from "lexical";
-import { Marker } from "shared/utils/usfm/usfmTypes";
-import NodesMenu from "./NodesMenu";
+import { GetMarkerAction } from "shared/utils/get-marker-action.model";
 import useUsfmMakersForMenu from "./PerfNodesItems/useUsfmMarkersForMenu";
+import NodesMenu from "./NodesMenu";
 import { ScriptureReference } from "./ScriptureReferencePlugin";
 
 export default function UsfmNodesMenuPlugin({
   trigger,
   scriptureReference,
   contextMarker,
-  usfmToLexicalAdapter,
+  getMarkerAction,
 }: {
   trigger: string;
   scriptureReference: ScriptureReference;
   contextMarker: string | undefined;
-  usfmToLexicalAdapter: (
-    usfm: string | undefined,
-    reference: ScriptureReference,
-    markerData?: Marker,
-  ) => SerializedLexicalNode;
+  getMarkerAction: GetMarkerAction;
 }) {
   const [editor] = useLexicalComposerContext();
   const { markersMenuItems } = useUsfmMakersForMenu({
     editor,
     scriptureReference,
     contextMarker,
-    usfmToLexicalAdapter,
+    getMarkerAction,
   });
 
   return <NodesMenu trigger={trigger} items={markersMenuItems} />;

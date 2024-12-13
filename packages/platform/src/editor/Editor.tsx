@@ -47,6 +47,7 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
 import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
@@ -272,7 +273,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             />
           )}
           {scrRef && (
-            <UsjNodesMenuPlugin trigger="\" scrRef={scrRef} editorAdaptor={usjEditorAdaptor} />
+            <UsjNodesMenuPlugin trigger="\" scrRef={scrRef} getMarkerAction={getUsjMarkerAction} />
           )}
           <UpdateStatePlugin
             scripture={usj}

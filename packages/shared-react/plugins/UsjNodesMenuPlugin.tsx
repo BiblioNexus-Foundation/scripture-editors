@@ -7,22 +7,20 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
+import { useEffect, useMemo, useState } from "react";
 import { ScriptureReference } from "shared/adaptors/scr-ref.model";
-import { createLexicalUsjNodeFromUsfm } from "shared/utils/usfm/usfmToLexicalUsj";
+import { GetMarkerAction } from "shared/utils/get-marker-action.model";
 import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
-import { ScriptureReference as Reference } from "./ScriptureReferencePlugin";
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
 export default function UsjNodesMenuPlugin({
   trigger,
   scrRef,
-  editorAdaptor,
+  getMarkerAction,
 }: {
   trigger: string;
   scrRef: ScriptureReference;
-  editorAdaptor: EditorAdaptor;
+  getMarkerAction: GetMarkerAction;
 }) {
   const { bookNum, chapterNum, verseNum } = scrRef;
   const scriptureReference = useMemo(
@@ -70,18 +68,12 @@ export default function UsjNodesMenuPlugin({
     [editor],
   );
 
-  const adapter = useCallback(
-    (usfm: string | undefined, reference: Reference) =>
-      createLexicalUsjNodeFromUsfm(usfm, reference, editorAdaptor),
-    [editorAdaptor],
-  );
-
   return (
     <UsfmNodesMenuPlugin
       trigger={trigger}
       scriptureReference={scriptureReference}
       contextMarker={contextMarker}
-      usfmToLexicalAdapter={adapter}
+      getMarkerAction={getMarkerAction}
     />
   );
 }

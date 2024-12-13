@@ -10,10 +10,12 @@ import {
   RangeSelection,
   SerializedLexicalNode,
 } from "lexical";
+import { MarkerAction } from "../get-marker-action.model";
 import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
-import { Marker } from "./usfmTypes";
-import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
+import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
+import { usfmToLexicalAdapter } from "./usfmToLexicalPerf";
+import { Marker } from "./usfmTypes";
 
 export const markerActions: {
   [marker: string]: {
@@ -65,16 +67,8 @@ export const markerActions: {
   },
 };
 
-/** A function that returns a marker action for a given usfm marker */
-export function getMarkerAction(
-  marker: string,
-  usfmToSerializedLexicalConverter: (
-    usfm: string,
-    reference: { book: string; chapter: number; verse: number },
-    markerData?: Marker,
-  ) => SerializedLexicalNode,
-  markerData?: Marker,
-) {
+/** A function that returns a marker action for a given USFM marker */
+export function getUsfmMarkerAction(marker: string, markerData?: Marker): MarkerAction {
   const markerAction = markerActions[marker];
   const action = (currentEditor: {
     editor: LexicalEditor;
@@ -88,7 +82,7 @@ export function getMarkerAction(
       const serializedLexicalNode = isSerializedNode(node)
         ? node
         : (() => {
-            const r = usfmToSerializedLexicalConverter(
+            const r = usfmToLexicalAdapter(
               node ||
                 `\\${marker} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
               currentEditor.reference,
