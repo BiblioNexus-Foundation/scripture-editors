@@ -42,6 +42,7 @@ export const usxGen1v1 = `
       <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
       <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
       <verse style="v" number="15" altnumber="3" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
+      <char style="va">4</char>
     </para>
     <para style="b" />
     <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <unmatched marker="f*" /> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
@@ -89,6 +90,7 @@ export const usjGen1v1: Usj = {
         "Tell the Israelites that I, the ",
         { type: "char", marker: "nd", content: ["Lord"] },
         ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
+        { type: "char", marker: "va", content: ["4"] },
       ],
     },
     { type: "para", marker: "b" },
