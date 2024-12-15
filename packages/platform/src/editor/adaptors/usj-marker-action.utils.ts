@@ -1,3 +1,4 @@
+import { MarkerContent } from "@biblionexus-foundation/scripture-utilities";
 import {
   $getSelection,
   $isElementNode,
@@ -7,126 +8,173 @@ import {
   LexicalEditor,
   LexicalNode,
   RangeSelection,
-  SerializedLexicalNode,
 } from "lexical";
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
-import { CURSOR_PLACEHOLDER_CHAR } from "shared/plugins/CursorHandler/core/utils/constants";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { CharNode } from "shared/nodes/scripture/usj/CharNode";
+import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction } from "shared/utils/get-marker-action.model";
-import { createLexicalUsjNodeFromUsfm } from "shared/utils/usfm/usfmToLexicalUsj";
 import { Marker } from "shared/utils/usfm/usfmTypes";
+import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
 import { ScriptureReference as Reference } from "shared-react/plugins/ScriptureReferencePlugin";
+import { ViewOptions } from "./view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
-export const markerActions: {
+const markerActions: {
   [marker: string]: {
     label?: string;
-    action?: (currentEditor: {
-      reference: { chapter: number; verse: number };
-      editor: LexicalEditor;
-    }) => SerializedLexicalNode | string;
+    action?: (currentEditor: { reference: Reference; editor: LexicalEditor }) => MarkerContent[];
   };
 } = {
-  no: {
-    label: "format_clear",
-  },
-  it: {
-    label: "format_italic",
-  },
-  bd: {
-    label: "format_bold",
-  },
-  sc: {
-    label: "uppercase",
-  },
-  sup: {
-    label: "superscript",
+  c: {
+    action: (currentEditor) => {
+      const { book, chapter } = currentEditor.reference;
+      const newChapter = chapter + 1;
+      const content: MarkerContent = {
+        type: "chapter",
+        marker: "c",
+        number: `${newChapter}`,
+        sid: `${book} ${newChapter}`,
+      };
+      return [content];
+    },
   },
   v: {
     action: (currentEditor) => {
-      const { verse } = currentEditor.reference;
-      return String.raw`\v ${verse + 1} `;
-    },
-  },
-  c: {
-    action: (currentEditor) => {
-      const { chapter } = currentEditor.reference;
-      return String.raw`\p \c ${chapter + 1} `;
+      const { book, chapter, verse } = currentEditor.reference;
+      const newVerse = verse + 1;
+      const content: MarkerContent = {
+        type: "verse",
+        marker: "v",
+        number: `${newVerse}`,
+        sid: `${book} ${chapter}:${newVerse}`,
+      };
+      return [content, " "];
     },
   },
   f: {
     action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${CURSOR_PLACEHOLDER_CHAR} \f*`;
+      const content: MarkerContent = {
+        type: "note",
+        marker: "f",
+        caller: "+",
+        content: [
+          { type: "char", marker: "fr", content: [`${chapter}:${verse} `] },
+          {
+            type: "char",
+            marker: "ft",
+            content: [" "],
+          },
+        ],
+      };
+      return [content];
     },
   },
   x: {
     action: (currentEditor) => {
       const { chapter, verse } = currentEditor.reference;
-      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${CURSOR_PLACEHOLDER_CHAR} \x*`;
+      const content: MarkerContent = {
+        type: "note",
+        marker: "x",
+        caller: "+",
+        content: [
+          { type: "char", marker: "xo", content: [`${chapter}:${verse} `] },
+          {
+            type: "char",
+            marker: "xt",
+            content: [" "],
+          },
+        ],
+      };
+      return [content];
     },
   },
 };
 
-const usfmToLexicalAdapter = (usfm: string | undefined, reference: Reference) =>
-  createLexicalUsjNodeFromUsfm(usfm, reference, usjEditorAdaptor);
-
 /** A function that returns a marker action for a given USJ marker */
-export function getUsjMarkerAction(marker: string, markerData?: Marker): MarkerAction {
-  const markerAction = markerActions[marker];
-  const action = (currentEditor: {
-    editor: LexicalEditor;
-    reference: { book: string; chapter: number; verse: number };
-  }) => {
-    const isSerializedNode = (node: unknown): node is SerializedLexicalNode =>
-      typeof node === "object" && node !== null && "type" in node && "version" in node;
+export function getUsjMarkerAction(
+  marker: string,
+  _markerData?: Marker,
+  viewOptions?: ViewOptions,
+): MarkerAction {
+  const markerAction = getMarkerAction(marker);
+  const action = (currentEditor: { reference: Reference; editor: LexicalEditor }) => {
     currentEditor.editor.update(() => {
-      const node = markerAction?.action?.(currentEditor);
-      const selection = $getSelection();
-      const serializedLexicalNode = isSerializedNode(node)
-        ? node
-        : (() => {
-            const r = usfmToLexicalAdapter(
-              node ||
-                `\\${marker} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
-              currentEditor.reference,
-            );
-            return r;
-          })();
-      const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode);
+      const content = markerAction?.action?.(currentEditor);
+      if (!content) return;
 
-      // Check if the selection is a range selection
+      const serializedLexicalNode = createLexicalUsjNode(content, usjEditorAdaptor, viewOptions);
+      const usjNode = $createNodeFromSerializedNode(serializedLexicalNode);
+
+      const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         // If the selection has text content, wrap the text selection in an inline node
         if (selection.getTextContent().length > 0) {
-          $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
+          $wrapTextSelectionInInlineNode(selection, false, () =>
+            $createNodeFromSerializedNode(serializedLexicalNode),
+          );
         } else {
-          if ($isElementNode(usfmNode) && !usfmNode.isInline()) {
-            // If the selection is empty, insert a new paragraph and replace it with the USFM node
+          if ($isElementNode(usjNode) && !usjNode.isInline()) {
+            // If the selection is empty, insert a new paragraph and replace it with the USJ node
             const paragraph = selection.insertParagraph();
 
             if (paragraph) {
-              // Transfer the content of the paragraph to the USFM node
+              // Transfer the content of the paragraph to the USJ node
               const paragraphContent = paragraph.getChildren();
-              usfmNode.append(...paragraphContent);
-              paragraph.replace(usfmNode);
-              usfmNode.selectStart();
+              usjNode.append(...paragraphContent);
+              paragraph.replace(usjNode);
+              usjNode.selectStart();
             }
           } else {
-            selection?.insertNodes([usfmNode]);
+            selection.insertNodes([usjNode]);
           }
         }
       } else {
-        // If the selection is not a range selection, insert the USFM node directly
-        selection?.insertNodes([usfmNode]);
+        // If the selection is not a range selection, insert the USJ node directly
+        selection?.insertNodes([usjNode]);
       }
     });
   };
   return { action, label: markerAction?.label };
 }
 
-// TODO: handle edge cases for unwrap-able usfm elements
-export function $wrapTextSelectionInInlineNode(
+function getMarkerAction(marker: string): {
+  label?: string;
+  action?: (currentEditor: { reference: Reference; editor: LexicalEditor }) => MarkerContent[];
+} {
+  let markerAction = markerActions[marker];
+  if (!markerAction) {
+    if (ParaNode.isValidMarker(marker)) {
+      markerAction = {
+        action: () => {
+          const content: MarkerContent = {
+            type: ParaNode.getType(),
+            marker,
+            content: [],
+          };
+          return [content];
+        },
+      };
+    } else if (CharNode.isValidMarker(marker)) {
+      markerAction = {
+        action: () => {
+          const content: MarkerContent = {
+            type: CharNode.getType(),
+            marker,
+            content: [" "],
+          };
+          return [content];
+        },
+      };
+    }
+  }
+  return markerAction;
+}
+
+// TODO: handle edge cases for unwrap-able USJ elements
+function $wrapTextSelectionInInlineNode(
   selection: RangeSelection,
   isBackward: boolean,
   createNode: () => LexicalNode,
@@ -154,8 +202,15 @@ export function $wrapTextSelectionInInlineNode(
     const isLastNode = i === nodesLength - 1;
     let targetNode: LexicalNode | null = null;
 
-    if ($isTextNode(node)) {
-      // Case 1: The node is a text node and we can split it
+    if ($isTypedMarkNode(node) || $isNoteNode(node) || $isNoteNode(node.getParent())) {
+      // Case 1: the node is a mark node and we can ignore it as a target,
+      // moving on to its children OR a note node OR a notes children. Note that when we make a mark inside
+      // another mark, it may ultimately be unnested by a call to
+      // `registerNestedElementResolver<MarkNode>` somewhere else in the
+      // codebase.
+      continue;
+    } else if ($isTextNode(node)) {
+      // Case 2: The node is a text node and we can split it
       const textContentSize = node.getTextContentSize();
       const startTextOffset = isFirstNode ? startOffset : 0;
       const endTextOffset = isLastNode ? endOffset : textContentSize;
@@ -170,13 +225,7 @@ export function $wrapTextSelectionInInlineNode(
           endTextOffset === textContentSize)
           ? splitNodes[1]
           : splitNodes[0];
-    } else if ($isTypedMarkNode(node)) {
-      // Case 2: the node is a mark node and we can ignore it as a target,
-      // moving on to its children. Note that when we make a mark inside
-      // another mark, it may ultimately be unnested by a call to
-      // `registerNestedElementResolver<MarkNode>` somewhere else in the
-      // codebase.
-      continue;
+      lastCreatedNode = undefined;
     } else if ($isElementNode(node) && node.isInline()) {
       // Case 3: inline element nodes can be added in their entirety to the new
       // mark
@@ -206,9 +255,14 @@ export function $wrapTextSelectionInInlineNode(
         targetNode.insertBefore(lastCreatedNode);
       }
 
-      // Add the target node to be wrapped in the latest created mark node
-      (lastCreatedNode as ElementNode).clear();
-      (lastCreatedNode as ElementNode).append(targetNode);
+      if ($isTextNode(lastCreatedNode)) {
+        lastCreatedNode.setTextContent(targetNode.getTextContent());
+        targetNode.remove();
+      } else {
+        // Add the target node to be wrapped in the latest created mark node
+        (lastCreatedNode as ElementNode).clear();
+        (lastCreatedNode as ElementNode).append(targetNode);
+      }
     } else {
       // If we don't have a target node to wrap we can clear our state and
       // continue on with the next node
@@ -217,7 +271,7 @@ export function $wrapTextSelectionInInlineNode(
     }
   }
   // Make selection collapsed at the end
-  if ($isElementNode(lastCreatedNode)) {
+  if ($isTextNode(lastCreatedNode)) {
     if (isBackward) lastCreatedNode.selectStart();
     else lastCreatedNode.selectEnd();
   }

@@ -273,7 +273,13 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             />
           )}
           {scrRef && (
-            <UsjNodesMenuPlugin trigger="\" scrRef={scrRef} getMarkerAction={getUsjMarkerAction} />
+            <UsjNodesMenuPlugin
+              trigger="\"
+              scrRef={scrRef}
+              getMarkerAction={(marker, markerData) =>
+                getUsjMarkerAction(marker, markerData, viewOptions)
+              }
+            />
           )}
           <UpdateStatePlugin
             scripture={usj}

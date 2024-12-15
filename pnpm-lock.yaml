@@ -385,9 +385,6 @@ importers:
       proskomma-json-tools:
         specifier: ^0.8.21
         version: 0.8.21
-      sj-usfm-grammar:
-        specifier: ^3.0.8
-        version: 3.0.8
 
   packages/shared-react:
     dependencies:

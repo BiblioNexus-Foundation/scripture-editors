@@ -78,7 +78,6 @@ export function getUsfmMarkerAction(marker: string, markerData?: Marker): Marker
       typeof node === "object" && node !== null && "type" in node && "version" in node;
     currentEditor.editor.update(() => {
       const node = markerAction?.action?.(currentEditor);
-      const selection = $getSelection();
       const serializedLexicalNode = isSerializedNode(node)
         ? node
         : (() => {
@@ -92,7 +91,7 @@ export function getUsfmMarkerAction(marker: string, markerData?: Marker): Marker
           })();
       const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode);
 
-      // Check if the selection is a range selection
+      const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         // If the selection has text content, wrap the text selection in an inline node
         if (selection.getTextContent().length > 0) {
@@ -110,7 +109,7 @@ export function getUsfmMarkerAction(marker: string, markerData?: Marker): Marker
               usfmNode.selectStart();
             }
           } else {
-            selection?.insertNodes([usfmNode]);
+            selection.insertNodes([usfmNode]);
           }
         }
       } else {
