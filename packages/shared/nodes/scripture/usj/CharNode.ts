@@ -50,6 +50,12 @@ const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
 ];
 /** @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 const VALID_CHAR_MARKERS = [
+  // Chapter & Verse
+  "ca",
+  "cp",
+  "va",
+  "vp",
+
   // Text Features
   "add",
   "bk",
@@ -64,7 +70,7 @@ const VALID_CHAR_MARKERS = [
   "qt",
   "rb",
   "rq",
-  // "ref", // This is its own tag and not a Char
+  // "ref", // This has its own tag and is not a Char
   "sig",
   "sls",
   "tl",
@@ -73,7 +79,8 @@ const VALID_CHAR_MARKERS = [
   "wg",
   "wh",
   "wj",
-  // Note there are 2 deprecated markers not listed here: "addpn", "pro"
+  // Note there are 2 deprecated markers intentionally not listed here: "addpn", "pro"
+
   // Text Formatting
   "bd",
   "it",
@@ -81,12 +88,15 @@ const VALID_CHAR_MARKERS = [
   "no",
   "sc",
   "sup",
+
   // Introductions
   "ior",
   "iqt",
+
   // Poetry
   "qac",
   "qs",
+
   // Lists
   "litl",
   "lik",
