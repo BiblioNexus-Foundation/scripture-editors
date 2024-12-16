@@ -2,12 +2,13 @@
 
 import { BookCode, isValidBookCode } from "@biblionexus-foundation/scripture-utilities";
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  Spread,
   ElementNode,
+  LexicalNode,
+  NodeKey,
   SerializedElementNode,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
@@ -125,4 +126,10 @@ export function $createBookNode(code: BookCode, unknownAttributes?: UnknownAttri
 
 export function $isBookNode(node: LexicalNode | null | undefined): node is BookNode {
   return node instanceof BookNode;
+}
+
+export function isSerializedBookNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedBookNode {
+  return node?.type === BookNode.getType();
 }

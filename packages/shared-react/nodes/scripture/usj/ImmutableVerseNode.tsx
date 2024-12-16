@@ -1,17 +1,17 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/cv/v.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
+  DOMConversionMap,
+  DOMConversionOutput,
+  DOMExportOutput,
   DecoratorNode,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
   SerializedLexicalNode,
   Spread,
-  DOMConversionMap,
-  LexicalEditor,
-  DOMExportOutput,
   isHTMLElement,
-  DOMConversionOutput,
 } from "lexical";
 import { JSX } from "react";
 import {
@@ -261,4 +261,10 @@ export function $isImmutableVerseNode(
   node: LexicalNode | null | undefined,
 ): node is ImmutableVerseNode {
   return node instanceof ImmutableVerseNode;
+}
+
+export function isSerializedImmutableVerseNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedImmutableVerseNode {
+  return node?.type === ImmutableVerseNode.getType();
 }

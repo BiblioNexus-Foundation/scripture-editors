@@ -1,10 +1,10 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/ms/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
   DecoratorNode,
+  LexicalNode,
+  NodeKey,
   SerializedLexicalNode,
   Spread,
 } from "lexical";
@@ -180,4 +180,10 @@ export function $createMilestoneNode(
 
 export function $isMilestoneNode(node: LexicalNode | null | undefined): node is MilestoneNode {
   return node instanceof MilestoneNode;
+}
+
+export function isSerializedMilestoneNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedMilestoneNode {
+  return node?.type === MilestoneNode.getType();
 }

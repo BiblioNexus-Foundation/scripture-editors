@@ -164,11 +164,11 @@ const $getBookCode = (
     let node = root.getFirstChild();
 
     while (node !== null) {
-      if (node.getType() === BookNode.getType() && $isBookNode(node)) {
+      if ($isBookNode(node)) {
         const bookNode = node as BookNode;
         setScrRef((prevState: ScriptureReference) => ({
           ...prevState,
-          bookCode: bookNode?.__code,
+          bookCode: bookNode.__code,
         }));
         break;
       }

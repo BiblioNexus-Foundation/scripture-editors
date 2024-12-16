@@ -1,18 +1,19 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  ParagraphNode,
-  Spread,
-  SerializedParagraphNode,
-  RangeSelection,
   DOMConversionMap,
   DOMConversionOutput,
+  DOMExportOutput,
   ElementFormatType,
   LexicalEditor,
-  DOMExportOutput,
+  LexicalNode,
+  NodeKey,
+  ParagraphNode,
+  RangeSelection,
+  SerializedLexicalNode,
+  SerializedParagraphNode,
+  Spread,
   isHTMLElement,
 } from "lexical";
 import {
@@ -308,4 +309,10 @@ export function $createParaNode(
 
 export function $isParaNode(node: LexicalNode | null | undefined): node is ParaNode {
   return node instanceof ParaNode;
+}
+
+export function isSerializedParaNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedParaNode {
+  return node?.type === ParaNode.getType();
 }

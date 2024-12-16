@@ -36,6 +36,7 @@ import {
   BOOK_VERSION,
   BookMarker,
   BookNode,
+  isSerializedBookNode,
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
 import {
@@ -44,12 +45,19 @@ import {
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
+  isSerializedChapterNode,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+import {
+  CHAR_VERSION,
+  CharNode,
+  isSerializedCharNode,
+  SerializedCharNode,
+} from "shared/nodes/scripture/usj/CharNode";
 import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
+  isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -421,9 +429,9 @@ function createNote(
     const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
     callerNode = createNoteCaller(noteCaller, childNodes);
     childNodes.forEach((node) => {
-      if (node.type === CharNode.getType()) {
-        (node as SerializedCharNode).mode = "token";
-        (node as SerializedCharNode).style = "display: none";
+      if (isSerializedCharNode(node)) {
+        node.mode = "token";
+        node.style = "display: none";
       }
     });
   }
@@ -677,10 +685,10 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
  * @returns nodes with any needed implied paras inserted.
  */
 function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const bookNodeIndex = nodes.findIndex((node) => node.type === BookNode.getType());
+  const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
   const isBookNodeFound = bookNodeIndex >= 0;
   const chapterNodeIndex = nodes.findIndex(
-    (node) => node.type === ChapterNode.getType() || node.type === ImmutableChapterNode.getType(),
+    (node) => isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node),
   );
   const isChapterNodeFound = chapterNodeIndex >= 0;
   if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {

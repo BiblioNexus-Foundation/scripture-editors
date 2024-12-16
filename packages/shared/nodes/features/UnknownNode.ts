@@ -1,11 +1,12 @@
 import {
-  type LexicalNode,
   $applyNodeReplacement,
-  NodeKey,
-  Spread,
-  ElementNode,
-  SerializedElementNode,
   DOMExportOutput,
+  ElementNode,
+  LexicalNode,
+  NodeKey,
+  SerializedElementNode,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
 import { UnknownAttributes } from "../scripture/usj/node.utils";
 
@@ -136,4 +137,10 @@ export function $createUnknownNode(
 
 export function $isUnknownNode(node: LexicalNode | null | undefined): node is UnknownNode {
   return node instanceof UnknownNode;
+}
+
+export function isSerializedUnknownNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedUnknownNode {
+  return node?.type === UnknownNode.getType();
 }
