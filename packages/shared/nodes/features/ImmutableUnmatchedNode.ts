@@ -1,15 +1,15 @@
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
   DecoratorNode,
-  SerializedLexicalNode,
-  Spread,
   DOMConversionMap,
-  LexicalEditor,
+  DOMConversionOutput,
   DOMExportOutput,
   isHTMLElement,
-  DOMConversionOutput,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
 import { INVALID_CLASS_NAME, ZWSP } from "../scripture/usj/node.utils";
 
@@ -127,4 +127,10 @@ export function $isImmutableUnmatchedNode(
   node: LexicalNode | null | undefined,
 ): node is ImmutableUnmatchedNode {
   return node instanceof ImmutableUnmatchedNode;
+}
+
+export function isSerializedImmutableUnmatchedNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedImmutableUnmatchedNode {
+  return node?.type === ImmutableUnmatchedNode.getType();
 }

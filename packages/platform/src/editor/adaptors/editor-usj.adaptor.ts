@@ -14,6 +14,7 @@ import {
 } from "lexical";
 import {
   COMMENT_MARK_TYPE,
+  isSerializedTypedMarkNode,
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
@@ -32,7 +33,7 @@ import {
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  ImpliedParaNode,
+  isSerializedImpliedParaNode,
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
@@ -302,7 +303,7 @@ function replaceMarkWithMilestones(
     });
     markers.push(milestone);
   }
-  const isLastEnd = !nextNode || nextNode.type !== TypedMarkNode.getType();
+  const isLastEnd = !nextNode || !isSerializedTypedMarkNode(nextNode);
   if (isLastEnd) {
     ids.forEach((eid) => {
       const milestone = createMilestoneMarker({
@@ -423,7 +424,7 @@ function recurseNodes(
  * @returns nodes with all implied paras removed.
  */
 function removeImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const impliedParaIndex = nodes.findIndex((node) => node.type === ImpliedParaNode.getType());
+  const impliedParaIndex = nodes.findIndex((node) => isSerializedImpliedParaNode(node));
   if (impliedParaIndex >= 0) {
     const nodesBefore = nodes.slice(0, impliedParaIndex);
     const nodesFromImpliedPara = (nodes[impliedParaIndex] as SerializedImpliedParaNode).children;

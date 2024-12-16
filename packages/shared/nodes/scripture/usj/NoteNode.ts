@@ -1,17 +1,18 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/note/index.html */
 
 import {
-  type NodeKey,
-  ElementNode,
-  SerializedElementNode,
-  Spread,
   $applyNodeReplacement,
-  LexicalNode,
-  LexicalEditor,
-  DOMExportOutput,
-  isHTMLElement,
   DOMConversionMap,
   DOMConversionOutput,
+  DOMExportOutput,
+  ElementNode,
+  isHTMLElement,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedElementNode,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
 import { UnknownAttributes } from "./node.utils";
 
@@ -209,4 +210,10 @@ function isNoteElement(node: HTMLElement | null | undefined): boolean {
 
 export function $isNoteNode(node: LexicalNode | null | undefined): node is NoteNode {
   return node instanceof NoteNode;
+}
+
+export function isSerializedNoteNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedNoteNode {
+  return node?.type === NoteNode.getType();
 }

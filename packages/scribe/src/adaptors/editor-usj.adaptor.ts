@@ -28,7 +28,7 @@ import {
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  ImpliedParaNode,
+  isSerializedImpliedParaNode,
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import { MilestoneNode, SerializedMilestoneNode } from "shared/nodes/scripture/usj/MilestoneNode";
@@ -291,7 +291,7 @@ export function recurseNodes(
  * @returns nodes with all implied paras removed.
  */
 function removeImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const impliedParaIndex = nodes.findIndex((node) => node.type === ImpliedParaNode.getType());
+  const impliedParaIndex = nodes.findIndex((node) => isSerializedImpliedParaNode(node));
   if (impliedParaIndex >= 0) {
     const nodesBefore = nodes.slice(0, impliedParaIndex);
     const nodesFromImpliedPara = (nodes[impliedParaIndex] as SerializedImpliedParaNode).children;

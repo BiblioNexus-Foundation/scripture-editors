@@ -1,17 +1,17 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/note/index.html */
 
 import {
-  type LexicalNode,
   $applyNodeReplacement,
-  NodeKey,
-  Spread,
-  SerializedLexicalNode,
   DecoratorNode,
-  LexicalEditor,
+  DOMConversionMap,
+  DOMConversionOutput,
   DOMExportOutput,
   isHTMLElement,
-  DOMConversionOutput,
-  DOMConversionMap,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
 import { JSX, ReactNode, SyntheticEvent } from "react";
 
@@ -169,4 +169,10 @@ export function $isImmutableNoteCallerNode(
   node: LexicalNode | null | undefined,
 ): node is ImmutableNoteCallerNode {
   return node instanceof ImmutableNoteCallerNode;
+}
+
+export function isSerializedImmutableNoteCallerNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedImmutableNoteCallerNode {
+  return node?.type === ImmutableNoteCallerNode.getType();
 }

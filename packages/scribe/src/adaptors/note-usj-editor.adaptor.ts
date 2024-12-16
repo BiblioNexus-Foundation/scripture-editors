@@ -411,9 +411,9 @@ function createNote(
     callerNode = createNoteCaller(noteCaller, childNodes);
     /*
     childNodes.forEach((node) => {
-      if (node.type === CharNode.getType()) {
-        (node as SerializedCharNode).mode = "token";
-        (node as SerializedCharNode).style = "display: none";
+      if (isSerializedCharNode(node)) {
+        node.mode = "token";
+        node.style = "display: none";
       }
     });
     */

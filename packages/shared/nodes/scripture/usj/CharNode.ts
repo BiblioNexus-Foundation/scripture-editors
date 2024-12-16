@@ -1,18 +1,19 @@
 /** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  TextNode,
-  SerializedTextNode,
-  Spread,
-  EditorConfig,
-  DOMExportOutput,
-  LexicalEditor,
-  isHTMLElement,
   DOMConversionMap,
   DOMConversionOutput,
+  DOMExportOutput,
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  SerializedTextNode,
+  Spread,
+  TextNode,
+  isHTMLElement,
 } from "lexical";
 import {
   CHAR_NODE_TYPE,
@@ -259,4 +260,10 @@ function isCharElement(node: HTMLElement | null | undefined): boolean {
 
 export function $isCharNode(node: LexicalNode | null | undefined): node is CharNode {
   return node instanceof CharNode;
+}
+
+export function isSerializedCharNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedCharNode {
+  return node?.type === CharNode.getType();
 }

@@ -12,6 +12,7 @@ import type {
   NodeKey,
   RangeSelection,
   SerializedElementNode,
+  SerializedLexicalNode,
   Spread,
   TextNode,
 } from "lexical";
@@ -225,6 +226,12 @@ export function $createTypedMarkNode(typedIds: TypedIDs): TypedMarkNode {
 
 export function $isTypedMarkNode(node: LexicalNode | null | undefined): node is TypedMarkNode {
   return node instanceof TypedMarkNode;
+}
+
+export function isSerializedTypedMarkNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedTypedMarkNode {
+  return node?.type === TypedMarkNode.getType();
 }
 
 /**
