@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "./node.utils";
+import { UnknownAttributes } from "./node-constants";
 
 export const STARTING_MS_COMMENT_MARKER = "zmsc-s";
 export const ENDING_MS_COMMENT_MARKER = "zmsc-e";

@@ -11,7 +11,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { INVALID_CLASS_NAME, ZWSP } from "../scripture/usj/node.utils";
+import { INVALID_CLASS_NAME, ZWSP } from "../scripture/usj/node-constants";
 
 export const UNMATCHED_TAG_NAME = "unmatched";
 export const IMMUTABLE_UNMATCHED_VERSION = 1;

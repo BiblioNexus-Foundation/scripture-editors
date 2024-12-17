@@ -14,7 +14,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "./node.utils";
+import { UnknownAttributes } from "./node-constants";
 
 /** @see https://docs.usfm.bible/usfm/3.1/note/index.html */
 const VALID_NOTE_MARKERS = [

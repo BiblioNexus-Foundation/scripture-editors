@@ -44,14 +44,14 @@ import {
   SerializedMilestoneNode,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
-  NBSP,
   getEditableCallerText,
   parseNumberFromMarkerText,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
+import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   ImmutableVerseNode,

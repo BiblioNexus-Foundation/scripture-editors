@@ -9,7 +9,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node-constants";
 
 export const CHAPTER_MARKER = "c";
 export const CHAPTER_VERSION = 1;

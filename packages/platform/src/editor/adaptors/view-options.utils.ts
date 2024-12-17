@@ -3,7 +3,7 @@ import { ImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapte
 import {
   TEXT_SPACING_CLASS_NAME,
   FORMATTED_FONT_CLASS_NAME,
-} from "shared/nodes/scripture/usj/node.utils";
+} from "shared/nodes/scripture/usj/node-constants";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { ViewMode, FORMATTED_VIEW_MODE, UNFORMATTED_VIEW_MODE } from "./view-mode.model";

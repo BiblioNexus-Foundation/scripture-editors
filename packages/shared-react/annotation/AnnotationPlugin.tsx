@@ -2,6 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { mergeRegister, registerNestedElementResolver } from "@lexical/utils";
 import { $getNodeByKey, LexicalEditor, NodeKey } from "lexical";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import {
   $createTypedMarkNode,
   $isTypedMarkNode,
@@ -10,8 +11,7 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
-import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node.utils";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
 import { AnnotationRange } from "./selection.model";
 import { $getRangeFromSelection } from "./selection.utils";
 

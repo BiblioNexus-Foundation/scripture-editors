@@ -15,12 +15,13 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
   SerializedUnknownNode,
   UNKNOWN_VERSION,
   UnknownNode,
 } from "shared/nodes/features/UnknownNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
   BOOK_MARKER,
   BOOK_VERSION,
@@ -29,12 +30,6 @@ import {
   isSerializedBookNode,
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
-import {
-  SerializedImmutableChapterNode,
-  IMMUTABLE_CHAPTER_VERSION,
-  ImmutableChapterNode,
-  isSerializedImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   SerializedChapterNode,
   CHAPTER_VERSION,
@@ -50,6 +45,17 @@ import {
   SerializedCharNode,
 } from "shared/nodes/scripture/usj/CharNode";
 import {
+  SerializedImmutableChapterNode,
+  IMMUTABLE_CHAPTER_VERSION,
+  ImmutableChapterNode,
+  isSerializedImmutableChapterNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import {
+  SerializedImpliedParaNode,
+  ImpliedParaNode,
+  IMPLIED_PARA_VERSION,
+} from "shared/nodes/scripture/usj/ImpliedParaNode";
+import {
   MILESTONE_VERSION,
   MilestoneNode,
   MilestoneMarker,
@@ -59,22 +65,18 @@ import {
   isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
-  IMPLIED_PARA_VERSION,
-  ImpliedParaNode,
-  SerializedImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
+  NOTE_VERSION,
+  NoteNode,
+  NoteMarker,
+  SerializedNoteNode,
+} from "shared/nodes/scripture/usj/NoteNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
-import {
-  NOTE_VERSION,
-  NoteNode,
-  NoteMarker,
-  SerializedNoteNode,
-} from "shared/nodes/scripture/usj/NoteNode";
 import {
   SerializedVerseNode,
   VERSE_MARKER,
@@ -83,7 +85,6 @@ import {
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
 import {
-  NBSP,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
@@ -93,18 +94,17 @@ import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
   OnClick,
   SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
