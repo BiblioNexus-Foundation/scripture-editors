@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { useMenuCore } from "./useMenuCore";
+
 type MenuContextType = ReturnType<typeof useMenuCore>;
 
 const MenuContext = createContext<MenuContextType | undefined>(undefined);

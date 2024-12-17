@@ -15,6 +15,8 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
   SerializedUnknownNode,
@@ -89,7 +91,6 @@ import {
   getUnknownAttributes,
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
@@ -104,7 +105,6 @@ import {
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
