@@ -18,8 +18,8 @@ import {
   UnknownAttributes,
   VERSE_CLASS_NAME,
   ZWSP,
-  getVisibleOpenMarkerText,
-} from "shared/nodes/scripture/usj/node.utils";
+} from "shared/nodes/scripture/usj/node-constants";
+import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
 
 export const VERSE_MARKER = "v";
 export const IMMUTABLE_VERSE_VERSION = 1;

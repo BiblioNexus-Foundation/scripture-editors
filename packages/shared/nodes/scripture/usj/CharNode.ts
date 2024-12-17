@@ -15,9 +15,8 @@ import {
   TextNode,
   isHTMLElement,
 } from "lexical";
+import { UnknownAttributes } from "./node-constants";
 import {
-  CHAR_NODE_TYPE,
-  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,
@@ -137,7 +136,7 @@ export class CharNode extends TextNode {
   }
 
   static getType(): string {
-    return CHAR_NODE_TYPE;
+    return "char";
   }
 
   static clone(node: CharNode): CharNode {

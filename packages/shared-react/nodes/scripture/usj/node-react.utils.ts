@@ -1,10 +1,11 @@
 import { $isElementNode, LexicalNode } from "lexical";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
+import { $isNodeWithMarker, NodesWithMarker } from "shared/nodes/scripture/usj/node.utils";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { LoggerBasic } from "../../../plugins/logger-basic.model";
 import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "./ImmutableVerseNode";
+import { $isImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
 
 /** Caller count is in an object so it can be manipulated by passing the the object. */
 export type CallerData = {
@@ -218,4 +219,15 @@ export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
     nextVerseNode = findLastVerseInNode<T>(previousParentSibling, VerseNodeClass);
   }
   return verseNode;
+}
+
+/**
+ * Checks if the node has a `getMarker` method. Includes all React nodes.
+ * @param node - LexicalNode to check.
+ * @returns `true` if the node has a `getMarker` method, `false` otherwise.
+ */
+export function $isReactNodeWithMarker(
+  node: LexicalNode | null | undefined,
+): node is NodesWithMarker | ImmutableVerseNode {
+  return $isNodeWithMarker(node) || $isImmutableVerseNode(node);
 }
