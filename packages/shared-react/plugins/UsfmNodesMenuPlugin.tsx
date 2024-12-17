@@ -1,9 +1,9 @@
-import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ScriptureReference } from "../ScriptureReferencePlugin";
-import NodesMenu from "../NodesMenu";
-import { Marker } from "shared/utils/usfm/usfmTypes";
 import { SerializedLexicalNode } from "lexical";
+import { Marker } from "shared/utils/usfm/usfmTypes";
+import NodesMenu from "./NodesMenu";
+import useUsfmMakersForMenu from "./PerfNodesItems/useUsfmMarkersForMenu";
+import { ScriptureReference } from "./ScriptureReferencePlugin";
 
 export default function UsfmNodesMenuPlugin({
   trigger,
@@ -13,7 +13,7 @@ export default function UsfmNodesMenuPlugin({
 }: {
   trigger: string;
   scriptureReference: ScriptureReference;
-  contextMarker: string;
+  contextMarker: string | undefined;
   usfmToLexicalAdapter: (
     usfm: string | undefined,
     reference: ScriptureReference,

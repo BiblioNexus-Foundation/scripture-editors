@@ -62,18 +62,6 @@ import {
   isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
   SerializedImpliedParaNode,
@@ -94,7 +82,6 @@ import {
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import { NBSP } from "shared/nodes/scripture/usj/node-constants";
-import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
@@ -115,6 +102,19 @@ import {
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
+import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
   MarkNodeName,

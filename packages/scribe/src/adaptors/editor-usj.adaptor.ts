@@ -12,6 +12,7 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { MarkerNode } from "shared/nodes/features/MarkerNode";
 import { SerializedUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
@@ -40,7 +41,6 @@ import {
   ImmutableVerseNode,
   SerializedImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;

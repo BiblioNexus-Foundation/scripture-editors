@@ -233,7 +233,7 @@ export default function Editor({
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
             //This is the selected element expected to be a usfm element;
-            const selectedElement = startNode?.getCommonAncestor(endNode);
+            const selectedElement = startNode.getCommonAncestor(endNode);
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }

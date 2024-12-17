@@ -15,6 +15,7 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
@@ -90,7 +91,6 @@ import {
   getUnknownAttributes,
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,

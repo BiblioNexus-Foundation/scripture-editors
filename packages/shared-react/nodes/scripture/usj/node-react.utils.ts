@@ -1,9 +1,9 @@
 import { $isElementNode, LexicalNode } from "lexical";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import { $isNodeWithMarker, NodesWithMarker } from "shared/nodes/scripture/usj/node.utils";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
 import { $isImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
 

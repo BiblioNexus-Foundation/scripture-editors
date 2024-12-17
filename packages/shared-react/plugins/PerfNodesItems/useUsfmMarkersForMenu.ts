@@ -16,7 +16,7 @@ export default function useUsfmMakersForMenu({
 }: {
   editor: LexicalEditor;
   scriptureReference: ScriptureReference;
-  contextMarker: string;
+  contextMarker: string | undefined;
   usfmToLexicalAdapter: (
     usfm: string,
     reference: ScriptureReference,
@@ -24,9 +24,9 @@ export default function useUsfmMakersForMenu({
   ) => SerializedLexicalNode;
 }) {
   const markersMenuItems = useMemo(() => {
-    if (!contextMarker || !scriptureReference) return undefined;
+    if (!contextMarker || !scriptureReference) return;
     const marker = getMarker(contextMarker);
-    if (!marker?.children) return undefined;
+    if (!marker?.children) return;
 
     return Object.values(marker.children).flatMap((markers) =>
       markers.map((marker) => {

@@ -3,14 +3,15 @@ import USFMParser from "sj-usfm-grammar";
 
 USFMParser.init();
 
+function parseUsfm(usfm: string): Usj {
+  if (!USFMParser.language) throw new Error("The USFMParser language is not defined.");
+
+  const usfmParser = new USFMParser();
+  return usfmParser.usfmToUsj(usfm);
+}
+
 export const usfm2Usj = (usfm: string): Usj => {
-  const parseUsfm = (usfm: string): Usj => {
-    if (!USFMParser.language) {
-      return {} as Usj;
-    }
-    const usfmParser = new USFMParser();
-    return usfmParser.usfmToUsj(usfm);
-  };
-  const usj: Usj = usfm ? parseUsfm(usfm) : ({} as Usj);
-  return usj;
+  if (!usfm) throw new Error("Make sure the USFM argument is defined and not empty.");
+
+  return parseUsfm(usfm);
 };
