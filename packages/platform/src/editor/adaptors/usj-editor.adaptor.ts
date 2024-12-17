@@ -16,21 +16,21 @@ import {
   TextNode,
 } from "lexical";
 import {
+  IMMUTABLE_UNMATCHED_VERSION,
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
+import {
   COMMENT_MARK_TYPE,
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
 import {
-  IMMUTABLE_UNMATCHED_VERSION,
-  ImmutableUnmatchedNode,
-  SerializedImmutableUnmatchedNode,
-} from "shared/nodes/features/ImmutableUnmatchedNode";
-import {
   SerializedUnknownNode,
   UNKNOWN_VERSION,
   UnknownNode,
 } from "shared/nodes/features/UnknownNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
   BOOK_MARKER,
   BOOK_VERSION,
@@ -60,6 +60,18 @@ import {
   isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
   SerializedImpliedParaNode,
@@ -79,6 +91,16 @@ import {
   NoteMarker,
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
+import {
+  getEditableCallerText,
+  getPreviewTextFromSerializedNodes,
+  getUnknownAttributes,
+  getVisibleOpenMarkerText,
+  removeUndefinedProperties,
+} from "shared/nodes/scripture/usj/node.utils";
+import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
@@ -92,28 +114,6 @@ import {
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import {
-  NBSP,
-  getEditableCallerText,
-  getPreviewTextFromSerializedNodes,
-  getUnknownAttributes,
-  getVisibleOpenMarkerText,
-  removeUndefinedProperties,
-} from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
-import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
   MarkNodeName,

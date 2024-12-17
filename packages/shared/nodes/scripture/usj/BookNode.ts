@@ -10,7 +10,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "./node.utils";
+import { UnknownAttributes } from "./node-constants";
 
 export const BOOK_MARKER = "id";
 export const BOOK_VERSION = 1;

@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { useEffect } from "react";
-import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node.utils";
+import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-constants";
 import { LoggerBasic } from "./logger-basic.model";
 import { EditorAdaptor, NodeOptions } from "../adaptors/editor-adaptor.model";
 

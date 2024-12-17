@@ -2,43 +2,34 @@
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { LexicalEditor, LexicalNode, SerializedLexicalNode } from "lexical";
-import { ImmutableChapterNode } from "./ImmutableChapterNode";
-import { ChapterNode } from "./ChapterNode";
-import { CharNode, SerializedCharNode } from "./CharNode";
+// Must be imported before `CharNode` to prevent a circular dependency.
+import { NBSP, NUMBERED_MARKER_PLACEHOLDER, UnknownAttributes } from "./node-constants";
+import { $isUnknownNode, UnknownNode } from "../../features/UnknownNode";
+import { $isBookNode, BookNode } from "./BookNode";
+import { $isChapterNode, ChapterNode } from "./ChapterNode";
+import { $isCharNode, CharNode, isSerializedCharNode } from "./CharNode";
+import { $isImmutableChapterNode, ImmutableChapterNode } from "./ImmutableChapterNode";
+import { $isMilestoneNode, MilestoneNode } from "./MilestoneNode";
+import { $isNoteNode, NoteNode } from "./NoteNode";
+import { $isParaNode, ParaNode } from "./ParaNode";
+import { $isVerseNode, VerseNode } from "./VerseNode";
 
-export type UnknownAttributes = { [name: string]: string | undefined };
+export type NodesWithMarker =
+  | BookNode
+  | ChapterNode
+  | CharNode
+  | ImmutableChapterNode
+  | MilestoneNode
+  | ParaNode
+  | NoteNode
+  | VerseNode
+  | UnknownNode;
 
 // If you want use these utils with your own chapter node, add it to this list of types.
 type ChapterNodes = ChapterNode | ImmutableChapterNode;
 
 /** RegEx to test for a string only containing digits. */
-export const ONLY_DIGITS_TEST = /^\d+$/;
-
-// Can't use `CharNode.getType()` as that sets up a circular dependency.
-export const CHAR_NODE_TYPE = "char";
-
-export const NBSP = "\u00A0";
-export const ZWSP = "\u200B";
-
-export const CHAPTER_CLASS_NAME = "chapter";
-export const VERSE_CLASS_NAME = "verse";
-export const INVALID_CLASS_NAME = "invalid";
-export const TEXT_SPACING_CLASS_NAME = "text-spacing";
-export const FORMATTED_FONT_CLASS_NAME = "formatted-font";
-
-export const EXTERNAL_USJ_MUTATION_TAG = "external-usj-mutation";
-export const SELECTION_CHANGE_TAG = "selection-change";
-export const CURSOR_CHANGE_TAG = "cursor-change";
-export const ANNOTATION_CHANGE_TAG = "annotation-change";
-/** Tags that should not be present when handling a USJ change. */
-export const blackListedChangeTags = [
-  EXTERNAL_USJ_MUTATION_TAG,
-  SELECTION_CHANGE_TAG,
-  CURSOR_CHANGE_TAG,
-  ANNOTATION_CHANGE_TAG,
-];
-
-const NUMBERED_MARKER_PLACEHOLDER = "#";
+const ONLY_DIGITS_TEST = /^\d+$/;
 
 /**
  * Check if the marker is valid and numbered.
@@ -238,11 +229,7 @@ export function getVisibleOpenMarkerText(marker: string, content: string | undef
  */
 export function getPreviewTextFromSerializedNodes(childNodes: SerializedLexicalNode[]): string {
   const previewText = childNodes
-    .reduce(
-      (text, node) =>
-        text + (node.type === CHAR_NODE_TYPE ? ` ${(node as SerializedCharNode).text}` : ""),
-      "",
-    )
+    .reduce((text, node) => text + (isSerializedCharNode(node) ? ` ${node.text}` : ""), "")
     .trim();
   return previewText;
 }
@@ -263,11 +250,7 @@ export function getEditableCallerText(noteCaller: string): string {
  */
 export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
   const previewText = childNodes
-    .reduce(
-      (text, node) =>
-        text + (node.getType() === CHAR_NODE_TYPE ? ` ${(node as CharNode).getTextContent()}` : ""),
-      "",
-    )
+    .reduce((text, node) => text + ($isCharNode(node) ? ` ${node.getTextContent()}` : ""), "")
     .trim();
   return previewText;
 }
@@ -317,4 +300,26 @@ export function removeUndefinedProperties<T>(obj: T): T {
   return Object.fromEntries(
     Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined),
   ) as T;
+}
+
+/**
+ * Checks if the node has a `getMarker` method. Excludes React nodes - consider using
+ * `$isReactNodeWithMarker` instead.
+ * @param node - LexicalNode to check.
+ * @returns `true` if the node has a `getMarker` method, `false` otherwise.
+ */
+export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is NodesWithMarker {
+  return (
+    $isBookNode(node) ||
+    $isChapterNode(node) ||
+    $isCharNode(node) ||
+    $isImmutableChapterNode(node) ||
+    $isMilestoneNode(node) ||
+    $isParaNode(node) ||
+    $isNoteNode(node) ||
+    $isVerseNode(node) ||
+    $isUnknownNode(node)
+    // ImmutableUnmatchedNode & MarkerNode also have the `getMarker` method but they left out for
+    // now until we know we need them.
+  );
 }

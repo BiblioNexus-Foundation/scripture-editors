@@ -16,8 +16,8 @@ import {
   Spread,
   isHTMLElement,
 } from "lexical";
+import { UnknownAttributes } from "./node-constants";
 import {
-  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,

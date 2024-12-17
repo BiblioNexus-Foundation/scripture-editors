@@ -10,7 +10,7 @@ import {
   Spread,
   TextNode,
 } from "lexical";
-import { UnknownAttributes, VERSE_CLASS_NAME } from "./node.utils";
+import { UnknownAttributes, VERSE_CLASS_NAME } from "./node-constants";
 
 export const VERSE_MARKER = "v";
 export const VERSE_VERSION = 1;

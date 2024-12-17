@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "../scripture/usj/node.utils";
+import { UnknownAttributes } from "../scripture/usj/node-constants";
 
 export type SerializedUnknownNode = Spread<
   {

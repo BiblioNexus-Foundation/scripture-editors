@@ -13,7 +13,8 @@ import {
   Spread,
   isHTMLElement,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, UnknownAttributes, getVisibleOpenMarkerText } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node-constants";
+import { getVisibleOpenMarkerText } from "./node.utils";
 
 export const CHAPTER_MARKER = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
