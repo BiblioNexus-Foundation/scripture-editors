@@ -2,7 +2,7 @@ import { ElementNode, LexicalNode, NodeKey, SerializedElementNode, Spread } from
 
 export type Attributes = { [key: string]: string };
 
-export type SerializedUsfmElementNode = Spread<
+export type SerializedScriptureElementNode = Spread<
   {
     attributes?: Attributes;
     props?: NodeProps;
@@ -84,7 +84,7 @@ export class UsfmElementNode extends ElementNode {
     writable.__tag = tag;
   }
 
-  exportJSON(): SerializedUsfmElementNode {
+  exportJSON(): SerializedScriptureElementNode {
     const attributes = this.getAttributes();
     const nonUiAttributes: Attributes = Object.keys(attributes).reduce((acc: Attributes, key) => {
       if (!key.startsWith("data-ui-")) {

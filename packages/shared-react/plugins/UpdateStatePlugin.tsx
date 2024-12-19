@@ -34,6 +34,7 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
     editorAdaptor.reset?.();
     const serializedEditorState = editorAdaptor.serializeEditorState(scripture, viewOptions);
     const editorState = editor.parseEditorState(serializedEditorState);
+    console.log({ serializedEditorState, usj: scripture });
     // Execute after the current render cycle.
     const timeoutId = setTimeout(() => {
       editor.setEditorState(editorState, { tag: EXTERNAL_USJ_MUTATION_TAG });

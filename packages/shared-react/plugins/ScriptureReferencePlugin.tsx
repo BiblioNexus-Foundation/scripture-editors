@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getSelection, $isElementNode, LexicalNode } from "lexical";
 import { useEffect } from "react";
+import { $isScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
 import { $isUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 //TODO: move plugin functions to vanilla javascript plugin
@@ -71,30 +72,36 @@ const findNodeInTree = (
   return null;
 };
 
-export function $getCurrentChapterNode(selectedNode: LexicalNode) {
+export function $getCurrentChapterNode(selectedNode: LexicalNode, targetDepth = 2) {
   const chapterNode = findNodeInTree(
     selectedNode,
     (node: LexicalNode) => {
-      if ($isUsfmElementNode(node) && node.getAttribute("data-marker") === "c") {
+      if (
+        ($isUsfmElementNode(node) || $isScriptureElementNode(node)) &&
+        node.getAttribute("data-marker") === "c"
+      ) {
         return true;
       }
       return false;
     },
-    2,
+    targetDepth,
   ) as UsfmElementNode | null;
   return chapterNode ?? null;
 }
 
-export function $getCurrentVerseNode(selectedNode: LexicalNode) {
+export function $getCurrentVerseNode(selectedNode: LexicalNode, targetDepth = 2) {
   const verseNode = findNodeInTree(
     selectedNode,
     (node: LexicalNode) => {
-      if ($isUsfmElementNode(node) && node.getAttribute("data-marker") === "v") {
+      if (
+        ($isUsfmElementNode(node) || $isScriptureElementNode(node)) &&
+        node.getAttribute("data-marker") === "v"
+      ) {
         return true;
       }
       return false;
     },
-    2,
+    targetDepth,
   ) as UsfmElementNode | null;
   return verseNode ?? null;
 }
@@ -108,9 +115,13 @@ export type ScriptureReference = {
 export default function ScriptureReferencePlugin({
   book,
   onChangeReference,
+  verseDepth = 2,
+  chapterDepth = 2,
 }: {
   book?: string;
   onChangeReference?: (reference: ScriptureReference) => void;
+  verseDepth?: number;
+  chapterDepth?: number;
 }) {
   const [editor] = useLexicalComposerContext();
 
@@ -122,8 +133,8 @@ export default function ScriptureReferencePlugin({
           editorState.read(() => {
             const selectedNode = $getSelection()?.getNodes()?.[0];
             if (!selectedNode) return;
-            const verseNode = $getCurrentVerseNode(selectedNode);
-            const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode);
+            const verseNode = $getCurrentVerseNode(selectedNode, verseDepth);
+            const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode, chapterDepth);
             onChangeReference({
               book: book ?? "",
               chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),

@@ -1,0 +1,41 @@
+{
+  "name": "scriptural",
+  "private": true,
+  "version": "0.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1"
+  },
+  "dependencies": {
+    "@biblionexus-foundation/scripture-utilities": "workspace:^",
+    "@lexical/headless": "^0.20.0",
+    "@lexical/html": "^0.20.0",
+    "@lexical/react": "^0.20.0",
+    "@lexical/selection": "^0.20.0",
+    "@lexical/utils": "^0.20.0",
+    "base-64": "^1.0.0",
+    "epitelete-html": "^0.2.21-beta.2",
+    "lexical": "^0.20.0",
+    "open-patcher": "1.0.0-beta.1",
+    "pure-uuid": "^1.8.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/deep-equal": "^1.0.4",
+    "@types/base-64": "^1.0.2",
+    "deep-equal": "^2.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "shared": "link:../shared",
+    "shared-react": "link:../shared-react"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

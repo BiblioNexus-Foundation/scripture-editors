@@ -1,0 +1,457 @@
+{
+  "$id": "https://usfm-committee/usj.schema.json",
+  "title": "Unified Scripture JSON",
+  "description": "The JSON variant of USFM and USX data models",
+  "type": "object",
+  "$defs": {
+    "paraMarkerObject": {
+      "description": "Para-like content",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "para"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inParaObject"
+          }
+        },
+        "sid": {
+          "description": "Indicates the Book-Chapter-Verse-like value",
+          "type": "string",
+          "pattern": "^[0-6A-Z]{3}( [1-9][0-9]{0,2}(:[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?)?)?$"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "bookObject": {
+      "description": "Book object",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "book"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "const": "id"
+        },
+        "code": {
+          "description": "The 3-letter book code in id element",
+          "pattern": "^[0-6A-Z]{3}$",
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["type", "marker", "code"],
+      "additionalProperties": false
+    },
+    "chapterObject": {
+      "description": "Chapter object",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "chapter"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "const": "c"
+        },
+        "sid": {
+          "description": "Indicates the Book-Chapter-Verse-like value",
+          "type": "string",
+          "pattern": "^[0-6A-Z]{3}( [1-9][0-9]{0,2}(:[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?)?)?$"
+        },
+        "number": {
+          "description": "Chapter number",
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?$"
+        },
+        "altnumber": {
+          "description": "Alternative chapter number",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        },
+        "pubnumber": {
+          "description": "Published characters as non-orthogonal attribute for USFM-incompatibility (mad and wrong)",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker", "number"],
+      "additionalProperties": false
+    },
+    "sidebarObject": {
+      "type": "object",
+      "description": "Sidebar, which contains para-like content",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "sidebar"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "const": "esb"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/paraMarkerObject"
+          }
+        },
+        "category": {
+          "description": "Category of extended study bible sections",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "inParaObject": {
+      "description": "The set of thingeys that can appear inside a paragraph-like thingeys",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/charMarkerObject"
+        },
+        {
+          "$ref": "#/$defs/verseObject"
+        },
+        {
+          "$ref": "#/$defs/milestoneObject"
+        },
+        {
+          "$ref": "#/$defs/figureObject"
+        },
+        {
+          "$ref": "#/$defs/noteObject"
+        }
+      ]
+    },
+    "charMarkerObject": {
+      "type": "object",
+      "description": "Character-type content",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "enum": ["char", "whitespace", "row", "cell"]
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inParaObject"
+          }
+        },
+        "link-id": {
+          "description": "ID for link",
+          "type": "string"
+        },
+        "link-href": {
+          "description": "ID for link",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "noteObject": {
+      "type": "object",
+      "description": "A note",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "note"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inParaObject"
+          }
+        },
+        "caller": {
+          "description": "Caller character for footnotes and cross-refs",
+          "type": "string",
+          "pattern": "^[^ \t\n]$"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "figureObject": {
+      "type": "object",
+      "description": "a figure object",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "figure"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "file": {
+          "description": "The filename",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        },
+        "size": {
+          "description": "The file size",
+          "type": "string"
+        },
+        "ref": {
+          "description": "The file ref",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "verseObject": {
+      "type": "object",
+      "description": "A verse number",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "verse"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "sid": {
+          "description": "Indicates the Book-Chapter-Verse-like value",
+          "type": "string",
+          "pattern": "^[0-6A-Z]{3}( [1-9][0-9]{0,2}(:[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?)?)?$"
+        },
+        "number": {
+          "description": "Verse number",
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?$"
+        },
+        "altnumber": {
+          "description": "Alternative verse number",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        },
+        "pubnumber": {
+          "description": "Published characters as non-orthogonal attribute for USFM-incompatibility (mad and wrong)",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker", "number"],
+      "additionalProperties": false
+    },
+    "milestoneObject": {
+      "type": "object",
+      "description": "Milestone (start or end marker)",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "ms"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "sid": {
+          "description": "An id to distinguish milestones when using mad and wrong technology to process XML",
+          "type": "string",
+          "pattern": "^[^ \t\n](.*[^ \t\n])?$"
+        },
+        "who": {
+          "description": "The speaker in an sp tag",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        },
+        "eid": {
+          "description": "The end milestone id",
+          "type": "string",
+          "pattern": "^[^ \t\r\n](.*[^ \t\r\n])?$"
+        }
+      },
+      "required": ["type", "marker"],
+      "patternProperties": {
+        "^x-": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tableObject": {
+      "type": "object",
+      "description": "A table, which contains rows",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element this is, corresponding the USFM marker and USX node",
+          "type": "string",
+          "const": "table"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rowObject"
+          }
+        },
+        "sid": {
+          "description": "Indicates the Book-Chapter-Verse value in the paragraph-based structure",
+          "type": "string",
+          "pattern": "(^[0-6A-Z]{3}( [1-9][0-9]{0,2}(:[1-9][0-9]{0,2}(-[1-9][0-9]{0,2})?)?)?$)|.*"
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "rowObject": {
+      "type": "object",
+      "description": "A table row which contains cells",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element this is, corresponding the USFM marker and USX node",
+          "type": "string",
+          "const": "table:row"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/cellObject"
+              }
+            ]
+          }
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    },
+    "cellObject": {
+      "type": "object",
+      "description": "A table cell",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element this is, corresponding the USFM marker and USX node",
+          "type": "string",
+          "const": "table:cell"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "pattern": "^[^ \t\r\n]+$"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inParaObject"
+          }
+        },
+        "align": {
+          "description": "Alignment of table cells",
+          "type": "string",
+          "enum": ["start", "end", "center"]
+        },
+        "colspan": {
+          "description": "Number of columns spanned by the cell",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["type", "marker"],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "type": {
+      "description": "The kind of node/element/marker this is",
+      "type": "string"
+    },
+    "version": {
+      "description": "The USJ spec version",
+      "type": "string"
+    },
+    "content": {
+      "description": "The JSON representation of scripture contents from USFM/USX",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/bookObject"
+          },
+          {
+            "$ref": "#/$defs/chapterObject"
+          },
+          {
+            "$ref": "#/$defs/paraMarkerObject"
+          },
+          {
+            "$ref": "#/$defs/tableObject"
+          },
+          {
+            "$ref": "#/$defs/sidebarObject"
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

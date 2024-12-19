@@ -6,6 +6,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "rootDir": ".",
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
@@ -23,10 +24,10 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Workspace */
-    "baseUrl": "./packages/",
+    "baseUrl": ".",
     "paths": {
-      "@biblionexus-foundation/scripture-utilities": ["./utilities/src"]
+      "@biblionexus-foundation/scripture-utilities": ["packages/utilities/src"]
     }
   },
-  "include": ["packages"]
+  "exclude": ["node_modules", "tmp"]
 }

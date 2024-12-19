@@ -2,11 +2,12 @@
   "name": "scripture-editors",
   "version": "0.0.0",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "ncu:group": "npx npm-check-updates --interactive --format group --workspaces",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:shared": "nx test shared --test-file=packages/shared/converters/usj/index.test.ts"
   },
+  "private": true,
   "devDependencies": {
     "@nx/devkit": "19.8.14",
     "@nx/eslint-plugin": "19.8.14",
