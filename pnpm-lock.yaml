@@ -31,7 +31,7 @@ importers:
         version: 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(js-yaml@4.1.0)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(webpack@5.94.0(@swc/core@1.7.42(@swc/helpers@0.5.15)))
       '@nx/vite':
         specifier: 18.3.5
-        version: 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0)
+        version: 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0(@types/node@20.17.6)(@vitest/ui@1.6.0)(jsdom@25.0.1)(terser@5.36.0))
       '@nx/web':
         specifier: 18.3.5
         version: 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)
@@ -143,6 +143,70 @@ importers:
       yalc:
         specifier: 1.0.0-pre.53
         version: 1.0.0-pre.53
+
+  apps/scriptural:
+    dependencies:
+      '@biblionexus-foundation/scripture-utilities':
+        specifier: workspace:^
+        version: link:../../packages/utilities
+      '@lexical/headless':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/html':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/react':
+        specifier: ^0.20.0
+        version: 0.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.20)
+      '@lexical/selection':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/utils':
+        specifier: ^0.20.0
+        version: 0.20.0
+      base-64:
+        specifier: ^1.0.0
+        version: 1.0.0
+      epitelete-html:
+        specifier: ^0.2.21-beta.2
+        version: 0.2.21-beta.2
+      lexical:
+        specifier: ^0.20.0
+        version: 0.20.0
+      open-patcher:
+        specifier: 1.0.0-beta.1
+        version: 1.0.0-beta.1
+      pure-uuid:
+        specifier: ^1.8.1
+        version: 1.8.1
+    devDependencies:
+      '@types/base-64':
+        specifier: ^1.0.2
+        version: 1.0.2
+      '@types/deep-equal':
+        specifier: ^1.0.4
+        version: 1.0.4
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.1
+        version: 18.3.1
+      deep-equal:
+        specifier: ^2.2.3
+        version: 2.2.3
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      shared:
+        specifier: link:../../packages/shared
+        version: link:../../packages/shared
+      shared-react:
+        specifier: link:../../packages/shared-react
+        version: link:../../packages/shared-react
 
   packages/perf-react:
     dependencies:
@@ -349,6 +413,70 @@ importers:
         specifier: ^3.4.14
         version: 3.4.14(ts-node@10.9.2(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(typescript@5.4.5))
 
+  packages/scriptural:
+    dependencies:
+      '@biblionexus-foundation/scripture-utilities':
+        specifier: workspace:^
+        version: link:../utilities
+      '@lexical/headless':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/html':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/react':
+        specifier: ^0.20.0
+        version: 0.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(yjs@13.6.20)
+      '@lexical/selection':
+        specifier: ^0.20.0
+        version: 0.20.0
+      '@lexical/utils':
+        specifier: ^0.20.0
+        version: 0.20.0
+      base-64:
+        specifier: ^1.0.0
+        version: 1.0.0
+      epitelete-html:
+        specifier: ^0.2.21-beta.2
+        version: 0.2.21-beta.2
+      lexical:
+        specifier: ^0.20.0
+        version: 0.20.0
+      open-patcher:
+        specifier: 1.0.0-beta.1
+        version: 1.0.0-beta.1
+      pure-uuid:
+        specifier: ^1.8.1
+        version: 1.8.1
+    devDependencies:
+      '@types/base-64':
+        specifier: ^1.0.2
+        version: 1.0.2
+      '@types/deep-equal':
+        specifier: ^1.0.4
+        version: 1.0.4
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.1
+        version: 18.3.1
+      deep-equal:
+        specifier: ^2.2.3
+        version: 2.2.3
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      shared:
+        specifier: link:../shared
+        version: link:../shared
+      shared-react:
+        specifier: link:../shared-react
+        version: link:../shared-react
+
   packages/shared:
     dependencies:
       '@biblionexus-foundation/scripture-utilities':
@@ -369,6 +497,9 @@ importers:
       open-patcher:
         specifier: 1.0.0-beta.1
         version: 1.0.0-beta.1
+      xregexp:
+        specifier: ^5.1.1
+        version: 5.1.1
     devDependencies:
       '@types/deep-equal':
         specifier: ^1.0.4
@@ -10328,9 +10459,9 @@ snapshots:
       - '@swc/core'
       - debug
 
-  '@nrwl/vite@18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0)':
+  '@nrwl/vite@18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0(@types/node@20.17.6)(@vitest/ui@1.6.0)(jsdom@25.0.1)(terser@5.36.0))':
     dependencies:
-      '@nx/vite': 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0)
+      '@nx/vite': 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0(@types/node@20.17.6)(@vitest/ui@1.6.0)(jsdom@25.0.1)(terser@5.36.0))
     transitivePeerDependencies:
       - '@babel/traverse'
       - '@swc-node/register'
@@ -10602,9 +10733,9 @@ snapshots:
       - verdaccio
       - webpack
 
-  '@nx/vite@18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0)':
+  '@nx/vite@18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0(@types/node@20.17.6)(@vitest/ui@1.6.0)(jsdom@25.0.1)(terser@5.36.0))':
     dependencies:
-      '@nrwl/vite': 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0)
+      '@nrwl/vite': 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)(vite@5.4.11(@types/node@20.17.6)(terser@5.36.0))(vitest@1.6.0(@types/node@20.17.6)(@vitest/ui@1.6.0)(jsdom@25.0.1)(terser@5.36.0))
       '@nx/devkit': 18.3.5(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))
       '@nx/js': 18.3.5(@babel/traverse@7.25.9)(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15))(@types/node@20.17.6)(nx@18.3.5(@swc-node/register@1.10.9(@swc/core@1.7.42(@swc/helpers@0.5.15))(@swc/types@0.1.15)(typescript@5.4.5))(@swc/core@1.7.42(@swc/helpers@0.5.15)))(typescript@5.4.5)
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.4.5)

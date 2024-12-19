@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ncu:group": "npx npm-check-updates --interactive --format group",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:shared": "nx test shared --test-file=packages/shared/converters/usj/index.test.ts"
   },
   "private": true,
   "devDependencies": {

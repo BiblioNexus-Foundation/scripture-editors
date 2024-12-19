@@ -26,6 +26,14 @@ type PerfToLexicalMapCreator = (
 //   sections: [],
 // };
 
+//Lexical node types used:
+// - inline
+// - root
+// - divisionmark
+// - usfmparagraph
+// - graft
+// - text
+
 export const createPerfToLexicalMap: PerfToLexicalMapCreator = (perfSequences) => ({
   "*": {
     "*": ({ metadata, node, children }): SerializedUsfmElementNode => {

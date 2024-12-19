@@ -26,5 +26,13 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "jest.nodeEnv": {
+    "NODE_OPTIONS": "--experimental-vm-modules"
+  },
+  "jest.jestCommandLine": "nx test ${workspaceFolderBasename} --",
+  "jest.runMode": {
+    "type": "watch",
+    "runAllTestsOnStartup": true
   }
 }

@@ -1,0 +1,221 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Text Alignment Format Specification (TAFS)",
+  "description": "Schema for validating TAFS documents",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "minimumCompatibleVersion",
+    "meta",
+    "documents",
+    "groupData",
+    "groupedBy",
+    "groups"
+  ],
+  "properties": {
+    "format": {
+      "const": "alignment"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "minimumCompatibleVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "meta": {
+      "type": "object",
+      "required": ["creator", "timestamp"],
+      "properties": {
+        "creator": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["scheme", "docid", "validation"],
+        "properties": {
+          "scheme": {
+            "type": "string"
+          },
+          "docid": {
+            "type": "string"
+          },
+          "validation": {
+            "type": "object",
+            "required": ["pattern"],
+            "properties": {
+              "pattern": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "groupData": {
+      "type": "object",
+      "required": ["type", "roles"],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "groupedBy": {
+      "type": "string",
+      "enum": ["bcv", "paragraph", "section"]
+    },
+    "groups": {
+      "type": "object",
+      "patternProperties": {
+        "^[A-Z0-9]{3}\\.[0-9]+\\.[0-9]+$": {
+          "$ref": "#/definitions/alignmentGroup"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "alignmentGroup": {
+      "type": "object",
+      "required": ["meta", "records"],
+      "properties": {
+        "meta": {
+          "type": "object",
+          "required": ["verse_text"],
+          "properties": {
+            "verse_text": {
+              "type": "object",
+              "required": ["source", "target"],
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/alignmentRecord"
+          }
+        }
+      }
+    },
+    "alignmentRecord": {
+      "type": "object",
+      "required": ["references", "meta"],
+      "properties": {
+        "references": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        },
+        "meta": {
+          "type": "object",
+          "required": ["source", "target"],
+          "properties": {
+            "source": {
+              "oneOf": [
+                { "$ref": "#/definitions/sourceMeta" },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/sourceMeta"
+                  }
+                }
+              ]
+            },
+            "target": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/targetMeta"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": ["valid", "needs-review"]
+            }
+          }
+        }
+      }
+    },
+    "sourceMeta": {
+      "type": "object",
+      "required": ["strong", "morph", "lemma", "occurrence", "occurrences"],
+      "properties": {
+        "strong": {
+          "type": "string",
+          "pattern": "^G\\d{4}$"
+        },
+        "morph": {
+          "type": "string",
+          "pattern": "^Gr,[A-Z,]+$"
+        },
+        "lemma": {
+          "type": "string"
+        },
+        "occurrence": {
+          "type": "string",
+          "pattern": "^\\d+$"
+        },
+        "occurrences": {
+          "type": "string",
+          "pattern": "^\\d+$"
+        }
+      }
+    },
+    "targetMeta": {
+      "type": "object",
+      "required": ["occurrence", "occurrences"],
+      "properties": {
+        "occurrence": {
+          "type": "string",
+          "pattern": "^\\d+$"
+        },
+        "occurrences": {
+          "type": "string",
+          "pattern": "^\\d+$"
+        }
+      }
+    }
+  }
+}
