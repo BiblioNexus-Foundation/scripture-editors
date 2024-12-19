@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/scripture-utilities",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Utilities for working with Scripture data.",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/utilities#readme",
@@ -24,6 +24,7 @@
   },
   "files": [
     "dist",
+    "!dist/package.json",
     "src",
     "!src/**/*.test.ts",
     "!src/**/*.data.ts"
@@ -32,10 +33,10 @@
     "prepublish": "cd ../.. && nx build utilities"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.10"
+    "@xmldom/xmldom": "^0.9.6"
   },
   "devDependencies": {
-    "lexical": "^0.20.0"
+    "lexical": "^0.21.0"
   },
   "volta": {
     "extends": "../../package.json"

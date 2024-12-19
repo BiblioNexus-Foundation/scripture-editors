@@ -1,14 +1,15 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#chapter */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/cv/c.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  Spread,
-  SerializedElementNode,
   ElementNode,
+  LexicalNode,
+  NodeKey,
+  SerializedElementNode,
+  SerializedLexicalNode,
+  Spread,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node-constants";
 
 export const CHAPTER_MARKER = "c";
 export const CHAPTER_VERSION = 1;
@@ -183,4 +184,10 @@ export function $createChapterNode(
 
 export function $isChapterNode(node: LexicalNode | null | undefined): node is ChapterNode {
   return node instanceof ChapterNode;
+}
+
+export function isSerializedChapterNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedChapterNode {
+  return node?.type === ChapterNode.getType();
 }

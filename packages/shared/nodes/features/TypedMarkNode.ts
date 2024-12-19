@@ -12,6 +12,7 @@ import type {
   NodeKey,
   RangeSelection,
   SerializedElementNode,
+  SerializedLexicalNode,
   Spread,
   TextNode,
 } from "lexical";
@@ -227,6 +228,12 @@ export function $isTypedMarkNode(node: LexicalNode | null | undefined): node is 
   return node instanceof TypedMarkNode;
 }
 
+export function isSerializedTypedMarkNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedTypedMarkNode {
+  return node?.type === TypedMarkNode.getType();
+}
+
 /**
  * Adapted from https://github.com/facebook/lexical/blob/92c47217244f9d3c22a59728633fb41a10420724/packages/lexical-mark/src/index.ts
  */
@@ -337,7 +344,8 @@ export function $wrapSelectionInTypedMarkNode(
   }
   // Make selection collapsed at the end for comments.
   if (type === COMMENT_MARK_TYPE && $isElementNode(lastCreatedMarkNode)) {
-    isBackward ? lastCreatedMarkNode.selectStart() : lastCreatedMarkNode.selectEnd();
+    if (isBackward) lastCreatedMarkNode.selectStart();
+    else lastCreatedMarkNode.selectEnd();
   }
 }
 

@@ -1,15 +1,16 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#verse */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/cv/v.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
   EditorConfig,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
   SerializedTextNode,
   Spread,
   TextNode,
 } from "lexical";
-import { UnknownAttributes, VERSE_CLASS_NAME } from "./node.utils";
+import { UnknownAttributes, VERSE_CLASS_NAME } from "./node-constants";
 
 export const VERSE_MARKER = "v";
 export const VERSE_VERSION = 1;
@@ -191,4 +192,10 @@ export function $createVerseNode(
 
 export function $isVerseNode(node: LexicalNode | null | undefined): node is VerseNode {
   return node instanceof VerseNode;
+}
+
+export function isSerializedVerseNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedVerseNode {
+  return node?.type === VerseNode.getType();
 }

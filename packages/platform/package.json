@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/platform-editor",
-  "version": "0.6.5",
+  "version": "0.6.7",
   "description": "Scripture editor used in Platform. See https://platform.bible",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/platform#readme",
@@ -31,27 +31,27 @@
     "react-dom": ">=18.3.1"
   },
   "dependencies": {
-    "@biblionexus-foundation/scripture-utilities": "workspace:^",
-    "@lexical/react": "^0.20.0",
-    "@lexical/selection": "^0.20.0",
-    "@lexical/text": "^0.20.0",
-    "@lexical/utils": "^0.20.0",
-    "@lexical/yjs": "^0.20.0",
+    "@biblionexus-foundation/scripture-utilities": "workspace:~",
+    "@lexical/react": "^0.21.0",
+    "@lexical/selection": "^0.21.0",
+    "@lexical/text": "^0.21.0",
+    "@lexical/utils": "^0.21.0",
+    "@lexical/yjs": "^0.21.0",
     "@sillsdev/scripture": "^2.0.2",
     "fast-equals": "^5.0.1",
-    "lexical": "^0.20.0",
+    "lexical": "^0.21.0",
     "yjs": "^13.6.20"
   },
   "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/react": "^18.3.14",
+    "@types/react-dom": "^18.3.3",
     "platform-bible-react": "file:./lib/platform-bible-react",
     "platform-bible-utils": "file:./lib/platform-bible-utils",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "shared": "link:../shared",
     "shared-react": "link:../shared-react",
-    "tailwindcss": "3.4.15",
+    "tailwindcss": "3.4.16",
     "tailwindcss-animate": "1.0.7"
   },
   "volta": {

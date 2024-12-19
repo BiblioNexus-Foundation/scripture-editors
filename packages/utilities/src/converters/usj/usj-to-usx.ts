@@ -4,26 +4,26 @@
  * @see https://github.com/usfm-bible/tcdocs/blob/main/python/lib/usfmtc/usjproc.py
  */
 
-import { DOMImplementation } from "@xmldom/xmldom";
+import { DOMImplementation, Document, Element, Text } from "@xmldom/xmldom";
 import { MarkerContent, MarkerObject, Usj } from "./usj.model";
 import { USX_TYPE, USX_VERSION } from "./usx.model";
 
 let chapterEid: string | undefined;
 let verseEid: string | undefined;
 
-function createVerseEndElement(usxDoc: XMLDocument, verseEid: string): HTMLElement {
+function createVerseEndElement(usxDoc: Document, verseEid: string): Element {
   const eidElement = usxDoc.createElement("verse");
   eidElement.setAttribute("eid", verseEid);
   return eidElement;
 }
 
-function createChapterEndElement(usxDoc: XMLDocument, chapterEid: string): HTMLElement {
+function createChapterEndElement(usxDoc: Document, chapterEid: string): Element {
   const eidElement = usxDoc.createElement("chapter");
   eidElement.setAttribute("eid", chapterEid);
   return eidElement;
 }
 
-function setAttributes(element: HTMLElement, markerContent: MarkerObject) {
+function setAttributes(element: Element, markerContent: MarkerObject) {
   if (markerContent.type === "unmatched") element.setAttribute("marker", markerContent.marker);
   else element.setAttribute("style", markerContent.marker);
   for (const [key, value] of Object.entries(markerContent)) {
@@ -35,13 +35,13 @@ function setAttributes(element: HTMLElement, markerContent: MarkerObject) {
 
 function convertUsjRecurse(
   markerContent: MarkerContent,
-  parentElement: HTMLElement,
-  usxDoc: XMLDocument,
+  parentElement: Element,
+  usxDoc: Document,
   isLastItem: boolean,
 ) {
-  let element: Text | HTMLElement;
+  let element: Text | Element;
   let type: string | undefined;
-  let eidElement: HTMLElement | undefined;
+  let eidElement: Element | undefined;
   if (typeof markerContent === "string") element = usxDoc.createTextNode(markerContent);
   else {
     type = markerContent.type.replace("table:", "");
@@ -84,17 +84,21 @@ function convertUsjRecurse(
   }
 }
 
-export function usjToUsxDom(usj: Usj, usxDoc: XMLDocument): HTMLElement {
+export function usjToUsxDom(usj: Usj, usxDoc: Document): Element | undefined {
+  if (!usxDoc.documentElement) return undefined;
+
   for (const [index, markerContent] of usj.content.entries()) {
     const isLastItem = index === usj.content.length - 1;
     convertUsjRecurse(markerContent, usxDoc.documentElement, usxDoc, isLastItem);
   }
-  return usxDoc.documentElement;
+  return usxDoc.documentElement ?? undefined;
 }
 
 export function usjToUsxString(usj: Usj): string {
   const usxDoc = new DOMImplementation().createDocument("", USX_TYPE);
-  usxDoc.documentElement.setAttribute("version", USX_VERSION);
-  usjToUsxDom(usj, usxDoc);
+  if (usxDoc.documentElement) {
+    usxDoc.documentElement.setAttribute("version", USX_VERSION);
+    usjToUsxDom(usj, usxDoc);
+  }
   return usxDoc.toString();
 }

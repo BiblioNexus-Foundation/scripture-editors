@@ -15,26 +15,47 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
+import {
+  SerializedUnknownNode,
+  UNKNOWN_VERSION,
+  UnknownNode,
+} from "shared/nodes/features/UnknownNode";
 import {
   BOOK_MARKER,
   BOOK_VERSION,
   BookMarker,
   BookNode,
+  isSerializedBookNode,
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
-import {
-  SerializedImmutableChapterNode,
-  IMMUTABLE_CHAPTER_VERSION,
-  ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   SerializedChapterNode,
   CHAPTER_VERSION,
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
+  isSerializedChapterNode,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+import {
+  CHAR_VERSION,
+  CharNode,
+  isSerializedCharNode,
+  SerializedCharNode,
+} from "shared/nodes/scripture/usj/CharNode";
+import {
+  SerializedImmutableChapterNode,
+  IMMUTABLE_CHAPTER_VERSION,
+  ImmutableChapterNode,
+  isSerializedImmutableChapterNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import {
+  SerializedImpliedParaNode,
+  ImpliedParaNode,
+  IMPLIED_PARA_VERSION,
+} from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
   MILESTONE_VERSION,
   MilestoneNode,
@@ -45,10 +66,12 @@ import {
   isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import {
-  IMPLIED_PARA_VERSION,
-  ImpliedParaNode,
-  SerializedImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
+  NOTE_VERSION,
+  NoteNode,
+  NoteMarker,
+  SerializedNoteNode,
+} from "shared/nodes/scripture/usj/NoteNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
@@ -56,47 +79,32 @@ import {
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
 import {
-  NOTE_VERSION,
-  NoteNode,
-  NoteMarker,
-  SerializedNoteNode,
-} from "shared/nodes/scripture/usj/NoteNode";
-import {
-  SerializedUnknownNode,
-  UNKNOWN_VERSION,
-  UnknownNode,
-} from "shared/nodes/scripture/usj/UnknownNode";
-import {
   SerializedVerseNode,
   VERSE_MARKER,
   VERSE_VERSION,
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
-  NBSP,
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
   OnClick,
   SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
@@ -395,9 +403,9 @@ function createNote(
     const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
     callerNode = createNoteCaller(noteCaller, childNodes);
     childNodes.forEach((node) => {
-      if (node.type === CharNode.getType()) {
-        (node as SerializedCharNode).mode = "token";
-        (node as SerializedCharNode).style = "display: none";
+      if (isSerializedCharNode(node)) {
+        node.mode = "token";
+        node.style = "display: none";
       }
     });
   }
@@ -623,9 +631,11 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
  * @returns nodes with any needed implied paras inserted.
  */
 export function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const bookNodeIndex = nodes.findIndex((node) => node.type === BookNode.getType());
+  const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
   const isBookNodeFound = bookNodeIndex >= 0;
-  const chapterNodeIndex = nodes.findIndex((node) => node.type === ChapterNode.getType());
+  const chapterNodeIndex = nodes.findIndex(
+    (node) => isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node),
+  );
   const isChapterNodeFound = chapterNodeIndex >= 0;
   if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {
     const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, bookNodeIndex));

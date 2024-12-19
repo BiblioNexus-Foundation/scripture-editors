@@ -30,7 +30,8 @@ export function NodeSelectionMenu({
 
   const handleOptionSelection = (option: OptionItem) => {
     onClose?.();
-    onSelectOption ? onSelectOption(option) : option.action(editor);
+    if (onSelectOption) onSelectOption(option);
+    else option.action(editor);
   };
 
   useEffect(() => {

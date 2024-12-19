@@ -1,22 +1,23 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#para */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  ParagraphNode,
-  Spread,
-  SerializedParagraphNode,
-  RangeSelection,
   DOMConversionMap,
   DOMConversionOutput,
+  DOMExportOutput,
   ElementFormatType,
   LexicalEditor,
-  DOMExportOutput,
+  LexicalNode,
+  NodeKey,
+  ParagraphNode,
+  RangeSelection,
+  SerializedLexicalNode,
+  SerializedParagraphNode,
+  Spread,
   isHTMLElement,
 } from "lexical";
+import { UnknownAttributes } from "./node-constants";
 import {
-  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,
@@ -24,9 +25,12 @@ import {
 
 export const PARA_MARKER_DEFAULT = "p";
 
-/** @see https://ubsicap.github.io/usx/parastyles.html */
+/** @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 const VALID_PARA_MARKERS = [
   // Identification
+  "ide",
+  "sts",
+  "rem",
   "h",
   "toc1",
   "toc2",
@@ -35,63 +39,119 @@ const VALID_PARA_MARKERS = [
   "toca2",
   "toca3",
   // Introductions
-  "imt#",
-  "is#",
+  "imt",
+  "imt1",
+  "imt2",
+  "imt3",
+  "imt4",
+  "is",
+  "is1",
+  "is2",
   "ip",
   "ipi",
+  "im",
+  "imi",
   "ipq",
   "imq",
   "ipr",
-  "iq#",
+  "iq",
+  "iq1",
+  "iq2",
+  "iq3",
+  "ili",
+  "ili1",
+  "ili2",
   "ib",
-  "ili#",
   "iot",
-  "io#",
+  "io",
+  "io1",
+  "io2",
+  "io3",
+  "io4",
   "iex",
   "imte",
+  "imte1",
+  "imte2",
   "ie",
   // Titles and Headings
-  "mt#",
+  "mt",
+  "mt1",
+  "mt2",
+  "mt3",
+  "mt4",
   "mte",
+  "mte1",
+  "mte2",
   "cl",
   "cd",
-  "ms#",
+  "ms",
+  "ms1",
+  "ms2",
+  "ms3",
   "mr",
-  "s#",
+  "s",
+  "s1",
+  "s2",
+  "s3",
+  "s4",
   "sr",
   "r",
   "d",
   "sp",
-  "sd#",
-  // Paragraphs
+  "sd",
+  "sd1",
+  "sd2",
+  "sd3",
+  "sd4",
+  // Body Paragraphs
   PARA_MARKER_DEFAULT,
   "m",
   "po",
-  "pr",
   "cls",
-  "pmo",
+  "pr",
+  "pc",
   "pm",
+  "pmo",
   "pmc",
   "pmr",
-  "pi#",
+  "pi",
+  "pi1",
+  "pi2",
+  "pi3",
   "mi",
-  "pc",
-  "ph#",
   "lit",
+  "nb",
+  // Note there is 1 deprecated marker not listed here: "ph#"
   // Poetry
-  "q#",
+  "q",
+  "q1",
+  "q2",
+  "q3",
+  "q4",
   "qr",
   "qc",
   "qa",
-  "qm#",
+  "qm",
+  "qm1",
+  "qm2",
+  "qm3",
   "qd",
   "b",
   // Lists
   "lh",
-  "li#",
+  "li",
+  "li1",
+  "li2",
+  "li3",
+  "li4",
   "lf",
-  "lim#",
-  "litl", // TODO remove in USX3.1
+  "lim",
+  "lim1",
+  "lim2",
+  "lim3",
+  "lim4",
+  // Breaks - see https://docs.usfm.bible/usfm/3.1/char/breaks/pb.html
+  "pb",
 ] as const;
 
 const VALID_PARA_MARKERS_NUMBERED = extractNumberedMarkers(VALID_PARA_MARKERS);
@@ -249,4 +309,10 @@ export function $createParaNode(
 
 export function $isParaNode(node: LexicalNode | null | undefined): node is ParaNode {
   return node instanceof ParaNode;
+}
+
+export function isSerializedParaNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedParaNode {
+  return node?.type === ParaNode.getType();
 }

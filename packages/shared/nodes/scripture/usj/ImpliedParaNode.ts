@@ -1,11 +1,12 @@
-/** Conforms with USX v3.0 and adapted from @see https://ubsicap.github.io/usx/elements.html#para */
+/** Conforms with USJ v3.1 and adapted from @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 
 import {
-  type LexicalNode,
   $applyNodeReplacement,
+  LexicalNode,
   ParagraphNode,
-  SerializedParagraphNode,
   RangeSelection,
+  SerializedLexicalNode,
+  SerializedParagraphNode,
 } from "lexical";
 
 export const IMPLIED_PARA_VERSION = 1;
@@ -67,4 +68,10 @@ export function $createImpliedParaNode(): ImpliedParaNode {
 
 export function $isImpliedParaNode(node: LexicalNode | null | undefined): node is ImpliedParaNode {
   return node instanceof ImpliedParaNode;
+}
+
+export function isSerializedImpliedParaNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedImpliedParaNode {
+  return node?.type === ImpliedParaNode.getType();
 }

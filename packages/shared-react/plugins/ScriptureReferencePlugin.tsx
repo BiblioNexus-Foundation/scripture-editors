@@ -107,15 +107,18 @@ export function $getCurrentVerseNode(selectedNode: LexicalNode, targetDepth = 2)
 }
 
 export type ScriptureReference = {
+  book: string;
   chapter: number;
   verse: number;
 };
 
 export default function ScriptureReferencePlugin({
+  book,
   onChangeReference,
   verseDepth = 2,
   chapterDepth = 2,
 }: {
+  book?: string;
   onChangeReference?: (reference: ScriptureReference) => void;
   verseDepth?: number;
   chapterDepth?: number;
@@ -133,6 +136,7 @@ export default function ScriptureReferencePlugin({
             const verseNode = $getCurrentVerseNode(selectedNode, verseDepth);
             const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode, chapterDepth);
             onChangeReference({
+              book: book ?? "",
               chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),
               verse: Number(verseNode?.getAttribute("data-number") ?? 0),
             });

@@ -15,16 +15,30 @@ import {
   TextModeType,
   TextNode,
 } from "lexical";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import {
+  IMMUTABLE_UNMATCHED_VERSION,
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
+import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
 import {
   COMMENT_MARK_TYPE,
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
 import {
+  SerializedUnknownNode,
+  UNKNOWN_VERSION,
+  UnknownNode,
+} from "shared/nodes/features/UnknownNode";
+import {
   BOOK_MARKER,
   BOOK_VERSION,
   BookMarker,
   BookNode,
+  isSerializedBookNode,
   SerializedBookNode,
 } from "shared/nodes/scripture/usj/BookNode";
 import {
@@ -33,18 +47,20 @@ import {
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
+  isSerializedChapterNode,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+import {
+  CHAR_VERSION,
+  CharNode,
+  isSerializedCharNode,
+  SerializedCharNode,
+} from "shared/nodes/scripture/usj/CharNode";
 import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
+  isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
-  IMMUTABLE_UNMATCHED_VERSION,
-  ImmutableUnmatchedNode,
-  SerializedImmutableUnmatchedNode,
-} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
 import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
@@ -65,6 +81,14 @@ import {
   NoteMarker,
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+import {
+  getEditableCallerText,
+  getPreviewTextFromSerializedNodes,
+  getUnknownAttributes,
+  getVisibleOpenMarkerText,
+  removeUndefinedProperties,
+} from "shared/nodes/scripture/usj/node.utils";
 import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
@@ -72,27 +96,12 @@ import {
   SerializedParaNode,
 } from "shared/nodes/scripture/usj/ParaNode";
 import {
-  SerializedUnknownNode,
-  UNKNOWN_VERSION,
-  UnknownNode,
-} from "shared/nodes/scripture/usj/UnknownNode";
-import {
   SerializedVerseNode,
   VERSE_MARKER,
   VERSE_VERSION,
   VerseMarker,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import { MarkerNode, SerializedMarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
-import {
-  NBSP,
-  getEditableCallerText,
-  getPreviewTextFromSerializedNodes,
-  getUnknownAttributes,
-  getVisibleOpenMarkerText,
-  removeUndefinedProperties,
-} from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
@@ -111,7 +120,6 @@ import {
   MarkNodeName,
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
@@ -421,9 +429,9 @@ function createNote(
     const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
     callerNode = createNoteCaller(noteCaller, childNodes);
     childNodes.forEach((node) => {
-      if (node.type === CharNode.getType()) {
-        (node as SerializedCharNode).mode = "token";
-        (node as SerializedCharNode).style = "display: none";
+      if (isSerializedCharNode(node)) {
+        node.mode = "token";
+        node.style = "display: none";
       }
     });
   }
@@ -677,10 +685,10 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
  * @returns nodes with any needed implied paras inserted.
  */
 function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const bookNodeIndex = nodes.findIndex((node) => node.type === BookNode.getType());
+  const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
   const isBookNodeFound = bookNodeIndex >= 0;
   const chapterNodeIndex = nodes.findIndex(
-    (node) => node.type === ChapterNode.getType() || node.type === ImmutableChapterNode.getType(),
+    (node) => isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node),
   );
   const isChapterNodeFound = chapterNodeIndex >= 0;
   if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {

@@ -1,4 +1,4 @@
-import { formatFiles, generateFiles, Tree } from "@nx/devkit";
+import { generateFiles, Tree } from "@nx/devkit";
 import * as path from "path";
 import { MarkersDataGeneratorSchema } from "./schema";
 
@@ -27,18 +27,18 @@ export async function markersDataGenerator(tree: Tree, options: MarkersDataGener
     CategoryType.PeripheralReferences,
   ]);
 
-  // Function to capitalize the first letter of a string
-  function capitalizeFirstLetter(string: string): string {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  /** Function to capitalize the first letter of a string */
+  function capitalizeFirstLetter(text: string): string {
+    return text.charAt(0).toUpperCase() + text.slice(1);
   }
 
   // Convert the simplified dictionary to a string representation with proper enum handling
   const simplifiedDictionaryString = Object.entries(simplifiedDictionary)
     .map(([key, value]) => {
       return `  "${key}": {
-    category: CategoryType.${capitalizeFirstLetter(value.category)},
-    type: MarkerType.${capitalizeFirstLetter(value.type)},
-    description: "${value.description.replaceAll(`"`, `'`)}",
+    category: CategoryType.${value.category ? capitalizeFirstLetter(value.category) : CategoryType.Uncategorized},
+    type: MarkerType.${value.type ? capitalizeFirstLetter(value.type) : "Unknown"},
+    description: "${value.description ? value.description.replaceAll(`"`, `'`) : ""}",
     hasEndMarker: ${value.hasEndMarker},
     children: ${JSON.stringify(value.children, null, 4)}
   }`;
@@ -50,8 +50,6 @@ export async function markersDataGenerator(tree: Tree, options: MarkersDataGener
     ...options,
     simplifiedDictionaryString: String.raw`${simplifiedDictionaryString}`,
   });
-
-  await formatFiles(tree);
 }
 
 export default markersDataGenerator;

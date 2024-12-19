@@ -1,19 +1,20 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#chapter */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/cv/c.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
+  DOMConversionMap,
+  DOMConversionOutput,
+  DOMExportOutput,
   DecoratorNode,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
   SerializedLexicalNode,
   Spread,
-  LexicalEditor,
-  DOMExportOutput,
   isHTMLElement,
-  DOMConversionOutput,
-  DOMConversionMap,
 } from "lexical";
-import { CHAPTER_CLASS_NAME, UnknownAttributes, getVisibleOpenMarkerText } from "./node.utils";
+import { CHAPTER_CLASS_NAME, UnknownAttributes } from "./node-constants";
+import { getVisibleOpenMarkerText } from "./node.utils";
 
 export const CHAPTER_MARKER = "c";
 export const IMMUTABLE_CHAPTER_VERSION = 1;
@@ -269,4 +270,10 @@ export function $isImmutableChapterNode(
   node: LexicalNode | null | undefined,
 ): node is ImmutableChapterNode {
   return node instanceof ImmutableChapterNode;
+}
+
+export function isSerializedImmutableChapterNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedImmutableChapterNode {
+  return node?.type === ImmutableChapterNode.getType();
 }

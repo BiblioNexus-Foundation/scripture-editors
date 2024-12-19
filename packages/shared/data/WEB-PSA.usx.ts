@@ -1,8 +1,7 @@
 // Modified from original:
 //   unknown items (wat:z) added in first para:q1;
 //   custom annotation milestones in first para:q2.
-export const WEB_PSA_USX = `
-<?xml version="1.0" encoding="utf-8"?>
+export const WEB_PSA_USX = `<?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
   <book code="PSA" style="id">World English Bible (WEB)</book>
   <para style="ide">UTF-8</para>
@@ -8491,4 +8490,5 @@ export const WEB_PSA_USX = `
     <verse number="6" style="v" sid="PSA 150:6" />Let everything that has breath praise Yah!</para>
   <para style="q2" vid="PSA 150:6">Praise Yah!<verse eid="PSA 150:6" /></para>
   <chapter eid="PSA 150" />
-</usx>`;
+</usx>
+`;

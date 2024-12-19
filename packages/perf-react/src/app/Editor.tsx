@@ -24,12 +24,13 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
+import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import ScriptureReferencePlugin, {
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
-import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu";
+import PerfNodesMenuPlugin from "shared-react/plugins/PerfNodesMenuPlugin";
+
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
 
 const theme = {
@@ -66,6 +67,7 @@ export default function Editor({
   const [selectedMarker, setSelectedMarker] = useState<string>();
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
   const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
+    book: bookCode,
     chapter: 1,
     verse: 1,
   });
@@ -128,7 +130,7 @@ export default function Editor({
       if (["CharacterStyling"].includes(category)) {
         items[category] = markers.map((marker) => {
           const markerData = getMarker(marker);
-          const { action } = getMarkerAction(marker, markerData);
+          const { action } = getUsfmMarkerAction(marker, markerData);
           return {
             label: marker,
             description: markerData?.description ?? "",
@@ -230,7 +232,7 @@ export default function Editor({
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
             //This is the selected element expected to be a usfm element;
-            const selectedElement = startNode?.getCommonAncestor(endNode);
+            const selectedElement = startNode.getCommonAncestor(endNode);
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }
@@ -238,12 +240,13 @@ export default function Editor({
         }}
       />
       <ScriptureReferencePlugin
+        book={bookCode}
         onChangeReference={(reference) => {
           setScriptureReference(reference);
         }}
       />
       {scriptureReference && selectedMarker ? (
-        <PerfNodesMenu
+        <PerfNodesMenuPlugin
           trigger={contextMenuKey}
           scriptureReference={scriptureReference}
           contextMarker={selectedMarker}

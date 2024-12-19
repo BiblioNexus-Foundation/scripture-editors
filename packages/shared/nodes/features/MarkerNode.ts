@@ -1,15 +1,16 @@
 /** Marker node used when displaying USFM */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  TextNode,
+  EditorConfig,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
   SerializedTextNode,
   Spread,
-  EditorConfig,
+  TextNode,
 } from "lexical";
-import { closingMarkerText, openingMarkerText } from "./node.utils";
+import { closingMarkerText, openingMarkerText } from "../scripture/usj/node.utils";
 
 export const MARKER_VERSION = 1;
 
@@ -97,4 +98,10 @@ export function $createMarkerNode(marker: MarkerMarker, isOpening?: boolean): Ma
 
 export function $isMarkerNode(node: LexicalNode | null | undefined): node is MarkerNode {
   return node instanceof MarkerNode;
+}
+
+export function isSerializedMarkerNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedMarkerNode {
+  return node?.type === MarkerNode.getType();
 }

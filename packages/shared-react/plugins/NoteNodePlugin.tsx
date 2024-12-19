@@ -31,7 +31,7 @@ import {
 } from "../nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 import { MERGE_HISTORY_COMMAND } from "./HistoryPlugin";
-import { LoggerBasic } from "./logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 const callerData: CallerData = { count: 0 };
 
@@ -131,7 +131,7 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
         editor.update(() => {
           for (const [nodeKey, mutation] of nodeMutations) {
             const node = $getNodeByKey(nodeKey);
-            const parent = node && node.getParentOrThrow();
+            const parent = node?.getParentOrThrow();
             if (
               (mutation === "created" || mutation === "destroyed") &&
               $isImmutableNoteCallerNode(node) &&

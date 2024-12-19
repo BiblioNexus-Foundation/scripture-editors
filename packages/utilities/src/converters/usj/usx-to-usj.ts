@@ -6,15 +6,15 @@
  * @see https://github.com/usfm-bible/tcdocs/blob/main/python/scripts/usx2usj.py
  */
 
-import { DOMParser } from "@xmldom/xmldom";
-import { MarkerObject, USJ_TYPE, USJ_VERSION, Usj } from "./usj.model";
+import { DOMParser, Element } from "@xmldom/xmldom";
+import { MarkerContent, MarkerObject, USJ_TYPE, USJ_VERSION, Usj } from "./usj.model";
 import { USX_TYPE } from "./usx.model";
 
 type Action = "append" | "merge" | "ignore";
 type Attribs = { [name: string]: string };
 
 function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
-  inputUsxElement: HTMLElement,
+  inputUsxElement: Element,
 ): [outputJson: T, action: Action] {
   const attribs: Attribs = {};
   let type: string = inputUsxElement.tagName;
@@ -61,11 +61,11 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
 
   for (const child of children) {
     // ChildNodes are Elements.
-    if ((child as HTMLElement).tagName === undefined) {
+    if ((child as Element).tagName === undefined) {
       continue;
     }
     // ChildNodes are Elements.
-    const [childDict, whatToDo] = usxDomToUsjRecurse<MarkerObject>(child as HTMLElement);
+    const [childDict, whatToDo] = usxDomToUsjRecurse<MarkerObject>(child as Element);
 
     switch (whatToDo) {
       case "append":
@@ -105,8 +105,10 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
   return [outObj, action];
 }
 
-export function usxDomToUsj(inputUsxDom: HTMLElement): Usj {
-  const [outputJson] = usxDomToUsjRecurse(inputUsxDom);
+export function usxDomToUsj(inputUsxDom: Element | null): Usj {
+  const [outputJson] = inputUsxDom
+    ? usxDomToUsjRecurse(inputUsxDom)
+    : [{ content: [] as MarkerContent[] } as Usj];
   outputJson.type = USJ_TYPE;
   outputJson.version = USJ_VERSION;
   return outputJson;

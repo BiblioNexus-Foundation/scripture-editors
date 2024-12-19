@@ -1,14 +1,14 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#ms */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/ms/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
   DecoratorNode,
+  LexicalNode,
+  NodeKey,
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "./node.utils";
+import { UnknownAttributes } from "./node-constants";
 
 export const STARTING_MS_COMMENT_MARKER = "zmsc-s";
 export const ENDING_MS_COMMENT_MARKER = "zmsc-e";
@@ -16,7 +16,7 @@ export const ENDING_MS_COMMENT_MARKER = "zmsc-e";
 /** Milestone markers used to mark a comment annotation */
 const milestoneCommentMarkers = [STARTING_MS_COMMENT_MARKER, ENDING_MS_COMMENT_MARKER];
 
-/** @see https://ubsicap.github.io/usx/msstyles.html */
+/** @see https://docs.usfm.bible/usfm/3.1/ms/index.html */
 const VALID_MILESTONE_MARKERS = [
   "ts-s",
   "ts-e",
@@ -33,8 +33,6 @@ const VALID_MILESTONE_MARKERS = [
   "qt4-e",
   "qt5-s",
   "qt5-e",
-  "qts",
-  "qte",
   "qt-s",
   "qt-e",
   // custom markers used for annotations
@@ -182,4 +180,10 @@ export function $createMilestoneNode(
 
 export function $isMilestoneNode(node: LexicalNode | null | undefined): node is MilestoneNode {
   return node instanceof MilestoneNode;
+}
+
+export function isSerializedMilestoneNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedMilestoneNode {
+  return node?.type === MilestoneNode.getType();
 }

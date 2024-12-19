@@ -2,10 +2,10 @@ import { CategoryType } from "./categoriesMap";
 import { MarkersDictionary, StyleType } from "./generateMarkersDictionary";
 
 export interface SimplifiedMarker {
-  category: CategoryType;
-  type: StyleType;
-  description: string;
-  hasEndMarker: boolean;
+  category?: CategoryType;
+  type?: StyleType;
+  description?: string;
+  hasEndMarker?: boolean;
   children?: Partial<Record<CategoryType, string[]>>;
 }
 

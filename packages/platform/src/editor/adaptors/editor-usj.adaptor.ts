@@ -12,11 +12,20 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import {
   COMMENT_MARK_TYPE,
+  isSerializedTypedMarkNode,
   SerializedTypedMarkNode,
   TypedMarkNode,
 } from "shared/nodes/features/TypedMarkNode";
+import {
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+  UNMATCHED_TAG_NAME,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
+import { MarkerNode } from "shared/nodes/features/MarkerNode";
+import { SerializedUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
 import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
 import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
 import { CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
@@ -25,15 +34,9 @@ import {
   SerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  ImmutableUnmatchedNode,
-  SerializedImmutableUnmatchedNode,
-  UNMATCHED_TAG_NAME,
-} from "shared/nodes/scripture/usj/ImmutableUnmatchedNode";
-import {
-  ImpliedParaNode,
+  isSerializedImpliedParaNode,
   SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { MarkerNode } from "shared/nodes/scripture/usj/MarkerNode";
 import {
   ENDING_MS_COMMENT_MARKER,
   MILESTONE_VERSION,
@@ -42,21 +45,19 @@ import {
   SerializedMilestoneNode,
 } from "shared/nodes/scripture/usj/MilestoneNode";
 import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedUnknownNode, UnknownNode } from "shared/nodes/scripture/usj/UnknownNode";
-import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
-  NBSP,
   getEditableCallerText,
   parseNumberFromMarkerText,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
+import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   ImmutableVerseNode,
   SerializedImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;
@@ -302,7 +303,7 @@ function replaceMarkWithMilestones(
     });
     markers.push(milestone);
   }
-  const isLastEnd = !nextNode || nextNode.type !== TypedMarkNode.getType();
+  const isLastEnd = !nextNode || !isSerializedTypedMarkNode(nextNode);
   if (isLastEnd) {
     ids.forEach((eid) => {
       const milestone = createMilestoneMarker({
@@ -423,7 +424,7 @@ function recurseNodes(
  * @returns nodes with all implied paras removed.
  */
 function removeImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const impliedParaIndex = nodes.findIndex((node) => node.type === ImpliedParaNode.getType());
+  const impliedParaIndex = nodes.findIndex((node) => isSerializedImpliedParaNode(node));
   if (impliedParaIndex >= 0) {
     const nodesBefore = nodes.slice(0, impliedParaIndex);
     const nodesFromImpliedPara = (nodes[impliedParaIndex] as SerializedImpliedParaNode).children;

@@ -1,5 +1,6 @@
 @import "./usj-nodes";
 @import "./editor/editor";
+@import "shared/styles/nodes-menu";
 
 @import "https://fonts.googleapis.com/css?family=Reenie+Beanie";
 

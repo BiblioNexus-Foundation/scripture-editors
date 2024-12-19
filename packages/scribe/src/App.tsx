@@ -1,4 +1,4 @@
-import { Usj } from "@biblionexus-foundation/scripture-utilities";
+import { Usj, USJ_TYPE, USJ_VERSION } from "@biblionexus-foundation/scripture-utilities";
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
 import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 import Editor, { EditorRef } from "./components/Editor";
@@ -11,8 +11,8 @@ import { Usj2Usfm } from "./hooks/usj2Usfm";
 import { ScriptureReference } from "./plugins/ScriptureReferencePlugin";
 
 const defaultUsj: Usj = {
-  type: "USJ",
-  version: "0.2.1",
+  type: USJ_TYPE,
+  version: USJ_VERSION,
   content: [],
 };
 const defaultScrRef: ScriptureReference = { /* PSA */ bookCode: "PSA", chapterNum: 1, verseNum: 1 };
@@ -26,7 +26,7 @@ function App() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      usj && editorRef.current?.setUsj(usj);
+      if (usj) editorRef.current?.setUsj(usj);
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [usj]);

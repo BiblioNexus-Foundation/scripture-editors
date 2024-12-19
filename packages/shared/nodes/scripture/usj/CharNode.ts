@@ -1,84 +1,101 @@
-/** Conforms with USX v3.0 @see https://ubsicap.github.io/usx/elements.html#char */
+/** Conforms with USJ v3.1 @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 
 import {
-  type LexicalNode,
-  type NodeKey,
   $applyNodeReplacement,
-  TextNode,
-  SerializedTextNode,
-  Spread,
-  EditorConfig,
-  DOMExportOutput,
-  LexicalEditor,
-  isHTMLElement,
   DOMConversionMap,
   DOMConversionOutput,
+  DOMExportOutput,
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  SerializedTextNode,
+  Spread,
+  TextNode,
+  isHTMLElement,
 } from "lexical";
+import { UnknownAttributes } from "./node-constants";
 import {
-  CHAR_NODE_TYPE,
-  UnknownAttributes,
   extractNonNumberedMarkers,
   extractNumberedMarkers,
   isValidNumberedMarker,
 } from "./node.utils";
 
-const VALID_CHAR_FOOTNOTE_MARKERS = ["fr", "ft", "fk", "fq", "fqa", "fl", "fw", "fp", "fv", "fdc"];
+/** @see https://docs.usfm.bible/usfm/3.1/char/notes/footnote/index.html */
+const VALID_CHAR_FOOTNOTE_MARKERS = [
+  "fr",
+  "fq",
+  "fqa",
+  "fk",
+  "ft",
+  "fl",
+  "fw",
+  "fp",
+  "fv",
+  "fdc",
+  "fm",
+];
+/** @see https://docs.usfm.bible/usfm/3.1/char/notes/crossref/index.html */
 const VALID_CHAR_CROSS_REFERENCE_MARKERS = [
   "xo",
   "xop",
-  "xt",
-  "xta",
   "xk",
   "xq",
+  "xt",
+  "xta",
   "xot",
   "xnt",
   "xdc",
 ];
-/**
- * @see https://ubsicap.github.io/usx/charstyles.html
- * @see https://ubsicap.github.io/usx/notes.html
- */
+/** @see https://docs.usfm.bible/usfm/3.1/char/index.html */
 const VALID_CHAR_MARKERS = [
-  // Special Text
+  // Text Features
   "add",
   "bk",
   "dc",
-  "ior",
-  "iqt",
+  "em",
+  "jmp",
   "k",
-  "litl",
   "nd",
   "ord",
   "pn",
   "png",
-  "qac",
-  "qs",
   "qt",
+  "rb",
   "rq",
+  // "ref", // This is its own tag and not a Char
   "sig",
   "sls",
   "tl",
+  "w",
+  "wa",
+  "wg",
+  "wh",
   "wj",
-  // Character Styling
-  "em",
+  // Note there are 2 deprecated markers not listed here: "addpn", "pro"
+  // Text Formatting
   "bd",
-  "bdit",
   "it",
+  "bdit",
   "no",
   "sc",
   "sup",
-  // Special Features
-  "rb",
-  "pro",
-  "w",
-  "wg",
-  "wh",
-  "wa",
-  // Structured List Entries
+  // Introductions
+  "ior",
+  "iqt",
+  // Poetry
+  "qac",
+  "qs",
+  // Lists
+  "litl",
   "lik",
-  "liv#",
-  // Linking
-  "jmp",
+  "liv",
+  "liv1",
+  "liv2",
+  "liv3",
+  "liv4",
+  "liv5",
 
   ...VALID_CHAR_FOOTNOTE_MARKERS,
   ...VALID_CHAR_CROSS_REFERENCE_MARKERS,
@@ -119,7 +136,7 @@ export class CharNode extends TextNode {
   }
 
   static getType(): string {
-    return CHAR_NODE_TYPE;
+    return "char";
   }
 
   static clone(node: CharNode): CharNode {
@@ -242,4 +259,10 @@ function isCharElement(node: HTMLElement | null | undefined): boolean {
 
 export function $isCharNode(node: LexicalNode | null | undefined): node is CharNode {
   return node instanceof CharNode;
+}
+
+export function isSerializedCharNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedCharNode {
+  return node?.type === CharNode.getType();
 }

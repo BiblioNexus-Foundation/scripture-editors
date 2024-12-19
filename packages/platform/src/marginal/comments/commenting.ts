@@ -6,7 +6,7 @@ import { Provider, TOGGLE_CONNECT_COMMAND } from "@lexical/yjs";
 import { COMMAND_PRIORITY_LOW, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
 import { Array as YArray, Map as YMap, Transaction, YArrayEvent, YEvent } from "yjs";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 export type Comment = {
   author: string;
@@ -277,7 +277,7 @@ export class CommentStore<TLogger extends LoggerBasic = LoggerBasic> {
     const disconnect = () => {
       try {
         provider.disconnect();
-      } catch (e) {
+      } catch {
         // Do nothing
       }
     };

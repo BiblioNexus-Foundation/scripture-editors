@@ -12,7 +12,7 @@ Utilities for working with Scripture data.
 
 ## Features
 
-For data that conforms to [USX/USJ v3.1](https://ubsicap.github.io/usx/):
+For data that conforms to [USX/USJ v3.1](https://docs.usfm.bible/usfm/3.1/):
 
 - USJ to USX converter.
 - USX to USJ converter.

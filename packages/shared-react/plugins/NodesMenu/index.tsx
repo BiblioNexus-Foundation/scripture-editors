@@ -34,10 +34,15 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
 
   // Close the menu when the selection changes
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
+    return editor.registerUpdateListener(({ prevEditorState, editorState }) => {
+      const prevSelection = prevEditorState.read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
+        return selection;
+      });
+      editorState.read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || prevSelection?.is(selection)) return;
         setIsOpen(false);
       });
     });
