@@ -3,7 +3,7 @@ import { UsjMilestone, UsjNode } from "../core/usj";
 import { Attributes } from "../../../nodes/scripture/generic/ScriptureElementNode";
 import { UsjChar } from "../core/usj";
 import { Output, UsjMapCreator } from "../core/usjToLexical";
-import { SerializedTextNode } from "lexical";
+import { SerializedLexicalNode, SerializedTextNode } from "lexical";
 import { createSerializedRootNode, createSerializedTextNode } from "../../utils";
 import { createSerializedBlockNode } from "../../../nodes/scripture/generic/BlockNode";
 import { createSerializedInlineNode } from "../../../nodes/scripture/generic/InlineNode";
@@ -18,6 +18,62 @@ const convertNodePropsToAttributes = (
     }
     return acc;
   }, {});
+};
+
+type UsjNodeOrString = UsjNode | string;
+
+const UsjNodeGetters = {
+  getUsjNodeFromRelativePath(
+    relativePath: number[],
+    initialNode: UsjNodeOrString,
+  ): UsjNodeOrString {
+    return relativePath.reduce((acc, path) => {
+      if (typeof acc === "string") {
+        return acc;
+      }
+
+      if (!("content" in acc) || !acc.content) {
+        return acc;
+      }
+
+      const content = acc.content;
+      if (path < 0 || path >= content.length) {
+        return acc;
+      }
+
+      return content[path];
+    }, initialNode);
+  },
+
+  createSiblingPath(pathToCurrentNode: number[], offset: number): number[] {
+    const parentPath = pathToCurrentNode.slice(0, -1);
+    const currentIndex = pathToCurrentNode[pathToCurrentNode.length - 1];
+    return [...parentPath, currentIndex + offset];
+  },
+
+  getUsjNodeNextSiblingFromPath(
+    pathToCurrentNode: number[],
+    initialNode: UsjNodeOrString,
+  ): UsjNodeOrString {
+    const nextSiblingPath = this.createSiblingPath(pathToCurrentNode, 1);
+    return this.getUsjNodeFromRelativePath(nextSiblingPath, initialNode);
+  },
+
+  getPreviousUsjNodeSiblingFromPath(
+    pathToCurrentNode: number[],
+    initialNode: UsjNodeOrString,
+  ): UsjNodeOrString {
+    const previousSiblingPath = this.createSiblingPath(pathToCurrentNode, -1);
+    return this.getUsjNodeFromRelativePath(previousSiblingPath, initialNode);
+  },
+
+  getUsjNodeParentFromPath(
+    pathToCurrentNode: number[],
+    initialNode: UsjNodeOrString,
+  ): UsjNodeOrString {
+    const parentPath = pathToCurrentNode.slice(0, -1);
+    return this.getUsjNodeFromRelativePath(parentPath, initialNode);
+  },
 };
 
 export const createUsjMap: () => UsjMapCreator = () => {
@@ -41,6 +97,10 @@ export const createUsjMap: () => UsjMapCreator = () => {
     lastTextObject: null,
   };
 
+  function $isSerializedTextNode(node: SerializedLexicalNode): node is SerializedTextNode {
+    return typeof node === "object" && node !== null && "type" in node && node.type === "text";
+  }
+
   interface OutputWithExtractedAlignment extends Output {
     extractedAlignment: ExtractedAlignments;
   }
@@ -56,9 +116,22 @@ export const createUsjMap: () => UsjMapCreator = () => {
       },
       text: ({ nodeProps, metadata }) => {
         const parent = metadata.parent as UsjNode | null;
+
         if (parent && "type" in parent && parent.type === "char" && parent.marker === "w") {
           //Start Wrapper Event
           workspace.pendingAlignmentMarkup.push(parent);
+        } else {
+          const currentOutput = metadata.currentOutput;
+          const textNode = createSerializedTextNode(nodeProps.value ?? "");
+          if (currentOutput && textNode) {
+            //get the latest output node
+            const latestOutputNode = currentOutput[currentOutput.length - 1];
+            if ($isSerializedTextNode(latestOutputNode)) {
+              //merge contiguous text nodes
+              latestOutputNode.text = latestOutputNode.text + textNode.text;
+              return undefined;
+            }
+          }
         }
 
         const words = extractWords(nodeProps.value);
@@ -99,7 +172,8 @@ export const createUsjMap: () => UsjMapCreator = () => {
       verse: ({ nodeProps }) => {
         workspace.verse = nodeProps.number;
         workspace.lastTextObject = null;
-        output.extractedAlignment[workspace.chapter][nodeProps.number] = {};
+        if (output.extractedAlignment?.[workspace.chapter])
+          output.extractedAlignment[workspace.chapter][nodeProps.number] = {};
         workspace.lastWord = "";
         workspace.verseWordsOccurrences = {};
 
@@ -108,13 +182,31 @@ export const createUsjMap: () => UsjMapCreator = () => {
           attributes: convertNodePropsToAttributes(nodeProps),
         });
       },
-      note: ({ nodeProps, convertedContent }) => {
+      note: ({ nodeProps, convertedContent, metadata: { initialNode, relativePath } }) => {
         const { caller, ...atts } = nodeProps;
+
+        let _caller = caller;
+
+        if (!caller && initialNode) {
+          const currentNode = UsjNodeGetters.getUsjNodeFromRelativePath(relativePath, initialNode);
+          if (
+            currentNode &&
+            typeof currentNode === "object" &&
+            "content" in currentNode &&
+            currentNode.content &&
+            currentNode.content.length &&
+            currentNode.content[0] &&
+            typeof currentNode.content[0] === "string"
+          ) {
+            _caller = currentNode.content[0];
+            convertedContent?.shift();
+          }
+        }
         return createSerializedInlineNode({
           children: [
             createSerializedInlineNode({
-              children: [createSerializedTextNode(caller)],
-              attributes: { "data-type": "caller", "data-value": caller },
+              children: [createSerializedTextNode(_caller)],
+              attributes: { "data-type": "caller", "data-value": _caller },
             }),
             ...(convertedContent || []),
           ],
@@ -152,9 +244,55 @@ export const createUsjMap: () => UsjMapCreator = () => {
           attributes: convertNodePropsToAttributes(nodeProps),
         });
       },
-      char: ({ nodeProps, convertedContent }) => {
-        if (nodeProps.marker === "w") {
+      char: ({ nodeProps, convertedContent, metadata }) => {
+        if ("marker" in nodeProps && nodeProps.marker === "w") {
           const textNode = convertedContent?.[0] as SerializedTextNode | undefined;
+          const metadataRelativePath = metadata.relativePath;
+          if (metadataRelativePath) {
+            const { currentOutput, initialNode } = metadata;
+            const nextSibling = UsjNodeGetters.getUsjNodeNextSiblingFromPath(
+              metadataRelativePath,
+              initialNode,
+            );
+
+            const shouldAddSpaceAfter = Boolean(
+              currentOutput &&
+                nextSibling &&
+                typeof nextSibling === "object" &&
+                nextSibling.type === "char",
+            );
+
+            if (shouldAddSpaceAfter && textNode) {
+              textNode.text = textNode.text + " ";
+            }
+
+            const previousSibling = UsjNodeGetters.getPreviousUsjNodeSiblingFromPath(
+              metadataRelativePath,
+              initialNode,
+            );
+
+            const shouldAddSpaceBefore = Boolean(
+              currentOutput &&
+                previousSibling &&
+                typeof previousSibling === "object" &&
+                previousSibling.type === "ms",
+            );
+
+            if (shouldAddSpaceBefore && textNode) {
+              textNode.text = " " + textNode.text;
+            }
+
+            if (currentOutput && textNode) {
+              //get the latest output node
+              const latestOutputNode = currentOutput[currentOutput.length - 1];
+              if ($isSerializedTextNode(latestOutputNode)) {
+                //merge contiguous text nodes
+                latestOutputNode.text = latestOutputNode.text + textNode.text;
+                return undefined;
+              }
+            }
+          }
+
           return textNode;
         }
         return createSerializedInlineNode({

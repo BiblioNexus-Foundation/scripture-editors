@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "module": "Preserve",
+    "target": "es2020",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "preserveSymlinks": true
+  },
+  "include": ["**/*.ts", "**/*.tsx", "src/**/*.ts", "src/**/*.tsx"],
+}
+

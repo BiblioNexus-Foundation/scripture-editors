@@ -508,21 +508,6 @@ IntroList.para.style.enum = (
       "ili"
     )
 
-IntroList =
-    element para {
-        [usfm:grouping="12" usfm:ptag[]] attribute style { IntroList.para.style.enum },
-        ([usfm:text[]] text | CharEmbed | IntroChar | ListChar | Footnote | CrossReference | Figure | Milestone | Reference | Sidebar)*
-    }
-
-IntroList.para.style.enum = (
-        ## A list entry, level 1 (if multiple levels)
-      "ili1"
-    |   ## A list entry, level 2
-      "ili2"
-    |   ## A list entry, level 1 (if single level)
-      "ili"
-    )
-
 BookIntroductionEndTitles =
     element para {
         [usfm:ptag[]] attribute style { Title.para.style.enum },

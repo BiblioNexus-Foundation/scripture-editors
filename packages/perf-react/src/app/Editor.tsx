@@ -25,7 +25,8 @@ import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
-import ScriptureReferencePlugin, {
+import {
+  ScriptureReferencePlugin,
   ScriptureReference,
 } from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";

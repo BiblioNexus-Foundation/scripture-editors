@@ -32,7 +32,6 @@ export function registerToggableNodes(
         if (!(node instanceof ScriptureElementNode)) return false;
         return toggableNodeTypes.includes(node.getAttributes()["data-type"]);
       });
-      console.log({ node });
       if (!node) {
         $removeToggledNodes();
         return;
@@ -52,6 +51,7 @@ export function registerToggableNodes(
             }
           });
           toggledNodes.length = 0;
+
           node.setUIAttribute("active", "true");
           toggledNodes.push(node.getKey());
         },

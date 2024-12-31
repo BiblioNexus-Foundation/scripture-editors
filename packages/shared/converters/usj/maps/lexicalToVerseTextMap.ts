@@ -42,7 +42,7 @@ export const lexicalToVerseTextMapCreator: () => LexicalMapCreator = () => {
           node.attributes["data-type"] === "caller" &&
           typeof children?.[0] === "string"
         ) {
-          return children[0];
+          return children[0] as string;
         }
         return {
           type: "para",
@@ -145,7 +145,7 @@ export const lexicalToVerseTextMapCreator: () => LexicalMapCreator = () => {
 
         const hasCaller = typeof children?.[0] === "string" && children[0].length === 1;
 
-        const caller = hasCaller ? children[0] : attributes["data-caller"];
+        const caller = hasCaller ? (children[0] as string) : attributes["data-caller"];
 
         const { marker, ...props } = extractDataAttributes(attributes, ["caller"]);
 

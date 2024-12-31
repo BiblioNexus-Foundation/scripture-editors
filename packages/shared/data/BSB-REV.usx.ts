@@ -1,5 +1,4 @@
-export const BSB_REV_USX = `
-<?xml version="1.0" encoding="utf-8"?>
+export const BSB_REV_USX = `<?xml version="1.0" encoding="utf-8"?>
 <usx version="3.0">
   <book code="REV" style="id">EN_BSB en_English_ltr - Berean Study Bible Mon Apr 15 2024 16:09:49 GMT-0400 (Eastern Daylight Time) tc</book>
   <para style="usfm">3.0</para>

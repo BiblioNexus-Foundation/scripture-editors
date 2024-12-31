@@ -4,6 +4,60 @@ import { UsjNode, UsjDocument, UsjParaContent, UsjCharType, UsjRow } from "../co
 // import { Output } from "../core/usjToLexical";
 import { ExtractedAlignments } from "./usjToLexicalMap";
 
+export const LexicalNodeGetters = {
+  getLexicalNodeFromRelativePath(
+    relativePath: number[],
+    initialNode: SerializedLexicalNode,
+  ): SerializedLexicalNode {
+    return relativePath.reduce((acc, path) => {
+      if (!("children" in acc) || !acc.children) {
+        return acc;
+      }
+
+      if (!Array.isArray(acc.children)) {
+        return acc;
+      }
+
+      const children = acc.children;
+      if (path < 0 || path >= children.length) {
+        return acc;
+      }
+
+      return children[path];
+    }, initialNode);
+  },
+
+  createSiblingPath(pathToCurrentNode: number[], offset: number): number[] {
+    const parentPath = pathToCurrentNode.slice(0, -1);
+    const currentIndex = pathToCurrentNode[pathToCurrentNode.length - 1];
+    return [...parentPath, currentIndex + offset];
+  },
+
+  getUsjNodeNextSiblingFromPath(
+    pathToCurrentNode: number[],
+    initialNode: SerializedLexicalNode,
+  ): SerializedLexicalNode {
+    const nextSiblingPath = this.createSiblingPath(pathToCurrentNode, 1);
+    return this.getLexicalNodeFromRelativePath(nextSiblingPath, initialNode);
+  },
+
+  getPreviousUsjNodeSiblingFromPath(
+    pathToCurrentNode: number[],
+    initialNode: SerializedLexicalNode,
+  ): SerializedLexicalNode {
+    const previousSiblingPath = this.createSiblingPath(pathToCurrentNode, -1);
+    return this.getLexicalNodeFromRelativePath(previousSiblingPath, initialNode);
+  },
+
+  getUsjNodeParentFromPath(
+    pathToCurrentNode: number[],
+    initialNode: SerializedLexicalNode,
+  ): SerializedLexicalNode {
+    const parentPath = pathToCurrentNode.slice(0, -1);
+    return this.getLexicalNodeFromRelativePath(parentPath, initialNode);
+  },
+};
+
 export const createLexicalMap: (props?: {
   extractedAlignment?: ExtractedAlignments;
   verseTextMap?: { [chapter: string]: { [verse: string]: string } };
@@ -127,14 +181,27 @@ export const createLexicalMap: (props?: {
           ...props,
         };
       },
-      note: ({ node, children }) => {
+      note: ({ node, children, metadata: { relativePath, initialNode } }) => {
         const attributes =
           (node as SerializedLexicalNode & { attributes?: Record<string, string> }).attributes ??
           {};
 
-        const hasCaller = typeof children?.[0] === "string" && children[0].length === 1;
+        let caller = "+";
 
-        const caller = hasCaller ? children[0] : attributes["data-caller"];
+        if (initialNode) {
+          const currentNode = LexicalNodeGetters.getLexicalNodeFromRelativePath(
+            relativePath,
+            initialNode,
+          );
+          if (
+            currentNode &&
+            "children" in currentNode &&
+            Array.isArray(currentNode.children) &&
+            currentNode.children?.[0]
+          ) {
+            caller = currentNode.children[0]?.children?.[0]?.text ?? "+";
+          }
+        }
 
         const { marker, ...props } = extractDataAttributes(attributes, ["caller"]);
 
@@ -143,9 +210,7 @@ export const createLexicalMap: (props?: {
           caller,
           marker: marker || "f",
           ...props,
-          content: hasCaller
-            ? (children.slice(1) as UsjParaContent[])
-            : (children as UsjParaContent[]),
+          content: children as UsjParaContent[],
         };
       },
       ms: ({ node, children }) => {
@@ -160,6 +225,9 @@ export const createLexicalMap: (props?: {
           ...props,
           content: children as UsjParaContent[],
         };
+      },
+      caller: () => {
+        return "";
       },
       char: ({ node, children }) => {
         const attributes =

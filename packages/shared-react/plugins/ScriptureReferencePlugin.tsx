@@ -112,7 +112,7 @@ export type ScriptureReference = {
   verse: number;
 };
 
-export default function ScriptureReferencePlugin({
+export function ScriptureReferencePlugin({
   book,
   onChangeReference,
   verseDepth = 2,
@@ -124,7 +124,6 @@ export default function ScriptureReferencePlugin({
   chapterDepth?: number;
 }) {
   const [editor] = useLexicalComposerContext();
-
   useEffect(
     () =>
       onChangeReference &&
@@ -135,11 +134,12 @@ export default function ScriptureReferencePlugin({
             if (!selectedNode) return;
             const verseNode = $getCurrentVerseNode(selectedNode, verseDepth);
             const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode, chapterDepth);
-            onChangeReference({
+            const newReference = {
               book: book ?? "",
               chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),
               verse: Number(verseNode?.getAttribute("data-number") ?? 0),
-            });
+            };
+            onChangeReference(newReference);
           });
       }),
     [editor, onChangeReference],

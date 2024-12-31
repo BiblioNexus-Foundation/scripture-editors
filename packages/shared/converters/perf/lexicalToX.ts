@@ -1,8 +1,13 @@
 import { SerializedLexicalNode } from "lexical";
-import { isTruthy } from "./utils";
+// import { isTruthy } from "./utils";
 
-type BaseMetadata = { relativePath: (string | number)[] };
-type OptionalMetadata = { [key: string]: unknown };
+export type BaseMetadata<SourceNode extends SerializedLexicalNode> = {
+  relativePath: number[];
+  currentOutput?: unknown[];
+  currentOutputIndex?: number;
+  initialNode?: SourceNode;
+};
+export type OptionalMetadata = { [key: string]: unknown };
 
 export type NodeBuilderArgs<
   SourceNode extends SerializedLexicalNode,
@@ -10,7 +15,7 @@ export type NodeBuilderArgs<
   Metadata = OptionalMetadata,
 > = {
   node: SourceNode;
-  metadata: BaseMetadata & Metadata;
+  metadata: BaseMetadata<SourceNode> & Metadata;
   children?: ChildrenNodeType[];
 };
 
@@ -25,8 +30,8 @@ export type MetadataBuilder<Metadata = OptionalMetadata> = <
   LexicalNodeType extends SerializedLexicalNode,
 >(args: {
   node: LexicalNodeType;
-  metadata: BaseMetadata & Metadata;
-}) => BaseMetadata & Metadata;
+  metadata: BaseMetadata<LexicalNodeType> & Metadata;
+}) => BaseMetadata<LexicalNodeType> & Metadata;
 
 type NodeData<
   LexicalNodeType extends SerializedLexicalNode,
@@ -53,7 +58,7 @@ export const convertLexicalStateNode = <
     metadata = { relativePath: [] },
     nodeBuilder: buildNode,
   }: NodeData<LexicalNodeType, NewNodeType, ChildrenNodeType> & {
-    metadata: { relativePath: (string | number)[] };
+    metadata: BaseMetadata<LexicalNodeType>;
   }): NewNodeType | undefined => {
     if (!buildNode) {
       throw new Error("No node builder provided");
@@ -66,20 +71,44 @@ export const convertLexicalStateNode = <
       });
     }
 
-    const convertedChildren = (nodeData.children as LexicalNodeType[])
-      .map((childNode, index) => {
-        return _recursiveConvertLexicalStateNode({
+    // const convertedChildren = (nodeData.children as LexicalNodeType[])
+    //   .map((childNode, index) => {
+    //     return _recursiveConvertLexicalStateNode({
+    //       node: childNode,
+    //       metadata: {
+    //         ..._metadata,
+    //         relativePath: [..._metadata.relativePath, index],
+    //       },
+    //       nodeBuilder: buildNode,
+    //     });
+    //   })
+    //   .filter(isTruthy);
+
+    const reducedChildren = (nodeData.children as LexicalNodeType[]).reduce(
+      (acc: NewNodeType[], childNode, index) => {
+        const convertedChild = _recursiveConvertLexicalStateNode({
           node: childNode,
-          metadata: { ..._metadata, relativePath: [..._metadata.relativePath, index] },
+          metadata: {
+            ..._metadata,
+            currentOutput: acc,
+            currentOutputIndex: index,
+            initialNode: nodeData,
+            relativePath: [..._metadata.relativePath, index],
+          },
           nodeBuilder: buildNode,
         });
-      })
-      .filter(isTruthy);
+        if (convertedChild) {
+          acc.push(convertedChild);
+        }
+        return acc;
+      },
+      [] as NewNodeType[],
+    );
 
     return buildNode({
       node: nodeData,
       metadata: _metadata,
-      children: convertedChildren as unknown as ChildrenNodeType[],
+      children: reducedChildren as unknown as ChildrenNodeType[],
     });
   };
   return _recursiveConvertLexicalStateNode({

@@ -1,8 +1,11 @@
 import { UsjNode } from "./usj";
-import { isTruthy } from "../../perf/utils";
+// import { isTruthy } from "../../perf/utils";
 
-export interface NodeMetadata {
+export interface NodeMetadata<T> {
   relativePath: number[];
+  initialNode: UsjNode | string;
+  currentOutput: T[] | null;
+  currentOutputIndex: number | null;
   [key: string]: unknown;
 }
 
@@ -11,17 +14,20 @@ export type UsjTextNode = {
   value: string;
 };
 
-export type MetadataBuilder = (props: { node: UsjNode; metadata: NodeMetadata }) => NodeMetadata;
+export type MetadataBuilder<T> = (props: {
+  node: UsjNode;
+  metadata: NodeMetadata<T>;
+}) => NodeMetadata<T>;
 
 interface ConversionOptions<T> {
   node: UsjNode | string;
   nodeBuilder: (props: NodeBuilderProps<T>) => T | null;
-  metadataBuilder?: MetadataBuilder;
+  metadataBuilder?: MetadataBuilder<T>;
 }
 
 interface NodeBuilderProps<T> {
   nodeProps: Omit<UsjNode, "content"> | UsjTextNode;
-  metadata: NodeMetadata;
+  metadata: NodeMetadata<T>;
   convertedContent?: T[];
 }
 
@@ -40,7 +46,10 @@ export const convertUsjNode = <T>({
   }
 
   // Separate recursive function to handle the traversal
-  const convertNode = (currentNode: UsjNode | string, currentMetadata: NodeMetadata): T | null => {
+  const convertNode = (
+    currentNode: UsjNode | string,
+    currentMetadata: NodeMetadata<T>,
+  ): T | null => {
     if (typeof currentNode === "string") {
       return nodeBuilder({
         nodeProps: { type: "text", value: currentNode },
@@ -68,14 +77,28 @@ export const convertUsjNode = <T>({
     const { content, ...nodeProps } = currentNode;
 
     // Process children
-    const convertedContent = content
-      .map((child, index) =>
-        convertNode(child, {
-          ...enrichedMetadata,
-          relativePath: enrichedMetadata.relativePath.concat(index),
-        }),
-      )
-      .filter(isTruthy);
+    // const convertedContent = content
+    //   .map((child, index, convertedContent) =>
+    //     convertNode(child, {
+    //       ...enrichedMetadata,
+    //       relativePath: enrichedMetadata.relativePath.concat(index),
+    //     }),
+    //   )
+    //   .filter(isTruthy);
+
+    const convertedContent = content.reduce((convertedContent, child, index) => {
+      const convertedChild = convertNode(child, {
+        ...enrichedMetadata,
+        relativePath: enrichedMetadata.relativePath.concat(index),
+        initialNode: node,
+        currentOutput: convertedContent,
+        currentOutputIndex: index,
+      });
+      if (convertedChild) {
+        convertedContent.push(convertedChild);
+      }
+      return convertedContent;
+    }, [] as T[]);
 
     // Build and return the node with its children
     return nodeBuilder({
@@ -84,6 +107,10 @@ export const convertUsjNode = <T>({
       convertedContent,
     });
   };
-
-  return convertNode(node, { relativePath: [] });
+  return convertNode(node, {
+    relativePath: [],
+    initialNode: node,
+    currentOutput: null,
+    currentOutputIndex: null,
+  });
 };

@@ -1,0 +1,44 @@
+{
+  "name": "scriptural-react",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/scriptural-react/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "{projectRoot}/dist",
+        "defaultConfiguration": "development",
+        "minify": false,
+        "skipNxCache": true,
+        "generatePackageJson": true
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "dependencies"
+        }
+      ]
+    },
+    "buildts": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "packages/scriptural-react/dist",
+        "main": "packages/scriptural-react/src/index.ts",
+        "tsConfig": "packages/scriptural-react/tsconfig.lib.json",
+        "assets": ["packages/scriptural-react/*.md"],
+        "generatePackageJson": true,
+        "clean": false
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs scriptural-react {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    },
+    "lint": {},
+    "test": {}
+  }
+}

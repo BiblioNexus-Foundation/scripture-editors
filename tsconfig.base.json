@@ -26,7 +26,11 @@
     /* Workspace */
     "baseUrl": ".",
     "paths": {
-      "@biblionexus-foundation/scripture-utilities": ["packages/utilities/src"]
+      "@biblionexus-foundation/scripture-utilities": ["packages/utilities/src"],
+      "@scriptural/react": ["packages/scriptural-react/src"],
+      "@scriptural/react/*": ["packages/scriptural-react/src/*"],
+      "shared-react/*": ["packages/shared-react/*"],
+      "shared/*": ["packages/shared/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
