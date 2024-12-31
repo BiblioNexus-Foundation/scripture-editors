@@ -20,7 +20,6 @@ import {
 } from "lexical";
 import { HistoryState, HistoryStateEntry, LexicalHistoryManager } from "./HistoryManager";
 import { DirtyNodes } from "./DirtyNodes";
-import { UpdateListener } from "lexical/LexicalEditor";
 
 export const PUSH_COMMAND = createCommand("PUSH_COMMAND");
 
@@ -36,7 +35,7 @@ const INSERT_CHARACTER_AFTER_SELECTION = 2;
 const DELETE_CHARACTER_BEFORE_SELECTION = 3;
 const DELETE_CHARACTER_AFTER_SELECTION = 4;
 
-type UpdateListenerArgs = Parameters<UpdateListener>[0];
+type UpdateListenerArgs = Parameters<Parameters<LexicalEditor["registerUpdateListener"]>[0]>[0];
 interface OnChangeArgs extends Omit<UpdateListenerArgs, "normalizedNodes"> {
   editorChanged: boolean;
   history: {

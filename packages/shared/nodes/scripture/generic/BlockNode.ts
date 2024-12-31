@@ -61,10 +61,6 @@ export class BlockNode extends ScriptureElementNode {
       const formatType = this.getFormatType();
       element.style.textAlign = formatType;
 
-      const direction = this.getDirection();
-      if (direction) {
-        element.dir = direction;
-      }
       const indent = this.getIndent();
       if (indent > 0) {
         // padding-inline-start is not widely supported in email HTML, but

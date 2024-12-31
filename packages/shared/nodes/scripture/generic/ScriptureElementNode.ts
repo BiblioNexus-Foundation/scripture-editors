@@ -116,7 +116,12 @@ export class ScriptureElementNode extends ElementNode {
   updateDOM(_: ScriptureElementNode, element: HTMLElement): boolean {
     const elementAttributes = element.attributes;
     const nodeAttributes = this.getAttributes();
-    if (Object.keys(elementAttributes).length !== Object.keys(nodeAttributes).length) return true;
+
+    const elementAttributesCount = elementAttributes.getNamedItem("dir")
+      ? elementAttributes.length - 1
+      : elementAttributes.length;
+    const nodeAttributesCount = Object.keys(nodeAttributes).filter((key) => key !== "dir").length;
+    if (elementAttributesCount !== nodeAttributesCount) return true;
     return false;
   }
 }
@@ -124,7 +129,11 @@ export class ScriptureElementNode extends ElementNode {
 export function $isScriptureElementNode(
   node: LexicalNode | null | undefined,
 ): node is ScriptureElementNode {
-  return node instanceof ScriptureElementNode;
+  return (
+    node instanceof ScriptureElementNode ||
+    node?.getType() === "block" ||
+    node?.getType() === "inline"
+  );
 }
 
 export const isSerializedScriptureElementNode = (

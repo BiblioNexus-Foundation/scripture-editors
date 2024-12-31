@@ -1,6 +1,11 @@
 import { SerializedLexicalNode, SerializedRootNode, SerializedTextNode } from "lexical";
 import { UsjChar, UsjDocument, UsjNode, UsjTypes } from "./usj";
-import { convertLexicalStateNode, MetadataBuilder } from "../../perf/lexicalToX";
+import {
+  BaseMetadata,
+  convertLexicalStateNode,
+  MetadataBuilder,
+  OptionalMetadata,
+} from "../../perf/lexicalToX";
 import { SerializedBlockNode } from "../../../nodes/scripture/generic/BlockNode";
 import { SerializedInlineNode } from "../../../nodes/InlineNode";
 import {
@@ -95,10 +100,7 @@ const mapLexical = ({
   });
 };
 
-export interface NodeMetadata {
-  relativePath: (string | number)[];
-  [key: string]: unknown;
-}
+export type NodeMetadata = BaseMetadata<SerializedLexicalNode> & OptionalMetadata;
 
 export type LexicalMap = {
   default: (props: {

@@ -31,5 +31,8 @@
       "extends": ["plugin:@nx/javascript"],
       "rules": {}
     }
-  ]
+  ],
+  "rules": {
+    "@nx/dependency-checks": "error"
+  }
 }

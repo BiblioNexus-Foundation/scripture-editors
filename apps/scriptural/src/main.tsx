@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import "shared/styles/scriptural-editor.css";
+import "@scriptural/react/styles/scriptural-editor.css";
 
 const container = document.getElementById("app");
 if (!container) {

@@ -14,7 +14,7 @@ export type UsjMapCreator = <T extends Output>(output: T) => UsjMap;
 export const transformUsjToLexical = (
   node: UsjNode,
   usjMapCreator: UsjMapCreator,
-  metadataBuilder: MetadataBuilder = (props) => props.metadata,
+  metadataBuilder: MetadataBuilder<SerializedLexicalNode> = (props) => props.metadata,
 ): Output => {
   const output: Output = { result: null };
   const result = convertUsjNode<SerializedLexicalNode>({
@@ -45,7 +45,7 @@ const usjNodeBuilder = ({
 }: {
   output: Output;
   nodeProps: Omit<UsjNode, "content"> | UsjTextNode;
-  metadata: NodeMetadata;
+  metadata: NodeMetadata<SerializedLexicalNode>;
   convertedContent?: SerializedLexicalNode[];
   usjMapCreator: UsjMapCreator;
 }): SerializedLexicalNode | null => {
@@ -70,7 +70,7 @@ const mapUsj = ({
   nodeProps: Omit<UsjNode, "content"> | UsjTextNode;
   convertedContent?: SerializedLexicalNode[];
   usjMap: UsjMap;
-  metadata: NodeMetadata;
+  metadata: NodeMetadata<SerializedLexicalNode>;
 }): SerializedLexicalNode | undefined => {
   const maps = [usjMap[nodeProps?.type], usjMap.default];
   const map = maps.find((map) => map !== undefined);
@@ -97,7 +97,7 @@ export type UsjMap = {
   default: (props: {
     nodeProps: Omit<UsjNode, "content"> | UsjTextNode;
     convertedContent?: SerializedLexicalNode[];
-    metadata: NodeMetadata;
+    metadata: NodeMetadata<SerializedLexicalNode>;
   }) => SerializedLexicalNode | undefined;
   USJ?: (props: {
     nodeProps: Omit<UsjDocument, "content">;
@@ -105,7 +105,7 @@ export type UsjMap = {
   }) => SerializedRootNode | undefined;
   text?: (props: {
     nodeProps: UsjTextNode;
-    metadata: NodeMetadata;
+    metadata: NodeMetadata<SerializedLexicalNode>;
   }) => SerializedTextNode | undefined;
 } & StructuralNodeBuilders &
   InlineNodeBuilders;
@@ -114,7 +114,7 @@ type StructuralNodeBuilders = {
   [K in keyof typeof UsjTypes.structural]?: (props: {
     nodeProps: Extract<UsjNode, { type: K }>;
     convertedContent?: SerializedLexicalNode[];
-    metadata: NodeMetadata;
+    metadata: NodeMetadata<SerializedLexicalNode>;
   }) => SerializedBlockNode | undefined;
 };
 
@@ -124,7 +124,7 @@ type InlineNodeBuilders = {
   [K in keyof typeof UsjTypes.inline]?: (props: {
     nodeProps: Omit<InlineNodeProps<K>, "content">;
     convertedContent?: SerializedLexicalNode[];
-    metadata: NodeMetadata;
+    metadata: NodeMetadata<SerializedLexicalNode>;
   }) => K extends "char" | "ms"
     ? SerializedTextNode | SerializedInlineNode | undefined
     : SerializedInlineNode | undefined;

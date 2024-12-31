@@ -1,0 +1,844 @@
+/* Variables */
+:root {
+  --editor-background-color: #fff;
+  --editor-text-color: rgba(40, 40, 40, 0.87);
+  --verse-marker-color: black;
+  --chapter-marker-color: black;
+  --title-color: orange;
+  --pilcrow-color: rgb(0 0 0 / 25%);
+}
+
+/* General Editor Styles */
+.editor-oce {
+  position: relative;
+  text-align: left;
+  background-color: var(--editor-background-color);
+  color: var(--editor-text-color);
+  border-radius: 0 0 1rem 1rem;
+  padding: 1em 2em;
+  overflow: auto;
+}
+
+.scriptural-editor .contentEditable {
+  min-height: 40em;
+  outline: none;
+  counter-reset: ts-counter f-counter x-counter;
+  padding-bottom: 1em;
+}
+
+/* Paragraph Styles */
+.editor-paragraph {
+  margin: 0 0 15px 0;
+  position: relative;
+}
+
+/* Chapter and Verse Styles */
+[data-type="verse"],
+[data-type="chapter"] {
+  position: relative;
+  visibility: visible;
+  display: inline;
+}
+
+[data-type="chapter"] {
+  font-size: 1.7rem;
+  width: 100%;
+  display: block;
+  text-align: center;
+  font-weight: 700;
+  margin-inline-end: 0.1em;
+}
+
+[data-type="verse"] {
+  font-size: 0.8em;
+  line-height: 1rem;
+  vertical-align: top;
+  font-weight: 600;
+  margin-inline-end: 0.1em;
+}
+
+/* Node Inspection Styles */
+[data-type] {
+  position: relative;
+  box-sizing: border-box;
+}
+
+[data-type]:hover {
+  border-color: rgb(80, 80, 80);
+}
+
+/* Specific Marker Styles */
+
+/* Titles & Heading Styles */
+
+[data-type="para"]:where([data-marker^="mt"],
+[data-marker^="s"],
+[data-marker^="imt"],
+[data-marker="r"]
+) {
+  width: 100%;
+  text-align: center;
+}
+
+[data-marker="mt1"], [data-marker="mt"] {
+  font-weight: 700;
+  font-size: 20pt;
+}
+
+[data-marker="mt2"] {
+  font-style: italic;
+  font-size: 16pt;
+}
+
+[data-marker="mt3"] {
+  font-weight: 600;
+  font-size: 16pt;
+}
+
+[data-marker="mt4"] {
+  font-weight: 500;
+  font-size: 12pt;
+}
+
+[data-marker="mte"] {
+  font-size: 20pt;
+  font-weight: 700;
+}
+
+[data-marker="mte2"] {
+  font-size: 16pt;
+  font-style: italic;
+}
+
+[data-marker="imt"],[data-marker="imt1"] {
+  font-weight: 600;
+  font-size: 14pt;
+}
+
+[data-marker="imt2"] {
+  font-style: italic;
+  font-size: 13pt;
+}
+
+[data-marker="imt3"] {
+  font-weight: 500;
+  font-size: 12pt;
+}
+
+[data-marker="imt4"] {
+  font-style: italic;
+  font-size: 12pt;
+}
+
+[data-marker="imte"], [data-marker="imte2"] {
+  font-size: 20pt;
+  font-weight: 700;
+}
+
+[data-marker="imte2"] {
+  font-size: 16pt;
+  font-style: italic;
+}
+
+[data-type="para"]:where([data-marker="imt1"], [data-marker="imt3"]) {
+  color: #1a1aa0;
+}
+
+[data-marker="s"],[data-marker="s1"] {
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+[data-marker="s2"] {
+  font-size: 12pt;
+  font-style: italic;
+}
+
+[data-marker="s3"] {
+  font-size: 12pt;
+  font-style: italic;
+  text-align: left;
+}
+
+[data-marker="s4"] {
+  font-size: 12pt;
+  font-style: italic;
+  text-align: left;
+}
+
+[data-marker="sr"] {
+  font-size: 12pt;
+  font-weight: 600;
+}
+
+[data-marker="r"] {
+  font-size: 12pt;
+  font-style: italic;
+}
+
+[data-marker="sp"] {
+  font-size: 12pt;
+  font-style: italic;
+  text-align: left;
+}
+
+p[data-marker="io"],
+p[data-marker="io1"] {
+  margin: 0.5rem;
+  padding-left: 0rem;
+}
+
+p[data-marker="io2"] {
+  margin: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+[data-marker="ior"] {
+  font-style: italic;
+}
+
+p[data-marker="ib"],
+p[data-marker="b"] {
+  padding: 0;
+  margin: 0;
+  height: 1rem;
+}
+
+p[data-marker="q"] {
+  margin: 0;
+}
+
+p[data-marker="q"],
+p[data-marker="q1"] {
+  padding-left: 2rem;
+}
+p[data-marker="q2"] {
+  padding-left: 3rem;
+}
+
+[data-marker="fr"],
+[data-marker="xo"] {
+  font-weight: 600;
+}
+
+[data-marker="fq"] {
+  font-style: italic;
+}
+
+[data-marker="fq"],
+[data-marker="fqa"] {
+  font-style: italic;
+  color: #1a1aa0;
+}
+
+[perf-subtype="introduction"] > [perf-subtype="title"] {
+  margin-bottom: 0;
+}
+
+:where([data-marker="s"], [data-marker="s1"], [data-marker="s2"]) + [data-marker="r"] {
+  margin-top: 0;
+}
+
+[data-marker="s"],
+[data-marker="imt"],
+[data-marker="imt1"] {
+  font-size: 1.17rem;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+
+[data-type="para"]:where([data-marker="s"], [data-marker="s1"]) {
+  margin-bottom: 0;
+}
+
+[data-type="verse"] span,
+[data-type="chapter"] span {
+  font-weight: 900;
+}
+
+[data-type="verse"] span,
+[data-type="chapter"] span {
+  color: var(--verse-marker-color);
+}
+
+:where([data-marker="q"], [data-marker="q1"], [data-marker="q2"], [data-marker="q3"])
+  [data-type="verse"]:first-child {
+  position: absolute;
+  left: 0.5rem;
+}
+
+[data-type="chapter"] span {
+  color: var(--chapter-marker-color);
+}
+
+[data-marker="wj"] {
+  color: #cd0000;
+}
+
+[data-marker="add"],
+[data-marker="bk"],
+[data-marker="dc"],
+[data-marker="qt"],
+[data-marker="sig"],
+[data-marker="sls"],
+[data-marker="tl"] {
+  font-style: italic;
+}
+
+[data-marker="lit"] {
+  display: block;
+  font-weight: bolder;
+}
+
+[data-marker="nd"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
+}
+
+[data-marker="bd"] {
+  font-weight: bold;
+}
+
+[data-marker="em"],
+[data-marker="it"] {
+  font-style: italic;
+}
+
+[data-marker="bdit"] {
+  font-style: italic;
+  font-weight: bold;
+}
+
+[data-marker="sc"] {
+  font-variant: small-caps;
+  font-synthesis: small-caps;
+}
+
+[data-marker="no"] {
+  font-style: normal;
+  font-weight: initial;
+  text-transform: initial;
+}
+
+.info-bar {
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  background: #070707;
+  padding: 0.2em 0.6em;
+  border-radius: 0.4em;
+}
+
+.info-bar span {
+  color: #fff;
+  font-size: 0.75em;
+}
+
+/* Empty Node Styles */
+[data-type]:empty::before {
+  content: "·";
+  padding: 2px;
+  color: #b80000;
+  opacity: 0.5;
+}
+
+/* Unsupported Element Styles */
+.unsupported {
+  color: #b80000;
+  text-decoration: underline wavy;
+  text-decoration-thickness: 0.08rem;
+}
+
+.unsupported:hover:after {
+  font-size: 0.8rem;
+  content: attr(perf-type) "/" attr(perf-subtype) " not supported";
+  position: absolute;
+  padding: 0 0.4em;
+  border-radius: 0.5em;
+  width: max-content;
+  background-color: #c50000;
+  color: #ffc0c0;
+  top: -1.4rem;
+  right: 0;
+  border: 1px solid #6b2f2f;
+  opacity: 1;
+}
+
+[data-marker="xo"]:empty::before {
+  content: "origin reference";
+}
+
+[data-marker="xt"]:empty::before {
+  content: "target references";
+}
+
+[data-marker="ts"] {
+  display: flex;
+  border-bottom: 2px #a8ff9730;
+  border-style: dashed;
+  height: 2px;
+  width: 100%;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  position: relative;
+  justify-content: center;
+  opacity: 0.5;
+}
+
+[data-marker="ts"]:hover {
+  opacity: 1;
+  border-color: #a8ff97;
+  cursor: pointer;
+}
+
+[data-marker="ts"]:after {
+  content: none;
+  display: none;
+}
+
+[data-marker="ts"]:empty::before {
+  counter-increment: ts-counter;
+  content: counter(ts-counter); /* Avoids adding extra text */
+  position: absolute; /* Position the triangle relative to the line */
+  /* top: 50%; */ /* Center the triangle vertically */
+  /* left: -5px; */ /* Offset the triangle slightly to the left of the line */
+  transform: translateY(-50%) scale(0.8); /* Adjust vertical position if needed */
+  font-weight: 900;
+  background: #242424;
+  color: white;
+  border-radius: 0.3em;
+  padding: 0em 0.5em;
+  opacity: 1;
+  display: inline-block;
+}
+
+[data-marker="sup"] {
+  vertical-align: super;
+  font-size: 70%;
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    color: #070707 !important;
+    background-color: #c50000 !important;
+  }
+  span[data-marker="ts"] {
+    display: none;
+  }
+
+  [data-type="para"]:after {
+    content: "";
+  }
+}
+
+[data-type="para"][data-marker="f"] {
+  display: inline;
+  box-sizing: border-box;
+  height: fit-content;
+}
+
+.editor {
+  width: 100%;
+  height: 80vh;
+  height: 80dvh;
+}
+
+/* Toolbar Styles */
+.toolbar {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: #fff;
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: 0 3px 8px -6px rgb(0 0 0 / 50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  padding: 0.25rem;
+  gap: 0.2rem;
+}
+
+.toolbar-section {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  gap: 0.2rem;
+}
+
+.toolbar button {
+  background: transparent;
+  color: inherit;
+  padding: 0.4rem;
+  border: 0.5rem;
+  border-radius: 0.7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  min-width: 35px;
+}
+
+.toolbar button.active {
+  background: #dadada;
+}
+
+.toolbar button:hover {
+  background: #eee;
+}
+
+.toolbar button i {
+  text-decoration: none;
+  font-style: normal;
+  font-family: "Material Symbols Outlined";
+  font-size: 1.3rem;
+  font-size: 130%;
+}
+
+.toolbar hr {
+  margin: 0 0.2rem;
+  border-color: #ddd;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.toolbar > * {
+  height: 40px;
+}
+
+.toolbar .info {
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  background: #0000000f;
+  color: inherit;
+  outline: none;
+  border: none;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* Note Caller Styles */
+
+/* Hide all content except for caller in notes */
+:where([data-type="note"])
+  > *:not([data-type="caller"]) {
+  display: none;
+}
+
+[data-type="caller"] {
+  display: inline;
+  vertical-align: middle;
+}
+
+[data-type="caller"][data-value="+"] span {
+  position: absolute;
+  text-align: center;
+  opacity: 0;
+  width: 100%;
+}
+
+/* Initialize Caller Counters after each chapter */
+[data-type="chapter"] {
+  counter-set: f-counter 0 x-counter 0;
+}
+
+/* Increment Caller Counters */
+[data-marker="f"] [data-type="caller"][data-value="+"] {
+  counter-increment: f-counter;
+}
+
+[data-marker="x"] [data-type="caller"][data-value="+"] {
+  counter-increment: x-counter;
+}
+
+/* Display Footnote Caller Counter */
+[data-marker="f"] [data-type="caller"][data-value="+"]::after {
+  content: counter(f-counter, lower-alpha);
+}
+
+/* Display Cross-Reference Caller Counter */
+[data-marker="x"] [data-type="caller"][data-value="+"]::after {
+  content: counter(x-counter, lower-roman);
+}
+
+[data-type="caller"] {
+  display: inline;
+  color: blue;
+  font-size: 0.6rem;
+  vertical-align: middle;
+  font-weight: 900;
+}
+
+[data-ui-active="true"] [data-type="caller"] > span {
+  position: relative;
+  text-align: center;
+  color: blue;
+  opacity: 1;
+  font-size: 1rem;
+  padding-left: 0.2rem;
+}
+
+[data-ui-active="true"] [data-type="caller"]::after {
+  display: none !important;
+}
+
+
+[data-type="note"][data-ui-active="true"] > [data-type="caller"] ~ * {
+  background-color: rgb(0 0 0 / 6%);
+}
+
+[data-type="note"] > [data-type="caller"] + * {
+  padding-left: 0.2rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+[data-type="note"] > [data-type="caller"] ~ *:last-child {
+  padding-right: 0.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+[data-type="note"] > [data-type="caller"] + * {
+  margin-left: 0.23rem;
+}
+
+[data-type="note"]
+  > *:not([data-type="caller"], [data-type="caller"] *) {
+  display: none;
+}
+
+[data-type="note"][data-ui-active="true"]
+  > *:not([data-type="caller"], [data-type="caller"] *) {
+  display: inline;
+}
+
+[data-type="caller"] {
+  border-radius: 0.4rem;
+  display: inline;
+  vertical-align: top;
+  line-height: 1rem;
+  text-wrap: nowrap;
+}
+
+[data-type="note"] {
+  display: inline;
+  margin-inline-end: 0.1em;
+  border-radius: 0.5rem;
+}
+
+/* Non-printable Marks */
+.with-markers [data-type="para"]:after {
+  content: "¶";
+  display: inline-block;
+  color: var(--pilcrow-color);
+  position: absolute;
+  font-family: arial;
+  margin-inline-start: 0.05rem;
+}
+
+.with-markers [data-type="para"]:has(br) {
+  pointer-events: none;
+}
+
+.with-markers [data-type="para"]:has(br)::after {
+  top: 0;
+  left: 1.1rem;
+}
+
+.with-markers [data-marker]:before,
+.with-markers [data-marker]:not([data-type="para"], [data-type="caller"]):after {
+  display: inline;
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.1em;
+  color: rgb(0 0 0 / 20%);
+  vertical-align: bottom;
+}
+
+.with-markers [data-marker]:before {
+  content: "\\" attr(data-marker) "";
+}
+
+.with-markers
+  [data-marker]:where(
+    [data-marker="ior"],
+    [data-marker="iqt"],
+    [data-marker="rq"],
+    [data-marker="ca"],
+    [data-marker="va"],
+    [data-marker="vp"],
+    [data-marker="qs"],
+    [data-marker="qac"],
+    [data-marker="litl"],
+    [data-marker="lik"],
+    [data-marker="liv#"],
+    [data-marker="f"],
+    [data-marker="fe"],
+    [data-marker="fv"],
+    [data-marker="fdc"],
+    [data-marker="fm"],
+    [data-marker="x"],
+    [data-marker="xop"],
+    [data-marker="xot"],
+    [data-marker="xnt"],
+    [data-marker="xdc"],
+    [data-marker="rq"],
+    [data-marker="add"],
+    [data-marker="bk"],
+    [data-marker="dc"],
+    [data-marker="k"],
+    [data-marker="lit"],
+    [data-marker="nd"],
+    [data-marker="ord"],
+    [data-marker="pn"],
+    [data-marker="png"],
+    [data-marker="addpn"],
+    [data-marker="qt"],
+    [data-marker="sig"],
+    [data-marker="sls"],
+    [data-marker="tl"],
+    [data-marker="wj"],
+    [data-marker="em"],
+    [data-marker="bd"],
+    [data-marker="it"],
+    [data-marker="bdit"],
+    [data-marker="no"],
+    [data-marker="sc"],
+    [data-marker="sup"],
+    [data-marker="fig"],
+    [data-marker="ndx"],
+    [data-marker="rb"],
+    [data-marker="pro"],
+    [data-marker="w"],
+    [data-marker="wg"],
+    [data-marker="wh"],
+    [data-marker="wa"],
+    [data-marker="jmp"],
+
+  ):after {
+  content: "\\" attr(data-marker) "*";
+}
+
+.with-markers [data-marker]:hover:before,
+.with-markers [data-marker]:hover:after {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span[data-marker="v"]:before,
+.with-markers span[data-marker="c"]:before {
+  font-size: 0.6rem;
+  font-weight: 600;
+  left: 0;
+  padding: 0.2em;
+  color: rgb(0 0 0 / 20%);
+  margin-inline-end: 0.1rem;
+  vertical-align: bottom;
+}
+
+.with-markers span[data-marker="v"]:hover:before,
+.with-markers span[data-marker="c"]:hover:before {
+  color: rgb(0 0 0 / 60%);
+}
+
+.with-markers span[data-marker="v"]:before {
+  content: "\\v";
+}
+
+.with-markers span[data-marker="c"]:before {
+  content: "\\c";
+}
+
+/* Verse as Blocks */
+.verse-blocks span[data-type="verse"] {
+  display: block;
+  margin-top: 1em;
+  padding-top: 1em;
+  border-top: dashed 1px #ffffff91;
+}
+
+[data-marker="v"]:has(+ [data-marker="v"], + [data-marker="c"]):after,
+[data-marker="c"]:has(+ [data-marker="v"] + [data-marker="v"]):after {
+  display: block;
+  content: "";
+}
+
+/* Floating Menu Styles */
+.floating-box:has(> .autocomplete-menu-container) {
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+}
+
+.floating-box .autocomplete-menu-options {
+  display: block;
+  text-align: left;
+  width: fit-content;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+  overflow: auto;
+  max-height: 200px;
+}
+
+.autocomplete-menu-options button {
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: min-content minmax(0, 90vw);
+  align-items: baseline;
+  max-width: 400px;
+  gap: 1rem;
+  width: 100%;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  border-radius: 0;
+  border: 0;
+}
+
+.autocomplete-menu-options button[aria-selected="true"] {
+  background: rgb(0 0 0 / 5%);
+}
+
+.autocomplete-menu-options button.active {
+  background: rgb(189, 232, 255);
+}
+
+.autocomplete-menu-options button .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  text-align: right;
+  align-items: baseline;
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.autocomplete-menu-container input[type="text"] {
+  width: auto;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  background: #e9e9e9;
+  border: none;
+  outline: none;
+  color: #222222;
+  font-size: 1rem;
+  margin: 0.4rem;
+  border-radius: 0.2rem;
+  font-family: inherit;
+}
+
+.autocomplete-menu-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.autocomplete-menu-container.inverse {
+  flex-direction: column-reverse;
+}
