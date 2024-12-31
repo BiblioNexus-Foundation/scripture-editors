@@ -71,6 +71,17 @@ export default defineConfig({
           src: "src/styles/**/*.css",
           dest: "styles",
         },
+        {
+          src: [
+            "README.md",
+            "LICENSE",
+            "API.md",
+            "GUIDES.md",
+            "CONTRIBUTING.md",
+            "CODE_OF_CONDUCT.md",
+          ],
+          dest: ".",
+        },
       ],
     }),
   ],
