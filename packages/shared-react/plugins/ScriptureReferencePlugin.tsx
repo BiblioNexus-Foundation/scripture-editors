@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getSelection, $isElementNode, LexicalNode } from "lexical";
 import { useEffect } from "react";
-import { $isScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
+import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 import { $isUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 //TODO: move plugin functions to vanilla javascript plugin

@@ -97,8 +97,21 @@ function createEmptyUsj(
       case "book":
         return { code: bookCode };
       case "f":
+        return {
+          caller: "+",
+          content: [
+            { type: "char", marker: "fr", content: [`${reference.chapter}.${reference.verse}`] },
+            { type: "char", marker: "ft", content: [CURSOR_PLACEHOLDER_CHAR] },
+          ],
+        };
       case "x":
-        return { caller: "+" };
+        return {
+          caller: "+",
+          content: [
+            { type: "char", marker: "xo", content: [`${reference.chapter}.${reference.verse}`] },
+            { type: "char", marker: "xt", content: [CURSOR_PLACEHOLDER_CHAR] },
+          ],
+        };
       default:
         return {};
     }

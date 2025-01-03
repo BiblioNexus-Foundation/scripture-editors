@@ -1,11 +1,18 @@
-import { $getSelection, $isRangeSelection } from "lexical";
+import { $getSelection, $isRangeSelection, KEY_ENTER_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
 import { NodeSelectionMenu } from "./NodeSelectionMenu";
 import { OptionItem } from "./Menu";
+import { $isCursorAtEdgeofBlock } from "shared/plugins/CursorHandler/core/utils";
 
-export default function NodesMenu({ trigger, items }: { trigger: string; items?: OptionItem[] }) {
+export const NodesMenu = memo(function NodesMenu({
+  trigger,
+  items,
+}: {
+  trigger: string;
+  items?: OptionItem[];
+}) {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,6 +28,23 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
     },
     [editor, trigger, isOpen],
   );
+
+  useEffect(() => {
+    return editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (e) => {
+        if (!isOpen) {
+          if ($isCursorAtEdgeofBlock()) {
+            setIsOpen(true);
+            e?.preventDefault();
+            return true;
+          }
+        }
+        return false;
+      },
+      3,
+    );
+  }, [isOpen, editor]);
 
   useEffect(() => {
     return editor.registerRootListener((root) => {
@@ -61,4 +85,6 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
       </FloatingBoxAtCursor>
     )
   );
-}
+});
+
+export default NodesMenu;

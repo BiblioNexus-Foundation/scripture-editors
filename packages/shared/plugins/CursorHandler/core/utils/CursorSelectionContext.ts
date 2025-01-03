@@ -1,4 +1,11 @@
-import { $isTextNode, $isRangeSelection, BaseSelection, TextNode, RangeSelection } from "lexical";
+import {
+  $isTextNode,
+  $isRangeSelection,
+  BaseSelection,
+  TextNode,
+  RangeSelection,
+  $getNodeByKey,
+} from "lexical";
 import { CURSOR_PLACEHOLDER_CHAR, CursorMovementDirection } from "./constants";
 
 export enum CursorPosition {
@@ -78,7 +85,7 @@ export function $getCursorSelectionContext(
     return null;
   }
 
-  const node = selection.anchor.getNode();
+  const node = $getNodeByKey(selection.anchor.key);
 
   if (!$isTextNode(node)) {
     return null;

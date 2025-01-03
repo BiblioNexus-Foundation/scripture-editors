@@ -1,6 +1,8 @@
 import React from "react";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
-import { $getNodeByKey, $getSelection, EditorState, LexicalEditor } from "lexical";
+import { LexicalEditor } from "lexical";
+import { ChapterVerseUpdatePlugin } from "./plugins/ChapterVerseUpdatePlugin";
+import { MarkerWatcherPlugin } from "./plugins/MarkerWatcherPlugin";
 import ContentEditablePlugin from "./plugins/ContentEditablePlugin";
 import { ScripturalHandlersPlugin } from "shared-react/plugins/ScripturalHandlers/ScripturalHandlersPlugin";
 import { ScriptureReferencePlugin } from "shared-react/plugins/ScriptureReferencePlugin";
@@ -10,9 +12,6 @@ import {
   ScripturalInitialConfigType,
 } from "./context/ScripturalEditorContext";
 import { useScripturalComposerContext } from "./context/ScripturalEditorContext";
-import OnEditorUpdate from "shared-react/plugins/OnEditorUpdate";
-import { $isScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
-import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 type ScripturalComposerProps = {
   initialConfig: ScripturalInitialConfigType;
@@ -20,13 +19,8 @@ type ScripturalComposerProps = {
 };
 
 function ScripturalComposerContent({ children }: { children: React.ReactNode }) {
-  const {
-    initialLexicalState,
-    scripturalInitialConfig,
-    setScriptureReference,
-    editorRef,
-    setSelectedMarker,
-  } = useScripturalComposerContext();
+  const { initialLexicalState, scripturalInitialConfig, setScriptureReference, editorRef } =
+    useScripturalComposerContext();
 
   const initialConfig: InitialConfigType = {
     namespace: "ScriptureEditor",
@@ -46,27 +40,12 @@ function ScripturalComposerContent({ children }: { children: React.ReactNode }) 
           onChangeReference={(reference) => {
             setScriptureReference(reference);
           }}
+          book={scripturalInitialConfig.bookCode}
           verseDepth={2}
           chapterDepth={1}
         />
-        <OnEditorUpdate
-          updateListener={({ editorState }: { editorState: EditorState }) => {
-            editorState.read(() => {
-              const selection = $getSelection();
-              if (!selection) return;
-              const startEndPoints = selection.getStartEndPoints();
-              if (!startEndPoints) return;
-              const startNode = $getNodeByKey(startEndPoints[0].key);
-              const endNode = $getNodeByKey(startEndPoints[1].key);
-              if (!startNode || !endNode) return;
-              //This is the selected element expected to be a usfm element;
-              const selectedElement = startNode?.getCommonAncestor(endNode);
-              if ($isUsfmElementNode(selectedElement) || $isScriptureElementNode(selectedElement)) {
-                setSelectedMarker(selectedElement.getAttribute("data-marker"));
-              }
-            });
-          }}
-        />
+        <MarkerWatcherPlugin />
+        <ChapterVerseUpdatePlugin />
         <div className={"scriptural-editor"}>
           <ContentEditablePlugin ref={editorRef} />
           <ScripturalHandlersPlugin />

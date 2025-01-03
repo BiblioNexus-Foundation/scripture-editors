@@ -1811,6 +1811,19 @@ export const getMarkersAlike = (marker: string) => {
   }, [] as string[]);
 };
 
+export const getMarkersOfType = (type: MarkerType, omit: string[]) => {
+  return Object.entries(scripturalElements).reduce((acc, [elementType, elementData]) => {
+    if (
+      !omit.includes(elementType) &&
+      elementData.type === type &&
+      Array.isArray(elementData.markers)
+    ) {
+      elementData.markers.forEach((marker) => acc.add(marker));
+    }
+    return acc;
+  }, new Set<string>());
+};
+
 export function getMarker(marker: string): ScripturalMarker | undefined {
   return scripturalMarkers[marker];
 }

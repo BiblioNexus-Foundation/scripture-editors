@@ -4,9 +4,12 @@ import {
   getMarker,
   getChildrenMarkers,
   getMarkersAlike,
+  getMarkersOfType,
+  MarkerTypes,
 } from "shared/utils/scriptureMarkers/scripturalMarkers";
 import { getScripturalMarkerAction } from "shared/utils/scriptureMarkers/getScripturalMarkerActions";
 import { ScriptureReference } from "shared-react/plugins/ScriptureReferencePlugin";
+import { $isCursorAtEdgeofBlock } from "shared/plugins/CursorHandler/core/utils";
 
 // getMarker() takes a marker string and gets its data from a usfm markers map object that is merged with overwrites that fit the PERF editor context.
 // getMarkerAction() returns a function to generate a LexicalNode and insert it in the editor, this lexical node is a custom node made for the PERF editor
@@ -25,12 +28,19 @@ export default function useScripturalMakersForMenu({
   const markersMenuItems = useMemo(() => {
     if (!contextMarker || !scriptureReference) return;
     const marker = getMarker(contextMarker);
-    const markerChildren = getChildrenMarkers(contextMarker);
+    const isAtEdge = editor.getEditorState().read(() => $isCursorAtEdgeofBlock());
+    const markerChildren = isAtEdge
+      ? [
+          "c",
+          ...getMarkersOfType(MarkerTypes.para, []),
+          ...(getChildrenMarkers(contextMarker) ?? []),
+        ]
+      : getChildrenMarkers(contextMarker);
     const markerAlike = getMarkersAlike(contextMarker);
 
     if (!markerChildren || !marker) return;
 
-    return [...markerChildren, ...(markerAlike || [])]
+    return [...new Set([contextMarker, ...markerChildren, ...(markerAlike || [])])]
       .map((marker) => {
         const markerData = getMarker(marker);
         if (!markerData) return;

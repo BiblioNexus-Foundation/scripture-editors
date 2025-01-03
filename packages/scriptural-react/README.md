@@ -10,6 +10,116 @@ A React-based Bible editor component library built on top of [Lexical](https://l
 npm install @scriptural/react
 ```
 
+## Quick Start
+
+Here's a simple example of creating a scripture editor:
+
+```tsx
+import React from "react";
+import { ScripturalEditorComposer, ToolbarDefault } from "@scriptural/react";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import "@scriptural/react/styles/scriptural-editor.css";
+
+// Sample USJ data (normally you'd load this from a file or API)
+const sampleUsj = {
+  type: "USJ",
+  version: "0.2.1",
+  content: [
+    {
+      type: "chapter",
+      marker: "c",
+      number: "1",
+    },
+    {
+      type: "para",
+      marker: "p",
+      content: [
+        {
+          type: "verse",
+          marker: "v",
+          number: "1",
+        },
+        "In the beginning...",
+      ],
+    },
+  ],
+};
+
+function SimpleEditor() {
+  const handleSave = (usj) => {
+    console.log("Saving USJ:", usj);
+  };
+
+  const handleError = (error) => {
+    console.error("Editor error:", error);
+  };
+
+  const handleHistoryChange = (editorState) => {
+    // Called whenever the history state changes (e.g., after undo/redo)
+    console.log("History changed:", editorState);
+  };
+
+  const initialConfig = {
+    bookCode: "GEN",
+    usj: sampleUsj,
+    onError: handleError,
+    editable: true,
+    initialSettings: {
+      "toolbar.enhancedCursorPosition": true,
+      "toolbar.contextMenuTriggerKey": "\\",
+    },
+  };
+
+  return (
+    <div className="editor-container">
+      <ScripturalEditorComposer initialConfig={initialConfig}>
+        <ToolbarDefault onSave={handleSave} />
+        <HistoryPlugin onChange={handleHistoryChange} />
+      </ScripturalEditorComposer>
+    </div>
+  );
+}
+
+export default SimpleEditor;
+```
+
+Add some basic styles:
+
+```css
+.editor-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.contentEditable {
+  min-height: 400px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+```
+
+This creates a basic scripture editor with:
+
+- A toolbar with standard editing actions
+- Built-in scripture reference tracking
+- Built-in context menu for inserting scripture elements (triggered with `\`)
+- Built-in enhanced cursor positioning
+- Basic error handling
+- Save functionality
+
+The `ScripturalEditorComposer` component automatically includes several essential plugins:
+
+- `ContentEditablePlugin` for basic editing
+- `ScripturalHandlersPlugin` for handling scripture-specific interactions
+- `ScriptureReferencePlugin` for tracking references
+- `ChapterVerseUpdatePlugin` for managing chapter and verse updates
+
+Additional plugins like `HistoryPlugin` for undo/redo and `CursorHandlerPlugin` for enhanced cursor positioning can be added as needed. See our [GUIDES.md](./GUIDES.md) for examples of adding these plugins.
+
+For more advanced examples and customization options, see our [GUIDES.md](./GUIDES.md).
+
 ## Requirements
 
 - React >= 18.3.1
