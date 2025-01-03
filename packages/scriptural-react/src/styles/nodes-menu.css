@@ -21,10 +21,10 @@
   grid-template-columns: min-content minmax(0, 90vw);
   align-items: baseline;
   max-width: 400px;
-  gap: 1rem;
+  gap: 1em;
   width: 100%;
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 0.9em;
   border-radius: 0;
   border: 0;
 }
@@ -44,21 +44,21 @@
   white-space: nowrap;
   text-align: right;
   align-items: baseline;
-  font-size: 0.7rem;
+  font-size: 0.7em;
   opacity: 0.8;
 }
 
 .autocomplete-menu-container input[type="text"] {
   width: auto;
-  padding: 0.5rem;
+  padding: 0.5em;
   box-sizing: border-box;
   background: #e9e9e9;
   border: none;
   outline: none;
   color: #222222;
-  font-size: 1rem;
-  margin: 0.4rem;
-  border-radius: 0.2rem;
+  font-size: 1em;
+  margin: 0.4em;
+  border-radius: 0.2em;
   font-family: inherit;
 }
 

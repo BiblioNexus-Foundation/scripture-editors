@@ -7,9 +7,13 @@ import {
   ScripturalNodesMenuPlugin,
   CursorHandlerPlugin,
   ToolbarDefault,
-  useToolbarSettings,
 } from "@scriptural/react/plugins";
+import {
+  DEFAULT_SCRIPTURAL_BASE_SETTINGS,
+  useBaseSettings,
+} from "@scriptural/react/plugins/BaseSettingsPlugin";
 import { ScripturalInitialConfigType } from "@scriptural/react/context";
+import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 
 function onError(error: Error) {
   console.error(error);
@@ -17,21 +21,26 @@ function onError(error: Error) {
 
 export default function Editor({
   usj,
+  bookCode,
   editable = true,
   children,
   onSave,
 }: {
   usj: UsjDocument;
+  bookCode: string;
   editable?: boolean;
   children?: ReactElement;
   onSave?: (usj: UsjDocument | UsjNode | string) => void;
 }) {
   const initialConfig: ScripturalInitialConfigType = useMemo(() => {
     return {
-      bookCode: "GEN",
+      bookCode,
       usj,
       onError,
       editable,
+      initialSettings: {
+        ...DEFAULT_SCRIPTURAL_BASE_SETTINGS,
+      },
       onSave,
     };
   }, [usj, editable, onSave]);
@@ -45,7 +54,7 @@ export default function Editor({
 }
 
 function EditorPlugins({ onSave }: { onSave?: (usj: UsjDocument | UsjNode | string) => void }) {
-  const { enhancedCursorPosition, contextMenuTriggerKey } = useToolbarSettings();
+  const { enhancedCursorPosition, contextMenuTriggerKey } = useBaseSettings();
 
   return (
     <>
@@ -53,7 +62,9 @@ function EditorPlugins({ onSave }: { onSave?: (usj: UsjDocument | UsjNode | stri
       {enhancedCursorPosition && (
         <CursorHandlerPlugin
           updateTags={["history-merge"]}
-          canContainPlaceHolder={(node: LexicalNode) => node.getType() !== "graft"}
+          canContainPlaceHolder={(node: LexicalNode) =>
+            !($isScriptureElementNode(node) && node.getAttribute("data-marker") === "f")
+          }
         />
       )}
       <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />

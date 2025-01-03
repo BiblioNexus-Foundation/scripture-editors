@@ -91,10 +91,6 @@ export class BlockNode extends ScriptureElementNode {
     };
   }
 
-  updateDOM(): boolean {
-    return false;
-  }
-
   insertNewAfter(_: RangeSelection, restoreSelection: boolean): BlockNode {
     const newElement = $createBlockNode(this.getAttributes(), this.getProps(), this.getTag());
     const direction = this.getDirection();

@@ -1,6 +1,5 @@
 import {
   ElementNode,
-  LexicalNode,
   NodeKey,
   SerializedElementNode,
   SerializedLexicalNode,
@@ -114,26 +113,29 @@ export class ScriptureElementNode extends ElementNode {
   }
 
   updateDOM(_: ScriptureElementNode, element: HTMLElement): boolean {
-    const elementAttributes = element.attributes;
+    const elementAttributes = Array.from(element.attributes).reduce((acc, attr) => {
+      if (attr.name !== "dir") {
+        acc[attr.name] = attr.value;
+      }
+      return acc;
+    }, {} as Attributes);
     const nodeAttributes = this.getAttributes();
 
-    const elementAttributesCount = elementAttributes.getNamedItem("dir")
-      ? elementAttributes.length - 1
-      : elementAttributes.length;
-    const nodeAttributesCount = Object.keys(nodeAttributes).filter((key) => key !== "dir").length;
-    if (elementAttributesCount !== nodeAttributesCount) return true;
+    const filteredNodeAttributes = Object.fromEntries(
+      Object.entries(nodeAttributes).filter(([key]) => key !== "dir"),
+    );
+    if (Object.keys(elementAttributes).length !== Object.keys(filteredNodeAttributes).length) {
+      console.log("updating DOM");
+      return true;
+    }
+    for (const [key, value] of Object.entries(elementAttributes)) {
+      if (filteredNodeAttributes[key] !== value) {
+        console.log("updating DOM");
+        return true;
+      }
+    }
     return false;
   }
-}
-
-export function $isScriptureElementNode(
-  node: LexicalNode | null | undefined,
-): node is ScriptureElementNode {
-  return (
-    node instanceof ScriptureElementNode ||
-    node?.getType() === "block" ||
-    node?.getType() === "inline"
-  );
 }
 
 export const isSerializedScriptureElementNode = (

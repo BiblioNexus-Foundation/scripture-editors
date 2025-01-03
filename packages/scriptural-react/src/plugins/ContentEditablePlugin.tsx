@@ -11,7 +11,7 @@ export const ContentEditablePlugin = forwardRef<HTMLDivElement>((_props, ref) =>
           <ContentEditable className="contentEditable" spellCheck={false} />
         </div>
       }
-      placeholder={<div className="placeholder">Enter some text...</div>}
+      placeholder={<div className="placeholder">...</div>}
       ErrorBoundary={LexicalErrorBoundary}
     />
   );

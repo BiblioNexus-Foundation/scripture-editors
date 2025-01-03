@@ -1,4 +1,4 @@
-import { EditorState, LexicalNode } from "lexical";
+import { $getEditor, EditorState, LexicalNode } from "lexical";
 import { EditorThemeClasses } from "lexical";
 import { LexicalEditor } from "lexical";
 import { usjNodeToSerializedLexical } from "shared/converters/usj";
@@ -81,20 +81,67 @@ export function ScripturalEditorProvider({
 
   const editorRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const usj = initialConfig.usj;
-    if (usj) {
-      (async () => {
-        const { result: lexicalState } = usjNodeToSerializedLexical(usj);
+  const convertToLexicalState = useCallback(
+    (usjDoc: UsjDocument) => {
+      try {
+        const { result: lexicalState } = usjNodeToSerializedLexical(usjDoc);
         if (!lexicalState) {
-          throw new Error("Failed to convert usj to lexical state", {
-            cause: usj,
-          });
+          throw new Error("Failed to convert USJ to Lexical state");
         }
-        setLexicalState(JSON.stringify({ root: lexicalState }));
-      })();
+        return JSON.stringify({ root: lexicalState });
+      } catch (error) {
+        initialConfig.onError(error as Error, $getEditor());
+        return JSON.stringify({
+          root: {
+            children: [
+              {
+                children: [
+                  {
+                    detail: 0,
+                    format: 0,
+                    mode: "normal",
+                    style: "",
+                    text: "",
+                    type: "text",
+                    version: 1,
+                  },
+                ],
+                direction: null,
+                format: "",
+                indent: 0,
+                type: "block",
+                version: 1,
+                attributes: {
+                  "data-code": initialConfig.bookCode,
+                  "data-marker": "id",
+                  "data-type": "book",
+                },
+                tag: "p",
+              },
+            ],
+          },
+        });
+      }
+    },
+    [initialConfig.onError],
+  );
+  useEffect(() => {
+    if (initialConfig.initialLexicalState) {
+      return;
     }
-  }, [initialConfig.usj]);
+    try {
+      const usjDoc = initialConfig.usj ?? createEmptyUsj(initialConfig.bookCode);
+      const lexicalState2 = convertToLexicalState(usjDoc);
+      setLexicalState(lexicalState2);
+    } catch (error) {
+      initialConfig.onError(error as Error, $getEditor());
+    }
+  }, [
+    initialConfig.usj,
+    initialConfig.bookCode,
+    initialConfig.initialLexicalState,
+    convertToLexicalState,
+  ]);
 
   return (
     <ScripturalEditorContext.Provider
@@ -121,4 +168,24 @@ export function useScripturalComposerContext() {
     throw new Error("useScripturalComposerContext must be used within an ScripturalEditorProvider");
   }
   return context;
+}
+
+function createEmptyUsj(bookCode: string): UsjDocument {
+  return {
+    content: [
+      {
+        code: bookCode,
+        content: [""],
+        marker: "id",
+        type: "book",
+      },
+      {
+        marker: "c",
+        number: "1",
+        type: "chapter",
+      },
+    ],
+    type: "USJ",
+    version: "3.0",
+  };
 }

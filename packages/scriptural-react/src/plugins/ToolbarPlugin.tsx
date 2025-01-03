@@ -2,7 +2,8 @@ import { ReactElement, ReactNode, useCallback, useMemo } from "react";
 import { LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
-import { useScripturalComposerContext, EditorSettings } from "../context/ScripturalEditorContext";
+import { useScripturalComposerContext } from "../context/ScripturalEditorContext";
+import { ScripturalBaseSettings, useBaseSettings } from "./BaseSettingsPlugin";
 import {
   getMarker,
   getChildrenMarkers,
@@ -10,86 +11,6 @@ import {
   getScripturalMarkerAction,
 } from "../utils";
 import { serializedLexicalToUsjNode } from "shared/converters/usj";
-import { UsjNode } from "shared/converters/usj/core/usj";
-import { UsjDocument } from "shared/converters/usj/core/usj";
-
-export interface ScripturalToolbarSettings {
-  enhancedCursorPosition: boolean;
-  contextMenuTriggerKey: string;
-  onSave: (usj: UsjDocument | UsjNode | string) => void;
-}
-
-export const SCRIPTURAL_TOOLBAR_SETTINGS = {
-  enhancedCursorPosition: "toolbar.enhancedCursorPosition",
-  contextMenuTriggerKey: "toolbar.contextMenuTriggerKey",
-  onSave: "toolbar.onSave",
-} as const;
-
-export const DEFAULT_SCRIPTURAL_TOOLBAR_SETTINGS: ScripturalToolbarSettings = {
-  enhancedCursorPosition: true,
-  contextMenuTriggerKey: "\\",
-  onSave: () => undefined,
-};
-
-export function getToolbarSettings(settings: EditorSettings) {
-  return {
-    enhancedCursorPosition:
-      settings[SCRIPTURAL_TOOLBAR_SETTINGS.enhancedCursorPosition] ??
-      DEFAULT_SCRIPTURAL_TOOLBAR_SETTINGS.enhancedCursorPosition,
-    contextMenuTriggerKey:
-      settings[SCRIPTURAL_TOOLBAR_SETTINGS.contextMenuTriggerKey] ??
-      DEFAULT_SCRIPTURAL_TOOLBAR_SETTINGS.contextMenuTriggerKey,
-    onSave:
-      settings[SCRIPTURAL_TOOLBAR_SETTINGS.onSave] ?? DEFAULT_SCRIPTURAL_TOOLBAR_SETTINGS.onSave,
-  };
-}
-
-export const useToolbarSettings = () => {
-  const { getSettings, updateSettings } = useScripturalComposerContext();
-
-  const contextMenuTriggerKey = getSettings(
-    SCRIPTURAL_TOOLBAR_SETTINGS.contextMenuTriggerKey,
-  ) as ScripturalToolbarSettings["contextMenuTriggerKey"];
-
-  const enhancedCursorPosition = getSettings(
-    SCRIPTURAL_TOOLBAR_SETTINGS.enhancedCursorPosition,
-  ) as ScripturalToolbarSettings["enhancedCursorPosition"];
-
-  const updateContextMenuTriggerKey = useCallback(
-    (key: string) => {
-      updateSettings(SCRIPTURAL_TOOLBAR_SETTINGS.contextMenuTriggerKey, key);
-    },
-    [updateSettings],
-  );
-
-  const onSave = getSettings(
-    SCRIPTURAL_TOOLBAR_SETTINGS.onSave,
-  ) as ScripturalToolbarSettings["onSave"];
-
-  const updateOnSave = useCallback(
-    (fn: ScripturalToolbarSettings["onSave"]) => {
-      updateSettings(SCRIPTURAL_TOOLBAR_SETTINGS.onSave, fn);
-    },
-    [updateSettings],
-  );
-
-  const toggleEnhancedCursorPosition = useCallback(() => {
-    updateSettings(SCRIPTURAL_TOOLBAR_SETTINGS.enhancedCursorPosition, !enhancedCursorPosition);
-  }, [updateSettings, enhancedCursorPosition]);
-
-  const toggleClass = (element: HTMLElement | null, className: string) =>
-    element && element.classList.toggle(className);
-
-  return {
-    contextMenuTriggerKey,
-    enhancedCursorPosition,
-    updateContextMenuTriggerKey,
-    toggleEnhancedCursorPosition,
-    toggleClass,
-    onSave,
-    updateOnSave,
-  };
-};
 
 export function ToolbarContainer({
   children,
@@ -129,7 +50,7 @@ export function ToolbarSection({
   );
 }
 
-export function ToolbarDefault({ onSave }: { onSave?: ScripturalToolbarSettings["onSave"] }) {
+export function ToolbarDefault({ onSave }: { onSave?: ScripturalBaseSettings["onSave"] }) {
   return (
     <ToolbarContainer>
       <ToolbarSection>
@@ -148,7 +69,6 @@ export function ToolbarDefault({ onSave }: { onSave?: ScripturalToolbarSettings[
         <ScriptureReferenceInfo />
         <hr />
       </ToolbarSection>
-      <ToolbarMarkerSections />
     </ToolbarContainer>
   );
 }
@@ -177,7 +97,7 @@ export function SaveButton({
   onSave,
 }: {
   saveIconComponent?: ReactNode;
-  onSave?: ScripturalToolbarSettings["onSave"];
+  onSave?: ScripturalBaseSettings["onSave"];
 }) {
   const [editor] = useLexicalComposerContext();
   const getCurrentUsj = useCallback(() => {
@@ -197,7 +117,7 @@ export function SaveButton({
 
 export function ViewButton({ viewIconComponent }: { viewIconComponent?: ReactNode }) {
   const { editorRef } = useScripturalComposerContext();
-  const { toggleClass } = useToolbarSettings();
+  const { toggleClass } = useBaseSettings();
   return (
     <button
       onClick={(e) => {
@@ -212,7 +132,7 @@ export function ViewButton({ viewIconComponent }: { viewIconComponent?: ReactNod
 
 export function FormatButton({ formatIconComponent }: { formatIconComponent?: ReactNode }) {
   const { editorRef } = useScripturalComposerContext();
-  const { toggleClass } = useToolbarSettings();
+  const { toggleClass } = useBaseSettings();
   return (
     <button
       className="active"
@@ -231,7 +151,7 @@ export function EnhancedCursorToggleButton({
 }: {
   enhancedCursorIconComponent?: ReactNode;
 }) {
-  const { enhancedCursorPosition, toggleEnhancedCursorPosition } = useToolbarSettings();
+  const { enhancedCursorPosition, toggleEnhancedCursorPosition } = useBaseSettings();
   return (
     <button
       className={enhancedCursorPosition ? "active" : undefined}
@@ -247,7 +167,7 @@ export function ContextMenuTriggerButton({
 }: {
   contextMenuTriggerIconComponent?: ReactNode;
 }) {
-  const { updateContextMenuTriggerKey, contextMenuTriggerKey } = useToolbarSettings();
+  const { updateContextMenuTriggerKey, contextMenuTriggerKey } = useBaseSettings();
 
   const handleKeyPress = (event: KeyboardEvent) => {
     updateContextMenuTriggerKey(event.key);

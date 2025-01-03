@@ -8,9 +8,8 @@ import titUsj from "shared/data/tit.usj.json";
 function App() {
   // const usj = usxStringToUsj(BSB_REV_USX) as UsjDocument;
   const usj = titUsj as UsjDocument;
-  console.log({ usj });
 
-  return usj ? <Editor usj={usj} onSave={(usj) => console.log({ usj })} /> : null;
+  return usj ? <Editor usj={usj} bookCode="TIT" onSave={(usj) => console.log({ usj })} /> : null;
 }
 
 export default App;
