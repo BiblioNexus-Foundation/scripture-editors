@@ -10,9 +10,13 @@ export function useFloatingPosition() {
     if (cleanupRef.current) {
       cleanupRef.current();
     }
+    const referenceElement =
+      domRange.commonAncestorContainer.nodeType === domRange.commonAncestorContainer.TEXT_NODE
+        ? domRange
+        : (domRange.commonAncestorContainer as HTMLElement);
 
-    cleanupRef.current = autoUpdate(domRange, anchorElement, () => {
-      computePosition(domRange, anchorElement, {
+    cleanupRef.current = autoUpdate(referenceElement, anchorElement, () => {
+      computePosition(referenceElement, anchorElement, {
         placement: "bottom-start",
         middleware: [shift(), flip()],
       })
