@@ -99,6 +99,8 @@ export type EditorOptions = {
   hasSpellCheck?: boolean;
   /** Text direction: "ltr" | "rtl" | "auto". */
   textDirection?: TextDirection;
+  /** Key to trigger the marker menu. Defaults to '\'. */
+  markerMenuTrigger?: string;
   /**
    * View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only
    * functional option.
@@ -145,7 +147,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   nodes: [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
 };
 
-const defaultViewOptions = getViewOptions(undefined);
+const defaultViewOptions = getViewOptions();
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -189,6 +191,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     isReadonly = false,
     hasSpellCheck = false,
     textDirection = "auto",
+    markerMenuTrigger = "\\",
     view: viewOptions = defaultViewOptions,
     nodes: nodeOptions = {},
   } = options ?? {};
@@ -274,7 +277,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           )}
           {scrRef && (
             <UsjNodesMenuPlugin
-              trigger="\"
+              trigger={markerMenuTrigger}
               scrRef={scrRef}
               getMarkerAction={(marker, markerData) =>
                 getUsjMarkerAction(marker, markerData, viewOptions)
