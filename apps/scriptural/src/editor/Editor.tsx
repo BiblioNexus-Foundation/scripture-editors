@@ -1,7 +1,6 @@
 import { ReactElement, useMemo } from "react";
 import { UsjDocument, UsjNode } from "shared/converters/usj/core/usj";
 
-import { LexicalNode } from "lexical";
 import { ScripturalEditorComposer } from "@scriptural/react";
 import {
   ScripturalNodesMenuPlugin,
@@ -13,7 +12,6 @@ import {
   useBaseSettings,
 } from "@scriptural/react/plugins/BaseSettingsPlugin";
 import { ScripturalInitialConfigType } from "@scriptural/react/context";
-import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 
 function onError(error: Error) {
   console.error(error);
@@ -59,12 +57,7 @@ function EditorPlugins({ onSave }: { onSave?: (usj: UsjDocument | UsjNode | stri
   return (
     <>
       <ToolbarDefault onSave={onSave} />
-      {enhancedCursorPosition && (
-        <CursorHandlerPlugin
-          updateTags={["history-merge"]}
-          canContainPlaceHolder={(node: LexicalNode) => true}
-        />
-      )}
+      {enhancedCursorPosition && <CursorHandlerPlugin updateTags={["history-merge"]} />}
       <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
     </>
   );
