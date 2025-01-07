@@ -21,11 +21,13 @@ import {
   editorStateGen1v1,
   editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
+  editorStateGen1v1Nonstandard,
   editorStateMarks,
   editorStateWithUnknownItems,
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjGen1v1Nonstandard,
   usjMarks,
   usjWithUnknownItems,
 } from "../../../../utilities/src/converters/usj/converter-test.data";
@@ -58,6 +60,16 @@ describe("Editor USJ Adaptor", () => {
     const usj = editorUsjAdaptor.deserializeEditorState(editorState);
 
     expect(usj).toEqual(usjGen1v1ImpliedPara);
+  });
+
+  // TODO: Fix char not being able to contain other content and re-enable this test
+  // https://github.com/BiblioNexus-Foundation/scripture-editors/issues/223
+  xit("should convert to USJ from Lexical editor state JSON with nonstandard features", () => {
+    const editorState = editor.parseEditorState(editorStateGen1v1Nonstandard);
+
+    const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+
+    expect(usj).toEqual(usjGen1v1Nonstandard);
   });
 
   it("should convert to USJ from Lexical editor state JSON with edits", () => {
