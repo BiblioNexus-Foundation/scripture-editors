@@ -4,6 +4,7 @@ import {
   $isElementNode,
   $isRangeSelection,
   $isTextNode,
+  $setSelection,
   ElementNode,
   LexicalEditor,
   LexicalNode,
@@ -17,6 +18,7 @@ import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
 import { ScripturalMarker } from "./scripturalMarkers";
 import { UsjNode } from "../../converters/usj/core/usj";
 import { usjNodeToSerializedLexical } from "../../converters/usj";
+import { ScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
 
 export const markerActions: {
   [marker: string]: {
@@ -101,7 +103,11 @@ function createEmptyUsj(
           caller: "+",
           content: [
             { type: "char", marker: "fr", content: [`${reference.chapter}.${reference.verse}`] },
-            { type: "char", marker: "ft", content: [CURSOR_PLACEHOLDER_CHAR] },
+            {
+              type: "char",
+              marker: "ft",
+              content: [" "],
+            },
           ],
         };
       case "x":
@@ -109,7 +115,7 @@ function createEmptyUsj(
           caller: "+",
           content: [
             { type: "char", marker: "xo", content: [`${reference.chapter}.${reference.verse}`] },
-            { type: "char", marker: "xt", content: [CURSOR_PLACEHOLDER_CHAR] },
+            { type: "char", marker: "xt", content: [" "] },
           ],
         };
       default:
@@ -171,7 +177,7 @@ export function getScripturalMarkerAction(
       if (!serializedLexicalNode) {
         return;
       }
-      const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode);
+      const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode) as ScriptureElementNode;
 
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -181,6 +187,7 @@ export function getScripturalMarkerAction(
         } else {
           if ($isElementNode(usfmNode) && !usfmNode.isInline()) {
             // If the selection is empty, insert a new paragraph and replace it with the USFM node
+            debugger;
             const paragraph = selection.insertParagraph();
 
             if (paragraph) {
@@ -191,7 +198,14 @@ export function getScripturalMarkerAction(
               usfmNode.selectStart();
             }
           } else {
-            selection.insertNodes([usfmNode]);
+            const selectionNode = selection.getNodes()[0];
+            if ($isTextNode(selectionNode) && selectionNode.getParent()?.isInline()) {
+              const splittedNodes = selectionNode.splitText(selection.focus.offset);
+              const insertedNode = splittedNodes[0].insertAfter(usfmNode, false);
+              $setSelection(insertedNode.selectEnd());
+            } else {
+              selection.insertNodes([usfmNode]);
+            }
           }
         }
       } else {

@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useCallback, useMemo } from "react";
+import { ReactElement, ReactNode, useCallback, useMemo, useRef, useEffect } from "react";
 import { LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
@@ -168,14 +168,52 @@ export function ContextMenuTriggerButton({
   contextMenuTriggerIconComponent?: ReactNode;
 }) {
   const { updateContextMenuTriggerKey, contextMenuTriggerKey } = useBaseSettings();
+  const isListeningRef = useRef(false);
 
-  const handleKeyPress = (event: KeyboardEvent) => {
-    updateContextMenuTriggerKey(event.key);
-  };
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      event.preventDefault();
+      updateContextMenuTriggerKey(event.key);
+      isListeningRef.current = false;
+      document.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("click", cancelListening);
+    },
+    [updateContextMenuTriggerKey],
+  );
 
-  const handleButtonClick = () => {
-    document.addEventListener("keydown", handleKeyPress, { once: true });
-  };
+  const cancelListening = useCallback(() => {
+    if (isListeningRef.current) {
+      document.removeEventListener("keydown", handleKeyPress);
+      isListeningRef.current = false;
+    }
+  }, [handleKeyPress]);
+
+  const handleButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Prevent the click event from bubbling up to window
+      e.stopPropagation();
+
+      if (isListeningRef.current) {
+        cancelListening();
+      } else {
+        isListeningRef.current = true;
+        document.addEventListener("keydown", handleKeyPress);
+        // Add click listener on next tick to avoid the current click
+        setTimeout(() => {
+          window.addEventListener("click", cancelListening, { once: true });
+        }, 0);
+      }
+    },
+    [handleKeyPress, cancelListening],
+  );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cancelListening();
+    };
+  }, [cancelListening]);
+  console.log({ contextMenuTriggerKey });
   return (
     <button onClick={handleButtonClick}>
       {contextMenuTriggerIconComponent || <i>keyboard_command_key</i>}: {contextMenuTriggerKey}
