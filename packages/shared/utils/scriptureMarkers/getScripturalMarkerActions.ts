@@ -187,7 +187,6 @@ export function getScripturalMarkerAction(
         } else {
           if ($isElementNode(usfmNode) && !usfmNode.isInline()) {
             // If the selection is empty, insert a new paragraph and replace it with the USFM node
-            debugger;
             const paragraph = selection.insertParagraph();
 
             if (paragraph) {
