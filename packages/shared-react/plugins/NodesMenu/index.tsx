@@ -47,13 +47,29 @@ export const NodesMenu = memo(function NodesMenu({
   }, [isOpen, editor]);
 
   useEffect(() => {
-    return editor.registerRootListener((root) => {
+    let removeListener: (() => void) | undefined;
+
+    const cleanup = editor.registerRootListener((root) => {
       if (!root) return;
+
+      // Clean up previous listener if it exists
+      removeListener?.();
+
+      // Add new listener and store its cleanup function
       root.addEventListener("keydown", handleKeyDown);
-      return () => {
+      removeListener = () => {
         root.removeEventListener("keydown", handleKeyDown);
       };
+
+      return removeListener;
     });
+
+    // Return a cleanup function that both unregisters the root listener
+    // and removes any existing keydown listener
+    return () => {
+      cleanup();
+      removeListener?.();
+    };
   }, [editor, handleKeyDown]);
 
   // Close the menu when the selection changes

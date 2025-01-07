@@ -62,9 +62,7 @@ function EditorPlugins({ onSave }: { onSave?: (usj: UsjDocument | UsjNode | stri
       {enhancedCursorPosition && (
         <CursorHandlerPlugin
           updateTags={["history-merge"]}
-          canContainPlaceHolder={(node: LexicalNode) =>
-            !($isScriptureElementNode(node) && node.getAttribute("data-marker") === "f")
-          }
+          canContainPlaceHolder={(node: LexicalNode) => true}
         />
       )}
       <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
