@@ -43,7 +43,7 @@ export default function ScriptureReferencePlugin({
 }): null {
   const [editor] = useLexicalComposerContext();
   /** Prevents the cursor being moved again after a selection has changed. */
-  const hasSelectionChanged = useRef(false);
+  const hasSelectionChangedRef = useRef(false);
   const { bookNum, chapterNum, verseNum } = scrRef;
 
   // Book loaded or changed
@@ -73,9 +73,9 @@ export default function ScriptureReferencePlugin({
   useEffect(() => {
     editor.update(
       () => {
-        if (!hasSelectionChanged.current)
+        if (!hasSelectionChangedRef.current)
           $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
-        else hasSelectionChanged.current = false;
+        else hasSelectionChangedRef.current = false;
       },
       { tag: CURSOR_CHANGE_TAG },
     );
@@ -92,7 +92,7 @@ export default function ScriptureReferencePlugin({
             chapterNum,
             verseNum,
             onScrRefChange,
-            hasSelectionChanged,
+            hasSelectionChangedRef,
             viewOptions,
           ),
         COMMAND_PRIORITY_LOW,
@@ -126,7 +126,7 @@ function $findAndSetChapterAndVerse(
   chapterNum: number,
   verseNum: number,
   onScrRefChange: (scrRef: ScriptureReference) => void,
-  hasSelectionChanged: React.MutableRefObject<boolean>,
+  hasSelectionChangedRef: React.MutableRefObject<boolean>,
   viewOptions?: ViewOptions,
 ) {
   const startNode = $getSelection()?.getNodes()[0];
@@ -136,18 +136,18 @@ function $findAndSetChapterAndVerse(
 
   const chapterNode = findThisChapter(startNode, ChapterNodeClass);
   const selectedChapterNum = parseInt(chapterNode?.getNumber() ?? "0", 10);
-  const verseNode = findThisVerse(startNode, VerseNodeClass);
+  const verseNode = findThisVerse(startNode, VerseNodeClass, ChapterNodeClass);
   // For combined verses this returns the first number.
   const selectedVerseNum = parseInt(verseNode?.getNumber() ?? "0", 10);
-  hasSelectionChanged.current = !!(
+  hasSelectionChangedRef.current = !!(
     (chapterNode && selectedChapterNum !== chapterNum) ||
-    (verseNode && selectedVerseNum !== verseNum)
+    selectedVerseNum !== verseNum
   );
-  if (hasSelectionChanged.current)
+  if (hasSelectionChangedRef.current)
     onScrRefChange({
       bookNum,
-      chapterNum: selectedChapterNum || chapterNum,
-      verseNum: selectedVerseNum || verseNum,
+      chapterNum: selectedChapterNum,
+      verseNum: selectedVerseNum,
     });
 
   return false;

@@ -1,6 +1,7 @@
 import { $isElementNode, LexicalNode } from "lexical";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { ImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import { $isNodeWithMarker, NodesWithMarker } from "shared/nodes/scripture/usj/node.utils";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
@@ -109,7 +110,7 @@ export function findVerse<T extends VerseNodes = ImmutableVerseNode>(
     nodes
       .map((node) => findVerseInNode<T>(node, verseNum, VerseNodeClass))
       // remove any undefined results and take the first found
-      .filter((verseNode) => verseNode)[0] as T | undefined
+      .filter((verseNode) => verseNode)[0]
   );
 }
 
@@ -192,8 +193,9 @@ export function findLastVerse<T extends VerseNodes = ImmutableVerseNode>(
 export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
   node: LexicalNode | null | undefined,
   VerseNodeClass: typeof LexicalNode = ImmutableVerseNode,
+  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
 ): T | undefined {
-  if (!node) return;
+  if (!node || node.getType() === ChapterNodeClass.getType()) return;
 
   // is this node a verse
   if (node.getType() === VerseNodeClass.getType()) return node as T;
@@ -203,21 +205,32 @@ export function findThisVerse<T extends VerseNodes = ImmutableVerseNode>(
   let previousSibling = isWrappedInMark
     ? node.getParent()?.getPreviousSibling()
     : node.getPreviousSibling();
-  while (previousSibling && previousSibling.getType() !== VerseNodeClass.getType()) {
+  while (
+    previousSibling &&
+    previousSibling.getType() !== VerseNodeClass.getType() &&
+    previousSibling.getType() !== ChapterNodeClass.getType()
+  ) {
     previousSibling = previousSibling.getPreviousSibling();
   }
   if (previousSibling && previousSibling.getType() === VerseNodeClass.getType())
     return previousSibling as T;
+  if (previousSibling?.getType() === ChapterNodeClass.getType()) return;
 
   // is the verse in a previous parent sibling
   let previousParentSibling = node.getTopLevelElement()?.getPreviousSibling();
   let verseNode = findLastVerseInNode<T>(previousParentSibling, VerseNodeClass);
   let nextVerseNode = verseNode;
-  while (previousParentSibling && !verseNode) {
+  while (
+    previousParentSibling &&
+    !verseNode &&
+    previousParentSibling.getType() !== ChapterNodeClass.getType()
+  ) {
     verseNode = nextVerseNode;
     previousParentSibling = previousParentSibling.getPreviousSibling();
     nextVerseNode = findLastVerseInNode<T>(previousParentSibling, VerseNodeClass);
   }
+  if (!verseNode && previousParentSibling?.getType() === ChapterNodeClass.getType()) return;
+
   return verseNode;
 }
 

@@ -115,24 +115,21 @@ export function getUsjMarkerAction(
           $wrapTextSelectionInInlineNode(selection, false, () =>
             $createNodeFromSerializedNode(serializedLexicalNode),
           );
-        } else {
-          if ($isElementNode(usjNode) && !usjNode.isInline()) {
-            // If the selection is empty, insert a new paragraph and replace it with the USJ node
-            const paragraph = selection.insertParagraph();
-
-            if (paragraph) {
-              // Transfer the content of the paragraph to the USJ node
-              const paragraphContent = paragraph.getChildren();
-              usjNode.append(...paragraphContent);
-              paragraph.replace(usjNode);
-              usjNode.selectStart();
-            }
-          } else {
-            selection.insertNodes([usjNode]);
+        } else if ($isElementNode(usjNode) && !usjNode.isInline()) {
+          // If the selection is empty, insert a new paragraph and replace it with the USJ node
+          const paragraph = selection.insertParagraph();
+          if (paragraph) {
+            // Transfer the content of the paragraph to the USJ node
+            const paragraphContent = paragraph.getChildren();
+            usjNode.append(...paragraphContent);
+            paragraph.replace(usjNode);
+            usjNode.selectStart();
           }
+        } else {
+          selection.insertNodes([usjNode]);
         }
       } else {
-        // If the selection is not a range selection, insert the USJ node directly
+        // Insert the USJ node directly
         selection?.insertNodes([usjNode]);
       }
     });
@@ -173,7 +170,6 @@ function getMarkerAction(marker: string): {
   return markerAction;
 }
 
-// TODO: handle edge cases for unwrap-able USJ elements
 function $wrapTextSelectionInInlineNode(
   selection: RangeSelection,
   isBackward: boolean,
@@ -182,40 +178,36 @@ function $wrapTextSelectionInInlineNode(
   const nodes = selection.getNodes();
   const anchorOffset = selection.anchor.offset;
   const focusOffset = selection.focus.offset;
-  const nodesLength = nodes.length;
   const startOffset = isBackward ? focusOffset : anchorOffset;
   const endOffset = isBackward ? anchorOffset : focusOffset;
-  let currentNodeParent;
-  let lastCreatedNode;
+  let currentNodeParent: LexicalNode | undefined;
+  let lastCreatedNode: LexicalNode | undefined;
 
-  // We only want wrap adjacent text nodes, line break nodes
-  // and inline element nodes. For decorator nodes and block
-  // element nodes, we step out of their boundary and start
-  // again after, if there are more nodes.
-  for (let i = 0; i < nodesLength; i++) {
-    const node = nodes[i];
+  // We only want to wrap adjacent text nodes, line break nodes and inline element nodes. For
+  // decorator nodes and block element nodes, we step out of their boundary and start again after,
+  // if there are more nodes.
+  nodes.forEach((node, i) => {
     if ($isElementNode(lastCreatedNode) && lastCreatedNode.isParentOf(node)) {
       // If the current node is a child of the last created mark node, there is nothing to do here
-      continue;
+      return;
     }
     const isFirstNode = i === 0;
-    const isLastNode = i === nodesLength - 1;
-    let targetNode: LexicalNode | null = null;
+    const isLastNode = i === nodes.length - 1;
+    let targetNode: LexicalNode | undefined;
 
     if ($isTypedMarkNode(node) || $isNoteNode(node) || $isNoteNode(node.getParent())) {
-      // Case 1: the node is a mark node and we can ignore it as a target,
-      // moving on to its children OR a note node OR a notes children. Note that when we make a mark inside
-      // another mark, it may ultimately be unnested by a call to
-      // `registerNestedElementResolver<MarkNode>` somewhere else in the
-      // codebase.
-      continue;
+      // Case 1: the node is a mark node and we can ignore it as a target, moving on to its children
+      // OR a note node OR a notes children. Note that when we make a mark inside another mark, it
+      // may ultimately be unnested by a call to `registerNestedElementResolver<TypedMarkNode>`
+      // somewhere else in the codebase.
+      return;
     } else if ($isTextNode(node)) {
       // Case 2: The node is a text node and we can split it
       const textContentSize = node.getTextContentSize();
       const startTextOffset = isFirstNode ? startOffset : 0;
       const endTextOffset = isLastNode ? endOffset : textContentSize;
       if (startTextOffset === 0 && endTextOffset === 0) {
-        continue;
+        return;
       }
       const splitNodes = node.splitText(startTextOffset, endTextOffset);
       targetNode =
@@ -232,18 +224,16 @@ function $wrapTextSelectionInInlineNode(
       targetNode = node;
     }
 
-    if (targetNode !== null) {
-      // Now that we have a target node for wrapping with a mark, we can run
-      // through special cases.
-      if (targetNode && targetNode.is(currentNodeParent)) {
-        // The current node is a child of the target node to be wrapped, there
-        // is nothing to do here.
-        continue;
+    if (targetNode) {
+      // Now that we have a target node for wrapping with a mark, we can run through special cases.
+      if (targetNode.is(currentNodeParent)) {
+        // The current node is a child of the target node to be wrapped, there is nothing to do here.
+        return;
       }
-      const parentNode = targetNode.getParent();
-      if (parentNode == null || !parentNode.is(currentNodeParent)) {
-        // If the parent node is not the current node's parent node, we can
-        // clear the last created mark node.
+      const parentNode = targetNode.getParent() ?? undefined;
+      if (!parentNode?.is(currentNodeParent)) {
+        // If the parent node is not the current node's parent node, we can clear the last created
+        // mark node.
         lastCreatedNode = undefined;
       }
 
@@ -259,17 +249,17 @@ function $wrapTextSelectionInInlineNode(
         lastCreatedNode.setTextContent(targetNode.getTextContent());
         targetNode.remove();
       } else {
-        // Add the target node to be wrapped in the latest created mark node
+        // Add the target node to be wrapped in the latest created mark node.
         (lastCreatedNode as ElementNode).clear();
         (lastCreatedNode as ElementNode).append(targetNode);
       }
     } else {
-      // If we don't have a target node to wrap we can clear our state and
-      // continue on with the next node
+      // If we don't have a target node to wrap we can clear our state and continue on with the
+      // next node.
       currentNodeParent = undefined;
       lastCreatedNode = undefined;
     }
-  }
+  });
   // Make selection collapsed at the end
   if ($isTextNode(lastCreatedNode)) {
     if (isBackward) lastCreatedNode.selectStart();
