@@ -18,7 +18,7 @@ import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
 import { ScripturalMarker } from "./scripturalMarkers";
 import { UsjNode } from "../../converters/usj/core/usj";
 import { usjNodeToSerializedLexical } from "../../converters/usj";
-import { ScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
+import { ScriptureElementNode } from "../../nodes/scripture/generic/ScriptureElementNode";
 
 export const markerActions: {
   [marker: string]: {
