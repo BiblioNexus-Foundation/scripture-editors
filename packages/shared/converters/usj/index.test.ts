@@ -31,13 +31,13 @@ describe("usjNodeToSerializedLexical", () => {
   };
   console.log(lexicalBasic);
 
-  // it("basicUsj", () => {
-  //   expect(lexicalBasic).toMatchSnapshot();
-  // });
+  it("basicUsj", () => {
+    expect(lexicalBasic).toMatchSnapshot();
+  });
 
-  // it("fullUsj", () => {
-  //   expect(usjNodeToSerializedLexical(fullUsj)).toMatchSnapshot();
-  // });
+  it("fullUsj", () => {
+    expect(usjNodeToSerializedLexical(fullUsj)).toMatchSnapshot();
+  });
 
   const lexicalFull = (usjNodeToSerializedLexical(fullUsj).result as SerializedRootNode) || {
     direction: null,
