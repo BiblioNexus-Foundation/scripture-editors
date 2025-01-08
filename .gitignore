@@ -48,3 +48,6 @@ Thumbs.db
 
 # API Extractor
 api-extractor.json
+
+# Vitest
+vitest/
