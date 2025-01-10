@@ -36,7 +36,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
   }
   // dropping because presence of vid in para elements is not consistent in USX
   if (attribs.vid) delete attribs.vid;
-  if (attribs.closed) delete attribs.closed;
+  // dropping because it is nonstandard derived metadata that could get out of date
   if (attribs.status) delete attribs.status;
 
   let outObj: T = { type } as T;
@@ -90,11 +90,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
     }
   }
 
-  if (
-    (outObj.content.length === 0 && outObj.type !== USX_TYPE) ||
-    ["chapter", "verse", "optbreak", "ms"].includes(type) ||
-    (marker && ["va", "ca", "b"].includes(marker))
-  ) {
+  if (outObj.content.length === 0 && outObj.type !== USX_TYPE) {
     delete outObj.content;
   }
 

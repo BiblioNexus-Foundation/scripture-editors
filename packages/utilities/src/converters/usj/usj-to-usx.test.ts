@@ -2,9 +2,11 @@ import {
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjGen1v1Nonstandard,
   usxEmpty,
   usxGen1v1,
   usxGen1v1ImpliedPara,
+  usxGen1v1Nonstandard,
 } from "./converter-test.data";
 import { usjToUsxString } from "./usj-to-usx";
 import { usxStringToUsj } from "./usx-to-usj";
@@ -35,6 +37,11 @@ describe("USJ to USX Converter", () => {
   it("should convert from USJ with implied paragraphs to USX", () => {
     const usx = usjToUsxString(usjGen1v1ImpliedPara);
     expect(usx).toEqual(removeXmlWhitespace(usxGen1v1ImpliedPara));
+  });
+
+  it("should convert from USJ with nonstandard features to USX", () => {
+    const usx = usjToUsxString(usjGen1v1Nonstandard);
+    expect(usx).toEqual(removeXmlWhitespace(usxGen1v1Nonstandard));
   });
 
   it("should convert from USJ to USX and back", () => {

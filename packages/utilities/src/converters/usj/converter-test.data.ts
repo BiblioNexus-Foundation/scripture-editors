@@ -2,6 +2,8 @@ import type { SerializedEditorState } from "lexical";
 import { MarkerContent, Usj } from "./usj.model";
 
 const NBSP = "\u00A0";
+const IDEOGRAPHIC_SPACE = "\u3000";
+const THIN_SPACE = "\u2009";
 
 export const usxEmpty = '<usx version="3.1" />';
 
@@ -41,7 +43,7 @@ export const usxGen1v1 = `
     <para style="p">
       <verse style="v" number="1" sid="GEN 1:1" />the first verse <verse eid="GEN 1:1" />
       <verse style="v" number="2" sid="GEN 1:2" />the second verse <verse eid="GEN 1:2" />
-      <verse style="v" number="15" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<verse eid="GEN 1:15" />
+      <verse style="v" number="15" altnumber="3" sid="GEN 1:15"/>Tell the Israelites that I, the <char style="nd">Lord</char>, the God of their ancestors, the God of Abraham, Isaac, and Jacob,<char style="va">4</char><verse eid="GEN 1:15" />
     </para>
     <para style="b" />
     <para style="q2"><verse style="v" number="16" sid="GEN 1:16"/>“There is no help for him in God.”<note style="f" caller="+"><char style="fr">3:2 </char><char style="ft">The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).</char></note> <unmatched marker="f*" /> <char style="qs">Selah.</char><verse eid="GEN 1:16" /></para>
@@ -85,10 +87,11 @@ export const usjGen1v1: Usj = {
         "the first verse ",
         { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
         "the second verse ",
-        { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
+        { type: "verse", marker: "v", number: "15", altnumber: "3", sid: "GEN 1:15" },
         "Tell the Israelites that I, the ",
         { type: "char", marker: "nd", content: ["Lord"] },
         ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
+        { type: "char", marker: "va", content: ["4"] },
       ],
     },
     { type: "para", marker: "b" },
@@ -186,7 +189,14 @@ export const editorStateGen1v1 = {
             style: "",
             version: 1,
           },
-          { type: "immutable-verse", marker: "v", number: "15", sid: "GEN 1:15", version: 1 },
+          {
+            type: "immutable-verse",
+            marker: "v",
+            number: "15",
+            altnumber: "3",
+            sid: "GEN 1:15",
+            version: 1,
+          },
           {
             type: "text",
             text: "Tell the Israelites that I, the ",
@@ -209,6 +219,16 @@ export const editorStateGen1v1 = {
           {
             type: "text",
             text: ", the God of their ancestors, the God of Abraham, Isaac, and Jacob,",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "char",
+            marker: "va",
+            text: "4",
             detail: 0,
             format: 0,
             mode: "normal",
@@ -445,6 +465,7 @@ export const editorStateGen1v1Editable = {
             type: "verse",
             marker: "v",
             number: "15",
+            altnumber: "3",
             sid: "GEN 1:15",
             text: `\\v${NBSP}15 `,
             version: 1,
@@ -497,6 +518,38 @@ export const editorStateGen1v1Editable = {
             format: 0,
             mode: "normal",
             style: "",
+            version: 1,
+          },
+          {
+            type: "marker",
+            marker: "va",
+            isOpening: true,
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            text: "",
+            version: 1,
+          },
+          {
+            type: "char",
+            marker: "va",
+            text: `${NBSP}4`,
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "marker",
+            marker: "va",
+            isOpening: false,
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            text: "",
             version: 1,
           },
         ],
@@ -1567,6 +1620,225 @@ export const editorStateWithUnknownItems = {
                 ],
               },
             ],
+          },
+        ],
+      },
+    ],
+  },
+} as unknown as SerializedEditorState;
+
+/**
+ * Tests removing structural whitespace (see https://docs.usfm.bible/usfm/latest/whitespace.html) in
+ * USX while preserving content whitespace.
+ *
+ * Includes various strange whitespace quirks that Paratext supports.
+ *
+ * For example, Paratext's UsfmToken.RegularizeSpaces does not deduplicate U+3000 (IDEOGRAPHIC SPACE)
+ * after other whitespace and does not deduplicate other whitespace after U+3000 (IDEOGRAPHIC SPACE).
+ * However, it does deduplicate multiple U+3000 (IDEOGRAPHIC SPACE) in a row.
+ *
+ * TODO: also test ZWSP and its quirks. Especially concerning is that the editor inserts a bunch of
+ * ZWSP in many places in the editable state
+ */
+export const usxGen1v1Whitespace = `
+<usx version="3.1">
+  <book style="id" code="GEN" />
+  <chapter style="c" number="1" sid="GEN 1" />
+    <verse style="v" number="1" sid="GEN 1:1" /><char style="nd">space</char> <char style="wj">between</char> <char style="nd">each</char>${IDEOGRAPHIC_SPACE}<char style="wj">word</char> <char style="nd">should</char>${THIN_SPACE}${IDEOGRAPHIC_SPACE} <char style="wj">stay</char><verse eid="GEN 1:1" />
+  <chapter eid="GEN 1" />
+</usx>
+`;
+
+export const usjGen1v1Whitespace: Usj = {
+  type: "USJ",
+  version: "3.1",
+  content: [
+    { type: "book", marker: "id", code: "GEN" },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
+    { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
+    { type: "char", marker: "nd", content: ["space"] },
+    " ",
+    { type: "char", marker: "wj", content: ["between"] },
+    " ",
+    { type: "char", marker: "nd", content: ["each"] },
+    `${IDEOGRAPHIC_SPACE}`,
+    { type: "char", marker: "wj", content: ["word"] },
+    " ",
+    { type: "char", marker: "nd", content: ["should"] },
+    `${THIN_SPACE}${IDEOGRAPHIC_SPACE} `,
+    { type: "char", marker: "wj", content: ["stay"] },
+  ],
+};
+
+/**
+ * Includes various nonstandard features we want to support in the
+ * spirit of generously supporting user data
+ *
+ * Additional test features:
+ * - preserve contents of `ca` even though it seems possible `ca` should not occur as its own marker
+ * - preserve non-standard contents of `b` marker that should not have contents
+ * - preserve closed attribute on character marker
+ */
+export const usxGen1v1Nonstandard = `
+<usx version="3.1">
+  <book style="id" code="GEN">Some Scripture Version</book>
+  <chapter style="c" number="1" sid="GEN 1" />
+    <para style="p">
+      <verse style="v" number="1" sid="GEN 1:1" />the <char style="nd" closed="false">first verse <verse eid="GEN 1:1" />
+      <verse style="v" number="2" sid="GEN 1:2" />the second verse <char style="ca">4</char></char><verse eid="GEN 1:2" />
+    </para>
+    <para style="b">This should not be here</para>
+  <chapter eid="GEN 1" />
+</usx>
+`;
+
+export const usjGen1v1Nonstandard: Usj = {
+  type: "USJ",
+  version: "3.1",
+  content: [
+    { type: "book", marker: "id", code: "GEN", content: ["Some Scripture Version"] },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
+    {
+      type: "para",
+      marker: "p",
+      content: [
+        { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
+        "the ",
+        {
+          type: "char",
+          marker: "nd",
+          // @ts-expect-error the types aren't open enough to allow any attribute, but the
+          // conversion code allows most any attribute. Let's fix the types when we have clarity.
+          closed: "false",
+          content: [
+            "first verse ",
+            { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
+            "the second verse ",
+            { type: "char", marker: "ca", content: ["4"] },
+          ],
+        },
+      ],
+    },
+    { type: "para", marker: "b", content: ["This should not be here"] },
+  ],
+};
+
+/** Lexical editor state JSON (depends on nodes used). */
+export const editorStateGen1v1Nonstandard = {
+  root: {
+    type: "root",
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+    children: [
+      {
+        type: "book",
+        marker: "id",
+        code: "GEN",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "Some Scripture Version",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "immutable-chapter",
+        marker: "c",
+        number: "1",
+        sid: "GEN 1",
+        version: 1,
+      },
+      {
+        type: "para",
+        marker: "p",
+        direction: null,
+        format: "",
+        indent: 0,
+        textFormat: 0,
+        textStyle: "",
+        version: 1,
+        children: [
+          { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
+          {
+            type: "text",
+            text: "the ",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+          {
+            type: "char",
+            marker: "nd",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+            children: [
+              {
+                type: "text",
+                text: "first verse ",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
+                version: 1,
+              },
+              { type: "immutable-verse", marker: "v", number: "2", sid: "GEN 1:2", version: 1 },
+              {
+                type: "text",
+                text: "the second verse ",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
+                version: 1,
+              },
+              {
+                type: "char",
+                marker: "ca",
+                text: "4",
+                detail: 0,
+                format: 0,
+                mode: "normal",
+                style: "",
+                version: 1,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "para",
+        marker: "b",
+        direction: null,
+        format: "",
+        indent: 0,
+        textFormat: 0,
+        textStyle: "",
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "This should not be here",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
           },
         ],
       },
