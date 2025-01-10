@@ -2,6 +2,8 @@ import type { SerializedEditorState } from "lexical";
 import { MarkerContent, Usj } from "./usj.model";
 
 const NBSP = "\u00A0";
+const IDEOGRAPHIC_SPACE = "\u3000";
+const THIN_SPACE = "\u2009";
 
 export const usxEmpty = '<usx version="3.1" />';
 
@@ -1642,7 +1644,7 @@ export const usxGen1v1Whitespace = `
 <usx version="3.1">
   <book style="id" code="GEN" />
   <chapter style="c" number="1" sid="GEN 1" />
-    <verse style="v" number="1" sid="GEN 1:1" /><char style="nd">space</char> <char style="wj">between</char> <char style="nd">each</char>　<char style="wj">word</char> <char style="nd">should</char> 　 <char style="wj">stay</char><verse eid="GEN 1:1" />
+    <verse style="v" number="1" sid="GEN 1:1" /><char style="nd">space</char> <char style="wj">between</char> <char style="nd">each</char>${IDEOGRAPHIC_SPACE}<char style="wj">word</char> <char style="nd">should</char>${THIN_SPACE}${IDEOGRAPHIC_SPACE} <char style="wj">stay</char><verse eid="GEN 1:1" />
   <chapter eid="GEN 1" />
 </usx>
 `;
@@ -1659,13 +1661,11 @@ export const usjGen1v1Whitespace: Usj = {
     { type: "char", marker: "wj", content: ["between"] },
     " ",
     { type: "char", marker: "nd", content: ["each"] },
-    // A single U+3000 (IDEOGRAPHIC SPACE)
-    "　",
+    `${IDEOGRAPHIC_SPACE}`,
     { type: "char", marker: "wj", content: ["word"] },
     " ",
     { type: "char", marker: "nd", content: ["should"] },
-    // U+2009 (THIN SPACE), U+3000 (IDEOGRAPHIC SPACE), U+0020 (SPACE)
-    " 　 ",
+    `${THIN_SPACE}${IDEOGRAPHIC_SPACE} `,
     { type: "char", marker: "wj", content: ["stay"] },
   ],
 };
