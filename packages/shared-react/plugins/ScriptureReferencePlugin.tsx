@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getSelection, $isElementNode, LexicalNode } from "lexical";
+import { $getSelection, $isElementNode, $isTextNode, EditorState, LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 import { $isUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
@@ -106,6 +106,20 @@ export function $getCurrentVerseNode(selectedNode: LexicalNode, targetDepth = 2)
   return verseNode ?? null;
 }
 
+export function wereMarkersUpdated(markers: string[], editorState: EditorState) {
+  return editorState.read(() => {
+    let selectedNode = $getSelection()?.getNodes()?.[0];
+    if ($isTextNode(selectedNode)) {
+      selectedNode = selectedNode?.getParent() ?? undefined;
+    }
+    if (!selectedNode) return false;
+    return (
+      $isScriptureElementNode(selectedNode) &&
+      markers.includes(selectedNode.getAttribute("data-marker") ?? "")
+    );
+  });
+}
+
 export type ScriptureReference = {
   book: string;
   chapter: number;
@@ -127,8 +141,11 @@ export function ScriptureReferencePlugin({
   useEffect(
     () =>
       onChangeReference &&
-      editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves }) => {
-        if (dirtyLeaves.size === 0 || dirtyElements.size === 0)
+      editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves, tags }) => {
+        const wasChapterOrVerseMutated =
+          !tags.has("history-merge") && wereMarkersUpdated(["v", "c"], editorState);
+
+        if (dirtyLeaves.size === 0 || dirtyElements.size === 0 || wasChapterOrVerseMutated)
           editorState.read(() => {
             const selectedNode = $getSelection()?.getNodes()?.[0];
             if (!selectedNode) return;
