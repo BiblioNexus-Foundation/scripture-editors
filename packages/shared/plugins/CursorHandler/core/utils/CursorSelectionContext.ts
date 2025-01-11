@@ -14,7 +14,12 @@ export enum CursorPosition {
   End,
 }
 
-type Direction = CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT | undefined;
+type Direction =
+  | CursorMovementDirection.LEFT
+  | CursorMovementDirection.RIGHT
+  | CursorMovementDirection.UP
+  | CursorMovementDirection.DOWN
+  | undefined;
 
 interface PlaceholdersData {
   char: string;
@@ -35,6 +40,8 @@ export type CursorData = {
   isPlaceholder: boolean;
   isMovingRight: boolean;
   isMovingLeft: boolean;
+  isMovingUp: boolean;
+  isMovingDown: boolean;
   isAtStart: boolean;
   isAtEnd: boolean;
   isMovingFromStartToEnd: boolean;
@@ -202,6 +209,12 @@ export function $getCursorSelectionContext(
       },
       get isMovingLeft() {
         return targetDirection === CursorMovementDirection.LEFT;
+      },
+      get isMovingUp() {
+        return targetDirection === CursorMovementDirection.UP;
+      },
+      get isMovingDown() {
+        return targetDirection === CursorMovementDirection.DOWN;
       },
       get isAtStart() {
         return getPosition() === CursorPosition.Start;

@@ -45,7 +45,7 @@ export function $handleNoSibling(
       const selectOffset = cursor.isMovingLeft
         ? CharSelectionOffset.BEFORE
         : CharSelectionOffset.AFTER;
-      const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition);
+      const cursorPlaceholderNode = $insertCursorPlaceholder(ancestor, cursorPosition, true);
       cursorPlaceholderNode.select(selectOffset, selectOffset);
     });
     return true;

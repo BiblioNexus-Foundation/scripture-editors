@@ -125,12 +125,10 @@ export class ScriptureElementNode extends ElementNode {
       Object.entries(nodeAttributes).filter(([key]) => key !== "dir"),
     );
     if (Object.keys(elementAttributes).length !== Object.keys(filteredNodeAttributes).length) {
-      console.log("updating DOM");
       return true;
     }
     for (const [key, value] of Object.entries(elementAttributes)) {
       if (filteredNodeAttributes[key] !== value) {
-        console.log("updating DOM");
         return true;
       }
     }

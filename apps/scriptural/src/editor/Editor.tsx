@@ -57,7 +57,9 @@ function EditorPlugins({ onSave }: { onSave?: (usj: UsjDocument | UsjNode | stri
   return (
     <>
       <ToolbarDefault onSave={onSave} />
-      {enhancedCursorPosition && <CursorHandlerPlugin updateTags={["history-merge"]} />}
+      {enhancedCursorPosition && (
+        <CursorHandlerPlugin updateTags={["skip-remove-active-nodes", "history-merge"]} />
+      )}
       <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
     </>
   );
