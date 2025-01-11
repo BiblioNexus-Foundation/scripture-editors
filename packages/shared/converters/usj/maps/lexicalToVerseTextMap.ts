@@ -59,7 +59,6 @@ export const lexicalToVerseTextMapCreator: () => LexicalMapCreator = () => {
       },
       text: ({ node, metadata }) => {
         //if metadata.isCanonical, then we add(concatenate) the text to the current verse wordsOccurrences
-        console.log(metadata);
         const { chapter, verse } = workspace;
         if (metadata.isCanonical && chapter && verse) {
           if (!output.bcvContents) {

@@ -37,10 +37,7 @@ export function useMenuCore(
     });
   }, [menuItems.length]);
 
-  console.log({ activeIndex, selectedIndex });
-
   const select = useCallback(() => {
-    console.log("select", activeIndex);
     const optionsCount = menuItems.length;
     if (activeIndex >= 0 && activeIndex < optionsCount) {
       const selectedOption = menuItems[activeIndex];

@@ -213,7 +213,6 @@ export function ContextMenuTriggerButton({
       cancelListening();
     };
   }, [cancelListening]);
-  console.log({ contextMenuTriggerKey });
   return (
     <button onClick={handleButtonClick}>
       {contextMenuTriggerIconComponent || <i>keyboard_command_key</i>}: {contextMenuTriggerKey}
