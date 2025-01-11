@@ -4,7 +4,7 @@ export const useResponsive = (breakpoint = 768) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
 
   useEffect(() => {
-    let timeoutId: number;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const handleResize = () => {
       clearTimeout(timeoutId); // Clear any existing timeout

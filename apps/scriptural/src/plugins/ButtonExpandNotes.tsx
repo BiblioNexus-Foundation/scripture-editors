@@ -20,7 +20,6 @@ export function ButtonExpandNotes({ defaultState }: { defaultState: boolean }) {
 
   return (
     <button
-      variant="outline"
       onClick={handleClick}
       title={isActive ? "Fold All Notes" : "Unfold All Notes"}
       className={isActive ? "active" : ""}
