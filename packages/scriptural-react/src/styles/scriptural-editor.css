@@ -5,7 +5,8 @@
   --verse-marker-color: black;
   --chapter-marker-color: black;
   --title-color: orange;
-  --pilcrow-color: rgb(0 0 0 / 25%);
+  --pilcrow-color: rgb(0 0 0 / 30%);
+  --markers-colors: rgb(0 0 0 / 30%);
 }
 
 /* General Editor Styles */
@@ -662,7 +663,7 @@ p[data-marker="q2"] {
   font-weight: 600;
   left: 0;
   padding: 0.1em;
-  color: rgb(0 0 0 / 20%);
+  color: var(--markers-colors);
 }
 
 .with-markers [data-marker]:before {
@@ -740,7 +741,7 @@ p[data-marker="q2"] {
   font-weight: 600;
   left: 0;
   padding: 0.2em;
-  color: rgb(0 0 0 / 20%);
+  color: var(--markers-colors);
   margin-inline-end: 0.1em;
   vertical-align: text-top;
 }
