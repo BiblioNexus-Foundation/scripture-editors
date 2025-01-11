@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 [data-panel-group-direction='vertical'] .resizable-handle {
   border-top: 2px solid #eee;
   border-bottom: 2px solid transparent;
@@ -14,7 +10,7 @@
 
 [data-resize-handle-state='hover'].resizable-handle,
 [data-resize-handle-state='drag'].resizable-handle {
-  border-color: rgb(59 130 246 / 0.5);
+  border-color: #1976d28f;
 }
 
 .editor-wrapper {
@@ -36,4 +32,22 @@
 
 .toolbar {
   border-radius: 0 !important;
+}
+
+.scriptural-editor
+  > .editor.expand-notes
+  [data-type='note']
+  > *:not([data-type='caller'], [data-type='caller'] *) {
+  display: inline !important;
+  background-color: #eee;
+}
+
+.prose {
+  max-width: none;
+}
+
+.workspace {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: auto;
 }

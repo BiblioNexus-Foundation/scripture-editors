@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,6 +16,11 @@ export default defineConfig({
     host: "localhost",
   },
   plugins: [react(), nxViteTsPaths()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   build: {
     outDir: "../../dist/apps/react-app",
     emptyOutDir: true,
