@@ -1,0 +1,40 @@
+{
+  "extends": ["plugin:@nx/react", "../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {}
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "*",
+                "onlyDependOnLibsWithTags": ["*"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "es2020": true
+  },
+  "plugins": ["react-refresh"],
+  "rules": {
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
