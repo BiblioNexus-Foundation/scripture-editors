@@ -4,7 +4,6 @@ import {
   ContextMenuTriggerButton,
   EnhancedCursorToggleButton,
   FormatButton,
-  HistoryButtons,
   MarkerInfo,
   RedoButton,
   SaveButton,
