@@ -2,14 +2,14 @@ import { ReactElement, ReactNode, useCallback, useMemo, useRef, useEffect } from
 import { LexicalEditor, REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
-import { useScripturalComposerContext } from "../context/ScripturalEditorContext";
-import { ScripturalBaseSettings, useBaseSettings } from "./BaseSettingsPlugin";
+import { useScripturalComposerContext } from "../../context/ScripturalEditorContext";
+import { ScripturalBaseSettings, useBaseSettings } from "../BaseSettingsPlugin";
 import {
   getMarker,
   getChildrenMarkers,
   getMarkersAlike,
   getScripturalMarkerAction,
-} from "../utils";
+} from "../../utils";
 import { serializedLexicalToUsjNode } from "shared/converters/usj";
 
 export function ToolbarContainer({
@@ -54,17 +54,32 @@ export function ToolbarDefault({ onSave }: { onSave?: ScripturalBaseSettings["on
   return (
     <ToolbarContainer>
       <ToolbarSection>
-        <HistoryButtons />
+        <UndoButton title="undo">
+          <i>undo</i>
+        </UndoButton>
+        <RedoButton>
+          <i>redo</i>
+        </RedoButton>
         <hr />
-        <SaveButton onSave={onSave} />
+        <SaveButton onSave={onSave}>
+          <i>download</i>
+        </SaveButton>
         <hr />
-        <ViewButton />
-        <FormatButton />
-        <EnhancedCursorToggleButton />
+        <ViewButton title="toggle block view">
+          <i>block view</i>
+        </ViewButton>
+        <FormatButton title="toggle markup">
+          <i>markup</i>
+        </FormatButton>
+        <EnhancedCursorToggleButton title="toggle enhanced cursor">
+          <i>cursor</i>
+        </EnhancedCursorToggleButton>
         <hr />
       </ToolbarSection>
       <ToolbarSection>
-        <ContextMenuTriggerButton />
+        <ContextMenuTriggerButton title="set context menu trigger">
+          <i>set context menu trigger</i>
+        </ContextMenuTriggerButton>
         <MarkerInfo />
         <ScriptureReferenceInfo />
         <hr />
@@ -73,32 +88,42 @@ export function ToolbarDefault({ onSave }: { onSave?: ScripturalBaseSettings["on
   );
 }
 
-export function HistoryButtons({
-  undoIconComponent,
-  redoIconComponent,
-}: {
-  undoIconComponent?: ReactNode;
-  redoIconComponent?: ReactNode;
-}) {
+export function UndoButton({
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <>
-      <ToolbarButton onClick={(_, editor) => editor.dispatchCommand(UNDO_COMMAND, undefined)}>
-        {undoIconComponent || <i>undo</i>}
-      </ToolbarButton>
-      <ToolbarButton onClick={(_, editor) => editor.dispatchCommand(REDO_COMMAND, undefined)}>
-        {redoIconComponent || <i>redo</i>}
-      </ToolbarButton>
-    </>
+    <ToolbarButton
+      onClick={(_, editor) => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+      {...props}
+    >
+      {children}
+    </ToolbarButton>
+  );
+}
+
+export function RedoButton({
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <ToolbarButton
+      onClick={(_, editor) => editor.dispatchCommand(REDO_COMMAND, undefined)}
+      {...props}
+    >
+      {children}
+    </ToolbarButton>
   );
 }
 
 export function SaveButton({
-  saveIconComponent,
+  children,
   onSave,
+  ...props
 }: {
-  saveIconComponent?: ReactNode;
+  children: ReactNode;
   onSave?: ScripturalBaseSettings["onSave"];
-}) {
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const [editor] = useLexicalComposerContext();
   const getCurrentUsj = useCallback(() => {
     const serializedEditorState = editor.getEditorState().toJSON();
@@ -112,61 +137,72 @@ export function SaveButton({
     onSave?.(usj);
   }, [onSave, getCurrentUsj]);
 
-  return <button onClick={handleSave}>{saveIconComponent || <i>download</i>}</button>;
+  return (
+    <ToolbarButton onClick={handleSave} {...props}>
+      {children}
+    </ToolbarButton>
+  );
 }
 
-export function ViewButton({ viewIconComponent }: { viewIconComponent?: ReactNode }) {
+export function ViewButton({
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { editorRef } = useScripturalComposerContext();
   const { toggleClass } = useBaseSettings();
   return (
-    <button
+    <ToolbarButton
       onClick={(e) => {
         toggleClass(editorRef.current, "verse-blocks");
         toggleClass(e.currentTarget, "active");
       }}
+      {...props}
     >
-      {viewIconComponent || <i>view_agenda</i>}
-    </button>
+      {children}
+    </ToolbarButton>
   );
 }
 
-export function FormatButton({ formatIconComponent }: { formatIconComponent?: ReactNode }) {
+export function FormatButton({
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { editorRef } = useScripturalComposerContext();
   const { toggleClass } = useBaseSettings();
   return (
-    <button
+    <ToolbarButton
       className="active"
       onClick={(e) => {
         toggleClass(editorRef.current, "with-markers");
         toggleClass(e.currentTarget, "active");
       }}
+      {...props}
     >
-      {formatIconComponent || <i>format_paragraph</i>}
-    </button>
+      {children}
+    </ToolbarButton>
   );
 }
 
 export function EnhancedCursorToggleButton({
-  enhancedCursorIconComponent,
-}: {
-  enhancedCursorIconComponent?: ReactNode;
-}) {
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { enhancedCursorPosition, toggleEnhancedCursorPosition } = useBaseSettings();
   return (
-    <button
+    <ToolbarButton
       className={enhancedCursorPosition ? "active" : undefined}
       onClick={toggleEnhancedCursorPosition}
+      {...props}
     >
-      {enhancedCursorIconComponent || <i>highlight_text_cursor</i>}
-    </button>
+      {children}
+    </ToolbarButton>
   );
 }
 
 export function ContextMenuTriggerButton({
-  contextMenuTriggerIconComponent,
-}: {
-  contextMenuTriggerIconComponent?: ReactNode;
-}) {
+  children,
+  ...props
+}: { children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { updateContextMenuTriggerKey, contextMenuTriggerKey } = useBaseSettings();
   const isListeningRef = useRef(false);
 
@@ -214,14 +250,21 @@ export function ContextMenuTriggerButton({
     };
   }, [cancelListening]);
   return (
-    <button onClick={handleButtonClick}>
-      {contextMenuTriggerIconComponent || <i>keyboard_command_key</i>}: {contextMenuTriggerKey}
-    </button>
+    <ToolbarButton onClick={handleButtonClick} {...props}>
+      {children}: {contextMenuTriggerKey}
+    </ToolbarButton>
   );
 }
 
-export function ToolbarInfoElement(props: { info: string }) {
-  return <span className="info">{props.info}</span>;
+export function ToolbarInfoElement({
+  info,
+  ...props
+}: { info: string } & React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className="info" {...props}>
+      {info}
+    </span>
+  );
 }
 
 export function MarkerInfo() {

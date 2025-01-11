@@ -6,10 +6,12 @@ import {
   FormatButton,
   HistoryButtons,
   MarkerInfo,
+  RedoButton,
   SaveButton,
   ScriptureReferenceInfo,
   ToolbarContainer,
   ToolbarSection,
+  UndoButton,
   ViewButton,
 } from "@scriptural/react";
 
@@ -34,30 +36,38 @@ export function CustomToolbar({ onSave }: { onSave: any }) {
       <ToolbarSection>
         {editable ? (
           <>
-            <HistoryButtons
-              undoIconComponent={<MdOutlineUndo size={20} />}
-              redoIconComponent={<MdOutlineRedo size={20} />}
-            />
+            <UndoButton title="undo">
+              <MdOutlineUndo size={20} />
+            </UndoButton>
+            <RedoButton title="redo">
+              <MdOutlineRedo size={20} />
+            </RedoButton>
             <hr />
-            <SaveButton onSave={onSave} saveIconComponent={<MdSave size={20} />} />
+            <SaveButton onSave={onSave} title="save">
+              <MdSave size={20} />
+            </SaveButton>
             <hr />
           </>
         ) : null}
-        <ViewButton viewIconComponent={<MdViewAgenda size={16} />} />
-        <FormatButton formatIconComponent={<ImPilcrow />} />
+        <ViewButton title="toggle block view">
+          <MdViewAgenda size={16} />
+        </ViewButton>
+        <FormatButton title="toggle markup">
+          <ImPilcrow />
+        </FormatButton>
         {editable && (
-          <EnhancedCursorToggleButton
-            enhancedCursorIconComponent={<RiInputCursorMove size={18} />}
-          />
+          <EnhancedCursorToggleButton title="toggle enhanced cursor">
+            <RiInputCursorMove size={18} />
+          </EnhancedCursorToggleButton>
         )}
         <ButtonExpandNotes defaultState={editable ? false : true} />
         <hr />
       </ToolbarSection>
       <ToolbarSection>
         {editable && (
-          <ContextMenuTriggerButton
-            contextMenuTriggerIconComponent={<MdKeyboardCommandKey size={18} />}
-          />
+          <ContextMenuTriggerButton title="set context menu trigger">
+            <MdKeyboardCommandKey size={18} />
+          </ContextMenuTriggerButton>
         )}
         <MarkerInfo />
         <ScriptureReferenceInfo />
