@@ -1,15 +1,15 @@
-[data-panel-group-direction='vertical'] .resizable-handle {
+[data-panel-group-direction="vertical"] .resizable-handle {
   border-top: 2px solid #eee;
   border-bottom: 2px solid transparent;
 }
 
-[data-panel-group-direction='horizontal'] .resizable-handle {
+[data-panel-group-direction="horizontal"] .resizable-handle {
   border-left: 2px solid #eee;
   border-right: 2px solid transparent;
 }
 
-[data-resize-handle-state='hover'].resizable-handle,
-[data-resize-handle-state='drag'].resizable-handle {
+[data-resize-handle-state="hover"].resizable-handle,
+[data-resize-handle-state="drag"].resizable-handle {
   border-color: #1976d28f;
 }
 
@@ -36,8 +36,8 @@
 
 .scriptural-editor
   > .editor.expand-notes
-  [data-type='note']
-  > *:not([data-type='caller'], [data-type='caller'] *) {
+  [data-type="note"]
+  > *:not([data-type="caller"], [data-type="caller"] *) {
   display: inline !important;
   background-color: #eee;
 }
