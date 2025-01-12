@@ -4,18 +4,18 @@ import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 import Editor, { EditorRef } from "./components/Editor";
 import { getViewOptions } from "./adaptors/view-options.utils";
 import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { NoteEditor } from "./components/NoteEditor";
 import { Usj2Usfm } from "./hooks/usj2Usfm";
-import { ScriptureReference } from "./plugins/ScriptureReferencePlugin";
 
 const defaultUsj: Usj = {
   type: USJ_TYPE,
   version: USJ_VERSION,
   content: [],
 };
-const defaultScrRef: ScriptureReference = { /* PSA */ bookCode: "PSA", chapterNum: 1, verseNum: 1 };
+const defaultScrRef: ScriptureReference = { book: "PSA", chapterNum: 1, verseNum: 1 };
 
 function App() {
   const editorRef = useRef<EditorRef>(null!);

@@ -16,13 +16,13 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ScriptureReference } from "shared/adaptors/scr-ref.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import {
   blackListedChangeTags,
   SELECTION_CHANGE_TAG,
 } from "shared/nodes/scripture/usj/node-constants";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
 import {

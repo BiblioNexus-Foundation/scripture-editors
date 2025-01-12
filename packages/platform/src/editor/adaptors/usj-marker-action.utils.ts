@@ -14,54 +14,56 @@ import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { MarkerAction } from "shared/utils/get-marker-action.model";
+import { MarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
-import { ScriptureReference as Reference } from "shared-react/plugins/ScriptureReferencePlugin";
 import { ViewOptions } from "./view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
 const markerActions: {
   [marker: string]: {
     label?: string;
-    action?: (currentEditor: { reference: Reference; editor: LexicalEditor }) => MarkerContent[];
+    action?: (currentEditor: {
+      reference: ScriptureReference;
+      editor: LexicalEditor;
+    }) => MarkerContent[];
   };
 } = {
   c: {
     action: (currentEditor) => {
-      const { book, chapter } = currentEditor.reference;
-      const newChapter = chapter + 1;
+      const { book, chapterNum } = currentEditor.reference;
+      const nextChapter = chapterNum + 1;
       const content: MarkerContent = {
         type: "chapter",
         marker: "c",
-        number: `${newChapter}`,
-        sid: `${book} ${newChapter}`,
+        number: `${nextChapter}`,
+        sid: `${book} ${nextChapter}`,
       };
       return [content];
     },
   },
   v: {
     action: (currentEditor) => {
-      const { book, chapter, verse } = currentEditor.reference;
-      const newVerse = verse + 1;
+      const { book, chapterNum, verseNum } = currentEditor.reference;
+      const nextVerse = verseNum + 1;
       const content: MarkerContent = {
         type: "verse",
         marker: "v",
-        number: `${newVerse}`,
-        sid: `${book} ${chapter}:${newVerse}`,
+        number: `${nextVerse}`,
+        sid: `${book} ${chapterNum}:${nextVerse}`,
       };
       return [content, " "];
     },
   },
   f: {
     action: (currentEditor) => {
-      const { chapter, verse } = currentEditor.reference;
+      const { chapterNum, verseNum } = currentEditor.reference;
       const content: MarkerContent = {
         type: "note",
         marker: "f",
         caller: "+",
         content: [
-          { type: "char", marker: "fr", content: [`${chapter}:${verse} `] },
+          { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum} `] },
           {
             type: "char",
             marker: "ft",
@@ -74,13 +76,13 @@ const markerActions: {
   },
   x: {
     action: (currentEditor) => {
-      const { chapter, verse } = currentEditor.reference;
+      const { chapterNum, verseNum } = currentEditor.reference;
       const content: MarkerContent = {
         type: "note",
         marker: "x",
         caller: "+",
         content: [
-          { type: "char", marker: "xo", content: [`${chapter}:${verse} `] },
+          { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum} `] },
           {
             type: "char",
             marker: "xt",
@@ -100,7 +102,7 @@ export function getUsjMarkerAction(
   viewOptions?: ViewOptions,
 ): MarkerAction {
   const markerAction = getMarkerAction(marker);
-  const action = (currentEditor: { reference: Reference; editor: LexicalEditor }) => {
+  const action = (currentEditor: { reference: ScriptureReference; editor: LexicalEditor }) => {
     currentEditor.editor.update(() => {
       const content = markerAction?.action?.(currentEditor);
       if (!content) return;
@@ -139,7 +141,10 @@ export function getUsjMarkerAction(
 
 function getMarkerAction(marker: string): {
   label?: string;
-  action?: (currentEditor: { reference: Reference; editor: LexicalEditor }) => MarkerContent[];
+  action?: (currentEditor: {
+    reference: ScriptureReference;
+    editor: LexicalEditor;
+  }) => MarkerContent[];
 } {
   let markerAction = markerActions[marker];
   if (!markerAction) {

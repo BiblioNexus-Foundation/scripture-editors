@@ -1,7 +1,7 @@
-import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
-import { ScriptureReference } from "../ScriptureReferencePlugin";
+import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
 import TypeaheadPlugin from "../Typeahead/TypeaheadPlugin";
 
 export default function PerfTypeaheadPlugin({

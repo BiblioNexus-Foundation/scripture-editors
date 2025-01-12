@@ -1,6 +1,6 @@
-import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
-import { ScriptureReference } from "./ScriptureReferencePlugin";
+import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
 export default function PerfNodesMenuPlugin({
   trigger,

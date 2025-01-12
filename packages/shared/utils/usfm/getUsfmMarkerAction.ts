@@ -10,7 +10,7 @@ import {
   RangeSelection,
   SerializedLexicalNode,
 } from "lexical";
-import { MarkerAction } from "../get-marker-action.model";
+import { MarkerAction, ScriptureReference } from "../get-marker-action.model";
 import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
 import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
@@ -21,7 +21,7 @@ export const markerActions: {
   [marker: string]: {
     label?: string;
     action?: (currentEditor: {
-      reference: { chapter: number; verse: number };
+      reference: ScriptureReference;
       editor: LexicalEditor;
     }) => SerializedLexicalNode | string;
   };
@@ -43,26 +43,26 @@ export const markerActions: {
   },
   v: {
     action: (currentEditor) => {
-      const { verse } = currentEditor.reference;
-      return String.raw`\v ${verse + 1} `;
+      const { verseNum } = currentEditor.reference;
+      return String.raw`\v ${verseNum + 1} `;
     },
   },
   c: {
     action: (currentEditor) => {
-      const { chapter } = currentEditor.reference;
-      return String.raw`\p \c ${chapter + 1} `;
+      const { chapterNum } = currentEditor.reference;
+      return String.raw`\p \c ${chapterNum + 1} `;
     },
   },
   f: {
     action: (currentEditor) => {
-      const { chapter, verse } = currentEditor.reference;
-      return String.raw`\f + \fr ${chapter}.${verse}: \ft ${CURSOR_PLACEHOLDER_CHAR} \f*`;
+      const { chapterNum, verseNum } = currentEditor.reference;
+      return String.raw`\f + \fr ${chapterNum}.${verseNum}: \ft ${CURSOR_PLACEHOLDER_CHAR} \f*`;
     },
   },
   x: {
     action: (currentEditor) => {
-      const { chapter, verse } = currentEditor.reference;
-      return String.raw`\x + \xo ${chapter}.${verse}: \xt ${CURSOR_PLACEHOLDER_CHAR} \x*`;
+      const { chapterNum, verseNum } = currentEditor.reference;
+      return String.raw`\x + \xo ${chapterNum}.${verseNum}: \xt ${CURSOR_PLACEHOLDER_CHAR} \x*`;
     },
   },
 };
@@ -70,10 +70,7 @@ export const markerActions: {
 /** A function that returns a marker action for a given USFM marker */
 export function getUsfmMarkerAction(marker: string, markerData?: Marker): MarkerAction {
   const markerAction = markerActions[marker];
-  const action = (currentEditor: {
-    editor: LexicalEditor;
-    reference: { book: string; chapter: number; verse: number };
-  }) => {
+  const action = (currentEditor: { editor: LexicalEditor; reference: ScriptureReference }) => {
     const isSerializedNode = (node: unknown): node is SerializedLexicalNode =>
       typeof node === "object" && node !== null && "type" in node && "version" in node;
     currentEditor.editor.update(() => {

@@ -24,10 +24,9 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
-import ScriptureReferencePlugin, {
-  ScriptureReference,
-} from "shared-react/plugins/ScriptureReferencePlugin";
+import ScriptureReferencePlugin from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
 import PerfNodesMenuPlugin from "shared-react/plugins/PerfNodesMenuPlugin";
 
@@ -68,8 +67,8 @@ export default function Editor({
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
   const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
     book: bookCode,
-    chapter: 1,
-    verse: 1,
+    chapterNum: 1,
+    verseNum: 1,
   });
   const [shouldUseCursorHelper, setShouldUseCursorHelper] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -113,7 +112,7 @@ export default function Editor({
   );
 
   const toggleClass = (element: HTMLElement | null, className: string) =>
-    element && element.classList.toggle(className);
+    element?.classList.toggle(className);
 
   const toolbarMarkerSections = useMemo(() => {
     if (!selectedMarker || !scriptureReference) return null;
@@ -186,11 +185,11 @@ export default function Editor({
           <button onClick={handleButtonClick}>
             <i>keyboard_command_key</i>: {contextMenuKey}
           </button>
-          <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
+          <span className="info">{selectedMarker ?? "•"}</span>
           <span className="info">
             {bookCode}{" "}
             {scriptureReference
-              ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
+              ? `${scriptureReference?.chapterNum}:${scriptureReference?.verseNum}`
               : null}
           </span>
           <hr />

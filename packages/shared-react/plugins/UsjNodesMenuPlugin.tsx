@@ -1,5 +1,4 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { Canon } from "@sillsdev/scripture";
 import {
   $getNodeByKey,
   $getSelection,
@@ -8,8 +7,7 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useMemo, useState } from "react";
-import { ScriptureReference } from "shared/adaptors/scr-ref.model";
-import { GetMarkerAction } from "shared/utils/get-marker-action.model";
+import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
 import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
@@ -22,15 +20,8 @@ export default function UsjNodesMenuPlugin({
   scrRef: ScriptureReference;
   getMarkerAction: GetMarkerAction;
 }) {
-  const { bookNum, chapterNum, verseNum } = scrRef;
-  const scriptureReference = useMemo(
-    () => ({
-      book: Canon.bookNumberToId(bookNum ?? 0),
-      chapter: chapterNum ?? 0,
-      verse: verseNum ?? 0,
-    }),
-    [bookNum, chapterNum, verseNum],
-  );
+  const { book, chapterNum, verseNum, verse } = scrRef;
+  const scriptureReference = useMemo(() => scrRef, [book, chapterNum, verseNum, verse]);
 
   const [editor] = useLexicalComposerContext();
   const [contextMarker, setContextMarker] = useState<string | undefined>();

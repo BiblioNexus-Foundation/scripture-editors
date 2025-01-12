@@ -1,11 +1,11 @@
 import { FlatDocument } from "../../plugins/PerfOperations/Types/Document";
 import { usfm2perf } from "../../converters/perf/usfmToPerf";
 import { transformPerfNodeToSerializedLexicalNode } from "../../converters/perf/perfToLexical";
-import Sequence from "../../plugins/PerfOperations/Types/Sequence";
 import { PerfKind } from "../../plugins/PerfOperations/types";
 import { SerializedElementNode } from "lexical";
 import { Marker, MarkerType } from "./usfmTypes";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler";
+import { ScriptureReference } from "../get-marker-action.model";
 
 //For now only markers that are allowed to be under \p marker
 export const createLexicalPerfNodeFromUsfm = (usfm: string, kind: "inline" | "block") => {
@@ -24,7 +24,7 @@ export const createLexicalPerfNodeFromUsfm = (usfm: string, kind: "inline" | "bl
 
   const lexicalSerializedRoot = transformPerfNodeToSerializedLexicalNode({
     source: {
-      node: perf.sequences[perf.main_sequence_id] as Sequence,
+      node: perf.sequences[perf.main_sequence_id],
       kind: PerfKind.Sequence,
     },
     perfSequences: perf.sequences,
@@ -40,7 +40,7 @@ export const createLexicalPerfNodeFromUsfm = (usfm: string, kind: "inline" | "bl
 
 export const usfmToLexicalAdapter = (
   usfm: string | undefined,
-  _: { book: string; chapter: number; verse: number },
+  _: ScriptureReference,
   markerData?: Marker,
 ) => {
   return createLexicalPerfNodeFromUsfm(

@@ -7,7 +7,6 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useRef } from "react";
-import { ScriptureReference } from "shared/adaptors/scr-ref.model";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
 import { CURSOR_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
 import {
@@ -17,6 +16,7 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { findThisVerse, findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   getChapterNodeClass,
@@ -44,7 +44,7 @@ export default function ScriptureReferencePlugin({
   const [editor] = useLexicalComposerContext();
   /** Prevents the cursor being moved again after a selection has changed. */
   const hasSelectionChangedRef = useRef(false);
-  const { bookNum, chapterNum, verseNum } = scrRef;
+  const { book, chapterNum, verseNum } = scrRef;
 
   // Book loaded or changed
   useEffect(
@@ -88,7 +88,7 @@ export default function ScriptureReferencePlugin({
         SELECTION_CHANGE_COMMAND,
         () =>
           $findAndSetChapterAndVerse(
-            bookNum,
+            book,
             chapterNum,
             verseNum,
             onScrRefChange,
@@ -97,7 +97,7 @@ export default function ScriptureReferencePlugin({
           ),
         COMMAND_PRIORITY_LOW,
       ),
-    [editor, bookNum, chapterNum, verseNum, onScrRefChange, viewOptions],
+    [editor, book, chapterNum, verseNum, onScrRefChange, viewOptions],
   );
 
   return null;
@@ -122,7 +122,7 @@ function $moveCursorToVerseStart(chapterNum: number, verseNum: number, viewOptio
 }
 
 function $findAndSetChapterAndVerse(
-  bookNum: number,
+  book: string,
   chapterNum: number,
   verseNum: number,
   onScrRefChange: (scrRef: ScriptureReference) => void,
@@ -137,18 +137,22 @@ function $findAndSetChapterAndVerse(
   const chapterNode = findThisChapter(startNode, ChapterNodeClass);
   const selectedChapterNum = parseInt(chapterNode?.getNumber() ?? "0", 10);
   const verseNode = findThisVerse(startNode, VerseNodeClass, ChapterNodeClass);
-  // For combined verses this returns the first number.
-  const selectedVerseNum = parseInt(verseNode?.getNumber() ?? "0", 10);
+  const verse = verseNode?.getNumber();
+  // For verse ranges this returns the first number.
+  const selectedVerseNum = parseInt(verse ?? "0", 10);
   hasSelectionChangedRef.current = !!(
     (chapterNode && selectedChapterNum !== chapterNum) ||
     selectedVerseNum !== verseNum
   );
-  if (hasSelectionChangedRef.current)
-    onScrRefChange({
-      bookNum,
+  if (hasSelectionChangedRef.current) {
+    const scrRef: ScriptureReference = {
+      book,
       chapterNum: selectedChapterNum,
       verseNum: selectedVerseNum,
-    });
+    };
+    if (verse != null && selectedVerseNum.toString() !== verse) scrRef.verse = verse;
+    onScrRefChange(scrRef);
+  }
 
   return false;
 }
