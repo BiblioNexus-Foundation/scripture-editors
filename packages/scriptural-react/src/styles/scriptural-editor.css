@@ -724,8 +724,7 @@ p[data-marker="q2"] {
     [data-marker="wg"],
     [data-marker="wh"],
     [data-marker="wa"],
-    [data-marker="jmp"],
-
+    [data-marker="jmp"]
   ):after {
   content: "\\" attr(data-marker) "*";
 }

@@ -64,7 +64,7 @@ export function CustomToolbar({ onSave }: { onSave: any }) {
       </ToolbarSection>
       <ToolbarSection>
         {editable && (
-          <ContextMenuTriggerButton title="set context menu trigger">
+          <ContextMenuTriggerButton title="set context menu trigger key">
             <MdKeyboardCommandKey size={18} />
           </ContextMenuTriggerButton>
         )}

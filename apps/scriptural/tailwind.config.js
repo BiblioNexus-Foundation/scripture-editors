@@ -1,13 +1,17 @@
+import { createGlobPatternsForDependencies } from "@nx/react/tailwind";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import animate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    join(__dirname, "src/**/*!(*.stories|*.spec).{ts,tsx,html}"),
+    ...createGlobPatternsForDependencies(__dirname),
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -33,5 +37,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [animate, typography],
 };
