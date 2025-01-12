@@ -7,6 +7,7 @@ import {
   ScripturalNodesMenuPlugin,
   DEFAULT_SCRIPTURAL_BASE_SETTINGS,
   useBaseSettings,
+  ScripturalInitialConfigType,
 } from "@scriptural/react";
 import "@scriptural/react/styles/scriptural-editor.css";
 import "@scriptural/react/styles/nodes-menu.css";
@@ -15,6 +16,7 @@ import "./editor.css";
 import { CustomToolbar } from "./CustomToolbar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { UsjDocument } from "@scriptural/react/internal-packages/shared/converters/usj/core/usj";
+import { EditorState, LexicalEditor } from "lexical";
 
 function onError(error: any) {
   console.error(error);
@@ -22,25 +24,28 @@ function onError(error: any) {
 
 export function Editor({
   usj,
+  initialState,
   bookCode,
   editable = true,
   children,
   onSave,
   onHistoryChange,
 }: {
-  usj: UsjDocument;
+  usj?: UsjDocument;
+  initialState?: null | string | EditorState | ((editor: LexicalEditor) => void);
   bookCode: string;
   editable?: boolean;
   children?: React.ReactNode;
   onSave?: (newUsj: UsjDocument) => void;
   onHistoryChange?: Parameters<typeof HistoryPlugin>[0]["onChange"];
 }) {
-  const initialConfig = useMemo(() => {
+  const initialConfig = useMemo<ScripturalInitialConfigType>(() => {
     return {
       bookCode,
       usj,
       onError,
       editable,
+      initialLexicalState: initialState,
       initialSettings: {
         ...DEFAULT_SCRIPTURAL_BASE_SETTINGS,
         onSave,
