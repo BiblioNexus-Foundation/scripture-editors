@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { CommentStore, Comments } from "./commenting";
 import { EditorProps } from "../../editor/Editor";
 

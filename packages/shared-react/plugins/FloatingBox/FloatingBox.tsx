@@ -2,12 +2,14 @@ import { forwardRef, ReactNode } from "react";
 
 export type FloatingBoxCoords = { x: number; y: number } | undefined;
 
-type FloatingBoxProps = {
+export type FloatingBoxProps = {
   coords: FloatingBoxCoords;
   children?: ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const FloatingBox = forwardRef<HTMLDivElement, FloatingBoxProps>((props, ref) => {
+export const FloatingBox: React.ForwardRefExoticComponent<
+  FloatingBoxProps & React.RefAttributes<HTMLDivElement>
+> = forwardRef(function FloatingBox(props, ref) {
   const { coords, children, style, ...extraProps } = props;
   const shouldShow = coords !== undefined;
 

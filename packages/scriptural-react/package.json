@@ -1,0 +1,60 @@
+{
+  "name": "@scriptural/react",
+  "version": "0.0.17",
+  "description": "A React-based Bible editor component library built on top of Lexical, providing components, hooks, and utilities for creating scripture editing applications",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "bible",
+    "scripture",
+    "editor",
+    "react",
+    "lexical",
+    "usfm",
+    "usj",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BiblioNexus-Foundation/scripture-editors.git",
+    "directory": "packages/scriptural-react"
+  },
+  "bugs": {
+    "url": "https://github.com/BiblioNexus-Foundation/scripture-editors/issues"
+  },
+  "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/scriptural-react#readme",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.1",
+    "react-dom": ">=18.3.1",
+    "lexical": "^0.21.0",
+    "@lexical/react": "^0.21.0"
+  },
+  "devDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "lexical": "^0.21.0",
+    "@lexical/react": "^0.21.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "author": {
+    "name": "BiblioNexus-Foundation",
+    "url": "https://github.com/BiblioNexus-Foundation"
+  },
+  "license": "MIT"
+}

@@ -1,11 +1,18 @@
-import { $getSelection, $isRangeSelection } from "lexical";
+import { $getSelection, $isRangeSelection, KEY_ENTER_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
 import { NodeSelectionMenu } from "./NodeSelectionMenu";
 import { OptionItem } from "./Menu";
+import { $isCursorAtEdgeofBlock } from "shared/plugins/CursorHandler/core/utils";
 
-export default function NodesMenu({ trigger, items }: { trigger: string; items?: OptionItem[] }) {
+export const NodesMenu = memo(function NodesMenu({
+  trigger,
+  items,
+}: {
+  trigger: string;
+  items?: OptionItem[];
+}) {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -23,21 +30,59 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
   );
 
   useEffect(() => {
-    return editor.registerRootListener((root) => {
+    return editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (e) => {
+        if (!isOpen) {
+          if ($isCursorAtEdgeofBlock()) {
+            setIsOpen(true);
+            e?.preventDefault();
+            return true;
+          }
+        }
+        return false;
+      },
+      3,
+    );
+  }, [isOpen, editor]);
+
+  useEffect(() => {
+    let removeListener: (() => void) | undefined;
+
+    const cleanup = editor.registerRootListener((root) => {
       if (!root) return;
+
+      // Clean up previous listener if it exists
+      removeListener?.();
+
+      // Add new listener and store its cleanup function
       root.addEventListener("keydown", handleKeyDown);
-      return () => {
+      removeListener = () => {
         root.removeEventListener("keydown", handleKeyDown);
       };
+
+      return removeListener;
     });
+
+    // Return a cleanup function that both unregisters the root listener
+    // and removes any existing keydown listener
+    return () => {
+      cleanup();
+      removeListener?.();
+    };
   }, [editor, handleKeyDown]);
 
   // Close the menu when the selection changes
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
+    return editor.registerUpdateListener(({ prevEditorState, editorState }) => {
+      const prevSelection = prevEditorState.read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
+        return selection;
+      });
+      editorState.read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || prevSelection?.is(selection)) return;
         setIsOpen(false);
       });
     });
@@ -56,4 +101,6 @@ export default function NodesMenu({ trigger, items }: { trigger: string; items?:
       </FloatingBoxAtCursor>
     )
   );
-}
+});
+
+export default NodesMenu;

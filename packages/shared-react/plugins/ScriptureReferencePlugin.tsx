@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getSelection, $isElementNode, LexicalNode } from "lexical";
+import { $getSelection, $isElementNode, $isTextNode, EditorState, LexicalNode } from "lexical";
 import { useEffect } from "react";
+import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 import { $isUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
 
 //TODO: move plugin functions to vanilla javascript plugin
@@ -71,60 +72,91 @@ const findNodeInTree = (
   return null;
 };
 
-export function $getCurrentChapterNode(selectedNode: LexicalNode) {
+export function $getCurrentChapterNode(selectedNode: LexicalNode, targetDepth = 2) {
   const chapterNode = findNodeInTree(
     selectedNode,
     (node: LexicalNode) => {
-      if ($isUsfmElementNode(node) && node.getAttribute("data-marker") === "c") {
+      if (
+        ($isUsfmElementNode(node) || $isScriptureElementNode(node)) &&
+        node.getAttribute("data-marker") === "c"
+      ) {
         return true;
       }
       return false;
     },
-    2,
+    targetDepth,
   ) as UsfmElementNode | null;
   return chapterNode ?? null;
 }
 
-export function $getCurrentVerseNode(selectedNode: LexicalNode) {
+export function $getCurrentVerseNode(selectedNode: LexicalNode, targetDepth = 2) {
   const verseNode = findNodeInTree(
     selectedNode,
     (node: LexicalNode) => {
-      if ($isUsfmElementNode(node) && node.getAttribute("data-marker") === "v") {
+      if (
+        ($isUsfmElementNode(node) || $isScriptureElementNode(node)) &&
+        node.getAttribute("data-marker") === "v"
+      ) {
         return true;
       }
       return false;
     },
-    2,
+    targetDepth,
   ) as UsfmElementNode | null;
   return verseNode ?? null;
 }
 
+export function wereMarkersUpdated(markers: string[], editorState: EditorState) {
+  return editorState.read(() => {
+    let selectedNode = $getSelection()?.getNodes()?.[0];
+    if ($isTextNode(selectedNode)) {
+      selectedNode = selectedNode?.getParent() ?? undefined;
+    }
+    if (!selectedNode) return false;
+    return (
+      $isScriptureElementNode(selectedNode) &&
+      markers.includes(selectedNode.getAttribute("data-marker") ?? "")
+    );
+  });
+}
+
 export type ScriptureReference = {
+  book: string;
   chapter: number;
   verse: number;
 };
 
-export default function ScriptureReferencePlugin({
+export function ScriptureReferencePlugin({
+  book,
   onChangeReference,
+  verseDepth = 2,
+  chapterDepth = 2,
 }: {
+  book?: string;
   onChangeReference?: (reference: ScriptureReference) => void;
+  verseDepth?: number;
+  chapterDepth?: number;
 }) {
   const [editor] = useLexicalComposerContext();
-
   useEffect(
     () =>
       onChangeReference &&
-      editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves }) => {
-        if (dirtyLeaves.size === 0 || dirtyElements.size === 0)
+      editor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves, tags }) => {
+        const wasChapterOrVerseMutated =
+          !tags.has("history-merge") && wereMarkersUpdated(["v", "c"], editorState);
+
+        if (dirtyLeaves.size === 0 || dirtyElements.size === 0 || wasChapterOrVerseMutated)
           editorState.read(() => {
             const selectedNode = $getSelection()?.getNodes()?.[0];
             if (!selectedNode) return;
-            const verseNode = $getCurrentVerseNode(selectedNode);
-            const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode);
-            onChangeReference({
+            const verseNode = $getCurrentVerseNode(selectedNode, verseDepth);
+            const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode, chapterDepth);
+            const newReference = {
+              book: book ?? "",
               chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),
               verse: Number(verseNode?.getAttribute("data-number") ?? 0),
-            });
+            };
+            onChangeReference(newReference);
           });
       }),
     [editor, onChangeReference],

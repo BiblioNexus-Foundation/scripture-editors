@@ -45,3 +45,9 @@ Thumbs.db
 .nx/cache
 .nx/workspace-data
 .env
+
+# API Extractor
+api-extractor.json
+
+# Vitest
+vitest/

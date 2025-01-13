@@ -1,0 +1,53 @@
+[data-panel-group-direction="vertical"] .resizable-handle {
+  border-top: 2px solid #eee;
+  border-bottom: 2px solid transparent;
+}
+
+[data-panel-group-direction="horizontal"] .resizable-handle {
+  border-left: 2px solid #eee;
+  border-right: 2px solid transparent;
+}
+
+[data-resize-handle-state="hover"].resizable-handle,
+[data-resize-handle-state="drag"].resizable-handle {
+  border-color: #1976d28f;
+}
+
+.editor-wrapper {
+  display: grid;
+  height: 100%;
+}
+
+.scriptural-editor {
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0px -4px 8px -10px inset;
+  padding: 0rem 1rem;
+}
+
+.toolbar > * {
+  height: auto !important;
+  min-height: 40px !important;
+}
+
+.toolbar {
+  border-radius: 0 !important;
+}
+
+.scriptural-editor
+  > .editor.expand-notes
+  [data-type="note"]
+  > *:not([data-type="caller"], [data-type="caller"] *) {
+  display: inline !important;
+  background-color: #eee;
+}
+
+.prose {
+  max-width: none;
+}
+
+.workspace {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: auto;
+}

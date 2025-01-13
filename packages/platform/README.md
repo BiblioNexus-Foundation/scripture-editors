@@ -226,6 +226,8 @@ export type EditorOptions = {
   hasSpellCheck?: boolean;
   /** Text direction: "ltr" | "rtl" | "auto". */
   textDirection?: TextDirection;
+  /** Key to trigger the marker menu. Defaults to '\'. */
+  markerMenuTrigger?: string;
   /** View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only functional option. */
   view?: ViewOptions;
   /** Options for each editor node:

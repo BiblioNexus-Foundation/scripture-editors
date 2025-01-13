@@ -1,4 +1,11 @@
-import { $isTextNode, $isRangeSelection, BaseSelection, TextNode, RangeSelection } from "lexical";
+import {
+  $isTextNode,
+  $isRangeSelection,
+  BaseSelection,
+  TextNode,
+  RangeSelection,
+  $getNodeByKey,
+} from "lexical";
 import { CURSOR_PLACEHOLDER_CHAR, CursorMovementDirection } from "./constants";
 
 export enum CursorPosition {
@@ -7,7 +14,12 @@ export enum CursorPosition {
   End,
 }
 
-type Direction = CursorMovementDirection.LEFT | CursorMovementDirection.RIGHT | undefined;
+type Direction =
+  | CursorMovementDirection.LEFT
+  | CursorMovementDirection.RIGHT
+  | CursorMovementDirection.UP
+  | CursorMovementDirection.DOWN
+  | undefined;
 
 interface PlaceholdersData {
   char: string;
@@ -28,6 +40,8 @@ export type CursorData = {
   isPlaceholder: boolean;
   isMovingRight: boolean;
   isMovingLeft: boolean;
+  isMovingUp: boolean;
+  isMovingDown: boolean;
   isAtStart: boolean;
   isAtEnd: boolean;
   isMovingFromStartToEnd: boolean;
@@ -78,7 +92,7 @@ export function $getCursorSelectionContext(
     return null;
   }
 
-  const node = selection.anchor.getNode();
+  const node = $getNodeByKey(selection.anchor.key);
 
   if (!$isTextNode(node)) {
     return null;
@@ -195,6 +209,12 @@ export function $getCursorSelectionContext(
       },
       get isMovingLeft() {
         return targetDirection === CursorMovementDirection.LEFT;
+      },
+      get isMovingUp() {
+        return targetDirection === CursorMovementDirection.UP;
+      },
+      get isMovingDown() {
+        return targetDirection === CursorMovementDirection.DOWN;
       },
       get isAtStart() {
         return getPosition() === CursorPosition.Start;

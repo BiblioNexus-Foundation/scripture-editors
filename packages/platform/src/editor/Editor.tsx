@@ -38,14 +38,16 @@ import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
+import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
 import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
 import editorTheme from "./editor.theme";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
@@ -97,6 +99,8 @@ export type EditorOptions = {
   hasSpellCheck?: boolean;
   /** Text direction: "ltr" | "rtl" | "auto". */
   textDirection?: TextDirection;
+  /** Key to trigger the marker menu. Defaults to '\'. */
+  markerMenuTrigger?: string;
   /**
    * View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only
    * functional option.
@@ -143,7 +147,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   nodes: [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
 };
 
-const defaultViewOptions = getViewOptions(undefined);
+const defaultViewOptions = getViewOptions();
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -182,10 +186,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
   const [usj, setUsj] = useState(defaultUsj);
+
   const {
     isReadonly = false,
     hasSpellCheck = false,
     textDirection = "auto",
+    markerMenuTrigger = "\\",
     view: viewOptions = defaultViewOptions,
     nodes: nodeOptions = {},
   } = options ?? {};
@@ -267,6 +273,15 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               scrRef={scrRef}
               onScrRefChange={onScrRefChange}
               viewOptions={viewOptions}
+            />
+          )}
+          {scrRef && (
+            <UsjNodesMenuPlugin
+              trigger={markerMenuTrigger}
+              scrRef={scrRef}
+              getMarkerAction={(marker, markerData) =>
+                getUsjMarkerAction(marker, markerData, viewOptions)
+              }
             />
           )}
           <UpdateStatePlugin

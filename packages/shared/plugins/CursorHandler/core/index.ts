@@ -1,5 +1,5 @@
 /* eslint-disable no-debugger */
-import { $addUpdateTag, LexicalEditor, LexicalNode } from "lexical";
+import { LexicalEditor, LexicalNode } from "lexical";
 import { mergeRegister } from "@lexical/utils";
 import { registerCursorInsertion } from "./insertionHandlers";
 import { registerCursorRemoval } from "./removalHandlers";
@@ -12,11 +12,15 @@ export function registerCursorHandlers(
   updateTags?: string[],
 ) {
   function editorUpdate(update: (() => void) | (() => void), tag?: string) {
-    const options = tag ? { tag: tag } : undefined;
-    editor.update(() => {
-      update();
-      updateTags?.forEach((tag) => $addUpdateTag(tag));
-    }, options);
+    const options = tag ? { tag: [...(updateTags || []), tag] } : { tag: [...(updateTags || [])] };
+    editor.update(
+      () => {
+        update();
+      },
+      {
+        ...options,
+      },
+    );
   }
 
   const unRegisterCursorHandlers = mergeRegister(

@@ -1,9 +1,9 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { useEffect } from "react";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { EditorAdaptor, NodeOptions } from "shared/adaptors/editor-adaptor.model";
 import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-constants";
-import { LoggerBasic } from "./logger-basic.model";
-import { EditorAdaptor, NodeOptions } from "../adaptors/editor-adaptor.model";
 
 /**
  * A plugin component that updates the state of the lexical editor when incoming Scripture changes.
@@ -34,6 +34,7 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
     editorAdaptor.reset?.();
     const serializedEditorState = editorAdaptor.serializeEditorState(scripture, viewOptions);
     const editorState = editor.parseEditorState(serializedEditorState);
+    console.log({ serializedEditorState, usj: scripture });
     // Execute after the current render cycle.
     const timeoutId = setTimeout(() => {
       editor.setEditorState(editorState, { tag: EXTERNAL_USJ_MUTATION_TAG });

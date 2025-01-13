@@ -1,0 +1,72 @@
+/* Floating Menu Styles */
+.floating-box:has(> .autocomplete-menu-container) {
+  background: #f1f1f1;
+  border: 1px solid #ccc;
+}
+
+.floating-box .autocomplete-menu-options {
+  display: block;
+  text-align: left;
+  width: fit-content;
+  overflow-x: clip;
+  text-overflow: ellipsis;
+  overflow: auto;
+  max-height: 200px;
+}
+
+.autocomplete-menu-options button {
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: min-content minmax(0, 90vw);
+  align-items: baseline;
+  max-width: 400px;
+  gap: 1em;
+  width: 100%;
+  white-space: nowrap;
+  font-size: 0.9em;
+  border-radius: 0;
+  border: 0;
+}
+
+.autocomplete-menu-options button[aria-selected="true"] {
+  background: rgb(0 0 0 / 5%);
+}
+
+.autocomplete-menu-options button.active {
+  background: rgb(189, 232, 255);
+}
+
+.autocomplete-menu-options button .description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  white-space: nowrap;
+  text-align: right;
+  align-items: baseline;
+  font-size: 0.7em;
+  opacity: 0.8;
+}
+
+.autocomplete-menu-container input[type="text"] {
+  width: auto;
+  padding: 0.5em;
+  box-sizing: border-box;
+  background: #e9e9e9;
+  border: none;
+  outline: none;
+  color: #222222;
+  font-size: 1em;
+  margin: 0.4em;
+  border-radius: 0.2em;
+  font-family: inherit;
+}
+
+.autocomplete-menu-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.autocomplete-menu-container.inverse {
+  flex-direction: column-reverse;
+}

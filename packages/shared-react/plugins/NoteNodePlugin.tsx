@@ -31,7 +31,7 @@ import {
 } from "../nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 import { MERGE_HISTORY_COMMAND } from "./HistoryPlugin";
-import { LoggerBasic } from "./logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 const callerData: CallerData = { count: 0 };
 

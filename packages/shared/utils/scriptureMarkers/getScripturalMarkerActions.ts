@@ -4,24 +4,27 @@ import {
   $isElementNode,
   $isRangeSelection,
   $isTextNode,
+  $setSelection,
   ElementNode,
   LexicalEditor,
   LexicalNode,
   RangeSelection,
   SerializedLexicalNode,
 } from "lexical";
+import { MarkerAction } from "../get-marker-action.model";
 import { $createNodeFromSerializedNode } from "../../converters/usfm/emptyUsfmNodes";
-import { createLexicalNodeFromUsfm } from "./usfmToLexical";
-import { MarkerType, Marker } from "./usfmTypes";
-import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
 import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler/core/utils/constants";
-import { $isUsfmParagraphNode } from "../../nodes/UsfmParagraphNode";
+import { $isTypedMarkNode } from "../../nodes/features/TypedMarkNode";
+import { ScripturalMarker } from "./scripturalMarkers";
+import { UsjNode } from "../../converters/usj/core/usj";
+import { usjNodeToSerializedLexical } from "../../converters/usj";
+import { ScriptureElementNode } from "../../nodes/scripture/generic/ScriptureElementNode";
 
 export const markerActions: {
   [marker: string]: {
     label?: string;
     action?: (currentEditor: {
-      reference: { chapter: number; verse: number };
+      reference: { book: string; chapter: number; verse: number };
       editor: LexicalEditor;
     }) => SerializedLexicalNode | string;
   };
@@ -67,36 +70,122 @@ export const markerActions: {
   },
 };
 
-export function getMarkerAction(marker: string, markerData?: Marker) {
+function createEmptyUsj(
+  marker: string,
+  markerData: ScripturalMarker,
+  reference: { book: string; chapter: number; verse: number },
+): UsjNode | undefined {
+  const element = markerData.element;
+
+  if (!element) {
+    return undefined;
+  }
+
+  // Helper function to get required attributes based on marker type
+  const getRequiredAttributes = () => {
+    const bookCode = reference.book.toUpperCase();
+    const bcId = `${bookCode}.${reference.chapter}`;
+    switch (marker) {
+      case "v":
+        return {
+          number: String(reference.verse + 1),
+          sid: `${bcId}.${Number(reference.verse) + 1}`,
+        };
+      case "c":
+        return {
+          number: String(reference.chapter + 1),
+          sid: `${bookCode}.${Number(reference.chapter) + 1}`,
+        };
+      case "book":
+        return { code: bookCode };
+      case "f":
+        return {
+          caller: "+",
+          content: [
+            { type: "char", marker: "fr", content: [`${reference.chapter}.${reference.verse}`] },
+            {
+              type: "char",
+              marker: "ft",
+              content: [" "],
+            },
+          ],
+        };
+      case "x":
+        return {
+          caller: "+",
+          content: [
+            { type: "char", marker: "xo", content: [`${reference.chapter}.${reference.verse}`] },
+            { type: "char", marker: "xt", content: [" "] },
+          ],
+        };
+      default:
+        return {};
+    }
+  };
+
+  let nodeType: UsjNode["type"] | undefined = undefined;
+
+  if (Array.isArray(element)) {
+    nodeType = element[0]?.type;
+    const allSameType = element.every((el) => el.type === nodeType);
+    if (!allSameType || !nodeType) {
+      return undefined;
+    }
+
+    const usj = {
+      type: nodeType,
+      content: [],
+      marker: marker,
+      ...getRequiredAttributes(),
+    } as UsjNode;
+    return usj;
+  }
+
+  const usj: UsjNode = {
+    type: element.type,
+    content: [],
+    marker: marker,
+    ...getRequiredAttributes(),
+  } as UsjNode;
+  return usj;
+}
+
+/** A function that returns a marker action for a given USFM marker */
+export function getScripturalMarkerAction(
+  marker: string,
+  markerData: ScripturalMarker,
+): MarkerAction {
   const markerAction = markerActions[marker];
   const action = (currentEditor: {
     editor: LexicalEditor;
-    reference: { chapter: number; verse: number };
+    reference: { book: string; chapter: number; verse: number };
   }) => {
+    const isSerializedNode = (node: unknown): node is SerializedLexicalNode =>
+      typeof node === "object" && node !== null && "type" in node && "version" in node;
     currentEditor.editor.update(() => {
       const node = markerAction?.action?.(currentEditor);
-      const selection = $getSelection();
-      const usfmSerializedNode =
-        typeof node === "object"
-          ? node
-          : createLexicalNodeFromUsfm(
-              node ||
-                `\\${marker} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${marker}*` : ""}`,
-              !markerData ||
-                markerData.type === MarkerType.Character ||
-                markerData.type === MarkerType.Note
-                ? "inline"
-                : "block",
-            );
-      const usfmNode = $createNodeFromSerializedNode(usfmSerializedNode);
+      const serializedLexicalNode = isSerializedNode(node)
+        ? node
+        : (() => {
+            const r = createEmptyUsj(marker, markerData, currentEditor.reference);
+            if (!r) {
+              return undefined;
+            }
+            return usjNodeToSerializedLexical(r)?.result;
+          })();
 
-      // Check if the selection is a range selection
+      if (!serializedLexicalNode) {
+        return;
+      }
+      const usfmNode = $createNodeFromSerializedNode(serializedLexicalNode) as ScriptureElementNode;
+
+      const selection = $getSelection();
       if ($isRangeSelection(selection)) {
         // If the selection has text content, wrap the text selection in an inline node
         if (selection.getTextContent().length > 0) {
           $wrapTextSelectionInInlineNode(selection, false, () => usfmNode);
         } else {
-          if ($isUsfmParagraphNode(usfmNode)) {
+          if ($isElementNode(usfmNode) && !usfmNode.isInline()) {
             // If the selection is empty, insert a new paragraph and replace it with the USFM node
             const paragraph = selection.insertParagraph();
 
@@ -108,7 +197,14 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
               usfmNode.selectStart();
             }
           } else {
-            selection?.insertNodes([usfmNode]);
+            const selectionNode = selection.getNodes()[0];
+            if ($isTextNode(selectionNode) && selectionNode.getParent()?.isInline()) {
+              const splittedNodes = selectionNode.splitText(selection.focus.offset);
+              const insertedNode = splittedNodes[0].insertAfter(usfmNode, false);
+              $setSelection(insertedNode.selectEnd());
+            } else {
+              selection.insertNodes([usfmNode]);
+            }
           }
         }
       } else {
@@ -120,7 +216,7 @@ export function getMarkerAction(marker: string, markerData?: Marker) {
   return { action, label: markerAction?.label };
 }
 
-//TODO: handle edge cases for unwrapable usfm elements
+// TODO: handle edge cases for unwrap-able usfm elements
 export function $wrapTextSelectionInInlineNode(
   selection: RangeSelection,
   isBackward: boolean,

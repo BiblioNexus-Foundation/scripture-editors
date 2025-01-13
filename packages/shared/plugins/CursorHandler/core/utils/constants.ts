@@ -6,6 +6,8 @@ export const CURSOR_PLACEHOLDER_CHAR = ZERO_WIDTH_SPACE;
 export enum CursorMovementDirection {
   LEFT = "left",
   RIGHT = "right",
+  UP = "up",
+  DOWN = "down",
 }
 
 export enum CharSelectionOffset {

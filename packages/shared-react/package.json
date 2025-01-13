@@ -19,6 +19,7 @@
     "@floating-ui/dom": "^1.6.12",
     "@lexical/react": "^0.21.0",
     "@lexical/utils": "^0.21.0",
+    "@sillsdev/scripture": "^2.0.2",
     "lexical": "^0.21.0"
   },
   "devDependencies": {

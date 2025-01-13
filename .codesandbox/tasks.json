@@ -37,6 +37,14 @@
         "port": 5175
       }
     },
+    "dev:scriptural": {
+      "name": "dev:scriptural",
+      "command": "pnpm nx dev scriptural-app",
+      "runAtStart": true,
+      "preview": {
+        "port": 5176
+      }
+    },
     "build": {
       "name": "build",
       "command": "pnpm build"

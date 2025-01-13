@@ -1,0 +1,78 @@
+{
+  "$id": "https://usfm-committee/usj.schema.json",
+  "title": "Unified Scripture JSON extended from USX relax ng schema",
+  "description": "The JSON variant of USFM and USX data models",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The kind of node/element/marker this is",
+      "type": "string"
+    },
+    "version": {
+      "description": "The USJ spec version",
+      "type": "string"
+    },
+    "content": {
+      "description": "The JSON representation of scripture contents from USFM/USX",
+      "type": "array",
+      "items": {
+        "prefixItems": [
+          {
+            "$ref": "#/$defs/bookObject"
+          }
+        ],
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/bookObject"
+            },
+            {
+              "$ref": "#/$defs/chapterObject"
+            },
+            {
+              "$ref": "#/$defs/paraMarkerObject"
+            },
+            {
+              "$ref": "#/$defs/tableObject"
+            },
+            {
+              "$ref": "#/$defs/sidebarObject"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "bookObject": {
+      "description": "Book object",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The kind/category of node or element",
+          "type": "string",
+          "const": "book"
+        },
+        "marker": {
+          "description": "The corresponding marker in USFM or style in USX",
+          "type": "string",
+          "const": "id"
+        },
+        "code": {
+          "description": "The 3-letter book code in id element",
+          "pattern": "^[0-6A-Z]{3}$",
+          "type": "string"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["type", "marker", "code"],
+      "additionalProperties": false
+    }
+  }
+}
