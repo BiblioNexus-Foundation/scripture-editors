@@ -4,15 +4,16 @@ import {
   $isElementNode,
   $isRangeSelection,
   $isTextNode,
-  ElementNode,
   LexicalEditor,
   LexicalNode,
   RangeSelection,
+  TextNode,
 } from "lexical";
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
@@ -44,15 +45,15 @@ const markerActions: {
   },
   v: {
     action: (currentEditor) => {
-      const { book, chapterNum, verseNum } = currentEditor.reference;
-      const nextVerse = verseNum + 1;
+      const { book, chapterNum, verseNum, verse } = currentEditor.reference;
+      const nextVerse = getNextVerse(verseNum, verse);
       const content: MarkerContent = {
         type: "verse",
         marker: "v",
         number: `${nextVerse}`,
         sid: `${book} ${chapterNum}:${nextVerse}`,
       };
-      return [content, " "];
+      return [content];
     },
   },
   f: {
@@ -114,7 +115,7 @@ export function getUsjMarkerAction(
       if ($isRangeSelection(selection)) {
         // If the selection has text content, wrap the text selection in an inline node
         if (selection.getTextContent().length > 0) {
-          $wrapTextSelectionInInlineNode(selection, false, () =>
+          $wrapTextSelectionInInlineNode(selection, () =>
             $createNodeFromSerializedNode(serializedLexicalNode),
           );
         } else if ($isElementNode(usjNode) && !usjNode.isInline()) {
@@ -177,97 +178,117 @@ function getMarkerAction(marker: string): {
 
 function $wrapTextSelectionInInlineNode(
   selection: RangeSelection,
-  isBackward: boolean,
   createNode: () => LexicalNode,
 ): void {
   const nodes = selection.getNodes();
-  const anchorOffset = selection.anchor.offset;
-  const focusOffset = selection.focus.offset;
-  const startOffset = isBackward ? focusOffset : anchorOffset;
-  const endOffset = isBackward ? anchorOffset : focusOffset;
-  let currentNodeParent: LexicalNode | undefined;
-  let lastCreatedNode: LexicalNode | undefined;
+  const [startOffset, endOffset] = getSelectionOffsets(selection);
 
-  // We only want to wrap adjacent text nodes, line break nodes and inline element nodes. For
-  // decorator nodes and block element nodes, we step out of their boundary and start again after,
-  // if there are more nodes.
-  nodes.forEach((node, i) => {
-    if ($isElementNode(lastCreatedNode) && lastCreatedNode.isParentOf(node)) {
-      // If the current node is a child of the last created mark node, there is nothing to do here
+  let currentWrapper: LexicalNode | undefined;
+
+  nodes.forEach((node, index) => {
+    // Skip if node is already wrapped
+    if ($isElementNode(currentWrapper) && currentWrapper.isParentOf(node)) {
       return;
     }
-    const isFirstNode = i === 0;
-    const isLastNode = i === nodes.length - 1;
-    let targetNode: LexicalNode | undefined;
 
-    if ($isTypedMarkNode(node) || $isNoteNode(node) || $isNoteNode(node.getParent())) {
-      // Case 1: the node is a mark node and we can ignore it as a target, moving on to its children
-      // OR a note node OR a notes children. Note that when we make a mark inside another mark, it
-      // may ultimately be unnested by a call to `registerNestedElementResolver<TypedMarkNode>`
-      // somewhere else in the codebase.
+    // Get the target node to wrap
+    const targetNode = getTargetNode(
+      node,
+      index === 0,
+      index === nodes.length - 1,
+      startOffset,
+      endOffset,
+    );
+
+    if (!targetNode) {
+      currentWrapper = undefined;
       return;
-    } else if ($isTextNode(node)) {
-      // Case 2: The node is a text node and we can split it
-      const textContentSize = node.getTextContentSize();
-      const startTextOffset = isFirstNode ? startOffset : 0;
-      const endTextOffset = isLastNode ? endOffset : textContentSize;
-      if (startTextOffset === 0 && endTextOffset === 0) {
-        return;
-      }
-      const splitNodes = node.splitText(startTextOffset, endTextOffset);
-      targetNode =
-        splitNodes.length > 1 &&
-        (splitNodes.length === 3 ||
-          (isFirstNode && !isLastNode) ||
-          endTextOffset === textContentSize)
-          ? splitNodes[1]
-          : splitNodes[0];
-      lastCreatedNode = undefined;
-    } else if ($isElementNode(node) && node.isInline()) {
-      // Case 3: inline element nodes can be added in their entirety to the new
-      // mark
-      targetNode = node;
     }
 
-    if (targetNode) {
-      // Now that we have a target node for wrapping with a mark, we can run through special cases.
-      if (targetNode.is(currentNodeParent)) {
-        // The current node is a child of the target node to be wrapped, there is nothing to do here.
-        return;
-      }
-      const parentNode = targetNode.getParent() ?? undefined;
-      if (!parentNode?.is(currentNodeParent)) {
-        // If the parent node is not the current node's parent node, we can clear the last created
-        // mark node.
-        lastCreatedNode = undefined;
-      }
-
-      currentNodeParent = parentNode;
-
-      if (lastCreatedNode === undefined) {
-        // If we don't have a created mark node, we can make one
-        lastCreatedNode = createNode();
-        targetNode.insertBefore(lastCreatedNode);
-      }
-
-      if ($isTextNode(lastCreatedNode)) {
-        lastCreatedNode.setTextContent(targetNode.getTextContent());
-        targetNode.remove();
-      } else {
-        // Add the target node to be wrapped in the latest created mark node.
-        (lastCreatedNode as ElementNode).clear();
-        (lastCreatedNode as ElementNode).append(targetNode);
-      }
-    } else {
-      // If we don't have a target node to wrap we can clear our state and continue on with the
-      // next node.
-      currentNodeParent = undefined;
-      lastCreatedNode = undefined;
+    // Create or reuse wrapper node
+    if (!currentWrapper) {
+      currentWrapper = createNode();
+      targetNode.insertBefore(currentWrapper);
     }
+
+    // Wrap the target node
+    wrapNode(targetNode, currentWrapper);
   });
-  // Make selection collapsed at the end
-  if ($isTextNode(lastCreatedNode)) {
-    if (isBackward) lastCreatedNode.selectStart();
-    else lastCreatedNode.selectEnd();
+
+  // Update selection
+  if ($isTextNode(currentWrapper)) {
+    currentWrapper.selectEnd();
   }
 }
+
+// #region Helper functions for $wrapTextSelectionInInlineNode
+
+/**
+ * Get the start and end offsets of a selection.
+ * @param selection - The selection to get the offsets from.
+ * @returns the start and end offsets of the selection.
+ */
+function getSelectionOffsets(selection: RangeSelection): [number, number] {
+  const anchorOffset = selection.anchor.offset;
+  const focusOffset = selection.focus.offset;
+  return selection.isBackward() ? [focusOffset, anchorOffset] : [anchorOffset, focusOffset];
+}
+
+function getTargetNode(
+  node: LexicalNode,
+  isFirst: boolean,
+  isLast: boolean,
+  startOffset: number,
+  endOffset: number,
+): LexicalNode | undefined {
+  // Skip mark nodes and note nodes
+  if ($isTypedMarkNode(node) || $isNoteNode(node) || $isNoteNode(node.getParent())) {
+    return;
+  }
+
+  // Handle text nodes
+  if ($isTextNode(node)) {
+    return handleTextNode(node, isFirst, isLast, startOffset, endOffset);
+  }
+
+  // Handle inline elements
+  if ($isElementNode(node) && node.isInline()) {
+    return node;
+  }
+}
+
+function handleTextNode(
+  node: TextNode,
+  isFirst: boolean,
+  isLast: boolean,
+  startOffset: number,
+  endOffset: number,
+): TextNode | undefined {
+  const textLength = node.getTextContentSize();
+  const start = isFirst ? startOffset : 0;
+  const end = isLast ? endOffset : textLength;
+
+  if (start === 0 && end === 0) {
+    return;
+  }
+
+  const splitNodes = node.splitText(start, end);
+
+  if (splitNodes.length === 1) {
+    return splitNodes[0];
+  }
+
+  return splitNodes.length === 3 || isFirst || end === textLength ? splitNodes[1] : splitNodes[0];
+}
+
+function wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
+  if ($isTextNode(wrapper)) {
+    wrapper.setTextContent(node.getTextContent());
+    node.remove();
+  } else if ($isElementNode(wrapper)) {
+    wrapper.clear();
+    wrapper.append(node);
+  }
+}
+
+// #endregion

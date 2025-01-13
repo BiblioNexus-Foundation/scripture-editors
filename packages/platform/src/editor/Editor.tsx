@@ -1,8 +1,9 @@
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
-import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
@@ -33,7 +34,6 @@ import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/Immuta
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import HistoryPlugin from "shared-react/plugins/HistoryPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
