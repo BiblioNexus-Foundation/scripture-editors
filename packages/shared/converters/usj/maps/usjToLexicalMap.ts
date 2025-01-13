@@ -1,6 +1,9 @@
 import { UsjMilestone, UsjNode } from "../core/usj";
 
-import { Attributes } from "../../../nodes/scripture/generic/ScriptureElementNode";
+import {
+  Attributes,
+  isSerializedScriptureElementNode,
+} from "../../../nodes/scripture/generic/ScriptureElementNode";
 import { UsjChar } from "../core/usj";
 import { Output, UsjMapCreator } from "../core/usjToLexical";
 import { SerializedLexicalNode, SerializedTextNode } from "lexical";
@@ -8,6 +11,36 @@ import { createSerializedRootNode, createSerializedTextNode } from "../../utils"
 import { createSerializedBlockNode } from "../../../nodes/scripture/generic/BlockNode";
 import { createSerializedInlineNode } from "../../../nodes/scripture/generic/InlineNode";
 import XRegExp from "xregexp";
+
+const CHARS_NOT_REQUIRING_SPACE_AFTER = new Set([
+  '"', // opening quote
+  '"', // opening smart quote
+  "'", // opening single quote
+  "'", // opening single smart quote
+  "(", // opening parenthesis
+  "[", // opening bracket
+  "{", // opening brace
+  "¿", // opening question mark (Spanish)
+  "¡", // opening exclamation mark (Spanish)
+  "«", // opening guillemet
+  "‹", // opening single guillemet
+  "“", // opening double quote
+  "『", // Japanese opening quote
+  "「", // Japanese opening quote
+  "《", // Chinese/Korean opening quote
+  "〈", // Chinese/Korean opening bracket
+  "｢", // Japanese half-width opening quote
+  "¿", // Spanish opening question mark
+  "$", // currency symbol
+  "£", // pound symbol
+  "€", // euro symbol
+  "¥", // yen symbol
+  "@", // at symbol
+  "#", // hash symbol
+  "+", // plus symbol
+]);
+
+const WHITESPACE_CHAR = " ";
 
 const convertNodePropsToAttributes = (
   nodeProps: Record<string, unknown> | null | undefined,
@@ -169,9 +202,21 @@ export const createUsjMap: () => UsjMapCreator = () => {
           attributes: convertNodePropsToAttributes(nodeProps),
         });
       },
-      verse: ({ nodeProps }) => {
+      verse: ({ nodeProps, metadata }) => {
         workspace.verse = nodeProps.number;
         workspace.lastTextObject = null;
+
+        //Make sure there is a space after the last word of the previous verse
+        const lastOutputNode = metadata.currentOutput?.[metadata.currentOutput.length - 1];
+
+        if (lastOutputNode && $isSerializedTextNode(lastOutputNode)) {
+          const lastText = lastOutputNode.text;
+          const lastChar = lastText[lastText.length - 1];
+          if (lastChar !== WHITESPACE_CHAR) {
+            lastOutputNode.text += WHITESPACE_CHAR;
+          }
+        }
+
         if (output.extractedAlignment?.[workspace.chapter])
           output.extractedAlignment[workspace.chapter][nodeProps.number] = {};
         workspace.lastWord = "";
@@ -263,7 +308,7 @@ export const createUsjMap: () => UsjMapCreator = () => {
             );
 
             if (shouldAddSpaceAfter && textNode) {
-              textNode.text = textNode.text + " ";
+              textNode.text = textNode.text + WHITESPACE_CHAR;
             }
 
             const previousSibling = UsjNodeGetters.getPreviousUsjNodeSiblingFromPath(
@@ -271,15 +316,28 @@ export const createUsjMap: () => UsjMapCreator = () => {
               initialNode,
             );
 
-            const shouldAddSpaceBefore = Boolean(
-              currentOutput &&
-                previousSibling &&
-                typeof previousSibling === "object" &&
-                previousSibling.type === "ms",
-            );
+            const lastOutputNode =
+              (currentOutput?.[currentOutput.length - 1] as SerializedLexicalNode) ||
+              isSerializedScriptureElementNode;
+
+            const isPreviousSiblingMs =
+              previousSibling &&
+              typeof previousSibling === "object" &&
+              previousSibling.type === "ms";
+
+            const isLastOutputNodeVerse =
+              isSerializedScriptureElementNode(lastOutputNode) &&
+              lastOutputNode.attributes?.["data-type"] === "verse";
+
+            const shouldAddSpaceBefore =
+              isPreviousSiblingMs &&
+              !isLastOutputNodeVerse &&
+              ($isSerializedTextNode(lastOutputNode)
+                ? doesLastCharRequireSpaceAfter(lastOutputNode.text)
+                : true);
 
             if (shouldAddSpaceBefore && textNode) {
-              textNode.text = " " + textNode.text;
+              textNode.text = WHITESPACE_CHAR + textNode.text;
             }
 
             if (currentOutput && textNode) {
@@ -428,4 +486,10 @@ function createAlignmentRecord(payload: UsjMilestone | UsjChar | undefined, word
         },
       }
     : undefined;
+}
+
+function doesLastCharRequireSpaceAfter(text: string | undefined): boolean {
+  if (!text || text.length === 0) return true;
+  const lastChar = text[text.length - 1];
+  return !CHARS_NOT_REQUIRING_SPACE_AFTER.has(lastChar);
 }
