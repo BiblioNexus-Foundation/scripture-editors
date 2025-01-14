@@ -15,8 +15,8 @@ type ExtendedMarkerObject = MarkerObject & {
  * Represents a YJS-based Scripture document using USX and USJ structure
  */
 export class ScriptureDocument {
-  private _doc: Y.Doc;
-  private root: Y.XmlElement;
+  private readonly _doc: Y.Doc;
+  private readonly root: Y.XmlElement;
 
   /**
    * Get the underlying YJS document for sync
@@ -27,7 +27,7 @@ export class ScriptureDocument {
 
   constructor() {
     this._doc = new Y.Doc();
-    this.root = this._doc.get("content", Y.XmlElement) as Y.XmlElement;
+    this.root = this._doc.get("content", Y.XmlElement);
 
     // Initialize root if new document
     if (this.root.length === 0) {
@@ -177,7 +177,7 @@ export class ScriptureDocument {
     // Convert attributes
     const attrs: { [key: string]: string } = {};
     domElement.getAttributeNames().forEach((name) => {
-      attrs[name] = domElement.getAttribute(name) || "";
+      attrs[name] = domElement.getAttribute(name) ?? "";
     });
 
     // Create YXmlElement with same tag name and attributes
@@ -191,7 +191,7 @@ export class ScriptureDocument {
       if (child.nodeType === Node.ELEMENT_NODE) {
         this.convertDomToYXml(child as Element, element);
       } else if (child.nodeType === Node.TEXT_NODE) {
-        element.push([new Y.XmlText(child.textContent || "")]);
+        element.push([new Y.XmlText(child.textContent ?? "")]);
       }
     });
 
