@@ -15,6 +15,8 @@ import {
   TextModeType,
   TextNode,
 } from "lexical";
+import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import {
   IMMUTABLE_UNMATCHED_VERSION,
   ImmutableUnmatchedNode,
@@ -60,18 +62,6 @@ import {
   isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  IMMUTABLE_NOTE_CALLER_VERSION,
-  ImmutableNoteCallerNode,
-  OnClick,
-  SerializedImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  SerializedImmutableVerseNode,
-  IMMUTABLE_VERSE_VERSION,
-  ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
   SerializedImpliedParaNode,
@@ -92,7 +82,6 @@ import {
   SerializedNoteNode,
 } from "shared/nodes/scripture/usj/NoteNode";
 import { NBSP } from "shared/nodes/scripture/usj/node-constants";
-import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
@@ -100,7 +89,6 @@ import {
   getVisibleOpenMarkerText,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
-import { EditorAdaptor } from "shared-react/adaptors/editor-adaptor.model";
 import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
@@ -115,11 +103,23 @@ import {
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
 import {
+  IMMUTABLE_NOTE_CALLER_VERSION,
+  ImmutableNoteCallerNode,
+  OnClick,
+  SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  SerializedImmutableVerseNode,
+  IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
+import {
   AddMissingComments,
   MarkNodeName,
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {

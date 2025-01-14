@@ -30,8 +30,7 @@ import {
   generateNoteCaller,
 } from "../nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
-import { MERGE_HISTORY_COMMAND } from "./HistoryPlugin";
-import { LoggerBasic } from "./logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 const callerData: CallerData = { count: 0 };
 
@@ -128,20 +127,22 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
 
       // Re-generate all note callers when a note is added or removed.
       editor.registerMutationListener(ImmutableNoteCallerNode, (nodeMutations) => {
-        editor.update(() => {
-          for (const [nodeKey, mutation] of nodeMutations) {
-            const node = $getNodeByKey(nodeKey);
-            const parent = node?.getParentOrThrow();
-            if (
-              (mutation === "created" || mutation === "destroyed") &&
-              $isImmutableNoteCallerNode(node) &&
-              $isNoteNode(parent) &&
-              parent.getCaller() === GENERATOR_NOTE_CALLER
-            )
-              $generateAllNoteCallers(nodeOptions, logger);
-          }
-        });
-        editor.dispatchCommand(MERGE_HISTORY_COMMAND, undefined);
+        editor.update(
+          () => {
+            for (const [nodeKey, mutation] of nodeMutations) {
+              const node = $getNodeByKey(nodeKey);
+              const parent = node?.getParentOrThrow();
+              if (
+                (mutation === "created" || mutation === "destroyed") &&
+                $isImmutableNoteCallerNode(node) &&
+                $isNoteNode(parent) &&
+                parent.getCaller() === GENERATOR_NOTE_CALLER
+              )
+                $generateAllNoteCallers(nodeOptions, logger);
+            }
+          },
+          { tag: "history-merge" },
+        );
       }),
     );
   }, [editor]);

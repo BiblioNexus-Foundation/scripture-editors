@@ -2,6 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $getSelection, $isElementNode, LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isUsfmElementNode, UsfmElementNode } from "shared/nodes/UsfmElementNode";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 
 //TODO: move plugin functions to vanilla javascript plugin
 const getNodeDepth = (node: LexicalNode) => {
@@ -99,14 +100,11 @@ export function $getCurrentVerseNode(selectedNode: LexicalNode) {
   return verseNode ?? null;
 }
 
-export type ScriptureReference = {
-  chapter: number;
-  verse: number;
-};
-
 export default function ScriptureReferencePlugin({
+  book,
   onChangeReference,
 }: {
+  book?: string;
   onChangeReference?: (reference: ScriptureReference) => void;
 }) {
   const [editor] = useLexicalComposerContext();
@@ -121,10 +119,15 @@ export default function ScriptureReferencePlugin({
             if (!selectedNode) return;
             const verseNode = $getCurrentVerseNode(selectedNode);
             const chapterNode = $getCurrentChapterNode(verseNode ?? selectedNode);
-            onChangeReference({
-              chapter: Number(chapterNode?.getAttribute("data-number") ?? 0),
-              verse: Number(verseNode?.getAttribute("data-number") ?? 0),
-            });
+            const verse = verseNode?.getAttribute("data-number");
+            const verseNum = parseInt(verse ?? "0", 10);
+            const reference: ScriptureReference = {
+              book: book ?? "",
+              chapterNum: parseInt(chapterNode?.getAttribute("data-number") ?? "0", 10),
+              verseNum,
+            };
+            if (verse != null && verseNum.toString() !== verse) reference.verse = verse;
+            onChangeReference(reference);
           });
       }),
     [editor, onChangeReference],

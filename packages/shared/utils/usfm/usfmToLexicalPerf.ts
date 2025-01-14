@@ -1,12 +1,14 @@
 import { FlatDocument } from "../../plugins/PerfOperations/Types/Document";
 import { usfm2perf } from "../../converters/perf/usfmToPerf";
 import { transformPerfNodeToSerializedLexicalNode } from "../../converters/perf/perfToLexical";
-import Sequence from "../../plugins/PerfOperations/Types/Sequence";
 import { PerfKind } from "../../plugins/PerfOperations/types";
 import { SerializedElementNode } from "lexical";
+import { Marker, MarkerType } from "./usfmTypes";
+import { CURSOR_PLACEHOLDER_CHAR } from "../../plugins/CursorHandler";
+import { ScriptureReference } from "../get-marker-action.model";
 
 //For now only markers that are allowed to be under \p marker
-export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block") => {
+export const createLexicalPerfNodeFromUsfm = (usfm: string, kind: "inline" | "block") => {
   const usfmDocument = String.raw`
   \mt title
   \p \c 1 placeholder
@@ -22,7 +24,7 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
 
   const lexicalSerializedRoot = transformPerfNodeToSerializedLexicalNode({
     source: {
-      node: perf.sequences[perf.main_sequence_id] as Sequence,
+      node: perf.sequences[perf.main_sequence_id],
       kind: PerfKind.Sequence,
     },
     perfSequences: perf.sequences,
@@ -34,4 +36,17 @@ export const createLexicalNodeFromUsfm = (usfm: string, kind: "inline" | "block"
       : lexicalSerializedRoot.children[2];
 
   return lexicalSerializedNode;
+};
+
+export const usfmToLexicalAdapter = (
+  usfm: string | undefined,
+  _: ScriptureReference,
+  markerData?: Marker,
+) => {
+  return createLexicalPerfNodeFromUsfm(
+    usfm || `\\${usfm} ${CURSOR_PLACEHOLDER_CHAR}${markerData?.hasEndMarker ? ` \\${usfm}*` : ""}`,
+    !markerData || markerData.type === MarkerType.Character || markerData.type === MarkerType.Note
+      ? "inline"
+      : "block",
+  );
 };

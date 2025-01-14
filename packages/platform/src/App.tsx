@@ -1,9 +1,10 @@
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
 import { Canon } from "@sillsdev/scripture";
-import { BookChapterControl, ScriptureReference } from "platform-bible-react";
+import { BookChapterControl, ScriptureReference as BCReference } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
@@ -26,9 +27,14 @@ type Annotations = {
 
 const defaultUsj = usxStringToUsj('<usx version="3.1" />');
 const defaultScrRef: ScriptureReference = {
-  bookNum: Canon.bookIdToNumber("PSA"),
+  book: "PSA",
   chapterNum: 1,
   verseNum: 1,
+};
+const defaultBcScrRef: BCReference = {
+  bookNum: Canon.bookIdToNumber(defaultScrRef.book),
+  chapterNum: defaultScrRef.chapterNum,
+  verseNum: defaultScrRef.verseNum,
 };
 const nodeOptions: UsjNodeOptions = {
   [immutableNoteCallerNodeName]: { onClick: () => console.log("note node clicked") },
@@ -98,6 +104,7 @@ export default function App() {
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
+  const [bcScrRef, setBcScrRef] = useState(defaultBcScrRef);
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");
 
@@ -109,6 +116,24 @@ export default function App() {
   const handleUsjChange = useCallback((usj: Usj, comments: Comments | undefined) => {
     console.log({ usj, comments });
     marginalRef.current?.setUsj(usj);
+  }, []);
+
+  const handleBcScrRefChange = useCallback((bcScrRef: BCReference) => {
+    setBcScrRef(bcScrRef);
+    setScrRef({
+      book: Canon.bookNumberToId(bcScrRef.bookNum),
+      chapterNum: bcScrRef.chapterNum,
+      verseNum: bcScrRef.verseNum,
+    });
+  }, []);
+
+  const handleScrRefChange = useCallback((scrRef: ScriptureReference) => {
+    setScrRef(scrRef);
+    setBcScrRef({
+      bookNum: Canon.bookIdToNumber(scrRef.book),
+      chapterNum: scrRef.chapterNum,
+      verseNum: scrRef.verseNum,
+    });
   }, []);
 
   const handleTypeChange = useCallback((type: string) => setAnnotationType(type), []);
@@ -160,7 +185,7 @@ export default function App() {
   return (
     <>
       <div className="controls">
-        <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
+        <BookChapterControl scrRef={bcScrRef} handleSubmit={handleBcScrRefChange} />
         <span>
           <div>Cursor Location</div>
           <div>
@@ -230,7 +255,7 @@ export default function App() {
         ref={marginalRef}
         defaultUsj={defaultUsj}
         scrRef={scrRef}
-        onScrRefChange={setScrRef}
+        onScrRefChange={handleScrRefChange}
         onSelectionChange={(selection) => console.log({ selection })}
         onCommentChange={(comments) => console.log({ comments })}
         onUsjChange={handleUsjChange}

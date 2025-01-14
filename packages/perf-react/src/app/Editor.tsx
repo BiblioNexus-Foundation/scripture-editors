@@ -24,12 +24,12 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { getMarkerAction } from "shared/utils/usfm/getMarkerAction";
-import ScriptureReferencePlugin, {
-  ScriptureReference,
-} from "shared-react/plugins/ScriptureReferencePlugin";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
+import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
+import ScriptureReferencePlugin from "shared-react/plugins/ScriptureReferencePlugin";
 import getMarker from "shared/utils/usfm/getMarker";
-import PerfNodesMenu from "shared-react/plugins/PerfNodesMenu";
+import PerfNodesMenuPlugin from "shared-react/plugins/PerfNodesMenuPlugin";
+
 import { CursorHandlerPlugin } from "shared-react/plugins/CursorHandlerPlugin";
 
 const theme = {
@@ -66,8 +66,9 @@ export default function Editor({
   const [selectedMarker, setSelectedMarker] = useState<string>();
   const [perfDocument, setPerfDocument] = useState<PerfDocument | null>(null);
   const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
-    chapter: 1,
-    verse: 1,
+    book: bookCode,
+    chapterNum: 1,
+    verseNum: 1,
   });
   const [shouldUseCursorHelper, setShouldUseCursorHelper] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -111,7 +112,7 @@ export default function Editor({
   );
 
   const toggleClass = (element: HTMLElement | null, className: string) =>
-    element && element.classList.toggle(className);
+    element?.classList.toggle(className);
 
   const toolbarMarkerSections = useMemo(() => {
     if (!selectedMarker || !scriptureReference) return null;
@@ -128,7 +129,7 @@ export default function Editor({
       if (["CharacterStyling"].includes(category)) {
         items[category] = markers.map((marker) => {
           const markerData = getMarker(marker);
-          const { action } = getMarkerAction(marker, markerData);
+          const { action } = getUsfmMarkerAction(marker, markerData);
           return {
             label: marker,
             description: markerData?.description ?? "",
@@ -184,11 +185,11 @@ export default function Editor({
           <button onClick={handleButtonClick}>
             <i>keyboard_command_key</i>: {contextMenuKey}
           </button>
-          <span className="info">{selectedMarker ? selectedMarker : "•"}</span>
+          <span className="info">{selectedMarker ?? "•"}</span>
           <span className="info">
             {bookCode}{" "}
             {scriptureReference
-              ? `${scriptureReference?.chapter}:${scriptureReference?.verse}`
+              ? `${scriptureReference?.chapterNum}:${scriptureReference?.verseNum}`
               : null}
           </span>
           <hr />
@@ -230,7 +231,7 @@ export default function Editor({
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
             //This is the selected element expected to be a usfm element;
-            const selectedElement = startNode?.getCommonAncestor(endNode);
+            const selectedElement = startNode.getCommonAncestor(endNode);
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }
@@ -238,12 +239,13 @@ export default function Editor({
         }}
       />
       <ScriptureReferencePlugin
+        book={bookCode}
         onChangeReference={(reference) => {
           setScriptureReference(reference);
         }}
       />
       {scriptureReference && selectedMarker ? (
-        <PerfNodesMenu
+        <PerfNodesMenuPlugin
           trigger={contextMenuKey}
           scriptureReference={scriptureReference}
           contextMarker={selectedMarker}

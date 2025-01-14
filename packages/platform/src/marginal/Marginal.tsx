@@ -9,7 +9,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { LoggerBasic } from "shared-react/plugins/logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { Comments } from "./comments/commenting";
 import CommentPlugin from "./comments/CommentPlugin";
 import useCommentStoreRef from "./comments/use-comment-store-ref.hook";

@@ -17,6 +17,7 @@
     "@biblionexus-foundation/scripture-utilities": "workspace:*",
     "@lexical/mark": "^0.21.0",
     "@lexical/utils": "^0.21.0",
+    "@sillsdev/scripture": "^2.0.2",
     "epitelete": "^0.2.20",
     "lexical": "^0.21.0",
     "open-patcher": "1.0.0-beta.1"

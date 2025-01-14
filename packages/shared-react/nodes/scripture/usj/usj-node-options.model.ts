@@ -1,4 +1,4 @@
-import { NodeOptions } from "../../../adaptors/editor-adaptor.model";
+import { NodeOptions } from "shared/adaptors/editor-adaptor.model";
 import { OnClick, immutableNoteCallerNodeName } from "./ImmutableNoteCallerNode";
 
 export const MarkNodeName = "MarkNode";

@@ -360,6 +360,9 @@ importers:
       '@lexical/utils':
         specifier: ^0.21.0
         version: 0.21.0
+      '@sillsdev/scripture':
+        specifier: ^2.0.2
+        version: 2.0.2
       epitelete:
         specifier: ^0.2.20
         version: 0.2.20
@@ -6918,6 +6921,9 @@ packages:
 
   sj-usfm-grammar@3.0.2:
     resolution: {integrity: sha512-LBOx33vtU0gnUi/pAVxAqVMoGxD57c5itW650BaYGGD3Di2wweNHcQBD+XlQyGFXSoXoi3bn3gxfnNQG0oNGtg==}
+
+  sj-usfm-grammar@3.0.8:
+    resolution: {integrity: sha512-GThlgmxJKcs+abG/az0YVlTesGEAHkuRH5yy5Sj/Y5Xzq6SCL4EnZl2mdoemFEzvSjfPDE0tohKtHzCnmrohTQ==}
 
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -16317,7 +16323,11 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  sj-usfm-grammar@3.0.2: {}
+  sj-usfm-grammar@3.0.2:
+    dependencies:
+      sj-usfm-grammar: 3.0.8
+
+  sj-usfm-grammar@3.0.8: {}
 
   slash@3.0.0: {}
 

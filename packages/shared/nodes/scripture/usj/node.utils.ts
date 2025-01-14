@@ -323,3 +323,30 @@ export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is
     // now until we know we need them.
   );
 }
+
+/**
+ * Get the next verse number or segment.
+ *
+ * A verse range increments the end of the range (even if the range includes segments), and a verse
+ * segment increments the segment character. This is intentional to simplify the UX.
+ * @param verseNum - The current verse number.
+ * @param verse - The current verse string, which can be a single verse, a range, or a segment.
+ * @returns The next verse number or segment as a string.
+ */
+
+export function getNextVerse(verseNum: number, verse: string | undefined): string {
+  if (!verse) return (verseNum + 1).toString();
+
+  const verseParts = verse.split("-");
+  if (verseParts.length === 2)
+    return parseInt(verseParts[1])
+      ? `${parseInt(verseParts[1]) + 1}`
+      : `${parseInt(verseParts[0]) + 1}`;
+
+  // Don't increment beyond 'z' or 'Z'.
+  const verseSegment = RegExp(/(\d+)([a-yA-Y]+)/).exec(verse);
+  if (!verseSegment) return (parseInt(verse) + 1).toString();
+
+  const nextSegmentChar = String.fromCharCode(verseSegment[2].charCodeAt(0) + 1);
+  return `${verseSegment[1]}${nextSegmentChar}`;
+}

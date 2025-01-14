@@ -1,5 +1,9 @@
 import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
 import { $createTypedMarkNode, TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import {
+  $createImmutableChapterNode,
+  ImmutableChapterNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { $createVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { createBasicTestEnvironment } from "shared/nodes/test.utils";
@@ -58,7 +62,7 @@ describe("Editor Node Utilities", () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
       /*
-       *      R
+       *    root
        *     p1
        * v1 t1 v2 t2
        *          ^^
@@ -88,7 +92,7 @@ describe("Editor Node Utilities", () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode, TypedMarkNode]);
       /*
-       *      R
+       *    root
        *     p1
        * v1 t1 v2 m1(t2)
        *             ^^
@@ -120,7 +124,7 @@ describe("Editor Node Utilities", () => {
       let t3Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
       /*
-       *          R
+       *         root
        *   p1     p2    p3
        * v1 t1    t2    t3
        *                ^^
@@ -154,7 +158,7 @@ describe("Editor Node Utilities", () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);
       /*
-       *         R
+       *       root
        *    p1       p2
        * v1 t1 v2    t2
        *             ^^
@@ -179,6 +183,71 @@ describe("Editor Node Utilities", () => {
 
         expect(verseNode).toBeDefined();
         expect(verseNode?.getNumber()).toEqual("2");
+      });
+    });
+
+    it("should not find a verse if a chapter is encountered first from para", async () => {
+      let p2Key: string;
+      const { editor } = createBasicTestEnvironment([
+        ImmutableChapterNode,
+        ImmutableVerseNode,
+        ParaNode,
+      ]);
+      /*
+       *   root
+       * p1 c1 p2
+       * v1    ^^
+       */
+      await editor.update(() => {
+        const root = $getRoot();
+        const p1 = $createParaNode();
+        const v1 = $createImmutableVerseNode("1");
+        const c1 = $createImmutableChapterNode("1");
+        const p2 = $createParaNode();
+        root.append(p1, c1, p2);
+        p1.append(v1);
+        p2Key = p2.getKey();
+      });
+
+      await editor.getEditorState().read(() => {
+        const p2 = $getNodeByKey(p2Key);
+        const verseNode = findThisVerse(p2);
+
+        expect(verseNode).toBeUndefined();
+      });
+    });
+
+    it("should not find a verse if a chapter is encountered first from text", async () => {
+      let t1Key: string;
+      const { editor } = createBasicTestEnvironment([
+        ImmutableChapterNode,
+        ImmutableVerseNode,
+        ParaNode,
+      ]);
+      /*
+       *   root
+       * p1 c1 p2
+       * v1    t1
+       *       ^^
+       */
+      await editor.update(() => {
+        const root = $getRoot();
+        const p1 = $createParaNode();
+        const v1 = $createImmutableVerseNode("1");
+        const c1 = $createImmutableChapterNode("1");
+        const p2 = $createParaNode();
+        const t1 = $createTextNode("text1");
+        root.append(p1, c1, p2);
+        p1.append(v1);
+        p2.append(t1);
+        t1Key = t1.getKey();
+      });
+
+      await editor.getEditorState().read(() => {
+        const t1 = $getNodeByKey(t1Key);
+        const verseNode = findThisVerse(t1);
+
+        expect(verseNode).toBeUndefined();
       });
     });
   });

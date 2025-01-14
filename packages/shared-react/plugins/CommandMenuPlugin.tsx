@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { mergeRegister } from "@lexical/utils";
 import { COMMAND_PRIORITY_NORMAL, DROP_COMMAND, KEY_DOWN_COMMAND, PASTE_COMMAND } from "lexical";
 import { useEffect } from "react";
-import { LoggerBasic } from "./logger-basic.model";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 
 /**
  * This plugin prevents the backslash or forward slash key from being typed, or pasted or dragged.
