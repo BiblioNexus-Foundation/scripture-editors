@@ -41,18 +41,18 @@ const nodeOptions: UsjNodeOptions = {
 };
 // Word "man" inside first q1 of PSA 1:1.
 const annotationRange1 = {
-  start: { jsonPath: "$.content[10].content[2]", offset: 15 },
-  end: { jsonPath: "$.content[10].content[2]", offset: 18 },
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 18 },
 };
 // Phrase "man who" inside first q1 of PSA 1:1.
 const annotationRange2 = {
-  start: { jsonPath: "$.content[10].content[2]", offset: 15 },
-  end: { jsonPath: "$.content[10].content[2]", offset: 22 },
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 22 },
 };
 // Word "stand" inside first q2 of PSA 1:1.
 const annotationRange3 = {
-  start: { jsonPath: "$.content[11].content[0]", offset: 4 },
-  end: { jsonPath: "$.content[11].content[0]", offset: 9 },
+  start: { jsonPath: "$.content[4].content[0]", offset: 4 },
+  end: { jsonPath: "$.content[4].content[0]", offset: 9 },
 };
 const defaultAnnotations: Annotations = {
   annotation1: {
