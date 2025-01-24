@@ -9,7 +9,7 @@ export type MarkerOverwrite = Partial<
 const paragraphChildren = {
   DivisionMarks: { add: ["v", "c"], remove: [] },
   Paragraphs: { add: ["p"], remove: [] },
-  Poetry: { add: ["q", "q1", "q2", "q3", "q4"], remove: [] },
+  Poetry: { add: ["q", "q1", "q2", "q3", "q4", "b"], remove: [] },
   TitlesHeadings: {
     add: [
       "mte",
@@ -42,6 +42,7 @@ const usfmMarkersOverwrites: Record<string, MarkerOverwrite> = {
   q2: { children: paragraphChildren },
   q3: { children: paragraphChildren },
   q4: { children: paragraphChildren },
+  b: { children: paragraphChildren },
   qm: {
     children: {
       Paragraphs: { add: ["p"], remove: [] },

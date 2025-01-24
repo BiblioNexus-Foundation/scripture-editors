@@ -41,6 +41,7 @@ import EditablePlugin from "shared-react/plugins/EditablePlugin";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
+import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
@@ -302,6 +303,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <CommandMenuPlugin logger={logger} />
           <ContextMenuPlugin />
           <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
+          <ParaNodePlugin />
           <TextDirectionPlugin textDirection={textDirection} />
           {children}
         </div>

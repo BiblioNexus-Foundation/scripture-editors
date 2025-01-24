@@ -6,7 +6,6 @@ import DropDown, { DropDownItem } from "./DropDown";
 type BlockMarkerToBlockNames = typeof blockMarkerToBlockNames;
 
 const commonBlockMarkerToBlockNames = {
-  b: "b - Poetry - Stanza Break (Blank Line)",
   m: "m - Paragraph - Margin - No First Line Indent",
   ms: "ms - Heading - Major Section Level 1",
   nb: "nb - Paragraph - No Break with Previous Paragraph",
@@ -38,6 +37,7 @@ const blockMarkerToBlockNames = {
   ms1: "ms1 - Heading - Major Section Level 1",
   ms2: "ms2 - Heading - Major Section Level 2",
   ms3: "ms3 - Heading - Major Section Level 3",
+  b: "b - Poetry - Stanza Break (Blank Line)",
 };
 
 function blockMarkerToClassName(blockMarker: string) {
