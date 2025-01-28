@@ -40,7 +40,7 @@ export default function useScripturalMakersForMenu({
 
     if (!markerChildren || !marker) return;
 
-    return [...new Set([contextMarker, ...markerChildren, ...(markerAlike || [])])]
+    return [...new Set([contextMarker, ...markerChildren, ...(markerAlike ?? [])])]
       .map((marker) => {
         const markerData = getMarker(marker);
         if (!markerData) return;

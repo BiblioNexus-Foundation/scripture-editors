@@ -109,13 +109,11 @@ export type UsjFigure = {
   ref?: NonWhitespaceString;
 };
 
-export type SingleCharString = string;
-
 export type UsjNote = {
   type: "note";
   marker: MarkerString;
   content?: UsjParaContent[];
-  caller: SingleCharString;
+  caller: string;
 };
 
 export type UsjPara = {

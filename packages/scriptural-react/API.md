@@ -29,7 +29,8 @@ import { ScripturalEditorComposer } from "@scriptural/react";
   };
   ```
 
-  Note: You cannot provide both `usj` and `initialLexicalState` at the same time.
+  > [!NOTE]
+  > You cannot provide both `usj` and `initialLexicalState` at the same time.
 
 - `children: React.ReactNode`
 

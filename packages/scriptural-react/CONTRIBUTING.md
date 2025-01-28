@@ -6,7 +6,6 @@ Thank you for your interest in contributing to @scriptural/react! This document 
 
 - [Contributing to @scriptural/react](#contributing-to-scripturalreact)
   - [Table of Contents](#table-of-contents)
-  - [Code of Conduct](#code-of-conduct)
   - [Getting Started](#getting-started)
   - [Development Setup](#development-setup)
     - [Using Nx Console](#using-nx-console)
@@ -22,10 +21,6 @@ Thank you for your interest in contributing to @scriptural/react! This document 
   - [Release Process](#release-process)
   - [Questions?](#questions)
 
-## Code of Conduct
-
-This project adheres to a Code of Conduct that all contributors are expected to follow. Please read [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before contributing.
-
 ## Getting Started
 
 1. Fork the repository
@@ -35,7 +30,7 @@ This project adheres to a Code of Conduct that all contributors are expected to 
    ```
 3. Add the upstream repository:
    ```bash
-   git remote add upstream https://github.com/bible-technology/scripture-editors.git
+   git remote add upstream [https://github.com/bible-technology/scripture-editors.git](https://github.com/BiblioNexus-Foundation/scripture-editors.git)
    ```
 4. Create a new branch for your changes:
    ```bash
@@ -291,7 +286,6 @@ git commit -m "feat(scriptural-react): add chapter navigation plugin"
 
 3. Create a release PR:
    - Update version in package.json
-   - Update CHANGELOG.md
    - Update documentation if needed
    - Run `nx affected:build` to ensure all dependent packages build correctly
 

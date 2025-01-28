@@ -4,13 +4,19 @@ import { $getNodeByKey, TextNode } from "lexical";
 
 import { useEffect } from "react";
 import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
+import { ScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
 
 export const ChapterVerseUpdatePlugin = () => {
   const [editor] = useLexicalComposerContext();
   const { scriptureReference } = useScripturalComposerContext();
 
   useEffect(() => {
-    editor.registerNodeTransform(TextNode, (node) => {
+    return editor.registerNodeTransform(TextNode, (node) => {
+      if (!editor.hasNodes([ScriptureElementNode])) {
+        throw new Error(
+          "ChapterVerseUpdatePlugin: ScriptureElementNode is not registered on editor!",
+        );
+      }
       const parent = node.getParent();
       const nodeKey = node.getKey();
       if (
