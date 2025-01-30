@@ -71,7 +71,7 @@
 /* ChapterNode, ImmutableChapterNode */
 
 .formatted-font .usfm_c {
-  @apply m-2 block break-before-column font-medium uppercase tracking-wider before:content-['Chapter_:_'];
+  @apply m-2 block break-before-column font-medium uppercase tracking-wider;
 }
 .text-spacing[dir="ltr"] .usfm_c {
   @apply pl-4 text-left;

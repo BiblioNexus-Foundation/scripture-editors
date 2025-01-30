@@ -6,18 +6,28 @@ import {
   USJ_VERSION,
   Usj,
 } from "@biblionexus-foundation/scripture-utilities";
-import { MarkNode, SerializedMarkNode } from "@lexical/mark";
 import {
   LineBreakNode,
   SerializedEditorState,
   SerializedLexicalNode,
   SerializedLineBreakNode,
   SerializedTextNode,
+  TextModeType,
   TextNode,
 } from "lexical";
 import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import {
+  IMMUTABLE_UNMATCHED_VERSION,
+  ImmutableUnmatchedNode,
+  SerializedImmutableUnmatchedNode,
+} from "shared/nodes/features/ImmutableUnmatchedNode";
 import { MarkerNode, SerializedMarkerNode } from "shared/nodes/features/MarkerNode";
+import {
+  COMMENT_MARK_TYPE,
+  SerializedTypedMarkNode,
+  TypedMarkNode,
+} from "shared/nodes/features/TypedMarkNode";
 import {
   SerializedUnknownNode,
   UNKNOWN_VERSION,
@@ -52,9 +62,9 @@ import {
   isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
-  SerializedImpliedParaNode,
-  ImpliedParaNode,
   IMPLIED_PARA_VERSION,
+  ImpliedParaNode,
+  SerializedImpliedParaNode,
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import {
   MILESTONE_VERSION,
@@ -73,6 +83,13 @@ import {
 } from "shared/nodes/scripture/usj/NoteNode";
 import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
+  getEditableCallerText,
+  getPreviewTextFromSerializedNodes,
+  getUnknownAttributes,
+  getVisibleOpenMarkerText,
+  removeUndefinedProperties,
+} from "shared/nodes/scripture/usj/node.utils";
+import {
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
@@ -86,25 +103,23 @@ import {
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
 import {
-  getEditableCallerText,
-  getPreviewTextFromSerializedNodes,
-  getUnknownAttributes,
-  getVisibleOpenMarkerText,
-} from "shared/nodes/scripture/usj/node.utils";
-import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
   OnClick,
   SerializedImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
-  ImmutableVerseNode,
   IMMUTABLE_VERSE_VERSION,
+  ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import {
+  AddMissingComments,
+  MarkNodeName,
+  UsjNodeOptions,
+} from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
@@ -122,19 +137,24 @@ const callerData: CallerData = {
   count: 0,
 };
 
-/** View options - view mode parameters */
+/** Comment IDs in the USJ. */
+let commentIds: string[] = [];
+/** View options - view mode parameters. */
 let _viewOptions: ViewOptions | undefined;
-/** Options for each node */
+/** Options for each node. */
 let _nodeOptions: UsjNodeOptions | undefined;
 /** List of possible note callers. */
 let noteCallers: string[] | undefined;
-/** Logger instance */
+/** Method to add missing comments. */
+let addMissingComments: AddMissingComments;
+/** Logger instance. */
 let _logger: LoggerBasic;
 
 export function initialize(
   nodeOptions: UsjNodeOptions | undefined,
   logger: LoggerBasic | undefined,
 ) {
+  commentIds = [];
   setNodeOptions(nodeOptions);
   setLogger(logger);
 }
@@ -171,6 +191,7 @@ export function serializeEditorState(
     children = [emptyParaNode];
   }
 
+  addMissingComments?.(commentIds);
   return {
     root: {
       children,
@@ -194,6 +215,11 @@ function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
     const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
     if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
+  }
+
+  // Set the `addMissingComments` method.
+  if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
+    addMissingComments = nodeOptions[MarkNodeName].addMissingComments as AddMissingComments;
   }
 }
 
@@ -221,7 +247,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: BookNode.getType(),
     marker: marker as BookMarker,
     code: code ?? ("" as BookCode),
@@ -231,7 +257,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
     format: "",
     indent: 0,
     version: BOOK_VERSION,
-  };
+  });
 }
 
 function createChapter(
@@ -246,7 +272,7 @@ function createChapter(
   if (_viewOptions?.markerMode === "visible") showMarker = true;
 
   return _viewOptions?.markerMode === "editable"
-    ? {
+    ? removeUndefinedProperties({
         type: ChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -259,8 +285,8 @@ function createChapter(
         format: "",
         indent: 0,
         version: CHAPTER_VERSION,
-      }
-    : {
+      })
+    : removeUndefinedProperties({
         type: ImmutableChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -270,7 +296,7 @@ function createChapter(
         pubnumber,
         unknownAttributes,
         version: IMMUTABLE_CHAPTER_VERSION,
-      };
+      });
 }
 
 function createVerse(
@@ -289,7 +315,7 @@ function createVerse(
   else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type,
     text,
     marker: marker as VerseMarker,
@@ -300,7 +326,7 @@ function createVerse(
     showMarker,
     unknownAttributes,
     version,
-  };
+  });
 }
 
 function createChar(markerObject: MarkerObject): SerializedCharNode {
@@ -313,7 +339,7 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
     text = NBSP + text;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: CharNode.getType(),
     marker,
     text,
@@ -323,10 +349,10 @@ function createChar(markerObject: MarkerObject): SerializedCharNode {
     mode: "normal",
     style: "",
     version: CHAR_VERSION,
-  };
+  });
 }
 
-export function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
+function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
   return {
     type: ImpliedParaNode.getType(),
     children,
@@ -353,7 +379,7 @@ function createPara(
   children.push(...childNodes);
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: ParaNode.getType(),
     marker,
     unknownAttributes,
@@ -364,7 +390,7 @@ function createPara(
     textFormat: 0,
     textStyle: "",
     version: PARA_VERSION,
-  };
+  });
 }
 
 function createNoteCaller(
@@ -380,13 +406,13 @@ function createNoteCaller(
   )
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
-  return {
+  return removeUndefinedProperties({
     type: ImmutableNoteCallerNode.getType(),
     caller,
     previewText,
     onClick,
     version: IMMUTABLE_NOTE_CALLER_VERSION,
-  };
+  });
 }
 
 function createNote(
@@ -422,7 +448,7 @@ function createNote(
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
 
-  return {
+  return removeUndefinedProperties({
     type: NoteNode.getType(),
     marker: marker as NoteMarker,
     caller,
@@ -433,7 +459,7 @@ function createNote(
     format: "",
     indent: 0,
     version: NOTE_VERSION,
-  };
+  });
 }
 
 function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
@@ -443,20 +469,23 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: MilestoneNode.getType(),
     marker: marker as MilestoneMarker,
     sid,
     eid,
     unknownAttributes,
     version: MILESTONE_VERSION,
-  };
+  });
 }
 
-function createMark(children: SerializedLexicalNode[], ids: string[] = []): SerializedMarkNode {
+function createCommentMark(
+  children: SerializedLexicalNode[],
+  ids: string[] = [],
+): SerializedTypedMarkNode {
   return {
-    type: MarkNode.getType(),
-    ids,
+    type: TypedMarkNode.getType(),
+    typedIDs: { [COMMENT_MARK_TYPE]: ids },
     children,
     direction: null,
     format: "",
@@ -473,7 +502,7 @@ function createUnknown(
   const tag = markerObject.type;
   const unknownAttributes = getUnknownAttributes(markerObject);
   const children: SerializedLexicalNode[] = [...childNodes];
-  return {
+  return removeUndefinedProperties({
     type: UnknownNode.getType(),
     tag,
     marker,
@@ -483,6 +512,14 @@ function createUnknown(
     format: "",
     indent: 0,
     version: UNKNOWN_VERSION,
+  });
+}
+
+function createUnmatched(marker: string): SerializedImmutableUnmatchedNode {
+  return {
+    type: ImmutableUnmatchedNode.getType(),
+    marker,
+    version: IMMUTABLE_UNMATCHED_VERSION,
   };
 }
 
@@ -500,13 +537,13 @@ function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
   };
 }
 
-function createText(text: string): SerializedTextNode {
+function createText(text: string, mode: TextModeType = "normal"): SerializedTextNode {
   return {
     type: TextNode.getType(),
     text,
     detail: 0,
     format: 0,
-    mode: "normal",
+    mode,
     style: "",
     version: 1,
   };
@@ -540,49 +577,60 @@ function removeValueFromArray<T>(arr: T[], value: T) {
   }
 }
 
-function updateSids(sids: string[], msMarkNode: SerializedMilestoneNode) {
-  if (msMarkNode.marker === STARTING_MS_COMMENT_MARKER && msMarkNode.sid !== undefined)
-    sids.push(msMarkNode.sid);
-  if (msMarkNode.marker === ENDING_MS_COMMENT_MARKER && msMarkNode.eid !== undefined)
-    removeValueFromArray(sids, msMarkNode.eid);
+function updateIds(ids: string[], msCommentNode: SerializedMilestoneNode) {
+  if (msCommentNode.marker === STARTING_MS_COMMENT_MARKER && msCommentNode.sid !== undefined)
+    ids.push(msCommentNode.sid);
+  if (msCommentNode.marker === ENDING_MS_COMMENT_MARKER && msCommentNode.eid !== undefined)
+    removeValueFromArray(ids, msCommentNode.eid);
 }
 
-function insertMilestoneMarksRecurse(
+function replaceMilestonesWithMarkRecurse(
   nodes: SerializedLexicalNode[],
-  msMarkIndexes: number[],
+  msCommentIndexes: number[],
   isPreviousMsStarting = false,
-  sids: string[] = [],
+  ids: string[] = [],
 ): SerializedLexicalNode[] {
-  if (msMarkIndexes.length <= 0 || msMarkIndexes[0] >= nodes.length) return nodes;
+  if (msCommentIndexes.length <= 0 || msCommentIndexes[0] >= nodes.length) return nodes;
 
-  const firstIndex = msMarkIndexes.shift();
-  const secondIndex = msMarkIndexes.length > 0 ? msMarkIndexes.shift() : nodes.length - 1;
-  if (!firstIndex || !secondIndex) return nodes;
+  // get the pair of indexes for the mark
+  const firstIndex: number | undefined = msCommentIndexes.shift();
+  const secondIndex: number | undefined =
+    msCommentIndexes.length > 0 ? msCommentIndexes.shift() : nodes.length - 1;
+  if (
+    firstIndex === undefined ||
+    secondIndex === undefined ||
+    secondIndex >= nodes.length ||
+    nodes.length <= 0
+  )
+    return nodes;
 
+  // get the nodes before the mark
   const startNodes = nodes.slice(0, firstIndex);
-  const nodesBefore = isPreviousMsStarting ? [createMark(startNodes, [...sids])] : startNodes;
-  const firstMSMarkNode = nodes[firstIndex] as SerializedMilestoneNode;
-  updateSids(sids, firstMSMarkNode);
-  const markedNodes = insertMilestoneMarksRecurse(
+  const nodesBefore = isPreviousMsStarting ? [createCommentMark(startNodes, [...ids])] : startNodes;
+  // get the nodes inside the mark
+  const firstMSCommentNode = nodes[firstIndex] as SerializedMilestoneNode;
+  updateIds(ids, firstMSCommentNode);
+  const markedNodes = replaceMilestonesWithMarkRecurse(
     nodes.slice(firstIndex + 1, secondIndex),
-    reIndex(msMarkIndexes, firstIndex + 1),
-    firstMSMarkNode.marker === STARTING_MS_COMMENT_MARKER,
-    sids,
+    reIndex(msCommentIndexes, firstIndex + 1),
+    firstMSCommentNode.marker === STARTING_MS_COMMENT_MARKER,
+    ids,
   );
-  const markNode = createMark(markedNodes, [...sids]);
-  const secondMSMarkNode = nodes[secondIndex] as SerializedMilestoneNode;
-  updateSids(sids, secondMSMarkNode);
-  const nodesAfter = insertMilestoneMarksRecurse(
+  const markNode = createCommentMark(markedNodes, [...ids]);
+  // get the nodes after the mark
+  const secondMSCommentNode = nodes[secondIndex] as SerializedMilestoneNode;
+  updateIds(ids, secondMSCommentNode);
+  const nodesAfter = replaceMilestonesWithMarkRecurse(
     nodes.slice(secondIndex + 1),
-    reIndex(msMarkIndexes, secondIndex + 1),
-    secondMSMarkNode.marker === STARTING_MS_COMMENT_MARKER,
-    sids,
+    reIndex(msCommentIndexes, secondIndex + 1),
+    secondMSCommentNode.marker === STARTING_MS_COMMENT_MARKER,
+    ids,
   );
-  return [...nodesBefore, firstMSMarkNode, markNode, secondMSMarkNode, ...nodesAfter];
+  return [...nodesBefore, markNode, ...nodesAfter];
 }
 
 export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNode[] {
-  const msMarkIndexes: number[] = [];
+  const msCommentIndexes: number[] = [];
   const nodes: SerializedLexicalNode[] = [];
   markers?.forEach((markerContent) => {
     if (typeof markerContent === "string") {
@@ -613,8 +661,14 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
           nodes.push(createNote(markerContent, recurseNodes(markerContent.content)));
           break;
         case MilestoneNode.getType():
-          if (isMilestoneCommentMarker(markerContent.marker)) msMarkIndexes.push(nodes.length);
+          if (isMilestoneCommentMarker(markerContent.marker)) {
+            msCommentIndexes.push(nodes.length);
+            if (markerContent.sid !== undefined) commentIds?.push(markerContent.sid);
+          }
           nodes.push(createMilestone(markerContent));
+          break;
+        case ImmutableUnmatchedNode.getType():
+          nodes.push(createUnmatched(markerContent.marker));
           break;
         default:
           _logger?.warn(`Unknown type-marker '${markerContent.type}-${markerContent.marker}'!`);
@@ -622,7 +676,7 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
       }
     }
   });
-  return insertMilestoneMarksRecurse(nodes, msMarkIndexes);
+  return replaceMilestonesWithMarkRecurse(nodes, msCommentIndexes);
 }
 
 /**
@@ -630,7 +684,7 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
  * @param nodes - Serialized nodes.
  * @returns nodes with any needed implied paras inserted.
  */
-export function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
+function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
   const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
   const isBookNodeFound = bookNodeIndex >= 0;
   const chapterNodeIndex = nodes.findIndex(

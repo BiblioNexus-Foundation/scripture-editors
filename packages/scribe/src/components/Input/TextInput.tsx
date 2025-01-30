@@ -56,12 +56,12 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
   }, [inputValues]);
 
   const handleChange = (key: string) => (value: string) => {
-    console.log({ inputValues });
+    // console.log({ inputValues });
     setInputValues((prev) => ({ ...prev, [key]: value }));
   };
 
   const onClick = () => {
-    console.log("Inserting Note: ", inputValues);
+    // console.log("Inserting Note: ", inputValues);
     insertFunction({
       editor: activeEditor,
       inputValues,
