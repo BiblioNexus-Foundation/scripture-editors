@@ -24,6 +24,7 @@ import {
   getViewOptions,
   ViewOptions,
 } from "../adaptors/view-options.utils";
+import { CURSOR_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.
@@ -51,14 +52,17 @@ export function ScriptureReferencePlugin({
       editor.registerMutationListener(
         BookNode,
         (nodeMutations) => {
-          editor.update(() => {
-            for (const [nodeKey, mutation] of nodeMutations) {
-              const bookNode = $getNodeByKey<BookNode>(nodeKey);
-              if (bookNode && $isBookNode(bookNode) && mutation === "created") {
-                $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+          editor.update(
+            () => {
+              for (const [nodeKey, mutation] of nodeMutations) {
+                const bookNode = $getNodeByKey<BookNode>(nodeKey);
+                if (bookNode && $isBookNode(bookNode) && mutation === "created") {
+                  $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+                }
               }
-            }
-          });
+            },
+            { tag: CURSOR_CHANGE_TAG },
+          );
         },
         { skipInitialization: true },
       ),
@@ -67,11 +71,14 @@ export function ScriptureReferencePlugin({
 
   // Scripture Ref changed
   useEffect(() => {
-    editor.update(() => {
-      if (!hasSelectionChangedRef.current)
-        $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
-      else hasSelectionChangedRef.current = false;
-    });
+    editor.update(
+      () => {
+        if (!hasSelectionChangedRef.current)
+          $moveCursorToVerseStart(chapterNum, verseNum, viewOptions);
+        else hasSelectionChangedRef.current = false;
+      },
+      { tag: CURSOR_CHANGE_TAG },
+    );
   }, [editor, chapterNum, verseNum, viewOptions]);
 
   // selection changed

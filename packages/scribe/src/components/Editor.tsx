@@ -26,7 +26,8 @@ import useDeferredState from "../hooks/use-deferred-state.hook";
 import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
 import editorTheme from "../themes/editor-theme";
 import LoadingSpinner from "./LoadingSpinner";
-import { Toolbar } from "./Toolbar";
+import { blackListedChangeTags } from "shared/nodes/scripture/usj/node-constants";
+import { deepEqual } from "fast-equals";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -61,12 +62,14 @@ type EditorProps = {
   scrRef: ScriptureReference;
   setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
 };
+// const NODE_MENU_TRIGGER = "//";
 
 const Editor = forwardRef(function Editor(
   { usjInput, onChange, viewOptions, nodeOptions = {}, scrRef, setScrRef }: EditorProps,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
+  const editedUsjRef = useRef<Usj>();
   const [usj, setUsj] = useState(usjInput);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
   useDefaultNodeOptions(nodeOptions);
@@ -86,19 +89,28 @@ const Editor = forwardRef(function Editor(
     focus() {
       editorRef.current?.focus();
     },
-    setUsj(usj: Usj) {
-      setUsj(usj);
+    getUsj() {
+      return editedUsjRef.current;
+    },
+    setUsj(editedUsj) {
+      if (!deepEqual(editedUsjRef.current, editedUsj) && !deepEqual(usj, editedUsj)) {
+        editedUsjRef.current = editedUsj;
+        setUsj(editedUsj);
+      }
     },
   }));
 
   const handleChange = useCallback(
-    (editorState: EditorState, editor: LexicalEditor) => {
-      const usj = editorUsjAdaptor.deserializeEditorState(editorState);
-      const serializedState = editor.parseEditorState(usjEditorAdaptor.serializeEditorState(usj));
-      console.log({ serializedState });
-      if (usj) {
-        onChange?.(usj);
-        setEditedUsj(usj);
+    (editorState: EditorState, _editor: LexicalEditor, tags: Set<string>) => {
+      if (blackListedChangeTags.some((tag) => tags.has(tag))) return;
+
+      // const serializedState = editor.parseEditorState(usjEditorAdaptor.serializeEditorState(usj));
+      // console.log({ serializedState });
+      const newUsj = editorUsjAdaptor.deserializeEditorState(editorState);
+      if (newUsj) {
+        const isEdited = !deepEqual(editedUsjRef.current, newUsj);
+        if (isEdited) editedUsjRef.current = newUsj;
+        if (isEdited || !deepEqual(usj, newUsj)) onChange?.(newUsj);
       }
     },
     [onChange, setEditedUsj],
@@ -107,7 +119,6 @@ const Editor = forwardRef(function Editor(
   return (
     <>
       <LexicalComposer initialConfig={initialConfig}>
-        <Toolbar />
         <RichTextPlugin
           contentEditable={
             <ContentEditable
@@ -117,6 +128,13 @@ const Editor = forwardRef(function Editor(
           placeholder={<LoadingSpinner />}
           ErrorBoundary={LexicalErrorBoundary}
         />
+        {/* <UsjNodesMenuPlugin
+          trigger={NODE_MENU_TRIGGER}
+          scrRef={scrRef}
+          getMarkerAction={(marker, markerData) =>
+            getUsjMarkerAction(marker, markerData, viewOptions)
+          }
+        /> */}
         <UpdateStatePlugin
           scripture={loadedUsj}
           nodeOptions={nodeOptions}
