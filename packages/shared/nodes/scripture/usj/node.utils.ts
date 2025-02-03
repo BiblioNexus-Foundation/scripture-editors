@@ -26,7 +26,7 @@ export type NodesWithMarker =
   | UnknownNode;
 
 // If you want use these utils with your own chapter node, add it to this list of types.
-type ChapterNodes = ChapterNode | ImmutableChapterNode;
+type SomeChapterNode = ChapterNode | ImmutableChapterNode;
 
 /** RegEx to test for a string only containing digits. */
 const ONLY_DIGITS_TEST = /^\d+$/;
@@ -75,68 +75,59 @@ export function extractNumberedMarkers(markers: string[] | readonly string[]): s
  * @returns list of non-numbered markers (numbered are filtered out), e.g. ['p'].
  */
 export function extractNonNumberedMarkers(markers: string[] | readonly string[]): string[] {
-  return markers.filter((marker) => !(marker && marker.endsWith(NUMBERED_MARKER_PLACEHOLDER)));
+  return markers.filter((marker) => !marker?.endsWith(NUMBERED_MARKER_PLACEHOLDER));
+}
+
+/**
+ * Checks if the given node is a ChapterNode or ImmutableChapterNode.
+ * @param node - The node to check.
+ * @returns `true` if the node is a ChapterNode or ImmutableChapterNode, `false` otherwise.
+ */
+export function $isSomeChapterNode(node: LexicalNode | null | undefined): node is SomeChapterNode {
+  return $isChapterNode(node) || $isImmutableChapterNode(node);
 }
 
 /**
  * Finds the chapter node with the given chapter number amongst the nodes.
  * @param nodes - Nodes to look in.
  * @param chapterNum - Chapter number to look for.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findChapter<T extends ChapterNodes = ImmutableChapterNode>(
-  nodes: LexicalNode[],
-  chapterNum: number,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
-) {
+export function $findChapter(nodes: LexicalNode[], chapterNum: number) {
   return nodes.find(
-    (node) =>
-      node.getType() === ChapterNodeClass.getType() &&
-      (node as T).getNumber() === chapterNum.toString(),
-  ) as T | undefined;
+    (node) => $isSomeChapterNode(node) && node.getNumber() === chapterNum.toString(),
+  ) as SomeChapterNode | undefined;
 }
 
 /**
  * Finds the next chapter.
  * @param nodes - Nodes to look in.
  * @param isCurrentChapterAtFirstNode - If `true` ignore the first node.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the next chapter node if found, `undefined` otherwise.
  */
-export function findNextChapter<T extends ChapterNodes = ImmutableChapterNode>(
-  nodes: LexicalNode[],
-  isCurrentChapterAtFirstNode = false,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
-) {
+export function $findNextChapter(nodes: LexicalNode[], isCurrentChapterAtFirstNode = false) {
   return nodes.find(
-    (node, index) =>
-      (!isCurrentChapterAtFirstNode || index > 0) && node.getType() === ChapterNodeClass.getType(),
-  ) as T | undefined;
+    (node, index) => (!isCurrentChapterAtFirstNode || index > 0) && $isSomeChapterNode(node),
+  ) as SomeChapterNode | undefined;
 }
 
 /**
  * Find the chapter that this node is in.
  * @param node - Node to find the chapter it's in.
- * @param ChapterNodeClass - Use a different chapter node class if needed.
  * @returns the chapter node if found, `undefined` otherwise.
  */
-export function findThisChapter<T extends ChapterNodes = ImmutableChapterNode>(
-  node: LexicalNode | null | undefined,
-  ChapterNodeClass: typeof LexicalNode = ImmutableChapterNode,
-) {
+export function $findThisChapter(node: LexicalNode | null | undefined) {
   if (!node) return;
 
   // is this node a chapter
-  if (node.getType() === ChapterNodeClass.getType()) return node as T;
+  if ($isSomeChapterNode(node)) return node;
 
   // is the chapter a previous top level sibling
   let previousSibling = node.getTopLevelElement()?.getPreviousSibling();
-  while (previousSibling && previousSibling.getType() !== ChapterNodeClass.getType()) {
+  while (previousSibling && !$isSomeChapterNode(previousSibling)) {
     previousSibling = previousSibling.getPreviousSibling();
   }
-  if (previousSibling && previousSibling.getType() === ChapterNodeClass.getType())
-    return previousSibling as T;
+  if (previousSibling && $isSomeChapterNode(previousSibling)) return previousSibling;
 }
 
 /**
@@ -202,7 +193,7 @@ export function parseNumberFromMarkerText(
   number: string,
 ): string {
   const openMarkerText = openingMarkerText(marker);
-  if (text && text.startsWith(openMarkerText)) {
+  if (text?.startsWith(openMarkerText)) {
     const numberText = parseInt(text.slice(openMarkerText.length), 10);
     if (!isNaN(numberText)) number = numberText.toString();
   }

@@ -270,11 +270,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           />
           <HistoryPlugin />
           {scrRef && onScrRefChange && (
-            <ScriptureReferencePlugin
-              scrRef={scrRef}
-              onScrRefChange={onScrRefChange}
-              viewOptions={viewOptions}
-            />
+            <ScriptureReferencePlugin scrRef={scrRef} onScrRefChange={onScrRefChange} />
           )}
           {scrRef && (
             <UsjNodesMenuPlugin
