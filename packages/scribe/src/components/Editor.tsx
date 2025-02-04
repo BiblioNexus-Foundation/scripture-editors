@@ -117,40 +117,38 @@ const Editor = forwardRef(function Editor(
   );
 
   return (
-    <>
-      <LexicalComposer initialConfig={initialConfig}>
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable
-              className={`editor-input outline-none ${getViewClassList(viewOptions).join(" ")}`}
-            />
-          }
-          placeholder={<LoadingSpinner />}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        {/* <UsjNodesMenuPlugin
+    <LexicalComposer initialConfig={initialConfig}>
+      <RichTextPlugin
+        contentEditable={
+          <ContentEditable
+            className={`editor-input outline-none ${getViewClassList(viewOptions).join(" ")}`}
+          />
+        }
+        placeholder={<LoadingSpinner />}
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+      {/* <UsjNodesMenuPlugin
           trigger={NODE_MENU_TRIGGER}
           scrRef={scrRef}
           getMarkerAction={(marker, markerData) =>
             getUsjMarkerAction(marker, markerData, viewOptions)
           }
         /> */}
-        <UpdateStatePlugin
-          scripture={loadedUsj}
-          nodeOptions={nodeOptions}
-          editorAdaptor={usjEditorAdaptor}
-          viewOptions={viewOptions}
-          // logger={logger}
-        />
-        <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
-        <NoteNodePlugin nodeOptions={nodeOptions} />
-        <HistoryPlugin />
-        <AutoFocusPlugin />
-        <ContextMenuPlugin />
-        <ClipboardPlugin />
-        <ScriptureReferencePlugin viewOptions={viewOptions} scrRef={scrRef} setScrRef={setScrRef} />
-      </LexicalComposer>
-    </>
+      <UpdateStatePlugin
+        scripture={loadedUsj}
+        nodeOptions={nodeOptions}
+        editorAdaptor={usjEditorAdaptor}
+        viewOptions={viewOptions}
+        // logger={logger}
+      />
+      <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
+      <NoteNodePlugin nodeOptions={nodeOptions} />
+      <HistoryPlugin />
+      <AutoFocusPlugin />
+      <ContextMenuPlugin />
+      <ClipboardPlugin />
+      <ScriptureReferencePlugin scrRef={scrRef} setScrRef={setScrRef} />
+    </LexicalComposer>
   );
 });
 

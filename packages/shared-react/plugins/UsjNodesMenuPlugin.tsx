@@ -2,6 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $dfs, DFSNode, mergeRegister } from "@lexical/utils";
 import {
   $getNodeByKey,
+  $getRoot,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
@@ -9,7 +10,12 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useMemo, useState } from "react";
-import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
+import {
+  $findNextChapter,
+  $findThisChapter,
+  getNextVerse,
+  removeNodesBeforeNode,
+} from "shared/nodes/scripture/usj/node.utils";
 import { $isVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
 import {
@@ -106,7 +112,11 @@ function getVerseRangeSegment(verse: string) {
  * @param insertedNode - Inserted verse node.
  */
 function $renumberAllVerses(insertedNode: VerseNode | ImmutableVerseNode) {
-  const allVerseNodes = $dfs().filter<DfsVerseNode>(
+  const children = $getRoot().getChildren();
+  const chapterNode = $findThisChapter(insertedNode);
+  const nodesInChapter = removeNodesBeforeNode(children, chapterNode);
+  const nextChapterNode = $findNextChapter(nodesInChapter, !!chapterNode);
+  const allVerseNodes = $dfs(chapterNode, nextChapterNode).filter<DfsVerseNode>(
     (dfsNode): dfsNode is DfsVerseNode =>
       $isImmutableVerseNode(dfsNode.node) || $isVerseNode(dfsNode.node),
   );

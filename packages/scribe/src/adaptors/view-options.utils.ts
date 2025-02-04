@@ -1,5 +1,3 @@
-import { ChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { ImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   TEXT_SPACING_CLASS_NAME,
   FORMATTED_FONT_CLASS_NAME,
@@ -60,17 +58,6 @@ export function viewOptionsToMode(viewOptions: ViewOptions | undefined): ViewMod
   if (markerMode === "hidden" && hasSpacing && isFormattedFont) return FORMATTED_VIEW_MODE;
   if (markerMode === "editable" && !hasSpacing && !isFormattedFont) return UNFORMATTED_VIEW_MODE;
   return undefined;
-}
-
-/**
- * Get the chapter node class for the given view options.
- * @param viewOptions - View options of the editor.
- * @returns the chapter node class if the view is defined, `undefined` otherwise.
- */
-export function getChapterNodeClass(viewOptions: ViewOptions | undefined) {
-  if (!viewOptions) return;
-
-  return viewOptions.markerMode === "editable" ? ChapterNode : ImmutableChapterNode;
 }
 
 /**
