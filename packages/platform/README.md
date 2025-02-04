@@ -120,6 +120,7 @@ This npm package does not include styling so you need to style the editor compon
 
 - Scripture Nodes [/packages/platform/src/usj-nodes.css](/packages/platform/src/usj-nodes.css)
 - Editor [/packages/platform/src/editor/editor.css](/packages/platform/src/editor/editor.css)
+- Marker Menu [/packages/shared/styles/nodes-menu.css](/packages/shared/styles/nodes-menu.css)
 
 For **icon assets** for the editor referenced in `editor.css` (the license file is included):
 
