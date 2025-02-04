@@ -209,7 +209,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       return editedUsjRef.current;
     },
     setUsj(incomingUsj) {
-      if (!deepEqual(editedUsjRef.current, incomingUsj) && !deepEqual(usj, incomingUsj)) {
+      if (!deepEqual(editedUsjRef.current, incomingUsj)) {
         editedUsjRef.current = incomingUsj;
         setUsj(incomingUsj);
       }
