@@ -38,13 +38,13 @@
     "@lexical/utils": "^0.21.0",
     "@lexical/yjs": "^0.21.0",
     "@sillsdev/scripture": "^2.0.2",
-    "fast-equals": "^5.0.1",
+    "fast-equals": "^5.2.2",
     "lexical": "^0.21.0",
     "yjs": "^13.6.20"
   },
   "devDependencies": {
-    "@types/react": "^18.3.14",
-    "@types/react-dom": "^18.3.3",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "platform-bible-react": "file:./lib/platform-bible-react",
     "platform-bible-utils": "file:./lib/platform-bible-utils",
     "react": "^18.3.1",
