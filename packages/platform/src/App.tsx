@@ -31,11 +31,6 @@ const defaultScrRef: ScriptureReference = {
   chapterNum: 1,
   verseNum: 1,
 };
-const defaultBcScrRef: BCReference = {
-  bookNum: Canon.bookIdToNumber(defaultScrRef.book),
-  chapterNum: defaultScrRef.chapterNum,
-  verseNum: defaultScrRef.verseNum,
-};
 const nodeOptions: UsjNodeOptions = {
   [immutableNoteCallerNodeName]: { onClick: () => console.log("note node clicked") },
 };
@@ -104,7 +99,6 @@ export default function App() {
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
   const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
   const [scrRef, setScrRef] = useState(defaultScrRef);
-  const [bcScrRef, setBcScrRef] = useState(defaultBcScrRef);
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");
 
@@ -118,21 +112,20 @@ export default function App() {
     marginalRef.current?.setUsj(usj);
   }, []);
 
+  const bcScrRef = useMemo<BCReference>(
+    () => ({
+      bookNum: Canon.bookIdToNumber(scrRef.book),
+      chapterNum: scrRef.chapterNum,
+      verseNum: scrRef.verseNum,
+    }),
+    [scrRef],
+  );
+
   const handleBcScrRefChange = useCallback((bcScrRef: BCReference) => {
-    setBcScrRef(bcScrRef);
     setScrRef({
       book: Canon.bookNumberToId(bcScrRef.bookNum),
       chapterNum: bcScrRef.chapterNum,
       verseNum: bcScrRef.verseNum,
-    });
-  }, []);
-
-  const handleScrRefChange = useCallback((scrRef: ScriptureReference) => {
-    setScrRef(scrRef);
-    setBcScrRef({
-      bookNum: Canon.bookIdToNumber(scrRef.book),
-      chapterNum: scrRef.chapterNum,
-      verseNum: scrRef.verseNum,
     });
   }, []);
 
@@ -255,7 +248,7 @@ export default function App() {
         ref={marginalRef}
         defaultUsj={defaultUsj}
         scrRef={scrRef}
-        onScrRefChange={handleScrRefChange}
+        onScrRefChange={setScrRef}
         onSelectionChange={(selection) => console.log({ selection })}
         onCommentChange={(comments) => console.log({ comments })}
         onUsjChange={handleUsjChange}

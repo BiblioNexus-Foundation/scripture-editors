@@ -117,7 +117,7 @@ function $findAndSetChapterAndVerse(
   if (!startNode) return false;
 
   const chapterNode = $findThisChapter(startNode);
-  const selectedChapterNum = parseInt(chapterNode?.getNumber() ?? "0", 10);
+  const selectedChapterNum = parseInt(chapterNode?.getNumber() ?? "1", 10);
   const verseNode = $findThisVerse(startNode);
   const verse = verseNode?.getNumber();
   // For verse ranges this returns the first number.
