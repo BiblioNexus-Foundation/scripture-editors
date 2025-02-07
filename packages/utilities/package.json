@@ -33,7 +33,7 @@
     "prepublish": "cd ../.. && nx build utilities"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.9.6"
+    "@xmldom/xmldom": "^0.9.7"
   },
   "devDependencies": {
     "lexical": "^0.21.0"
