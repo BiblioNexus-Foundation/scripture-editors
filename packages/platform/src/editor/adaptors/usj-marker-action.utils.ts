@@ -1,4 +1,5 @@
 import { MarkerContent } from "@biblionexus-foundation/scripture-utilities";
+import { SerializedVerseRef } from "@sillsdev/scripture";
 import {
   $getSelection,
   $isElementNode,
@@ -15,7 +16,7 @@ import { CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { MarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
+import { MarkerAction } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
 import { ViewOptions } from "./view-options.utils";
@@ -25,7 +26,7 @@ const markerActions: {
   [marker: string]: {
     label?: string;
     action?: (currentEditor: {
-      reference: ScriptureReference;
+      reference: SerializedVerseRef;
       editor: LexicalEditor;
     }) => MarkerContent[];
   };
@@ -103,7 +104,7 @@ export function getUsjMarkerAction(
   viewOptions?: ViewOptions,
 ): MarkerAction {
   const markerAction = getMarkerAction(marker);
-  const action = (currentEditor: { reference: ScriptureReference; editor: LexicalEditor }) => {
+  const action = (currentEditor: { reference: SerializedVerseRef; editor: LexicalEditor }) => {
     currentEditor.editor.update(() => {
       const content = markerAction?.action?.(currentEditor);
       if (!content) return;
@@ -143,7 +144,7 @@ export function getUsjMarkerAction(
 function getMarkerAction(marker: string): {
   label?: string;
   action?: (currentEditor: {
-    reference: ScriptureReference;
+    reference: SerializedVerseRef;
     editor: LexicalEditor;
   }) => MarkerContent[];
 } {

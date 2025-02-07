@@ -6,6 +6,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { SerializedVerseRef } from "@sillsdev/scripture";
 import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
 import React, {
@@ -23,7 +24,6 @@ import {
   blackListedChangeTags,
   SELECTION_CHANGE_TAG,
 } from "shared/nodes/scripture/usj/node-constants";
-import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
 import {
@@ -119,9 +119,9 @@ export type EditorProps<TLogger extends LoggerBasic> = {
   /** Initial Scripture data in USJ format. */
   defaultUsj?: Usj;
   /** Scripture reference that controls the general cursor location of the Scripture. */
-  scrRef?: ScriptureReference;
+  scrRef?: SerializedVerseRef;
   /** Callback function when the Scripture reference has changed. */
-  onScrRefChange?: (scrRef: ScriptureReference) => void;
+  onScrRefChange?: (scrRef: SerializedVerseRef) => void;
   /** Callback function when the cursor selection changes. */
   onSelectionChange?: (selection: SelectionRange | undefined) => void;
   /** Callback function when USJ Scripture data has changed. */

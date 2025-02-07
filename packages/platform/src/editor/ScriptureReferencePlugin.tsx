@@ -1,4 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { SerializedVerseRef } from "@sillsdev/scripture";
 import {
   $getNodeByKey,
   $getRoot,
@@ -16,7 +17,6 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { $findThisVerse, $findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
 
 /**
@@ -29,8 +29,8 @@ export default function ScriptureReferencePlugin({
   scrRef,
   onScrRefChange,
 }: {
-  scrRef: ScriptureReference;
-  onScrRefChange: (scrRef: ScriptureReference) => void;
+  scrRef: SerializedVerseRef;
+  onScrRefChange: (scrRef: SerializedVerseRef) => void;
 }): null {
   const [editor] = useLexicalComposerContext();
   /** Prevents the cursor being moved again after a selection has changed. */
@@ -110,7 +110,7 @@ function $findAndSetChapterAndVerse(
   book: string,
   chapterNum: number,
   verseNum: number,
-  onScrRefChange: (scrRef: ScriptureReference) => void,
+  onScrRefChange: (scrRef: SerializedVerseRef) => void,
   hasSelectionChangedRef: React.MutableRefObject<boolean>,
 ) {
   const startNode = $getSelection()?.getNodes()[0];
@@ -127,7 +127,7 @@ function $findAndSetChapterAndVerse(
     selectedVerseNum !== verseNum
   );
   if (hasSelectionChangedRef.current) {
-    const scrRef: ScriptureReference = {
+    const scrRef: SerializedVerseRef = {
       book,
       chapterNum: selectedChapterNum,
       verseNum: selectedVerseNum,
