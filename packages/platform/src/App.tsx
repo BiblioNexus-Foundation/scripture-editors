@@ -1,10 +1,9 @@
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
-import { Canon } from "@sillsdev/scripture";
+import { Canon, SerializedVerseRef } from "@sillsdev/scripture";
 import { BookChapterControl, ScriptureReference as BCReference } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
-import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
@@ -26,7 +25,7 @@ type Annotations = {
 };
 
 const defaultUsj = usxStringToUsj('<usx version="3.1" />');
-const defaultScrRef: ScriptureReference = {
+const defaultScrRef: SerializedVerseRef = {
   book: "PSA",
   chapterNum: 1,
   verseNum: 1,
