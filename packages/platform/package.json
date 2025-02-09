@@ -40,11 +40,15 @@
     "@sillsdev/scripture": "^2.0.2",
     "fast-equals": "^5.2.2",
     "lexical": "^0.31.1",
+    "rich-text": "^4.1.0",
+    "sharedb": "^5.1.1",
+    "ts-object-path": "^0.1.2",
     "yjs": "^13.6.20"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@types/sharedb": "^5.1.0",
     "platform-bible-react": "file:./lib/platform-bible-react",
     "platform-bible-utils": "file:./lib/platform-bible-utils",
     "react": "^18.3.1",
