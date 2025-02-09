@@ -1,5 +1,7 @@
 declare module "rich-text" {
-  export const type: { name: string };
+  import { Type } from "sharedb/lib/sharedb";
+
+  export const type: Type;
 
   export interface StringMap {
     [key: string]: any;
