@@ -4,6 +4,7 @@ import {
   $applyNodeReplacement,
   EditorConfig,
   LexicalNode,
+  LexicalUpdateJSON,
   NodeKey,
   SerializedLexicalNode,
   SerializedTextNode,
@@ -72,31 +73,27 @@ export class VerseNode extends TextNode {
   }
 
   static importJSON(serializedNode: SerializedVerseNode): VerseNode {
-    const {
-      marker,
+    const { number, text, sid, altnumber, pubnumber, unknownAttributes } = serializedNode;
+    return $createVerseNode(
       number,
       text,
       sid,
       altnumber,
       pubnumber,
       unknownAttributes,
-      detail,
-      format,
-      mode,
-      style,
-    } = serializedNode;
-    const node = $createVerseNode(number, text, sid, altnumber, pubnumber, unknownAttributes);
-    node.setMarker(marker);
-    node.setDetail(detail);
-    node.setFormat(format);
-    node.setMode(mode);
-    node.setStyle(style);
-    return node;
+    ).updateFromJSON(serializedNode);
   }
 
-  setMarker(marker: VerseMarker): void {
+  updateFromJSON(serializedNode: LexicalUpdateJSON<SerializedVerseNode>): this {
+    return super.updateFromJSON(serializedNode).setMarker(serializedNode.marker);
+  }
+
+  setMarker(marker: VerseMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): VerseMarker {
@@ -104,9 +101,12 @@ export class VerseNode extends TextNode {
     return self.__marker;
   }
 
-  setNumber(verseNumber: string): void {
+  setNumber(verseNumber: string): this {
+    if (this.__number === verseNumber) return this;
+
     const self = this.getWritable();
     self.__number = verseNumber;
+    return self;
   }
 
   getNumber(): string {
@@ -114,9 +114,12 @@ export class VerseNode extends TextNode {
     return self.__number;
   }
 
-  setSid(sid: string | undefined): void {
+  setSid(sid: string | undefined): this {
+    if (this.__sid === sid) return this;
+
     const self = this.getWritable();
     self.__sid = sid;
+    return self;
   }
 
   getSid(): string | undefined {
@@ -124,9 +127,12 @@ export class VerseNode extends TextNode {
     return self.__sid;
   }
 
-  setAltnumber(altnumber: string | undefined): void {
+  setAltnumber(altnumber: string | undefined): this {
+    if (this.__altnumber === altnumber) return this;
+
     const self = this.getWritable();
     self.__altnumber = altnumber;
+    return self;
   }
 
   getAltnumber(): string | undefined {
@@ -134,9 +140,12 @@ export class VerseNode extends TextNode {
     return self.__altnumber;
   }
 
-  setPubnumber(pubnumber: string | undefined): void {
+  setPubnumber(pubnumber: string | undefined): this {
+    if (this.__pubnumber === pubnumber) return this;
+
     const self = this.getWritable();
     self.__pubnumber = pubnumber;
+    return self;
   }
 
   getPubnumber(): string | undefined {
@@ -144,9 +153,10 @@ export class VerseNode extends TextNode {
     return self.__pubnumber;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

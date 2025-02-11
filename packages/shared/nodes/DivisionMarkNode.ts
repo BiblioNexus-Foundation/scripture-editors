@@ -20,13 +20,8 @@ export class DivisionMarkNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedDivisionMarkNode) {
-    const { attributes, format, indent, direction, tag } = serializedNode;
-    const node = $createDivisionMarkNode(attributes, tag ?? DEFAULT_TAG);
-    node.setAttributes(attributes ?? {});
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { attributes, tag } = serializedNode;
+    return $createDivisionMarkNode(attributes, tag ?? DEFAULT_TAG).updateFromJSON(serializedNode);
   }
 
   canBeEmpty(): boolean {

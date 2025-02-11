@@ -43,17 +43,16 @@ export class UnknownNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedUnknownNode): UnknownNode {
-    const { tag, marker, unknownAttributes, format, indent, direction } = serializedNode;
-    const node = $createUnknownNode(tag, marker, unknownAttributes);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { tag, marker, unknownAttributes } = serializedNode;
+    return $createUnknownNode(tag, marker, unknownAttributes).updateFromJSON(serializedNode);
   }
 
-  setTag(tag: string): void {
+  setTag(tag: string): this {
+    if (this.__tag === tag) return this;
+
     const self = this.getWritable();
     self.__tag = tag;
+    return self;
   }
 
   getTag(): string {
@@ -61,9 +60,12 @@ export class UnknownNode extends ElementNode {
     return self.__tag;
   }
 
-  setMarker(marker: string): void {
+  setMarker(marker: string): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): string {
@@ -71,9 +73,10 @@ export class UnknownNode extends ElementNode {
     return self.__marker;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

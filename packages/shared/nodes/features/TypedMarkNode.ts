@@ -63,12 +63,8 @@ export class TypedMarkNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedTypedMarkNode): TypedMarkNode {
-    const { typedIDs, format, indent, direction } = serializedNode;
-    const node = $createTypedMarkNode(typedIDs);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { typedIDs } = serializedNode;
+    return $createTypedMarkNode(typedIDs).updateFromJSON(serializedNode);
   }
 
   static importDOM(): null {

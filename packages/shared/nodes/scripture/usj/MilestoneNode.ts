@@ -85,8 +85,7 @@ export class MilestoneNode extends DecoratorNode<void> {
 
   static importJSON(serializedNode: SerializedMilestoneNode): MilestoneNode {
     const { marker, sid, eid, unknownAttributes } = serializedNode;
-    const node = $createMilestoneNode(marker, sid, eid, unknownAttributes);
-    return node;
+    return $createMilestoneNode(marker, sid, eid, unknownAttributes);
   }
 
   static isValidMarker(marker: string | undefined): boolean {
@@ -96,9 +95,12 @@ export class MilestoneNode extends DecoratorNode<void> {
     );
   }
 
-  setMarker(marker: MilestoneMarker): void {
+  setMarker(marker: MilestoneMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): MilestoneMarker {
@@ -106,9 +108,12 @@ export class MilestoneNode extends DecoratorNode<void> {
     return self.__marker;
   }
 
-  setSid(sid: string | undefined): void {
+  setSid(sid: string | undefined): this {
+    if (this.__sid === sid) return this;
+
     const self = this.getWritable();
     self.__sid = sid;
+    return self;
   }
 
   getSid(): string | undefined {
@@ -116,9 +121,12 @@ export class MilestoneNode extends DecoratorNode<void> {
     return self.__sid;
   }
 
-  setEid(eid: string | undefined): void {
+  setEid(eid: string | undefined): this {
+    if (this.__eid === eid) return this;
+
     const self = this.getWritable();
     self.__eid = eid;
+    return self;
   }
 
   getEid(): string | undefined {
@@ -126,9 +134,10 @@ export class MilestoneNode extends DecoratorNode<void> {
     return self.__eid;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

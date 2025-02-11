@@ -32,12 +32,8 @@ export class InlineNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedInlineNode): InlineNode {
-    const { attributes, format, indent, direction } = serializedNode;
-    const node = $createInlineNode(attributes);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { attributes } = serializedNode;
+    return $createInlineNode(attributes).updateFromJSON(serializedNode);
   }
 
   exportJSON(): SerializedInlineNode {

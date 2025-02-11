@@ -155,13 +155,8 @@ export class CharNode extends TextNode {
   }
 
   static importJSON(serializedNode: SerializedCharNode): CharNode {
-    const { marker, text, unknownAttributes, detail, format, mode, style } = serializedNode;
-    const node = $createCharNode(marker, text, unknownAttributes);
-    node.setDetail(detail);
-    node.setFormat(format);
-    node.setMode(mode);
-    node.setStyle(style);
-    return node;
+    const { marker, text, unknownAttributes } = serializedNode;
+    return $createCharNode(marker, text, unknownAttributes).updateFromJSON(serializedNode);
   }
 
   static importDOM(): DOMConversionMap | null {
@@ -192,9 +187,12 @@ export class CharNode extends TextNode {
     return !!marker && VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
   }
 
-  setMarker(marker: CharMarker): void {
+  setMarker(marker: CharMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): CharMarker {
@@ -202,9 +200,10 @@ export class CharNode extends TextNode {
     return self.__marker;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

@@ -197,15 +197,8 @@ export class ParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedParaNode): ParaNode {
-    const { marker, unknownAttributes, format, indent, direction, textFormat, textStyle } =
-      serializedNode;
-    const node = $createParaNode(marker, unknownAttributes);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    node.setTextFormat(textFormat);
-    node.setTextStyle(textStyle);
-    return node;
+    const { marker, unknownAttributes } = serializedNode;
+    return $createParaNode(marker, unknownAttributes).updateFromJSON(serializedNode);
   }
 
   static importDOM(): DOMConversionMap | null {
@@ -224,9 +217,12 @@ export class ParaNode extends ParagraphNode {
     );
   }
 
-  setMarker(marker: ParaMarker): void {
+  setMarker(marker: ParaMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): ParaMarker {
@@ -234,9 +230,10 @@ export class ParaNode extends ParagraphNode {
     return self.__marker;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

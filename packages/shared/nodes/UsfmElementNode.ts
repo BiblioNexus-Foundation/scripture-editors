@@ -31,18 +31,22 @@ export class UsfmElementNode extends ElementNode {
     return this.getLatest().__attributes;
   }
 
-  setAttributes(attributes: Attributes) {
+  setAttributes(attributes: Attributes): this {
     const writable = this.getWritable();
     writable.__attributes = attributes;
+    return writable;
   }
 
   getAttribute(key: string): string | undefined {
     return this.getLatest().__attributes[key];
   }
 
-  setAttribute(key: string, value: string) {
+  setAttribute(key: string, value: string): this {
+    if (this.__attributes[key] === value) return this;
+
     const writable = this.getWritable();
     writable.__attributes[key] = value;
+    return writable;
   }
 
   removeAttribute(key: string) {
@@ -50,8 +54,8 @@ export class UsfmElementNode extends ElementNode {
     delete writable.__attributes[key];
   }
 
-  setUIAttribute(key: string, value: string) {
-    this.setAttribute(`data-ui-${key}`, value);
+  setUIAttribute(key: string, value: string): this {
+    return this.setAttribute(`data-ui-${key}`, value);
   }
 
   getUIAttribute(key: string): string | undefined {
@@ -79,9 +83,12 @@ export class UsfmElementNode extends ElementNode {
     return this.getLatest().__tag;
   }
 
-  setTag(tag: string | undefined) {
+  setTag(tag: string | undefined): this {
+    if (this.__tag === tag) return this;
+
     const writable = this.getWritable();
     writable.__tag = tag;
+    return writable;
   }
 
   exportJSON(): SerializedUsfmElementNode {
