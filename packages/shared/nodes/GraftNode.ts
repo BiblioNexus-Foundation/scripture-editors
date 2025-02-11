@@ -74,12 +74,8 @@ export class GraftNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedGraftNode): GraftNode {
-    const { attributes, props, format, indent, direction, tag } = serializedNode;
-    const node = $createGraftNode(attributes, props, tag ?? DEFAULT_TAG);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { attributes, props, tag } = serializedNode;
+    return $createGraftNode(attributes, props, tag ?? DEFAULT_TAG).updateFromJSON(serializedNode);
   }
 
   exportJSON(): SerializedGraftNode {

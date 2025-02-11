@@ -5,6 +5,7 @@ import {
   $applyNodeReplacement,
   ElementNode,
   LexicalNode,
+  LexicalUpdateJSON,
   NodeKey,
   SerializedElementNode,
   SerializedLexicalNode,
@@ -47,22 +48,24 @@ export class BookNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedBookNode): BookNode {
-    const { marker, code, unknownAttributes, format, indent, direction } = serializedNode;
-    const node = $createBookNode(code, unknownAttributes);
-    node.setMarker(marker);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { code, unknownAttributes } = serializedNode;
+    return $createBookNode(code, unknownAttributes).updateFromJSON(serializedNode);
   }
 
   static isValidBookCode(code: string): boolean {
     return isValidBookCode(code);
   }
 
-  setMarker(marker: BookMarker): void {
+  updateFromJSON(serializedNode: LexicalUpdateJSON<SerializedBookNode>): this {
+    return super.updateFromJSON(serializedNode).setMarker(serializedNode.marker);
+  }
+
+  setMarker(marker: BookMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): BookMarker {
@@ -70,9 +73,12 @@ export class BookNode extends ElementNode {
     return self.__marker;
   }
 
-  setCode(code: BookCode): void {
+  setCode(code: BookCode): this {
+    if (this.__code === code) return this;
+
     const self = this.getWritable();
     self.__code = code;
+    return self;
   }
 
   /**
@@ -84,9 +90,10 @@ export class BookNode extends ElementNode {
     return self.__code;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

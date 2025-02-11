@@ -30,12 +30,12 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:~",
-    "@lexical/mark": "^0.21.0",
-    "@lexical/react": "^0.21.0",
-    "@lexical/selection": "^0.21.0",
-    "@lexical/utils": "^0.21.0",
+    "@lexical/mark": "^0.24.0",
+    "@lexical/react": "^0.24.0",
+    "@lexical/selection": "^0.24.0",
+    "@lexical/utils": "^0.24.0",
     "fast-equals": "^5.2.2",
-    "lexical": "^0.21.0"
+    "lexical": "^0.24.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",

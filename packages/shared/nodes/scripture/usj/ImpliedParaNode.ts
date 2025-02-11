@@ -23,14 +23,7 @@ export class ImpliedParaNode extends ParagraphNode {
   }
 
   static importJSON(serializedNode: SerializedImpliedParaNode): ImpliedParaNode {
-    const { format, indent, direction, textFormat, textStyle } = serializedNode;
-    const node = $createImpliedParaNode();
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    node.setTextFormat(textFormat);
-    node.setTextStyle(textStyle);
-    return node;
+    return $createImpliedParaNode().updateFromJSON(serializedNode);
   }
 
   createDOM(): HTMLElement {

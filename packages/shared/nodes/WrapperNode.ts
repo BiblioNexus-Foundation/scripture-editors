@@ -22,11 +22,7 @@ export class WrapperNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedWrapperNode): WrapperNode {
-    const node = $createWrapperNode();
-    node.setFormat(serializedNode.format);
-    node.setIndent(serializedNode.indent);
-    node.setDirection(serializedNode.direction);
-    return node;
+    return $createWrapperNode().updateFromJSON(serializedNode);
   }
 
   updateDOM(): boolean {

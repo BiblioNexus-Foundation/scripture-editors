@@ -44,18 +44,16 @@ export class MarkerNode extends TextNode {
   }
 
   static importJSON(serializedNode: SerializedMarkerNode): MarkerNode {
-    const { marker, isOpening, detail, format, mode, style } = serializedNode;
-    const node = $createMarkerNode(marker, isOpening);
-    node.setDetail(detail);
-    node.setFormat(format);
-    node.setMode(mode);
-    node.setStyle(style);
-    return node;
+    const { marker, isOpening } = serializedNode;
+    return $createMarkerNode(marker, isOpening).updateFromJSON(serializedNode);
   }
 
-  setMarker(marker: MarkerMarker): void {
+  setMarker(marker: MarkerMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): MarkerMarker {
@@ -63,9 +61,12 @@ export class MarkerNode extends TextNode {
     return self.__marker;
   }
 
-  setIsOpening(isOpening: boolean): void {
+  setIsOpening(isOpening: boolean): this {
+    if (this.__isOpening === isOpening) return this;
+
     const self = this.getWritable();
     self.__isOpening = isOpening;
+    return self;
   }
 
   getIsOpening(): boolean {

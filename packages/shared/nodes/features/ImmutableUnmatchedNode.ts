@@ -59,9 +59,12 @@ export class ImmutableUnmatchedNode extends DecoratorNode<void> {
     };
   }
 
-  setMarker(marker: string): void {
+  setMarker(marker: string): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): string {

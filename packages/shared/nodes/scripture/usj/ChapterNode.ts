@@ -4,6 +4,7 @@ import {
   $applyNodeReplacement,
   ElementNode,
   LexicalNode,
+  LexicalUpdateJSON,
   NodeKey,
   SerializedElementNode,
   SerializedLexicalNode,
@@ -62,28 +63,22 @@ export class ChapterNode extends ElementNode {
   }
 
   static importJSON(serializedNode: SerializedChapterNode): ChapterNode {
-    const {
-      marker,
-      number,
-      sid,
-      altnumber,
-      pubnumber,
-      unknownAttributes,
-      format,
-      indent,
-      direction,
-    } = serializedNode;
-    const node = $createChapterNode(number, sid, altnumber, pubnumber, unknownAttributes);
-    node.setMarker(marker);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { number, sid, altnumber, pubnumber, unknownAttributes } = serializedNode;
+    return $createChapterNode(number, sid, altnumber, pubnumber, unknownAttributes).updateFromJSON(
+      serializedNode,
+    );
   }
 
-  setMarker(marker: ChapterMarker): void {
+  updateFromJSON(serializedNode: LexicalUpdateJSON<SerializedChapterNode>): this {
+    return super.updateFromJSON(serializedNode).setMarker(serializedNode.marker);
+  }
+
+  setMarker(marker: ChapterMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): ChapterMarker {
@@ -91,9 +86,12 @@ export class ChapterNode extends ElementNode {
     return self.__marker;
   }
 
-  setNumber(chapterNumber: string): void {
+  setNumber(chapterNumber: string): this {
+    if (this.__number === chapterNumber) return this;
+
     const self = this.getWritable();
     self.__number = chapterNumber;
+    return self;
   }
 
   getNumber(): string {
@@ -101,9 +99,12 @@ export class ChapterNode extends ElementNode {
     return self.__number;
   }
 
-  setSid(sid: string | undefined): void {
+  setSid(sid: string | undefined): this {
+    if (this.__sid === sid) return this;
+
     const self = this.getWritable();
     self.__sid = sid;
+    return self;
   }
 
   getSid(): string | undefined {
@@ -111,9 +112,12 @@ export class ChapterNode extends ElementNode {
     return self.__sid;
   }
 
-  setAltnumber(altnumber: string | undefined): void {
+  setAltnumber(altnumber: string | undefined): this {
+    if (this.__altnumber === altnumber) return this;
+
     const self = this.getWritable();
     self.__altnumber = altnumber;
+    return self;
   }
 
   getAltnumber(): string | undefined {
@@ -121,9 +125,12 @@ export class ChapterNode extends ElementNode {
     return self.__altnumber;
   }
 
-  setPubnumber(pubnumber: string | undefined): void {
+  setPubnumber(pubnumber: string | undefined): this {
+    if (this.__pubnumber === pubnumber) return this;
+
     const self = this.getWritable();
     self.__pubnumber = pubnumber;
+    return self;
   }
 
   getPubnumber(): string | undefined {
@@ -131,9 +138,10 @@ export class ChapterNode extends ElementNode {
     return self.__pubnumber;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {

@@ -27,12 +27,8 @@ export class UsfmParagraphNode extends UsfmElementNode {
   }
 
   static importJSON(serializedNode: SerializedUsfmParagraphNode): UsfmParagraphNode {
-    const { attributes, tag, format, indent, direction } = serializedNode;
-    const node = $createUsfmParagraphNode(attributes, tag ?? DEFAULT_TAG);
-    node.setFormat(format);
-    node.setIndent(indent);
-    node.setDirection(direction);
-    return node;
+    const { attributes, tag } = serializedNode;
+    return $createUsfmParagraphNode(attributes, tag ?? DEFAULT_TAG).updateFromJSON(serializedNode);
   }
 
   createDOM(config: EditorConfig): HTMLElement {

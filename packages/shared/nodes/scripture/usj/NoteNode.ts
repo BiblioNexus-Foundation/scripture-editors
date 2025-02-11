@@ -74,8 +74,9 @@ export class NoteNode extends ElementNode {
 
   static importJSON(serializedNode: SerializedNoteNode): NoteNode {
     const { marker, caller, category, unknownAttributes } = serializedNode;
-    const node = $createNoteNode(marker, caller, category, unknownAttributes);
-    return node;
+    return $createNoteNode(marker, caller, category, unknownAttributes).updateFromJSON(
+      serializedNode,
+    );
   }
 
   static importDOM(): DOMConversionMap | null {
@@ -95,9 +96,12 @@ export class NoteNode extends ElementNode {
     return !!marker && VALID_NOTE_MARKERS.includes(marker as NoteMarker);
   }
 
-  setMarker(marker: NoteMarker): void {
+  setMarker(marker: NoteMarker): this {
+    if (this.__marker === marker) return this;
+
     const self = this.getWritable();
     self.__marker = marker;
+    return self;
   }
 
   getMarker(): NoteMarker {
@@ -105,9 +109,12 @@ export class NoteNode extends ElementNode {
     return self.__marker;
   }
 
-  setCaller(caller: string): void {
+  setCaller(caller: string): this {
+    if (this.__caller === caller) return this;
+
     const self = this.getWritable();
     self.__caller = caller;
+    return self;
   }
 
   getCaller(): string {
@@ -115,9 +122,12 @@ export class NoteNode extends ElementNode {
     return self.__caller;
   }
 
-  setCategory(category: string | undefined): void {
+  setCategory(category: string | undefined): this {
+    if (this.__category === category) return this;
+
     const self = this.getWritable();
     self.__category = category;
+    return self;
   }
 
   getCategory(): string | undefined {
@@ -125,9 +135,10 @@ export class NoteNode extends ElementNode {
     return self.__category;
   }
 
-  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): void {
+  setUnknownAttributes(unknownAttributes: UnknownAttributes | undefined): this {
     const self = this.getWritable();
     self.__unknownAttributes = unknownAttributes;
+    return self;
   }
 
   getUnknownAttributes(): UnknownAttributes | undefined {
