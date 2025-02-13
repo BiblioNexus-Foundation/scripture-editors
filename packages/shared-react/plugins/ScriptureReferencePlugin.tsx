@@ -123,7 +123,7 @@ export default function ScriptureReferencePlugin({
             const verseNum = parseInt(verse ?? "0", 10);
             const reference: ScriptureReference = {
               book: book ?? "",
-              chapterNum: parseInt(chapterNode?.getAttribute("data-number") ?? "0", 10),
+              chapterNum: parseInt(chapterNode?.getAttribute("data-number") ?? "1", 10),
               verseNum,
             };
             if (verse != null && verseNum.toString() !== verse) reference.verse = verse;
