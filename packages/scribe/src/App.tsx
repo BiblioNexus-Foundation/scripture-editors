@@ -7,7 +7,8 @@ import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model"
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { Usj2Usfm } from "./hooks/usj2Usfm";
+// import { Usj2Usfm } from "./hooks/usj2Usfm";
+import "shared/styles/nodes-menu.css";
 
 const defaultUsj: Usj = {
   type: USJ_TYPE,
@@ -37,11 +38,8 @@ function App() {
     },
   };
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
-  // const noteViewOptions = useMemo(() => getViewOptions(noteViewMode), [noteViewMode]);
   const onChange = async (usj: Usj) => {
-    // console.log({ usj });
-    const usfm = await Usj2Usfm(usj);
-    console.log(usfm);
+    console.log(usj);
   };
   useEffect(() => {
     console.log({ scrRef });

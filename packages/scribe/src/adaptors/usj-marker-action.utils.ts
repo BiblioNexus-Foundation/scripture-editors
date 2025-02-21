@@ -27,13 +27,18 @@ const markerActions: {
     action?: (currentEditor: {
       reference: ScriptureReference;
       editor: LexicalEditor;
+      autoNumbering?: boolean;
+      newVerseRChapterNum?: number;
+      noteText?: string;
     }) => MarkerContent[];
   };
 } = {
   c: {
     action: (currentEditor) => {
       const { book, chapterNum } = currentEditor.reference;
-      const nextChapter = chapterNum + 1;
+      const nextChapter = currentEditor.autoNumbering
+        ? chapterNum + 1
+        : currentEditor.newVerseRChapterNum;
       const content: MarkerContent = {
         type: "chapter",
         marker: "c",
@@ -46,7 +51,9 @@ const markerActions: {
   v: {
     action: (currentEditor) => {
       const { book, chapterNum, verseNum, verse } = currentEditor.reference;
-      const nextVerse = getNextVerse(verseNum, verse);
+      const nextVerse = currentEditor.autoNumbering
+        ? getNextVerse(verseNum, verse)
+        : currentEditor.newVerseRChapterNum;
       const content: MarkerContent = {
         type: "verse",
         marker: "v",
@@ -68,7 +75,7 @@ const markerActions: {
           {
             type: "char",
             marker: "ft",
-            content: [" "],
+            content: [currentEditor.noteText ?? " "],
           },
         ],
       };
@@ -87,7 +94,7 @@ const markerActions: {
           {
             type: "char",
             marker: "xt",
-            content: [" "],
+            content: [currentEditor.noteText ?? " "],
           },
         ],
       };
@@ -103,9 +110,17 @@ export function getUsjMarkerAction(
   viewOptions?: ViewOptions,
 ): MarkerAction {
   const markerAction = getMarkerAction(marker);
-  const action = (currentEditor: { reference: ScriptureReference; editor: LexicalEditor }) => {
+  const action = (currentEditor: {
+    reference: ScriptureReference;
+    editor: LexicalEditor;
+    autoNumbering?: boolean;
+    newVerseRChapterNum?: number;
+    noteText?: string;
+  }) => {
     currentEditor.editor.update(() => {
-      const content = markerAction?.action?.(currentEditor);
+      const content = currentEditor.autoNumbering
+        ? markerAction?.action?.(currentEditor)
+        : markerAction?.action?.(currentEditor);
       if (!content) return;
 
       const serializedLexicalNode = createLexicalUsjNode(content, usjEditorAdaptor, viewOptions);

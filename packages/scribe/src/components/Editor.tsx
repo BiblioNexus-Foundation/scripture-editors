@@ -22,12 +22,14 @@ import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import { getViewClassList, ViewOptions } from "../adaptors/view-options.utils";
 import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
+import UsjNodesMenuPlugin from "../plugins/UsjNodesMenuPlugin";
 import useDeferredState from "../hooks/use-deferred-state.hook";
 import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
 import editorTheme from "../themes/editor-theme";
 import LoadingSpinner from "./LoadingSpinner";
 import { blackListedChangeTags } from "shared/nodes/scripture/usj/node-constants";
 import { deepEqual } from "fast-equals";
+import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -73,7 +75,7 @@ const Editor = forwardRef(function Editor(
   const [usj, setUsj] = useState(usjInput);
   const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
   useDefaultNodeOptions(nodeOptions);
-
+  const autoNumbering = false;
   const initialConfig = {
     namespace: "ScribeEditor",
     editable: true,
@@ -127,19 +129,21 @@ const Editor = forwardRef(function Editor(
         placeholder={<LoadingSpinner />}
         ErrorBoundary={LexicalErrorBoundary}
       />
-      {/* <UsjNodesMenuPlugin
-          trigger={NODE_MENU_TRIGGER}
+      {scrRef && (
+        <UsjNodesMenuPlugin
+          trigger={"\\"}
           scrRef={scrRef}
           getMarkerAction={(marker, markerData) =>
             getUsjMarkerAction(marker, markerData, viewOptions)
           }
-        /> */}
+          autoNumbering={autoNumbering}
+        />
+      )}
       <UpdateStatePlugin
         scripture={loadedUsj}
         nodeOptions={nodeOptions}
         editorAdaptor={usjEditorAdaptor}
         viewOptions={viewOptions}
-        // logger={logger}
       />
       <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
       <NoteNodePlugin nodeOptions={nodeOptions} />

@@ -4,6 +4,12 @@
     "jsx": "react-jsx",
     "moduleResolution": "Node"
   },
-  "include": ["."],
-  "exclude": ["node_modules", "jest.config.ts"]
+  "include": [
+    ".",
+    "../scribe/src/plugins/useModifiedMarkersForMenu.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "jest.config.ts"
+  ]
 }

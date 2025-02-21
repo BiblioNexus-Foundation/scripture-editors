@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/scribe-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scripture editor used in Scribe",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/scribe#readme",
@@ -30,10 +30,12 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:~",
+    "@floating-ui/dom": "^1.6.13",
     "@lexical/mark": "^0.24.0",
     "@lexical/react": "^0.24.0",
     "@lexical/selection": "^0.24.0",
     "@lexical/utils": "^0.24.0",
+    "autoprefixer": "^10.4.20",
     "fast-equals": "^5.2.2",
     "lexical": "^0.24.0"
   },
