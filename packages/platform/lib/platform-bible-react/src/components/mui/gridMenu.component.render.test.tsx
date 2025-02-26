@@ -2,11 +2,12 @@ import GridMenu from "@/components/mui/grid-menu.component";
 import * as jsonMenu from "@/components/mui/sample.composed.full.menu.json";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { NonValidatingDocumentCombiner, PlatformMenus } from "platform-bible-utils";
 import { PropsWithChildren } from "react";
+import { vi } from "vitest";
+import { NonValidatingDocumentCombiner, PlatformMenus } from "platform-bible-utils";
 
-jest.mock("@mui/material", () => {
-  const mui = jest.requireActual("@mui/material"); // Import the actual MUI components
+vi.mock("@mui/material", async () => {
+  const mui = await vi.importActual("@mui/material"); // Import the actual MUI components
 
   return {
     ...mui, // Spread the actual MUI exports
@@ -22,9 +23,9 @@ jest.mock("@mui/material", () => {
     } & PropsWithChildren) => {
       const dividerStyle = divider ? " hasDivider" : "";
       return (
-        <li className={`${className || ""}${dividerStyle}`} role="menuitem">
+        <button className={`${className ?? ""}${dividerStyle}`} type="button" role="menuitem">
           {children}
-        </li>
+        </button>
       );
     },
   };
@@ -47,9 +48,9 @@ describe("GridMenu renders", () => {
         html: screen.getByRole("menu", { name: "paratext.paratext" }),
         label: "%mainMenu_Paratext%",
       },
-      { html: screen.getByRole("menu", { name: "platform.window" }), label: "%mainMenu_Window%" },
-      { html: screen.getByRole("menu", { name: "platform.layout" }), label: "%mainMenu_Layout%" },
-      { html: screen.getByRole("menu", { name: "platform.help" }), label: "%mainMenu_Help%" },
+      { html: screen.getByRole("menu", { name: "platform.window" }), label: "%mainMenu_window%" },
+      { html: screen.getByRole("menu", { name: "platform.layout" }), label: "%mainMenu_layout%" },
+      { html: screen.getByRole("menu", { name: "platform.help" }), label: "%mainMenu_help%" },
     ];
 
     expectedColumns.forEach((column) => {
@@ -81,7 +82,7 @@ describe("GridMenu renders", () => {
   it("the correct total number of groups with dividers", () => {
     let cGroupsWithDividers = 0;
     allMenuItems.forEach((m) => {
-      if (m.outerHTML?.match("hasDivider")) cGroupsWithDividers += 1;
+      if (/hasDivider/.exec(m.outerHTML)) cGroupsWithDividers += 1;
     });
 
     // In the test data, only 4 of the column-level groups contain menu items. They are in two

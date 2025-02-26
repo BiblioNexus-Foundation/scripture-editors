@@ -204,9 +204,9 @@ export declare class DocumentCombiner {
 	/**
 	 * Add or update one of the contribution documents for the composition process
 	 *
-	 * Note: the order in which contribution documents are added can be considered to be indeterminate
-	 * as it is currently ordered by however `Map.forEach` provides the contributions. The order
-	 * matters when merging two arrays into one. Also, when `options.ignoreDuplicateProperties` is
+	 * Note: the order in which contribution documents are added can be considered indeterminate as it
+	 * depends on the order in which `Map.forEach` iterates over the contributions. However, the order
+	 * matters when merging two arrays into one. Also, when `options.ignoreDuplicateProperties` is is
 	 * `true`, the order also matters when adding the same property to an object that is already
 	 * provided previously. Please let us know if you have trouble because of indeterminate
 	 * contribution ordering.
@@ -445,6 +445,59 @@ export declare class PlatformEventEmitter<T> implements Dispose {
 	 * override emit and still call the base functionality.
 	 */
 	protected disposeFn(): Promise<boolean>;
+}
+/**
+ * Class that allows you to chain promises for a given key. This is useful when:
+ *
+ * 1. You need to run promises from synchronous code and don't need to look at the results.
+ * 2. The promises to run, or at least precisely when to run them, are not known in advance.
+ * 3. The promises need to be run sequentially, waiting for the previous one to finish.
+ *
+ * An example of when this can be helpful is inside of React components. Component code is mostly
+ * synchronous, but you may need to run some asynchronous code. You can't use `await` inside of
+ * React component code in many situations, so you can use this class to chain promises together.
+ *
+ * When promises are added to the map with a key, they will run in the order they were added to the
+ * map for that key. If a promise rejects, a warning will be logged and the chain will continue. If
+ * a promise is added while another promise in the map for that key is running, the new promise will
+ * be chained to the existing one.
+ */
+export declare class PromiseChainingMap<TKey = string> {
+	private readonly map;
+	private readonly logger;
+	/**
+	 * Creates a new PromiseChainingMap
+	 *
+	 * @param logger Object with a `warn` method that will be called when a promise rejects. This
+	 *   defaults to `console`.
+	 */
+	constructor(logger?: {
+		warn: (message: string) => void;
+	});
+	/**
+	 * Adds a promise function to the map for a given key. If a promise is already running for the
+	 * key, the new promise will be chained to the existing one. Once all promises for a key have
+	 * settled, the map will be cleared for that key.
+	 *
+	 * @param key Unique key to identify a distinct promise chain
+	 * @param promiseFunction Function that returns a promise to add to the chain
+	 */
+	addPromiseFunction(key: TKey, promiseFunction: () => Promise<unknown>): void;
+	/**
+	 * Gets the current promise chain for the given key. This is mostly useful for testing. Normally
+	 * you should just call {@link addPromiseFunction} and let the map handle the rest.
+	 *
+	 * @param key Unique key to identify a distinct promise chain
+	 * @returns The current promise chain for the key
+	 */
+	get(key: TKey): Promise<unknown> | undefined;
+	/**
+	 * Configures a promise chain to be removed from the map for the given key after all the promises
+	 * have settled
+	 *
+	 * @param key Unique key to identify a distinct promise chain
+	 */
+	private cleanupPromiseChain;
 }
 /** Simple collection for UnsubscriberAsync objects that also provides an easy way to run them. */
 export declare class UnsubscriberAsyncList {
@@ -1007,6 +1060,7 @@ export declare const FIRST_SCR_BOOK_NUM = 1;
 export declare const LAST_SCR_BOOK_NUM: number;
 export declare const FIRST_SCR_CHAPTER_NUM = 1;
 export declare const FIRST_SCR_VERSE_NUM = 1;
+export declare const defaultScrRef: ScriptureReference;
 export declare const getChaptersForBook: (bookNum: number) => number;
 export declare const offsetBook: (scrRef: ScriptureReference, offset: number) => ScriptureReference;
 export declare const offsetChapter: (scrRef: ScriptureReference, offset: number) => ScriptureReference;
@@ -1079,6 +1133,28 @@ export declare function getLocalizeKeysForScrollGroupIds(scrollGroupIds: (Scroll
  * @returns The formatted reference.
  */
 export declare function formatScrRef(scrRef: ScriptureReference, optionOrLocalizedBookName?: "id" | "English" | string, chapterVerseSeparator?: string, bookChapterSeparator?: string): string;
+/**
+ * Converts all control characters, carriage returns, and tabs into spaces and then strips duplicate
+ * spaces.
+ *
+ * This is mainly intended for use with individual Scripture strings in USFM, USX, USJ, etc. format.
+ * It is not intended to implement the [USFM white space definition or reduction
+ * rules](https://docs.usfm.bible/usfm/3.1/whitespace.html) but strictly follows Paratext 9's white
+ * space rules. It is generally best suited to normalizing spaces within a Scripture marker as it
+ * removes all newlines.
+ *
+ * This function is a direct translation of `UsfmToken.RegularizeSpaces` from `ParatextData.dll`
+ */
+export declare function normalizeScriptureSpaces(str: string): string;
+/**
+ * Determines if the USJ documents or markers (and all contents) are equivalent after regularizing
+ * spaces according to the way `ParatextData.dll` does.
+ *
+ * Note that this will not work properly if there ever exist any properties of USJ document or USJ
+ * markers other than `content` that are complex objects like arrays or objects as the properties
+ * are shallow equaled.
+ */
+export declare function areUsjContentsEqualExceptWhitespace(a: Usj | undefined, b: Usj | undefined): boolean;
 /** USJ content node type for a chapter */
 export declare const CHAPTER_TYPE = "chapter";
 /** USJ content node type for a verse */
@@ -1237,6 +1313,53 @@ export declare function codePointAt(string: string, index: number): number | und
  * @returns True if it ends with searchString, false if it does not
  */
 export declare function endsWith(string: string, searchString: string, endPosition?: number): boolean;
+/**
+ * Formats a string into an array of objects (adjacent strings are concatenated in one array entry),
+ * replacing `{replacer key}` with the value in the `replacers` at that replacer key (or multiple
+ * replacer values if there are multiple in the string). Will also remove \ before curly braces if
+ * curly braces are escaped with a backslash in order to preserve the curly braces. E.g. 'Hi, this
+ * is {name}! I like `\{curly braces\}`! would become Hi, this is Jim! I like {curly braces}!
+ *
+ * If the key in unescaped braces is not found, returns the key without the braces. Empty unescaped
+ * curly braces will just return a string without the braces e.g. ('I am {Nemo}', { 'name': 'Jim'})
+ * would return 'I am Nemo'.
+ *
+ * Note: React elements can be used as replacer values.
+ *
+ * @example
+ *
+ * ```tsx
+ * <p>
+ *   {formatReplacementStringToArray('Hi {other}! I am {name}.', {
+ *     other: 'Billy',
+ *     name: <span className="tw-text-red-500">Jim</span>,
+ *   })}
+ * </p>
+ * ```
+ *
+ * @example
+ *
+ * ```typescript
+ * formatReplacementStringToArray(
+ *   'Hi, this is {name}! I like \{curly braces\}! I have a {carInfo} car. My favorite food is {food}.',
+ *   { name: ['Bill'], carInfo: { year: 2015, color: 'blue' } }
+ * );
+ *
+ * =>
+ *
+ * ['Hi, this is ', ['Bill'], '! I like {curly braces}! I have a ', { year: 2015, color: 'blue' }, ' car. My favorite food is food.']
+ * ```
+ *
+ * @param str String to format and break out into an array of objects
+ * @param replacers Object whose keys are replacer keys and whose values are the values with which
+ *   to replace `{replacer key}`s found in the string to format. If the replacer value is a string,
+ *   it will be concatenated into existing strings in the array. Otherwise, the replacer value will
+ *   be added as a new entry in the array
+ * @returns Array of formatted strings and replaced objects
+ */
+export declare function formatReplacementStringToArray<T = unknown>(str: string, replacers: {
+	[key: string | number]: T;
+} | object): (string | T)[];
 /**
  * Formats a string, replacing `{replacer key}` with the value in the `replacers` at that replacer
  * key (or multiple replacer values if there are multiple in the string). Will also remove \ before
@@ -1492,6 +1615,28 @@ export declare function transformAndEnsureRegExpRegExpArray(stringStringMaybeArr
  */
 export declare function transformAndEnsureRegExpArray(stringMaybeArray: string | string[] | undefined): RegExp[];
 /**
+ * Determines whether a string contains one or more white space characters and no other characters.
+ *
+ * This implementation uses [dotnet's `Char.IsWhiteSpace` definition of white
+ * space](https://learn.microsoft.com/en-us/dotnet/api/system.char.iswhitespace?view=net-9.0):
+ *
+ * ```ts
+ * /^[\u000C\u000A\u000D\u0009\u000B\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\u0085]+$/.test(
+ *   ch,
+ * );
+ * ```
+ *
+ * Note: This differs from
+ * [`/\s/.test(ch)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Character_classes#:~:text=Matches%20a%20single%20white%20space%20character%2C%20including%20space)
+ * (usually considered the determiner of what is white space in JavaScript) in that it does not
+ * include ZWNBSP (U+FEFF) but rather includes NEXT LINE (U+0085)
+ *
+ * @param ch Single character or a string of characters
+ * @returns `true` if the string consists of one or more white space characters and no other
+ *   characters, `false` otherwise
+ */
+export declare function isWhiteSpace(ch: string): boolean;
+/**
  * Check that two objects are deeply equal, comparing members of each object and such
  *
  * @param a The first object to compare
@@ -1641,6 +1786,22 @@ export function formatBytes(fileSize: number, decimals?: number): string;
  *   returned.
  */
 export function ensureArray<T>(maybeArray: T | T[] | undefined): T[];
+/**
+ * Get a localized string representation of the time between two dates
+ *
+ * @example
+ *
+ * `since` = 3 Aug 2024 8:00 AM
+ *
+ * `to` = 5 Aug 2024 8:000 AM
+ *
+ * Returns: "two days ago"
+ *
+ * @param since "Destination" time. time against which to get the time span.
+ * @param to "Starting" time. Time span will be formatted relative to `to`. Defaults to `new Date()`
+ * @returns Time span in words from `to` to `since`
+ */
+export declare function formatTimeSpan(relativeTimeFormatter: Intl.RelativeTimeFormat, since: Date, to?: Date): string;
 /** Localized string value associated with this key */
 export type LocalizedStringValue = string;
 /** The data an extension provides to inform Platform.Bible of the localized strings it provides. */
@@ -1748,6 +1909,18 @@ export declare const localizedStringsDocumentSchema: {
 			tsType: string;
 		};
 	};
+};
+export type ResourceType = "ScriptureResource" | "EnhancedResource" | "XmlResource" | "SourceLanguageResource";
+export type DblResourceData = {
+	dblEntryUid: string;
+	displayName: string;
+	fullName: string;
+	bestLanguageName: string;
+	type: ResourceType;
+	size: number;
+	installed: boolean;
+	updateAvailable: boolean;
+	projectId: string;
 };
 /** The data an extension provides to inform Platform.Bible of the settings it provides */
 export type SettingsContribution = SettingsGroup | SettingsGroup[];
