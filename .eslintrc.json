@@ -1,11 +1,12 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "plugins": ["@lexical", "@nx"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
+        "@lexical/rules-of-lexical": "error",
         "@nx/enforce-module-boundaries": [
           "error",
           {

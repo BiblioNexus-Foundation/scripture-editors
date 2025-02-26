@@ -1,7 +1,7 @@
 import { transformLexicalStateToPerf } from "../../converters/perf/lexicalToPerf";
 import { SerializedUsfmElementNode } from "../../nodes/UsfmElementNode";
 import { HistoryMergeListener } from "../History";
-import { getOperations } from "../History/operations";
+import { $getOperations } from "../History/operations";
 import { getOperationBuilder } from "./operationBuilder";
 import { getPathBuilder } from "./pathBuilder";
 import { getLexicalState } from "../../contentManager";
@@ -80,7 +80,7 @@ export const getPerfHistoryUpdater: (
         const extraData = { sequences: sideSequences, extendedOperations };
 
         // Get the operations (add, remove, replace) for the dirty elements
-        const perfElementOperations = getOperations({
+        const perfElementOperations = $getOperations({
           dirtyNodes: dirtyElements,
           editorState,
           prevEditorState,

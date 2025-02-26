@@ -1,6 +1,6 @@
-import { buildOperation, getNodePath } from "./defaults";
 import { $getNodeByKey } from "lexical";
-import { EditorState, NodeKey } from "lexical";
+import type { EditorState, NodeKey } from "lexical";
+import { buildOperation, getNodePath } from "./defaults";
 import type { Mapper, PathBuilder } from "./defaults";
 import { Operation, OperationType } from "./index.d";
 
@@ -29,7 +29,7 @@ type GetOperationsParams = OperationsSource & OperationCallback;
  * @param [pathBuilder] - The path builder function to generate the path of the node.
  * @returns The array of operations.
  */
-export const getOperations = ({
+export const $getOperations = ({
   dirtyNodes,
   editorState,
   prevEditorState,
@@ -39,7 +39,7 @@ export const getOperations = ({
   const operations = [];
   for (const dirtyNode of dirtyNodes) {
     const nodeKey = Array.isArray(dirtyNode) ? dirtyNode[0] : dirtyNode;
-    const operation = getOperation({
+    const operation = $getOperation({
       nodeKey,
       prevEditorState,
       editorState,
@@ -70,7 +70,7 @@ type GetOperationParams = OperationSource & OperationCallback;
  * @param [pathBuilder] - The path builder function to generate the path of the node.
  * @returns The Operation object.
  */
-export const getOperation = ({
+export const $getOperation = ({
   nodeKey,
   editorState,
   prevEditorState,
