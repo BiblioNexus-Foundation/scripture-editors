@@ -8,6 +8,7 @@ export { default as MutexMap } from "./mutex-map";
 export { default as NonValidatingDocumentCombiner } from "./non-validating-document-combiner";
 export { default as NumberFormat } from "./intl-number-format";
 export { default as PlatformEventEmitter } from "./platform-event-emitter.model";
+export { default as PromiseChainingMap } from "./promise-chaining-map";
 export { default as UnsubscriberAsyncList } from "./unsubscriber-async-list";
 
 // Consts
@@ -22,6 +23,7 @@ export {
   FIRST_SCR_VERSE_NUM,
   getLocalizeKeyForScrollGroupId,
   getLocalizeKeysForScrollGroupIds,
+  defaultScrRef,
 } from "./scripture-util";
 export { aggregateUnsubscribers, aggregateUnsubscriberAsyncs } from "./unsubscriber";
 export { CHAPTER_TYPE, VERSE_TYPE } from "./usj-reader-writer.model";
@@ -40,9 +42,11 @@ export {
   createSyncProxyForAsyncObject,
 } from "./util";
 export {
+  areUsjContentsEqualExceptWhitespace,
   compareScrRefs,
   formatScrRef,
   getLocalizedIdFromBookNumber,
+  normalizeScriptureSpaces,
   scrRefToBBBCCCVVV,
 } from "./scripture-util";
 export {
@@ -52,6 +56,7 @@ export {
   endsWith,
   escapeStringRegexp,
   formatReplacementString,
+  formatReplacementStringToArray,
   includes,
   indexOf,
   isLocalizeKey,
@@ -68,6 +73,7 @@ export {
   ordinalCompare,
   transformAndEnsureRegExpRegExpArray,
   transformAndEnsureRegExpArray,
+  isWhiteSpace,
 } from "./string-util";
 export { default as deepEqual } from "./equality-checking";
 export { default as isSubset } from "./subset-checking";
@@ -75,6 +81,7 @@ export { serialize, deserialize, isSerializable, htmlEncode } from "./serializat
 export { default as getCurrentLocale } from "./intl-util";
 export { default as formatBytes } from "./number-utils";
 export { default as ensureArray } from "./array-util";
+export { default as formatTimeSpan } from "./date-time-format-util";
 
 // Types
 export type { DeepPartial, ReplaceType, UnionToIntersection } from "./util";
@@ -125,6 +132,7 @@ export type {
   Localized,
 } from "./menus.model";
 export { menuDocumentSchema } from "./menus.model";
+export type { DblResourceData, ResourceType } from "./resources.model";
 export type {
   ExtensionControlledProjectSetting,
   ExtensionControlledSetting,

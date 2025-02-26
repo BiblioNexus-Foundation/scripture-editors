@@ -42,7 +42,7 @@
   "devDependencies": {
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "postcss": "^8.5.1",
+    "postcss": "^8.5.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "shared": "link:../shared",

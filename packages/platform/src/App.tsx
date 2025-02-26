@@ -1,6 +1,7 @@
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
 import { Canon, SerializedVerseRef } from "@sillsdev/scripture";
-import { BookChapterControl, ScriptureReference as BCReference } from "platform-bible-react";
+import { BookChapterControl } from "platform-bible-react";
+import { ScriptureReference as BCReference } from "platform-bible-utils";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";

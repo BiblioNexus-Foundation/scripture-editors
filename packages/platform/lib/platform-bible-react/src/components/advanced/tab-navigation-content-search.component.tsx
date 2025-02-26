@@ -13,9 +13,12 @@ export type TabKeyValueContent = {
   content: ReactNode;
 };
 
-export type NavigationContentSearchProps = {
+export type TabNavigationContentSearchProps = {
   /** List of values and keys for each tab this component should provide */
   tabList: TabKeyValueContent[];
+
+  /** The search query in the search bar */
+  searchValue: string;
 
   /** Handler to run when the value of the search bar changes */
   onSearch: (searchQuery: string) => void;
@@ -26,32 +29,30 @@ export type NavigationContentSearchProps = {
   /** Optional title to include in the header */
   headerTitle?: string;
 
-  /** Optional flag to make the search bar appear full width */
-  isSearchBarFullWidth?: boolean;
-
-  /** Text direction ltr or rtl */
-  direction?: "ltr" | "rtl";
+  /** Optional className to modify the search input */
+  searchClassName?: string;
 };
 
-export default function NavigationContentSearch({
+export default function TabNavigationContentSearch({
   tabList,
+  searchValue,
   onSearch,
   searchPlaceholder,
   headerTitle,
-  isSearchBarFullWidth = false,
-  direction = "ltr",
-}: NavigationContentSearchProps) {
+  searchClassName,
+}: TabNavigationContentSearchProps) {
   return (
     <div className="pr-twp">
       <div className="tw-sticky tw-top-0 tw-space-y-2 tw-pb-2">
         {headerTitle ? <h1>{headerTitle}</h1> : ""}
         <SearchBar
-          isFullWidth={isSearchBarFullWidth}
+          className={searchClassName}
+          value={searchValue}
           onSearch={onSearch}
           placeholder={searchPlaceholder}
         />
       </div>
-      <VerticalTabs dir={direction}>
+      <VerticalTabs>
         <VerticalTabsList>
           {tabList.map((tab) => (
             <VerticalTabsTrigger key={tab.key} value={tab.value}>
