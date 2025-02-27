@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.13",
-    "@lexical/react": "^0.24.0",
-    "@lexical/utils": "^0.24.0",
-    "lexical": "^0.24.0"
+    "@lexical/react": "^0.25.0",
+    "@lexical/utils": "^0.25.0",
+    "lexical": "^0.25.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
