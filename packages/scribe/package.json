@@ -31,13 +31,13 @@
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:~",
     "@floating-ui/dom": "^1.6.13",
-    "@lexical/mark": "^0.26.0",
-    "@lexical/react": "^0.26.0",
-    "@lexical/selection": "^0.26.0",
-    "@lexical/utils": "^0.26.0",
+    "@lexical/mark": "^0.27.0",
+    "@lexical/react": "^0.27.0",
+    "@lexical/selection": "^0.27.0",
+    "@lexical/utils": "^0.27.0",
     "autoprefixer": "^10.4.20",
     "fast-equals": "^5.2.2",
-    "lexical": "^0.26.0"
+    "lexical": "^0.27.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
