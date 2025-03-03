@@ -11,9 +11,8 @@
  * - Added additional utility functions for text manipulation
  */
 
-import { $getSelection, $isTextNode, LexicalEditor, RangeSelection, TextNode } from "lexical";
-
-import { $isRangeSelection } from "lexical";
+import type { LexicalEditor, RangeSelection, TextNode } from "lexical";
+import { $getSelection, $isRangeSelection, $isTextNode } from "lexical";
 //TODO: This list is very language specific and probably should be externally supplied perhaps by the UI language setting.
 export const PUNCTUATION = "\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%'\"~=<>_:;";
 
