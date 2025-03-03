@@ -8,7 +8,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@lexical/eslint-plugin": "^0.25.0",
+    "@lexical/eslint-plugin": "^0.26.0",
     "@nx/devkit": "19.8.14",
     "@nx/eslint": "19.8.14",
     "@nx/eslint-plugin": "19.8.14",
@@ -43,7 +43,7 @@
     "lint-staged": "^15.4.3",
     "nx": "19.8.14",
     "nx-cloud": "^19.1.0",
-    "prettier": "^3.5.2",
+    "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",

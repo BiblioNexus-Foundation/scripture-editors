@@ -12,6 +12,7 @@ import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Type
 import Button from "./Components/Button";
 
 import {
+  $getCommonAncestor,
   $getNodeByKey,
   $getSelection,
   LexicalEditor,
@@ -230,8 +231,11 @@ export default function Editor({
             const startNode = $getNodeByKey(startEndPoints[0].key);
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
+
+            const result = $getCommonAncestor(startNode, endNode);
+            const commonAncestor = result ? result.commonAncestor : undefined;
             //This is the selected element expected to be a usfm element;
-            const selectedElement = startNode.getCommonAncestor(endNode);
+            const selectedElement = commonAncestor?.getParent();
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }

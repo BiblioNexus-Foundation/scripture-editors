@@ -1,4 +1,4 @@
-import { ElementNode, LexicalNode, TextNode } from "lexical";
+import type { ElementNode, LexicalNode, TextNode } from "lexical";
 import { $isElementNode, $isTextNode } from "lexical";
 import { CursorData, CursorPosition } from "../utils/CursorSelectionContext";
 import {
