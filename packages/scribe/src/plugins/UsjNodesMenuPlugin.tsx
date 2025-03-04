@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $dfs, DFSNode, mergeRegister } from "@lexical/utils";
 import {
+  $getCommonAncestor,
   $getNodeByKey,
   $getRoot,
   $getSelection,
@@ -79,7 +80,9 @@ function useContextMarker(editor: LexicalEditor) {
               return;
             }
 
-            const contextNode = startNode.getCommonAncestor(endNode);
+            const result = $getCommonAncestor(startNode, endNode);
+            const commonAncestor = result ? result.commonAncestor : undefined;
+            const contextNode = commonAncestor?.getParent();
             if (!contextNode || !$isReactNodeWithMarker(contextNode)) {
               setContextMarker(undefined);
               return;

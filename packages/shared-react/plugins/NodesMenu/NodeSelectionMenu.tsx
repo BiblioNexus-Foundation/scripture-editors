@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import Menu from "./Menu";
+import Menu, { OptionItem } from "./Menu";
 import { useFilteredItems } from "./Menu/useFilteredItems";
 import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalMenuNavigation from "./LexicalMenuNavigation";
-import { OptionItem } from "./Menu";
 
 interface NodeSelectionMenuProps {
   options: Array<OptionItem>;
