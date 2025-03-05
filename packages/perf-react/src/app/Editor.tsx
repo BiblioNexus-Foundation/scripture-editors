@@ -12,7 +12,6 @@ import { FlatDocument as PerfDocument } from "shared/plugins/PerfOperations/Type
 import Button from "./Components/Button";
 
 import {
-  $getCommonAncestor,
   $getNodeByKey,
   $getSelection,
   LexicalEditor,
@@ -25,6 +24,7 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
+import { $getCommonAncestorCompatible } from "shared/nodes/scripture/usj/node.utils";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import ScriptureReferencePlugin from "shared-react/plugins/ScriptureReferencePlugin";
@@ -232,10 +232,8 @@ export default function Editor({
             const endNode = $getNodeByKey(startEndPoints[1].key);
             if (!startNode || !endNode) return;
 
-            const result = $getCommonAncestor(startNode, endNode);
-            const commonAncestor = result ? result.commonAncestor : undefined;
             //This is the selected element expected to be a usfm element;
-            const selectedElement = commonAncestor?.getParent();
+            const selectedElement = $getCommonAncestorCompatible(startNode, endNode);
             if ($isUsfmElementNode(selectedElement)) {
               setSelectedMarker(selectedElement.getAttribute("data-marker"));
             }
