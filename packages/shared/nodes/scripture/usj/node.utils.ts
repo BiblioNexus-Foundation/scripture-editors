@@ -1,7 +1,13 @@
 /** Utility functions for editor nodes */
 
 import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scripture-utilities";
-import { LexicalEditor, LexicalNode, SerializedLexicalNode } from "lexical";
+import {
+  $getCommonAncestor,
+  $isElementNode,
+  LexicalEditor,
+  LexicalNode,
+  SerializedLexicalNode,
+} from "lexical";
 // Must be imported before `CharNode` to prevent a circular dependency.
 import { NBSP, NUMBERED_MARKER_PLACEHOLDER, UnknownAttributes } from "./node-constants";
 import { $isUnknownNode, UnknownNode } from "../../features/UnknownNode";
@@ -340,4 +346,25 @@ export function getNextVerse(verseNum: number, verse: string | undefined): strin
 
   const nextSegmentChar = String.fromCharCode(verseSegment[2].charCodeAt(0) + 1);
   return `${verseSegment[1]}${nextSegmentChar}`;
+}
+
+/**
+ * Find a common ancestor of a and b and return the common ancestor,
+ * or undefined if there is no common ancestor between the two nodes.
+ *
+ * This function is compatible with the deprecated `LexicalNode.getCommonAncestor` function but
+ * uses the new (as of Lexical v0.26.0) NodeCaret APIs.
+ *
+ * @param a A LexicalNode
+ * @param b A LexicalNode
+ * @returns The common ancestor between the two nodes or undefined if they have no common ancestor
+ */
+export function $getCommonAncestorCompatible(
+  a: LexicalNode,
+  b: LexicalNode,
+): LexicalNode | undefined {
+  const a1 = $isElementNode(a) ? a : a.getParent();
+  const b1 = $isElementNode(b) ? b : b.getParent();
+  const result = a1 && b1 ? $getCommonAncestor(a1, b1) : undefined;
+  return result ? result.commonAncestor : undefined;
 }
