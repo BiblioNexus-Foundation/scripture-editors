@@ -171,7 +171,7 @@ export default function App() {
     const timeoutId = setTimeout(() => {
       marginalRef.current?.setComments?.(comments as Comments);
       marginalRef.current?.setUsj(usxStringToUsj(usx));
-    }, 1000);
+    }, 0);
     return () => clearTimeout(timeoutId);
   }, []);
 

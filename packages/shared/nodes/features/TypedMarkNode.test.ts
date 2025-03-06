@@ -8,9 +8,9 @@ const testID2 = "testID2";
 
 describe("TypedMarkNode", () => {
   describe("hasID()", () => {
-    it("should work the specified type", async () => {
+    it("should work the specified type", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({
           [testType1]: [testID1, testID2],
           [testType2]: [testID2],
@@ -31,9 +31,9 @@ describe("TypedMarkNode", () => {
   });
 
   describe("addID()", () => {
-    it("should add IDs to the specified type", async () => {
+    it("should add IDs to the specified type", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({});
         expect(node).toBeDefined();
 
@@ -59,9 +59,9 @@ describe("TypedMarkNode", () => {
   });
 
   describe("deleteID()", () => {
-    it("should delete IDs from the specified type", async () => {
+    it("should delete IDs from the specified type", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({
           [testType1]: [testID1, testID2],
           [testType2]: [testID2],
@@ -90,9 +90,9 @@ describe("TypedMarkNode", () => {
   });
 
   describe("hasNoIDsForEveryType()", () => {
-    it("should work if has no types", async () => {
+    it("should work if has no types", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({});
         expect(node).toBeDefined();
 
@@ -100,9 +100,9 @@ describe("TypedMarkNode", () => {
       });
     });
 
-    it("should work if has types but no IDs", async () => {
+    it("should work if has types but no IDs", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({
           [testType1]: [],
           [testType2]: undefined as unknown as string[],
@@ -113,9 +113,9 @@ describe("TypedMarkNode", () => {
       });
     });
 
-    it("should work if has types and IDs", async () => {
+    it("should work if has types and IDs", () => {
       const { editor } = createBasicTestEnvironment([TypedMarkNode]);
-      await editor.update(() => {
+      editor.update(() => {
         const node = $createTypedMarkNode({
           [testType1]: [],
           [testType2]: [testID2],

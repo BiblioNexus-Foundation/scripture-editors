@@ -11,14 +11,14 @@ import { $isVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
 import { $isImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
 
-/** Caller count is in an object so it can be manipulated by passing the the object. */
+/** Caller count is in an object so it can be manipulated by passing the object. */
 export type CallerData = {
   count: number;
 };
 
 // If you want use these utils with your own verse node, add it to this list of types, then modify
-// all the functions where this type is used.
-type SomeVerseNode = VerseNode | ImmutableVerseNode;
+// all the functions where this type is used in this file.
+export type SomeVerseNode = VerseNode | ImmutableVerseNode;
 
 /**
  * Generate the note caller to use. E.g. for '+' replace with a-z, aa-zz.
