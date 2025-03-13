@@ -298,7 +298,7 @@ To develop an editor in a target application you can use [yalc](https://www.npmj
    ```bash
    yalc link @biblionexus-foundation/platform-editor
    ```
-3. In this monorepo, make changes and re-publish the editor (see step 2).
+3. In this monorepo, make changes and re-publish the editor (see step 1).
 4. When you have finished developing in the target application repo, unlink from `yalc`:
    ```bash
    yalc remove @biblionexus-foundation/platform-editor && npm i

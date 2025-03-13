@@ -1,6 +1,7 @@
 import { MarkerContent } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedVerseRef } from "@sillsdev/scripture";
 import {
+  $createTextNode,
   $getSelection,
   $isElementNode,
   $isRangeSelection,
@@ -19,6 +20,7 @@ import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
+import { $isSomeVerseNode } from "shared-react/nodes/scripture/usj/node-react.utils";
 import { ViewOptions } from "./view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
@@ -33,26 +35,24 @@ const markerActions: {
 } = {
   c: {
     action: (currentEditor) => {
-      const { book, chapterNum } = currentEditor.reference;
+      const { chapterNum } = currentEditor.reference;
       const nextChapter = chapterNum + 1;
       const content: MarkerContent = {
         type: "chapter",
         marker: "c",
         number: `${nextChapter}`,
-        sid: `${book} ${nextChapter}`,
       };
       return [content];
     },
   },
   v: {
     action: (currentEditor) => {
-      const { book, chapterNum, verseNum, verse } = currentEditor.reference;
+      const { verseNum, verse } = currentEditor.reference;
       const nextVerse = getNextVerse(verseNum, verse);
       const content: MarkerContent = {
         type: "verse",
         marker: "v",
         number: `${nextVerse}`,
-        sid: `${book} ${chapterNum}:${nextVerse}`,
       };
       return [content];
     },
@@ -110,7 +110,7 @@ export function getUsjMarkerAction(
       if (!content) return;
 
       const serializedLexicalNode = createLexicalUsjNode(content, usjEditorAdaptor, viewOptions);
-      const usjNode = $createNodeFromSerializedNode(serializedLexicalNode);
+      const nodeToInsert = $createNodeFromSerializedNode(serializedLexicalNode);
 
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -119,22 +119,23 @@ export function getUsjMarkerAction(
           $wrapTextSelectionInInlineNode(selection, () =>
             $createNodeFromSerializedNode(serializedLexicalNode),
           );
-        } else if ($isElementNode(usjNode) && !usjNode.isInline()) {
+        } else if ($isElementNode(nodeToInsert) && !nodeToInsert.isInline()) {
           // If the selection is empty, insert a new paragraph and replace it with the USJ node
           const paragraph = selection.insertParagraph();
           if (paragraph) {
             // Transfer the content of the paragraph to the USJ node
             const paragraphContent = paragraph.getChildren();
-            usjNode.append(...paragraphContent);
-            paragraph.replace(usjNode);
-            usjNode.selectStart();
+            nodeToInsert.append(...paragraphContent);
+            paragraph.replace(nodeToInsert);
+            nodeToInsert.selectStart();
           }
         } else {
-          selection.insertNodes([usjNode]);
+          const nodes = $addVerseLeadingSpaceIfNeeded(selection, nodeToInsert);
+          selection.insertNodes(nodes);
         }
       } else {
-        // Insert the USJ node directly
-        selection?.insertNodes([usjNode]);
+        // Insert the node directly
+        selection?.insertNodes([nodeToInsert]);
       }
     });
   };
@@ -193,7 +194,7 @@ function $wrapTextSelectionInInlineNode(
     }
 
     // Get the target node to wrap
-    const targetNode = getTargetNode(
+    const targetNode = $getTargetNode(
       node,
       index === 0,
       index === nodes.length - 1,
@@ -213,7 +214,7 @@ function $wrapTextSelectionInInlineNode(
     }
 
     // Wrap the target node
-    wrapNode(targetNode, currentWrapper);
+    $wrapNode(targetNode, currentWrapper);
   });
 
   // Update selection
@@ -235,7 +236,7 @@ function getSelectionOffsets(selection: RangeSelection): [number, number] {
   return selection.isBackward() ? [focusOffset, anchorOffset] : [anchorOffset, focusOffset];
 }
 
-function getTargetNode(
+function $getTargetNode(
   node: LexicalNode,
   isFirst: boolean,
   isLast: boolean,
@@ -282,7 +283,7 @@ function handleTextNode(
   return splitNodes.length === 3 || isFirst || end === textLength ? splitNodes[1] : splitNodes[0];
 }
 
-function wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
+function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
   if ($isTextNode(wrapper)) {
     wrapper.setTextContent(node.getTextContent());
     node.remove();
@@ -293,3 +294,33 @@ function wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
 }
 
 // #endregion
+
+/**
+ * Adds a leading space before a verse node if needed.
+ *
+ * This function checks if the given selection is collapsed and if the node to be inserted is a
+ * verse node or an immutable verse node. If both conditions are met, it further checks if the
+ * anchor node of the selection is a text node and if there is no leading space before the insertion
+ * point. If there is no leading space, it prepends a space to the node to be inserted.
+ *
+ * @param selection - The current selection range in the editor.
+ * @param nodeToInsert - The node that is to be inserted into the editor.
+ * @returns An array containing the nodes to be inserted, potentially with a leading space node.
+ */
+function $addVerseLeadingSpaceIfNeeded(
+  selection: RangeSelection,
+  nodeToInsert: LexicalNode,
+): LexicalNode[] {
+  if (!selection.isCollapsed()) return [nodeToInsert];
+  if (!$isSomeVerseNode(nodeToInsert)) return [nodeToInsert];
+
+  const anchorNode = selection.anchor.getNode();
+  if (!$isTextNode(anchorNode)) return [nodeToInsert];
+
+  const offset = selection.anchor.offset;
+  const textContent = anchorNode.getTextContent();
+  const hasLeadingSpace = textContent[offset - 1] === " ";
+  if (hasLeadingSpace) return [nodeToInsert];
+
+  return [$createTextNode(" "), nodeToInsert];
+}

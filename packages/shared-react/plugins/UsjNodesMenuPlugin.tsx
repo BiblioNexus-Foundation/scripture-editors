@@ -1,32 +1,35 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $dfs, DFSNode, mergeRegister } from "@lexical/utils";
+import { mergeRegister } from "@lexical/utils";
 import {
   $getNodeByKey,
-  $getRoot,
   $getSelection,
+  $hasUpdateTag,
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   LexicalEditor,
+  NodeKey,
+  NodeMutation,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useMemo, useState } from "react";
+import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-constants";
 import {
-  $findNextChapter,
   $findThisChapter,
   $getCommonAncestorCompatible,
   getNextVerse,
-  removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { $isVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
+import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
 import {
-  $isImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
+  $isReactNodeWithMarker,
+  $isSomeVerseNode,
+  SomeVerseNode,
+} from "../nodes/scripture/usj/node-react.utils";
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
-type DfsVerseNode = Omit<DFSNode, "node"> & { node: VerseNode | ImmutableVerseNode };
+type NodeKeysByChapter = { [chapter: string]: NodeKey[] };
+type ChapterByNodeKey = { [nodeKey: string]: string };
 
 export default function UsjNodesMenuPlugin({
   trigger,
@@ -64,24 +67,25 @@ function useContextMarker(editor: LexicalEditor) {
           editor.read(() => {
             const selection = $getSelection();
             if (!$isRangeSelection(selection)) {
-              setContextMarker(undefined);
+              if (contextMarker) setContextMarker(undefined);
               return;
             }
 
             const startNode = $getNodeByKey(selection.anchor.key);
             const endNode = $getNodeByKey(selection.focus.key);
             if (!startNode || !endNode) {
-              setContextMarker(undefined);
+              if (contextMarker) setContextMarker(undefined);
               return;
             }
 
             const contextNode = $getCommonAncestorCompatible(startNode, endNode);
             if (!contextNode || !$isReactNodeWithMarker(contextNode)) {
-              setContextMarker(undefined);
+              if (contextMarker) setContextMarker(undefined);
               return;
             }
 
-            setContextMarker(contextNode.getMarker());
+            const marker = contextNode.getMarker();
+            if (contextMarker !== marker) setContextMarker(marker);
           });
           return false;
         },
@@ -90,6 +94,48 @@ function useContextMarker(editor: LexicalEditor) {
     [editor],
   );
   return [contextMarker];
+}
+
+function useVerseCreated(editor: LexicalEditor) {
+  useEffect(() => {
+    if (!editor.hasNodes([VerseNode, ImmutableVerseNode])) {
+      throw new Error(
+        "UsjNodesMenuPlugin: VerseNode or ImmutableVerseNode not registered on editor!",
+      );
+    }
+
+    const verseNodeKeysByChapter: NodeKeysByChapter = {};
+    const chapterByNodeKey: ChapterByNodeKey = {};
+
+    // Re-generate following verse numbers when a verse is added.
+    return mergeRegister(
+      editor.registerNodeTransform(ImmutableVerseNode, (node) =>
+        $verseNodeInsertedTransform(node, editor, verseNodeKeysByChapter),
+      ),
+      editor.registerNodeTransform(VerseNode, (node) =>
+        $verseNodeInsertedTransform(node, editor, verseNodeKeysByChapter),
+      ),
+
+      editor.registerMutationListener(ImmutableVerseNode, (nodeMutations) =>
+        $trackMutatedVerses(nodeMutations, editor, verseNodeKeysByChapter, chapterByNodeKey),
+      ),
+      editor.registerMutationListener(VerseNode, (nodeMutations) =>
+        $trackMutatedVerses(nodeMutations, editor, verseNodeKeysByChapter, chapterByNodeKey),
+      ),
+    );
+  }, [editor]);
+}
+
+function $verseNodeInsertedTransform(
+  node: SomeVerseNode,
+  editor: LexicalEditor,
+  verseNodeKeysByChapter: NodeKeysByChapter,
+) {
+  if ($hasUpdateTag(EXTERNAL_USJ_MUTATION_TAG)) return;
+
+  // check if the node exists in the previous state
+  const nodeWasCreated = editor.getEditorState().read(() => !$getNodeByKey(node.getKey()));
+  if (nodeWasCreated) $renumberFollowingVerses(node, verseNodeKeysByChapter);
 }
 
 /**
@@ -108,77 +154,93 @@ function getVerseRangeSegment(verse: string) {
   return RegExp(/(\d+)([a-zA-Z]+)?(-(\d+)([a-zA-Z]+)?)?/).exec(verse);
 }
 
+// See the Regex in the `getVerseRangeSegment` function.
+const START_VERSE_SEGMENT_INDEX = 2;
+const VERSE_RANGE_INDEX = 3;
+const END_VERSE_NUMBER_INDEX = 4;
+const END_VERSE_SEGMENT_INDEX = 5;
+
 /**
  * Renumber all the verse numbers after the inserted verse to keep them sequential.
  * @param insertedNode - Inserted verse node.
  */
-function $renumberAllVerses(insertedNode: VerseNode | ImmutableVerseNode) {
-  const children = $getRoot().getChildren();
+function $renumberFollowingVerses(
+  insertedNode: SomeVerseNode,
+  verseNodeKeysByChapter: NodeKeysByChapter,
+) {
   const chapterNode = $findThisChapter(insertedNode);
-  const nodesInChapter = removeNodesBeforeNode(children, chapterNode);
-  const nextChapterNode = $findNextChapter(nodesInChapter, !!chapterNode);
-  const allVerseNodes = $dfs(chapterNode, nextChapterNode).filter<DfsVerseNode>(
-    (dfsNode): dfsNode is DfsVerseNode =>
-      $isImmutableVerseNode(dfsNode.node) || $isVerseNode(dfsNode.node),
-  );
-  // find the index of the inserted node in the DFS result
-  const insertedNodeKey = insertedNode.getKey();
-  const nodeIndex = allVerseNodes.findIndex(({ node }) => node.getKey() === insertedNodeKey);
-  // all verse nodes that require renumbering
-  const verseNodes = allVerseNodes.slice(nodeIndex + 1);
+  const chapter = chapterNode?.getNumber();
+  if (!chapter) return;
+
+  const verseNodeKeys = verseNodeKeysByChapter[chapter];
+  if (!verseNodeKeys) return;
 
   // renumber for each verse
   let verseNum = parseInt(insertedNode.getNumber());
-  verseNodes.forEach(({ node }) => {
-    const nodeVerse = node.getNumber();
-    const nodeVerseNum = parseInt(nodeVerse);
-    if (nodeVerseNum > verseNum) return;
+  let verseSegment =
+    getVerseRangeSegment(insertedNode.getNumber())?.[START_VERSE_SEGMENT_INDEX] ?? "";
+  verseNodeKeys.forEach((nodeKey) => {
+    const node = $getNodeByKey<SomeVerseNode>(nodeKey);
+    if (!node) return;
 
-    const startVerse = getNextVerse(nodeVerseNum, undefined);
-    const nodeVerseSegment = getVerseRangeSegment(nodeVerse);
-    const isRange = !!nodeVerseSegment?.[3];
-    const startVerseSegmentChar = nodeVerseSegment?.[2] ?? "";
-    const endVerseSegmentChar = nodeVerseSegment?.[5] ?? "";
-    const endVerse = isRange ? getNextVerse(parseInt(nodeVerseSegment[4]), undefined) : "";
-    let tail = `${startVerseSegmentChar}`;
-    tail += isRange ? `-${endVerse}${endVerseSegmentChar}` : "";
-    node.setNumber(`${startVerse}${tail}`);
-    verseNum = parseInt(isRange ? endVerse : startVerse);
+    const nodeVerse = node.getNumber();
+    const startVerseNum = parseInt(nodeVerse);
+    const nodeVerseParts = getVerseRangeSegment(nodeVerse);
+    const isRange = !!nodeVerseParts?.[VERSE_RANGE_INDEX];
+    const endVerseNum = isRange ? parseInt(nodeVerseParts[END_VERSE_NUMBER_INDEX]) : startVerseNum;
+    if (
+      endVerseNum < verseNum ||
+      // e.g. insert 3b before 4 => 4
+      startVerseNum > verseNum ||
+      // e.g. insert 3 before 3a => 4a
+      (endVerseNum === verseNum && verseSegment)
+    )
+      return;
+
+    const startVerseSegment = nodeVerseParts?.[START_VERSE_SEGMENT_INDEX] ?? "";
+    const endVerseSegment = nodeVerseParts?.[END_VERSE_SEGMENT_INDEX] ?? "";
+    const nextEndVerse = isRange
+      ? getNextVerse(parseInt(nodeVerseParts[END_VERSE_NUMBER_INDEX]), undefined)
+      : "";
+    let tail = `${startVerseSegment}`;
+    tail += isRange ? `-${nextEndVerse}${endVerseSegment}` : "";
+    const nextStartVerse = getNextVerse(startVerseNum, undefined);
+    node.setNumber(`${nextStartVerse}${tail}`);
+    verseNum = parseInt(isRange ? nextEndVerse : nextStartVerse);
+    verseSegment = isRange ? endVerseSegment : startVerseSegment;
   });
 }
 
-function useVerseCreated(editor: LexicalEditor) {
-  useEffect(() => {
-    if (!editor.hasNodes([VerseNode, ImmutableVerseNode])) {
-      throw new Error(
-        "UsjNodesMenuPlugin: VerseNode or ImmutableVerseNode not registered on editor!",
-      );
-    }
+function $trackMutatedVerses(
+  nodeMutations: Map<string, NodeMutation>,
+  editor: LexicalEditor,
+  verseNodeKeysByChapter: NodeKeysByChapter,
+  chapterByNodeKey: ChapterByNodeKey,
+) {
+  editor.getEditorState().read(() => {
+    for (const [nodeKey, mutation] of nodeMutations) {
+      const node = $getNodeByKey<SomeVerseNode>(nodeKey);
+      if (!$isSomeVerseNode(node)) continue;
 
-    // Re-generate all verse numbers when a verse is added.
-    return mergeRegister(
-      editor.registerMutationListener(ImmutableVerseNode, (nodeMutations) => {
-        editor.update(
-          () => {
-            for (const [nodeKey, mutation] of nodeMutations) {
-              const node = $getNodeByKey(nodeKey);
-              if (mutation === "created" && $isImmutableVerseNode(node)) $renumberAllVerses(node);
-            }
-          },
-          { tag: "history-merge" },
-        );
-      }),
-      editor.registerMutationListener(VerseNode, (nodeMutations) => {
-        editor.update(
-          () => {
-            for (const [nodeKey, mutation] of nodeMutations) {
-              const node = $getNodeByKey(nodeKey);
-              if (mutation === "created" && $isVerseNode(node)) $renumberAllVerses(node);
-            }
-          },
-          { tag: "history-merge" },
-        );
-      }),
-    );
-  }, [editor]);
+      if (mutation === "created") {
+        const chapterNode = $findThisChapter(node);
+        if (!chapterNode) continue;
+
+        const chapter = chapterNode.getNumber();
+        if (!verseNodeKeysByChapter[chapter]) verseNodeKeysByChapter[chapter] = [];
+        verseNodeKeysByChapter[chapter].push(nodeKey);
+        chapterByNodeKey[nodeKey] = chapter;
+      } else if (mutation === "destroyed") {
+        const chapter = chapterByNodeKey[nodeKey];
+        const verseNodeKeys = verseNodeKeysByChapter[chapter];
+        if (!verseNodeKeys) continue;
+
+        const index = verseNodeKeys.findIndex((verseNodeKey) => verseNodeKey === nodeKey);
+        if (index === -1) continue;
+
+        verseNodeKeys.splice(index, 1);
+        delete chapterByNodeKey[nodeKey];
+      }
+    }
+  });
 }

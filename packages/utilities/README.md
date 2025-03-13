@@ -56,6 +56,24 @@ Run `nx build utilities` to build the library.
 
 Run `nx test utilities` to execute the unit tests via [Jest](https://jestjs.io).
 
+## Develop in App
+
+To develop these utilities in a target application you can use [yalc](https://www.npmjs.com/package/yalc) to link the editor in without having to publish to NPM every time something changes.
+
+1. In this monorepo, publish the editor to `yalc`, e.g.:
+   ```bash
+   nx devpub utilities
+   ```
+2. In the target application repo, link from `yalc`:
+   ```bash
+   yalc link @biblionexus-foundation/scripture-utilities
+   ```
+3. In this monorepo, make changes and re-publish the editor (see step 1).
+4. When you have finished developing in the target application repo, unlink from `yalc`:
+   ```bash
+   yalc remove @biblionexus-foundation/scripture-utilities && npm i
+   ```
+
 ## License
 
 [MIT][github-license] © [BiblioNexus Foundation](https://biblionexus.org/)
