@@ -26,7 +26,7 @@
     "@typescript-eslint/parser": "^8.25.0",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "@vitest/ui": "^2.1.9",
-    "axios": "^1.8.1",
+    "axios": "^1.8.2",
     "cross-env": "^7.0.3",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^9.1.0",
