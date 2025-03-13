@@ -22,8 +22,6 @@ export default function NodesMenu({
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      console.log("KeyDown:", e.key, "isOpen:", isOpen, "isRequestingInput:", isRequestingInput);
-
       if (e.key === "Escape" && (isOpen || isRequestingInput)) {
         setIsOpen(false);
         setIsRequestingInput(false);

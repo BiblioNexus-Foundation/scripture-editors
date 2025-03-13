@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/scribe-editor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scripture editor used in Scribe",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/scribe#readme",

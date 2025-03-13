@@ -19,11 +19,11 @@ const TextInput: React.FC<TextInputProps> = ({
   "data-test-id": dataTestId,
   type = "text",
 }) => (
-  <div className="Input__wrapper">
-    <label className="Input__label">{label}</label>
+  <div className="scribe-input-wrapper">
+    <label className="scribe-input-label">{label}</label>
     <input
       type={type}
-      className="Input__input"
+      className="scribe-input-field"
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -35,8 +35,7 @@ const TextInput: React.FC<TextInputProps> = ({
 type InsertDialogProps = {
   activeEditor: LexicalEditor;
   onClose: () => void;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  insertFunction: (params: any) => void;
+  insertFunction: (editor: LexicalEditor, value?: string, noteText?: string) => void;
   label: string;
   placeholder?: string;
 };
@@ -48,130 +47,65 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
   label,
   placeholder,
 }) => {
-  const [inputValues, setInputValues] = useState<{ [key: string]: string }>({});
+  const [inputValue, setInputValue] = useState("");
   const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
-    setIsDisabled(Object.values(inputValues).some((val) => val.trim() === ""));
-  }, [inputValues]);
+    setIsDisabled(inputValue.trim() === "");
+  }, [inputValue]);
 
-  const handleChange = (key: string) => (value: string) => {
-    // console.log({ inputValues });
-    setInputValues((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const onClick = () => {
-    // console.log("Inserting Note: ", inputValues);
-    insertFunction({
-      editor: activeEditor,
-      inputValues,
-    });
-    setInputValues({});
+  const handleInsert = () => {
+    if (label === "Footnote" || label === "Crossref") {
+      insertFunction(activeEditor, undefined, inputValue); // noteText as third param
+    } else {
+      insertFunction(activeEditor, inputValue); // Regular value
+    }
+    setInputValue("");
     onClose();
   };
 
   return (
     <>
       {label === "Footnote" ? (
+        // For footnote with multiple fields
         <>
           <TextInput
             placeholder="Text"
             label="Text"
-            onChange={handleChange("ft")}
-            value={inputValues.ft || ""}
+            onChange={(val) => setInputValue(val)}
+            value={inputValue}
             data-test-id="note-ft"
-          />
-
-          <TextInput
-            placeholder="Origin Reference."
-            label="Orign Reference"
-            onChange={handleChange("fr")}
-            value={inputValues.fr || ""}
-            data-test-id="note-fr"
-          />
-          <TextInput
-            placeholder="Quotation"
-            label="Quotation"
-            onChange={handleChange("fq")}
-            value={inputValues.fq || ""}
-            data-test-id="note-ftquot"
-          />
-          <TextInput
-            placeholder="Content"
-            label="Content"
-            onChange={handleChange("fqa")}
-            value={inputValues.fqa || ""}
-            data-test-id="note-fqa"
-          />
-        </>
-      ) : label === "XRef" ? (
-        <>
-          <TextInput
-            placeholder="Note Title"
-            label="Title"
-            onChange={handleChange("title")}
-            value={inputValues.title || ""}
-            data-test-id="note-title"
-          />
-          <TextInput
-            placeholder="Note Content"
-            label="Content"
-            onChange={handleChange("content")}
-            value={inputValues.content || ""}
-            data-test-id="note-content"
-          />
-          <TextInput
-            placeholder="Author"
-            label="Author"
-            onChange={handleChange("author")}
-            value={inputValues.author || ""}
-            data-test-id="note-author"
-          />
-          <TextInput
-            placeholder="Date"
-            label="Date"
-            onChange={handleChange("date")}
-            value={inputValues.date || ""}
-            data-test-id="note-date"
           />
         </>
       ) : (
+        // For simple inputs like verse/chapter numbers
         <TextInput
           placeholder={placeholder ?? "Enter Value"}
           label={label}
-          onChange={handleChange(label.toLowerCase())}
-          value={inputValues[label.toLowerCase()] || ""}
+          onChange={setInputValue}
+          value={inputValue}
           data-test-id={`modal-${label.toLowerCase()}`}
-          type="number"
+          type={label === "Verse" || label === "Chapter" ? "number" : "text"}
         />
       )}
-      <Button disabled={isDisabled} onClick={onClick}>
-        Confirm
-      </Button>
+      <button className="scribe-button" disabled={isDisabled} onClick={handleInsert}>
+        Insert
+      </button>
     </>
   );
 };
 
-type ButtonProps = {
+export const Button: React.FC<{
   "data-test-id"?: string;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
   onClick: () => void;
   title?: string;
-};
-
-export const Button: React.FC<ButtonProps> = ({
-  "data-test-id": dataTestId,
-  children,
-  className,
-  onClick,
-  disabled,
-  title,
-}) => (
+}> = ({ "data-test-id": dataTestId, children, className, onClick, disabled, title }) => (
   <button
     disabled={disabled}
-    className={`Button__root ${className}`}
+    className={`scribe-button ${className || ""}`}
     onClick={onClick}
     title={title}
     aria-label={title}

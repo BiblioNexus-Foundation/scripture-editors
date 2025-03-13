@@ -3,7 +3,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { IS_APPLE } from "@lexical/utils";
 import { UNDO_COMMAND, REDO_COMMAND } from "lexical";
 
-export default function ClipboardPlugin(): null {
+export default function KeyboardShortcutPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

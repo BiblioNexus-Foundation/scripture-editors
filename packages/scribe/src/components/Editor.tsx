@@ -30,6 +30,8 @@ import LoadingSpinner from "./LoadingSpinner";
 import { blackListedChangeTags } from "shared/nodes/scripture/usj/node-constants";
 import { deepEqual } from "fast-equals";
 import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
+import KeyboardShortcutPlugin from "../plugins/KeyboardShortcutPlugin";
+import { Toolbar } from "./Toolbar";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -120,6 +122,7 @@ const Editor = forwardRef(function Editor(
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <Toolbar scrRef={scrRef} autoNumbering={autoNumbering} />
       <RichTextPlugin
         contentEditable={
           <ContentEditable
@@ -129,6 +132,7 @@ const Editor = forwardRef(function Editor(
         placeholder={<LoadingSpinner />}
         ErrorBoundary={LexicalErrorBoundary}
       />
+
       {scrRef && (
         <UsjNodesMenuPlugin
           trigger={"\\"}
@@ -150,6 +154,7 @@ const Editor = forwardRef(function Editor(
       <HistoryPlugin />
       <AutoFocusPlugin />
       <ContextMenuPlugin />
+      <KeyboardShortcutPlugin />
       <ClipboardPlugin />
       <ScriptureReferencePlugin scrRef={scrRef} setScrRef={setScrRef} />
     </LexicalComposer>
