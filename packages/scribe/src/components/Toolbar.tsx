@@ -7,6 +7,7 @@ import "./Toolbar.css";
 import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
 import { InsertDialog } from "./Input/TextInput";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
+import { ViewOptions } from "../adaptors/view-options.utils";
 
 export const Toolbar = ({
   scrRef,
@@ -14,7 +15,7 @@ export const Toolbar = ({
   autoNumbering = false,
 }: {
   scrRef: ScriptureReference;
-  viewOptions?: any;
+  viewOptions?: ViewOptions;
   autoNumbering?: boolean;
 }) => {
   const [modal, showModal] = useModal();
@@ -23,7 +24,14 @@ export const Toolbar = ({
   const [editor] = useLexicalComposerContext();
   const [isEditable, setIsEditable] = useState(true);
 
-  const insertOptions = [
+  type InsertOption = {
+    title: string;
+    marker: string;
+    requiresValue: boolean;
+    placeholder?: string; // Optional since not all items have it
+  };
+
+  const insertOptions: InsertOption[] = [
     {
       title: "Verse",
       marker: "v",
@@ -81,7 +89,7 @@ export const Toolbar = ({
     editor.dispatchCommand(REDO_COMMAND, undefined);
   };
 
-  const handleInsertOption = (option: any) => {
+  const handleInsertOption = (option: InsertOption) => {
     setIsDropdownOpen(false);
 
     if (option.requiresValue) {

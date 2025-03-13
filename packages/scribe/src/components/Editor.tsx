@@ -1,5 +1,4 @@
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
-import { MarkNode } from "@lexical/mark";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -86,7 +85,7 @@ const Editor = forwardRef(function Editor(
     onError(error: Error) {
       throw error;
     },
-    nodes: [MarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+    nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
   };
 
   useImperativeHandle(ref, () => ({
