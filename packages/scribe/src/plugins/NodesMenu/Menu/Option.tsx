@@ -23,7 +23,7 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
         setSelectedIndex(-1);
         onClick?.(event);
       },
-      [index, setSelectedIndex, onClick],
+      [onClick, select, setSelectedIndex],
     );
 
     const handleMouseEnter = useCallback(

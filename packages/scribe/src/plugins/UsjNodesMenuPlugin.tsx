@@ -40,6 +40,7 @@ export default function UsjNodesMenuPlugin({
   autoNumbering: boolean;
 }) {
   const { book, chapterNum, verseNum, verse } = scrRef;
+  // This is intentionally missing the `scrRef` dependency to ensure property changes are updated.
   const scriptureReference = useMemo(() => scrRef, [book, chapterNum, verseNum, verse]);
 
   const [editor] = useLexicalComposerContext();
