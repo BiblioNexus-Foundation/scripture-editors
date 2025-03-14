@@ -21,7 +21,7 @@ export default function useCursorCoords({
       updatePosition(domRange, floatingBoxRef.current);
       return cleanup;
     }
-  }, [isOpen, updatePosition, cleanup]);
+  }, [cleanup, isOpen, floatingBoxRef, updatePosition]);
 
   return { coords, placement };
 }

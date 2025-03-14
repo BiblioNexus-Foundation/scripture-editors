@@ -7,13 +7,11 @@ import getMarker from "shared/utils/usfm/getMarker";
 // getMarkerAction() returns a function to generate a LexicalNode and insert it in the editor, this lexical node is a custom node made for the PERF editor
 //NOTE: You can create your own typeahead plugin by creating your own getMarker() and getMarkerAction() functions adapted to your editor needs.
 export default function useUsfmMakersForMenu({
-  editor,
   scriptureReference,
   contextMarker,
   getMarkerAction,
   autoNumbering,
 }: {
-  editor: LexicalEditor;
   scriptureReference: ScriptureReference;
   contextMarker: string | undefined;
   getMarkerAction: GetMarkerAction;
@@ -38,8 +36,8 @@ export default function useUsfmMakersForMenu({
             noteText,
           }: {
             editor: LexicalEditor;
-            newVerseRChapterNum?: number | undefined;
-            noteText?: string | undefined;
+            newVerseRChapterNum?: number;
+            noteText?: string;
           }) => {
             action({
               editor,
@@ -52,7 +50,7 @@ export default function useUsfmMakersForMenu({
         };
       }),
     );
-  }, [editor, contextMarker, scriptureReference]);
+  }, [autoNumbering, contextMarker, getMarkerAction, scriptureReference]);
 
   return { markersMenuItems };
 }

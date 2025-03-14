@@ -74,7 +74,7 @@ const Editor = forwardRef(function Editor(
   const editorRef = useRef<LexicalEditor>(null);
   const editedUsjRef = useRef<Usj>();
   const [usj, setUsj] = useState(usjInput);
-  const [loadedUsj, , setEditedUsj] = useDeferredState(usj);
+  const [loadedUsj] = useDeferredState(usj);
   useDefaultNodeOptions(nodeOptions);
   const autoNumbering = false;
   const initialConfig = {
@@ -116,7 +116,7 @@ const Editor = forwardRef(function Editor(
         if (isEdited || !deepEqual(usj, newUsj)) onChange?.(newUsj);
       }
     },
-    [onChange, setEditedUsj],
+    [onChange, usj],
   );
 
   return (

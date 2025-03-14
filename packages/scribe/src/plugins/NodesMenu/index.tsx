@@ -20,6 +20,34 @@ export default function NodesMenu({
   const [selectedOption, setSelectedOption] = useState<OptionItem | null>(null);
   const [isRequestingInput, setIsRequestingInput] = useState(false);
 
+  const handleInputSubmit = useCallback(() => {
+    if (selectedOption && userInputValue.trim()) {
+      try {
+        if (selectedOption.name === "c" || selectedOption.name === "v") {
+          const newVerseRChapterNum = parseInt(userInputValue);
+          if (isNaN(newVerseRChapterNum)) {
+            console.error("Invalid number input");
+            return;
+          }
+          selectedOption.action({ editor, newVerseRChapterNum });
+        } else if (selectedOption.name === "f" || selectedOption.name === "x") {
+          selectedOption.action({ editor, noteText: userInputValue });
+        } else {
+          selectedOption.action({ editor });
+        }
+
+        console.log("Submitted: ", selectedOption.name, userInputValue);
+      } catch (error) {
+        console.error("Error processing input:", error);
+      }
+
+      setIsRequestingInput(false);
+      setUserInputValue("");
+      setSelectedOption(null);
+      editor.focus();
+    }
+  }, [editor, selectedOption, userInputValue]);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape" && (isOpen || isRequestingInput)) {
@@ -37,7 +65,7 @@ export default function NodesMenu({
         }
       }
     },
-    [editor, trigger, isOpen, isRequestingInput],
+    [editor, handleInputSubmit, isOpen, isRequestingInput, trigger],
   );
 
   useEffect(() => {
@@ -91,36 +119,8 @@ export default function NodesMenu({
         setIsOpen(false);
       }
     },
-    [editor],
+    [autoNumbering, editor],
   );
-
-  const handleInputSubmit = () => {
-    if (selectedOption && userInputValue.trim()) {
-      try {
-        if (selectedOption.name === "c" || selectedOption.name === "v") {
-          const newVerseRChapterNum = parseInt(userInputValue);
-          if (isNaN(newVerseRChapterNum)) {
-            console.error("Invalid number input");
-            return;
-          }
-          selectedOption.action({ editor, newVerseRChapterNum });
-        } else if (selectedOption.name === "f" || selectedOption.name === "x") {
-          selectedOption.action({ editor, noteText: userInputValue });
-        } else {
-          selectedOption.action({ editor });
-        }
-
-        console.log("Submitted: ", selectedOption.name, userInputValue);
-      } catch (error) {
-        console.error("Error processing input:", error);
-      }
-
-      setIsRequestingInput(false);
-      setUserInputValue("");
-      setSelectedOption(null);
-      editor.focus();
-    }
-  };
 
   return (
     <>
