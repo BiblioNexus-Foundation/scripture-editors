@@ -3,6 +3,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { render, act } from "@testing-library/react";
 import {
   $getRoot,
   $createTextNode,
@@ -13,8 +14,6 @@ import {
   $createPoint,
   TextNode,
 } from "lexical";
-import { act } from "react";
-import { createRoot, Root } from "react-dom/client";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
@@ -26,7 +25,6 @@ import {
 } from "../nodes/scripture/usj/ImmutableVerseNode";
 import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
 
-let reactRoot: Root;
 let firstVerseNode: ImmutableVerseNode;
 let firstVerseTextNode: TextNode;
 let secondVerseNode: ImmutableVerseNode;
@@ -35,23 +33,6 @@ let thirdVerseNode: ImmutableVerseNode;
 let thirdVerseTextNode: TextNode;
 
 describe("UsjNodesMenuPlugin", () => {
-  let container: HTMLDivElement | null = null;
-
-  beforeEach(() => {
-    container = document.createElement("div");
-    reactRoot = createRoot(container);
-    document.body.appendChild(container);
-  });
-
-  afterEach(() => {
-    // Is defined in beforeEach.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.body.removeChild(container!);
-    container = null;
-
-    jest.restoreAllMocks();
-  });
-
   it("should load default initialEditorState (sanity check)", async () => {
     const { editor } = await testEnvironment();
 
@@ -222,16 +203,16 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
   }
 
   await act(async () => {
-    reactRoot.render(<App />);
+    render(<App />);
   });
 
-  // `editor` is on React render.
+  // `editor` is defined on React render.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return { editor: editor!, verseToInsert };
 }
 
 /**
- * Sets the selection range in the LexicalEditor.
+ * Insert a VerseNode at the selection range in the LexicalEditor.
  *
  * @param editor - The LexicalEditor instance where the selection will be set.
  * @param verseToInsert - The verse to insert at the selection.

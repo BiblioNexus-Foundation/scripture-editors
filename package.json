@@ -20,6 +20,8 @@
     "@nx/web": "19.8.14",
     "@swc-node/register": "~1.10.9",
     "@swc/core": "^1.11.5",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.17.22",
     "@typescript-eslint/eslint-plugin": "^8.25.0",

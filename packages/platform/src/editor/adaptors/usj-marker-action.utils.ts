@@ -14,7 +14,7 @@ import {
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { $isNoteNode, GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction } from "shared/utils/get-marker-action.model";
@@ -63,7 +63,7 @@ const markerActions: {
       const content: MarkerContent = {
         type: "note",
         marker: "f",
-        caller: "+",
+        caller: GENERATOR_NOTE_CALLER,
         content: [
           { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum} `] },
           {
@@ -82,7 +82,7 @@ const markerActions: {
       const content: MarkerContent = {
         type: "note",
         marker: "x",
-        caller: "+",
+        caller: GENERATOR_NOTE_CALLER,
         content: [
           { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum} `] },
           {
