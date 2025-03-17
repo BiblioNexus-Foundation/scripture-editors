@@ -13,7 +13,7 @@ import {
 } from "lexical";
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { CharNode } from "shared/nodes/scripture/usj/CharNode";
+import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
@@ -270,22 +270,24 @@ function handleTextNode(
   const start = isFirst ? startOffset : 0;
   const end = isLast ? endOffset : textLength;
 
-  if (start === 0 && end === 0) {
-    return;
-  }
+  if (start === 0 && end === 0) return;
 
   const splitNodes = node.splitText(start, end);
 
-  if (splitNodes.length === 1) {
-    return splitNodes[0];
-  }
+  if (splitNodes.length === 1) return splitNodes[0];
 
-  return splitNodes.length === 3 || isFirst || end === textLength ? splitNodes[1] : splitNodes[0];
+  return splitNodes.length === 3 || end === textLength ? splitNodes[1] : splitNodes[0];
 }
 
 function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
   if ($isTextNode(wrapper)) {
-    wrapper.setTextContent(node.getTextContent());
+    let text = node.getTextContent();
+    // CharNodes can't start with a space.
+    if ($isTextNode(node) && $isCharNode(wrapper) && text.startsWith(" ")) {
+      wrapper.insertBefore($createTextNode(" "));
+      text = text.trimStart();
+    }
+    wrapper.setTextContent(text);
     node.remove();
   } else if ($isElementNode(wrapper)) {
     wrapper.clear();
