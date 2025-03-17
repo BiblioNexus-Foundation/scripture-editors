@@ -170,7 +170,7 @@ export function serializeEditorState(
 ): SerializedEditorState {
   if (viewOptions) _viewOptions = viewOptions;
   // use default view mode
-  else _viewOptions = getViewOptions(undefined);
+  else _viewOptions = getViewOptions();
   /** empty para node for an 'empty' editor */
   const emptyParaNode: SerializedParaNode = createPara({
     type: ParaNode.getType(),
@@ -212,14 +212,14 @@ function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
 
   // Set list of possible note callers.
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
+  if (_nodeOptions?.[immutableNoteCallerNodeName]) {
     const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
     if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
   }
 
   // Set the `addMissingComments` method.
   if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
-    addMissingComments = nodeOptions[MarkNodeName].addMissingComments as AddMissingComments;
+    addMissingComments = nodeOptions[MarkNodeName].addMissingComments;
   }
 }
 
@@ -399,11 +399,7 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (
-    _nodeOptions &&
-    _nodeOptions[immutableNoteCallerNodeName] &&
-    _nodeOptions[immutableNoteCallerNodeName].onClick
-  )
+  if (_nodeOptions?.[immutableNoteCallerNodeName]?.onClick)
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return removeUndefinedProperties({
