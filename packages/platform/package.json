@@ -32,14 +32,14 @@
   },
   "dependencies": {
     "@biblionexus-foundation/scripture-utilities": "workspace:~",
-    "@lexical/react": "^0.27.1",
-    "@lexical/selection": "^0.27.1",
-    "@lexical/text": "^0.27.1",
-    "@lexical/utils": "^0.27.1",
-    "@lexical/yjs": "^0.27.1",
+    "@lexical/react": "^0.27.2",
+    "@lexical/selection": "^0.27.2",
+    "@lexical/text": "^0.27.2",
+    "@lexical/utils": "^0.27.2",
+    "@lexical/yjs": "^0.27.2",
     "@sillsdev/scripture": "^2.0.2",
     "fast-equals": "^5.2.2",
-    "lexical": "^0.27.1",
+    "lexical": "^0.27.2",
     "yjs": "^13.6.20"
   },
   "devDependencies": {
