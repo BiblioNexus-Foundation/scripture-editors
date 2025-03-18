@@ -13,7 +13,7 @@ import {
 } from "lexical";
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
+import { CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
@@ -130,8 +130,9 @@ export function getUsjMarkerAction(
             nodeToInsert.selectStart();
           }
         } else {
-          const nodes = $addVerseLeadingSpaceIfNeeded(selection, nodeToInsert);
-          selection.insertNodes(nodes);
+          selection.insertNodes([nodeToInsert]);
+          $moveTextLeadingSpaceToPreviousNode(nodeToInsert);
+          $moveVerseFollowingSpaceToPreviousNode(nodeToInsert);
         }
       } else {
         // Insert the node directly
@@ -282,10 +283,16 @@ function handleTextNode(
 function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
   if ($isTextNode(wrapper)) {
     let text = node.getTextContent();
-    // CharNodes can't start with a space.
-    if ($isTextNode(node) && $isCharNode(wrapper) && text.startsWith(" ")) {
-      wrapper.insertBefore($createTextNode(" "));
+    // Inline nodes can't start with a space.
+    if ($isTextNode(node) && wrapper.isInline() && text.startsWith(" ")) {
       text = text.trimStart();
+      const previousNode = wrapper.getPreviousSibling();
+      if ($isTextNode(previousNode)) {
+        const previousText = previousNode.getTextContent();
+        if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
+      } else {
+        wrapper.insertBefore($createTextNode(" "));
+      }
     }
     wrapper.setTextContent(text);
     node.remove();
@@ -298,31 +305,45 @@ function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
 // #endregion
 
 /**
- * Adds a leading space before a verse node if needed.
+ * Moves the leading space of a text node to the previous node.
  *
- * This function checks if the given selection is collapsed and if the node to be inserted is a
- * verse node or an immutable verse node. If both conditions are met, it further checks if the
- * anchor node of the selection is a text node and if there is no leading space before the insertion
- * point. If there is no leading space, it prepends a space to the node to be inserted.
+ * This function checks if the given node is a text node and if it starts with a space. If both
+ * conditions are met, it trims the leading space from the text node and appends a space to the
+ * previous node if it is a text node and doesn't end in a space already.
  *
- * @param selection - The current selection range in the editor.
- * @param nodeToInsert - The node that is to be inserted into the editor.
- * @returns An array containing the nodes to be inserted, potentially with a leading space node.
+ * @param node - The node to check for leading space.
  */
-function $addVerseLeadingSpaceIfNeeded(
-  selection: RangeSelection,
-  nodeToInsert: LexicalNode,
-): LexicalNode[] {
-  if (!selection.isCollapsed()) return [nodeToInsert];
-  if (!$isSomeVerseNode(nodeToInsert)) return [nodeToInsert];
+function $moveTextLeadingSpaceToPreviousNode(node: LexicalNode): void {
+  if (!$isTextNode(node) || !node.getTextContent().startsWith(" ")) return;
 
-  const anchorNode = selection.anchor.getNode();
-  if (!$isTextNode(anchorNode)) return [nodeToInsert];
+  node.setTextContent(node.getTextContent().trimStart());
+  const previousNode = node.getPreviousSibling();
+  if ($isTextNode(previousNode)) {
+    const previousText = previousNode.getTextContent();
+    if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
+  }
+}
 
-  const offset = selection.anchor.offset;
-  const textContent = anchorNode.getTextContent();
-  const hasLeadingSpace = textContent[offset - 1] === " ";
-  if (hasLeadingSpace) return [nodeToInsert];
+/**
+ * Moves the leading space of a node following a verse node to the previous node.
+ *
+ * This function checks if the previous node ends in a space and adds one if needed. It then checks
+ * if the following node starts with a space and removes it.
+ *
+ * @param node - The node to check for leading space.
+ */
+function $moveVerseFollowingSpaceToPreviousNode(node: LexicalNode) {
+  if (!$isSomeVerseNode(node)) return;
 
-  return [$createTextNode(" "), nodeToInsert];
+  const previousNode = node.getPreviousSibling();
+  if ($isTextNode(previousNode)) {
+    const previousText = previousNode.getTextContent();
+    if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
+  }
+
+  const nextNode = node.getNextSibling();
+  if ($isTextNode(nextNode)) {
+    const nextText = nextNode.getTextContent();
+    if (nextText.startsWith(" ")) nextNode.setTextContent(nextText.trimStart());
+  }
 }

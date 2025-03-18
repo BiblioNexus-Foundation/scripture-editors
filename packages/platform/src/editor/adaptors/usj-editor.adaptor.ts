@@ -115,6 +115,7 @@ import {
   ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
+import { defaultNoteCallers } from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import {
   AddMissingComments,
   MarkNodeName,
@@ -144,7 +145,7 @@ let _viewOptions: ViewOptions | undefined;
 /** Options for each node. */
 let _nodeOptions: UsjNodeOptions | undefined;
 /** List of possible note callers. */
-let noteCallers: string[] | undefined;
+let noteCallers: string[] = defaultNoteCallers;
 /** Method to add missing comments. */
 let addMissingComments: AddMissingComments;
 /** Logger instance. */
