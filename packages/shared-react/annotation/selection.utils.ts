@@ -14,18 +14,6 @@ import {
 import { AnnotationRange, SelectionRange, UsjLocation } from "./selection.model";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 
-const JSON_PATH_START = "$";
-const JSON_PATH_CONTENT = ".content[";
-
-function extractJsonPathIndexes(jsonPath: string): number[] {
-  const path = jsonPath.split(JSON_PATH_CONTENT);
-  if (path.shift() !== JSON_PATH_START)
-    throw new Error(`extractJsonPathIndexes: jsonPath didn't start with '${JSON_PATH_START}'`);
-
-  const indexes = path.map((str) => parseInt(str, 10));
-  return indexes;
-}
-
 /**
  * Find the text node that contains the location offset. Check if the offset fits within the current
  * text node, if it doesn't check in the next nodes ignoring the TypedMarkNodes but looking inside
@@ -60,9 +48,8 @@ function $findTextNodeInMarks(
 function $getNodeFromLocation(
   location: UsjLocation,
 ): [LexicalNode | undefined, number | undefined] {
-  const indexes = extractJsonPathIndexes(location.jsonPath);
   let currentNode: LexicalNode | undefined = $getRoot();
-  for (const index of indexes) {
+  for (const index of location.jsonPathIndexes) {
     if (!currentNode || !$isElementNode(currentNode)) return [undefined, undefined];
 
     currentNode = currentNode.getChildAtIndex(index) ?? undefined;
@@ -114,19 +101,17 @@ export function $getRangeFromSelection(
 }
 
 function getLocationFromNode(node: LexicalNode, offset: number): UsjLocation {
-  const indexes: number[] = [];
+  const jsonPathIndexes: number[] = [];
   let current: LexicalNode | null = node;
   while (current?.getParent()) {
     const parent: ElementNode | null = current.getParent();
     if (parent) {
       const index = parent?.getChildren().indexOf(current);
-      if (index >= 0) indexes.unshift(index);
+      if (index >= 0) jsonPathIndexes.unshift(index);
     }
     current = parent;
   }
-  const jsonPath =
-    JSON_PATH_START + JSON_PATH_CONTENT + indexes.join("]" + JSON_PATH_CONTENT) + "]";
-  return { jsonPath, offset };
+  return { jsonPathIndexes, offset };
 }
 
 /**
