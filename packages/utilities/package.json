@@ -1,6 +1,6 @@
 {
   "name": "@biblionexus-foundation/scripture-utilities",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Utilities for working with Scripture data.",
   "license": "MIT",
   "homepage": "https://github.com/BiblioNexus-Foundation/scripture-editors/tree/main/packages/utilities#readme",
