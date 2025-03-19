@@ -54,7 +54,7 @@ export default function CommandMenuPlugin({ logger }: { logger?: LoggerBasic }):
         COMMAND_PRIORITY_NORMAL,
       ),
     );
-  }, [editor]);
+  }, [editor, logger]);
 
   return null;
 }

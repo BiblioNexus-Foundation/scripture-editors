@@ -23,7 +23,7 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
         setSelectedIndex(-1);
         onClick?.(event);
       },
-      [index, setSelectedIndex, onClick],
+      [onClick, select, setSelectedIndex],
     );
 
     const handleMouseEnter = useCallback(
@@ -40,7 +40,7 @@ export const MenuOption = forwardRef<HTMLButtonElement, OptionProps>(
         {...props}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
-        aria-selected={index !== undefined && activeIndex === index}
+        aria-selected={index !== undefined && activeIndex === index ? "true" : undefined}
         tabIndex={-1}
       >
         {children}

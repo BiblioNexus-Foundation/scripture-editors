@@ -144,7 +144,7 @@ export default function ContextMenuPlugin(): JSX.Element {
         isDisabled: isReadonly,
       }),
     ];
-  }, [editor]);
+  }, [editor, isReadonly]);
 
   const onSelectOption = useCallback(
     (selectedOption: ContextMenuOption, targetNode: LexicalNode | null, closeMenu: () => void) => {

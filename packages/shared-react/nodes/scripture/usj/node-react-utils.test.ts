@@ -114,7 +114,7 @@ describe("Editor Node Utilities", () => {
           const v1 = $createImmutableVerseNode("1");
           const v2 = $createImmutableVerseNode("2");
           const t1 = $createTextNode("text1");
-          const m1 = $createTypedMarkNode({ ["testType1"]: ["testID1"] });
+          const m1 = $createTypedMarkNode({ testType1: ["testID1"] });
           const t2 = $createTextNode("text2");
           root.append(p1);
           p1.append(v1, t1, v2, m1);

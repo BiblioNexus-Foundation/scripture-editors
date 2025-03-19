@@ -1,4 +1,3 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import useUsfmMakersForMenu from "../PerfNodesItems/useUsfmMarkersForMenu";
@@ -13,9 +12,7 @@ export default function PerfTypeaheadPlugin({
   scriptureReference: ScriptureReference;
   contextMarker: string;
 }) {
-  const [editor] = useLexicalComposerContext();
   const { markersMenuItems } = useUsfmMakersForMenu({
-    editor,
     scriptureReference,
     contextMarker,
     getMarkerAction: getUsfmMarkerAction,

@@ -100,7 +100,7 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
         },
       ),
     );
-  }, [editor]);
+  }, [editor, logger, nodeOptions]);
 }
 
 /**

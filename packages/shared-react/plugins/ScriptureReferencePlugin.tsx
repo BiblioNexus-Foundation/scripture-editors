@@ -130,7 +130,7 @@ export default function ScriptureReferencePlugin({
             onChangeReference(reference);
           });
       }),
-    [editor, onChangeReference],
+    [book, editor, onChangeReference],
   );
 
   return null;

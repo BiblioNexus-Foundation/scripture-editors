@@ -54,19 +54,17 @@ export function NodeSelectionMenu({
           event.preventDefault();
           action();
           return true;
-        } else {
-          if (event.key.length === 1) {
-            event.stopPropagation();
-            event.preventDefault();
-            setQuery((prev) => prev + event.key);
-            return true;
-          }
+        } else if (event.key.length === 1) {
+          event.stopPropagation();
+          event.preventDefault();
+          setQuery((prev) => prev + event.key);
+          return true;
         }
         return false;
       },
       COMMAND_PRIORITY_HIGH,
     );
-  }, [editor, onClose, localQuery]);
+  }, [editor, isControlled, localQuery, onClose]);
 
   return (
     <Menu.Root

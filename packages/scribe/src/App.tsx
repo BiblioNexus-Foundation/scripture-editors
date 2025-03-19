@@ -16,6 +16,13 @@ const defaultUsj: Usj = {
   content: [],
 };
 const defaultScrRef: ScriptureReference = { book: "PSA", chapterNum: 1, verseNum: 1 };
+const nodeOptions: UsjNodeOptions = {
+  [immutableNoteCallerNodeName]: {
+    onClick: (e: SyntheticEvent) => {
+      console.log("note node clicked", e);
+    },
+  },
+};
 
 function App() {
   const editorRef = useRef<EditorRef>(null!);
@@ -30,13 +37,6 @@ function App() {
   }, [usj]);
 
   const [viewMode] = useState(defaultViewMode);
-  const nodeOptions: UsjNodeOptions = {
-    [immutableNoteCallerNodeName]: {
-      onClick: (e: SyntheticEvent) => {
-        console.log("note node clicked", e);
-      },
-    },
-  };
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
   const onChange = async (usj: Usj) => {
     console.log(usj);

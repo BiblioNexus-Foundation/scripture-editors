@@ -92,7 +92,7 @@ function useContextMarker(editor: LexicalEditor) {
         },
         COMMAND_PRIORITY_LOW,
       ),
-    [editor],
+    [contextMarker, editor],
   );
   return [contextMarker];
 }
