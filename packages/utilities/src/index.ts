@@ -7,3 +7,4 @@ export {
 } from "./converters/usj/usj.model";
 export { usxStringToUsj } from "./converters/usj/usx-to-usj";
 export { usjToUsxString } from "./converters/usj/usj-to-usx";
+export { indexesFromUsjJsonPath, usjJsonPathFromIndexes } from "./converters/usj/jsonpath-indexes";

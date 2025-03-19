@@ -59,15 +59,15 @@ const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: 
 const options: EditorOptions = { isReadonly: false, textDirection: "ltr", nodes: nodeOptions };
 // Word "man" inside first q1 of PSA 1:1.
 const annotationRange1 = {
-  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
-  end: { jsonPath: "$.content[3].content[1]", offset: 18 },
+  start: { jsonPathIndexes: [3, 1], offset: 15 },
+  end: { jsonPathIndexes: [3, 1], offset: 18 },
 };
 // Phrase "man who" inside first q1 of PSA 1:1.
 const annotationRange2 = {
-  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
-  end: { jsonPath: "$.content[3].content[1]", offset: 22 },
+  start: { jsonPathIndexes: [3, 1], offset: 15 },
+  end: { jsonPathIndexes: [3, 1], offset: 22 },
 };
-const cursorLocation = { start: { jsonPath: "$.content[3].content[1]", offset: 15 } };
+const cursorLocation = { start: { jsonPathIndexes: [3, 1], offset: 15 } };
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
@@ -142,6 +142,7 @@ If using the **commenting features** in the `<Marginal />` component:
 - History - undo & redo
 - Cut, copy, paste, paste as plain text - context menu and keyboard shortcuts
 - Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
+- Insert markers - type '\\' (backslash - configurable to another key) for a marker menu. If text is selected first the marker will apply to the selection if possible, e.g. use '\\wj' to "red-letter" selected text.
 - Add comments to selected text, reply in comment threads, delete comments and threads.
   - To enable comments use the `<Marginal />` editor component (comments appear in the margin).
   - To use the editor without comments use the `<Editorial />` component.
