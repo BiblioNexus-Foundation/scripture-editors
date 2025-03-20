@@ -1,4 +1,4 @@
-name: Publish Scribe Package (scribe-v1 branch)
+name: Publish Scribe Package (scribe-v2)
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ jobs:
   publish:
     name: Build on ${{ matrix.os }}, node ${{ matrix.node_version }}, PNPM ${{ matrix.pnpm_version }}
     runs-on: ${{ matrix.os }}
-    if: github.ref == 'refs/heads/scribe-v1'
+    if: github.ref != 'refs/heads/main'
 
     strategy:
       matrix:
@@ -56,7 +56,7 @@ jobs:
         shell: bash
         run: |
           cd ./packages/scribe
-          pnpm publish --no-git-checks --access public --tag scribe-v1
+          pnpm publish --no-git-checks --access public --tag scribe-v2
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
