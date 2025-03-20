@@ -22,7 +22,7 @@ export default function OnSelectionChangePlugin({
         },
         COMMAND_PRIORITY_LOW,
       ),
-    [editor],
+    [editor, onChange],
   );
 
   return null;

@@ -13,6 +13,6 @@ export function CursorHandlerPlugin({
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     return registerCursorHandlers(editor, canContainPlaceHolder, updateTags);
-  }, [editor]);
+  }, [canContainPlaceHolder, editor, updateTags]);
   return null;
 }
