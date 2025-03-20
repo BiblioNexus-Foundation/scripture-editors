@@ -57,7 +57,7 @@ function PortalImpl({
   }, [closeOnClickOutside, onClose]);
 
   return (
-    <div className="Modal__overlay" role="dialog">
+    <div className="Modal__overlay Modal__editor_centered" role="dialog">
       <div className="Modal__modal" tabIndex={-1} ref={modalRef}>
         <h2 className="Modal__title">{title}</h2>
         <button
@@ -85,10 +85,17 @@ export default function Modal({
   onClose: () => void;
   title: string;
 }): JSX.Element {
+  // Find the editor container to position the modal relative to it
+  const editorContainer = document.querySelector(".editor-lexical")?.closest("div");
+
+  // If we can't find the editor, fall back to document.body
+  const portalTarget = editorContainer || document.body;
+  // const portalTarget = document.body;
+  console.log({ portalTarget });
   return createPortal(
     <PortalImpl onClose={onClose} title={title} closeOnClickOutside={closeOnClickOutside}>
       {children}
     </PortalImpl>,
-    document.body,
+    portalTarget,
   );
 }

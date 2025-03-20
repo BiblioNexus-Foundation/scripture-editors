@@ -32,10 +32,16 @@ const TextInput: React.FC<TextInputProps> = ({
   </div>
 );
 
+export type InsertFunction = {
+  editor: LexicalEditor;
+  value?: string;
+  noteText?: string;
+};
+
 type InsertDialogProps = {
   activeEditor: LexicalEditor;
   onClose: () => void;
-  insertFunction: (editor: LexicalEditor, value?: string, noteText?: string) => void;
+  insertFunction: ({ editor, value, noteText }: InsertFunction) => void;
   label: string;
   placeholder?: string;
 };
@@ -55,10 +61,10 @@ export const InsertDialog: React.FC<InsertDialogProps> = ({
   }, [inputValue]);
 
   const handleInsert = () => {
-    if (label === "Footnote" || label === "Crossref") {
-      insertFunction(activeEditor, undefined, inputValue); // noteText as third param
+    if (label === "Footnote" || label === "Cross Reference") {
+      insertFunction({ editor: activeEditor, noteText: inputValue });
     } else {
-      insertFunction(activeEditor, inputValue); // Regular value
+      insertFunction({ editor: activeEditor, value: inputValue });
     }
     setInputValue("");
     onClose();

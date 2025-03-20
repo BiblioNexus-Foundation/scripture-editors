@@ -7,7 +7,6 @@ import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model"
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-// import { Usj2Usfm } from "./hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";
 
 const defaultUsj: Usj = {
@@ -47,7 +46,7 @@ function App() {
   return (
     <div className="flex-center m-2 flex h-editor justify-center p-8">
       <div className="relative w-2/3 overflow-hidden rounded-md border-2 border-secondary">
-        <div className="h-editor overflow-y-auto p-2">
+        <div className="editor-lexical h-editor overflow-y-auto p-2">
           <Editor
             usjInput={defaultUsj}
             ref={editorRef}

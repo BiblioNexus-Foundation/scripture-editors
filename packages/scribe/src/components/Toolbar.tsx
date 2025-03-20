@@ -1,28 +1,34 @@
-import Button from "./Button";
+import ToolbarButton from "./ToolbarButton";
 import useModal from "../hooks/useModal";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useState, useRef, useEffect } from "react";
-import { REDO_COMMAND, UNDO_COMMAND } from "lexical";
+import { REDO_COMMAND, UNDO_COMMAND, CUT_COMMAND, COPY_COMMAND } from "lexical";
 import "./Toolbar.css";
 import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
 import { InsertDialog } from "./Input/TextInput";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { ViewOptions } from "../adaptors/view-options.utils";
-
+import { pasteSelection, pasteSelectionAsPlainText } from "shared-react/plugins/clipboard.utils";
+import { InsertFunction } from "./Input/TextInput";
 export const Toolbar = ({
   scrRef,
   viewOptions,
   autoNumbering = false,
+  canUndo,
+  canRedo,
 }: {
   scrRef: ScriptureReference;
   viewOptions?: ViewOptions;
   autoNumbering?: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
 }) => {
   const [modal, showModal] = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [editor] = useLexicalComposerContext();
   const [isEditable, setIsEditable] = useState(true);
+  const editorContainerRef = useRef<HTMLDivElement | null>(null);
 
   type InsertOption = {
     title: string;
@@ -69,16 +75,28 @@ export const Toolbar = ({
     };
   }, []);
 
+  useEffect(() => {
+    const editorElement = document.querySelector(".editor-input");
+    if (editorElement) {
+      const container = editorElement.closest("div");
+      editorContainerRef.current = container as HTMLDivElement;
+    }
+  }, []);
+
   const handleCopy = () => {
-    document.execCommand("copy");
+    editor.dispatchCommand(COPY_COMMAND, null);
   };
 
   const handleCut = () => {
-    document.execCommand("cut");
+    editor.dispatchCommand(CUT_COMMAND, null);
   };
 
   const handlePaste = () => {
-    document.execCommand("paste");
+    pasteSelection(editor);
+  };
+
+  const handlePasteAsPlainText = () => {
+    pasteSelectionAsPlainText(editor);
   };
 
   const handleUndo = () => {
@@ -90,18 +108,17 @@ export const Toolbar = ({
   };
 
   const handleInsertOption = (option: InsertOption) => {
+    console.log({ option });
     setIsDropdownOpen(false);
 
     if (option.requiresValue) {
-      // For options that need input, show a modal
       showModal(`Insert ${option.title}`, (onClose) => (
         <InsertDialog
           activeEditor={editor}
           onClose={onClose}
           label={option.title}
           placeholder={option.placeholder}
-          // Use the same action function that UsjNodesMenuPlugin would use
-          insertFunction={(editor, value, noteText) => {
+          insertFunction={({ editor, value, noteText }: InsertFunction) => {
             const markerAction = getUsjMarkerAction(option.marker, undefined, viewOptions);
             if (markerAction && markerAction.action) {
               markerAction.action({
@@ -116,7 +133,6 @@ export const Toolbar = ({
         />
       ));
     } else {
-      // For options that don't need input, insert directly
       const markerAction = getUsjMarkerAction(option.marker, undefined, viewOptions);
       if (markerAction && markerAction.action) {
         markerAction.action({
@@ -131,33 +147,36 @@ export const Toolbar = ({
   return (
     <div className="scribe-toolbar">
       <div className="scribe-toolbar-group">
-        <Button onClick={handleUndo} title="Undo">
+        <ToolbarButton onClick={handleUndo} title="Undo" disabled={!canUndo}>
           Undo
-        </Button>
-        <Button onClick={handleRedo} title="Redo">
+        </ToolbarButton>
+        <ToolbarButton onClick={handleRedo} title="Redo" disabled={!canRedo}>
           Redo
-        </Button>
+        </ToolbarButton>
       </div>
 
       <div className="scribe-toolbar-group">
-        <Button onClick={handleCut} title="Cut">
+        <ToolbarButton onClick={handleCut} title="Cut">
           Cut
-        </Button>
-        <Button onClick={handleCopy} title="Copy">
+        </ToolbarButton>
+        <ToolbarButton onClick={handleCopy} title="Copy">
           Copy
-        </Button>
-        <Button onClick={handlePaste} title="Paste">
+        </ToolbarButton>
+        <ToolbarButton onClick={handlePaste} title="Paste">
           Paste
-        </Button>
+        </ToolbarButton>
+        <ToolbarButton onClick={handlePasteAsPlainText} title="Paste as Plain Text">
+          Paste as Plain Text
+        </ToolbarButton>
       </div>
 
       <div className="scribe-toolbar-group" ref={dropdownRef}>
-        <Button
+        <ToolbarButton
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className={isDropdownOpen ? "scribe-active" : ""}
         >
           Insert ▼
-        </Button>
+        </ToolbarButton>
 
         {isDropdownOpen && (
           <div className="scribe-dropdown">
@@ -175,7 +194,7 @@ export const Toolbar = ({
       </div>
 
       <div className="scribe-toolbar-group">
-        <Button
+        <ToolbarButton
           onClick={() => {
             const newValue = !isEditable;
             setIsEditable(newValue);
@@ -184,7 +203,7 @@ export const Toolbar = ({
           className={isEditable ? "scribe-status-editable" : "scribe-status-readonly"}
         >
           {isEditable ? "Editable" : "Read Only"}
-        </Button>
+        </ToolbarButton>
       </div>
 
       {modal}

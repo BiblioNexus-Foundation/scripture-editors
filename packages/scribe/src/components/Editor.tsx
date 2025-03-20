@@ -75,6 +75,9 @@ const Editor = forwardRef(function Editor(
   const editedUsjRef = useRef<Usj>();
   const [usj, setUsj] = useState(usjInput);
   const [loadedUsj] = useDeferredState(usj);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
   useDefaultNodeOptions(nodeOptions);
   const autoNumbering = false;
   const initialConfig = {
@@ -121,7 +124,7 @@ const Editor = forwardRef(function Editor(
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <Toolbar scrRef={scrRef} autoNumbering={autoNumbering} />
+      <Toolbar scrRef={scrRef} autoNumbering={autoNumbering} canUndo={canUndo} canRedo={canRedo} />
       <RichTextPlugin
         contentEditable={
           <ContentEditable
@@ -153,7 +156,12 @@ const Editor = forwardRef(function Editor(
       <HistoryPlugin />
       <AutoFocusPlugin />
       <ContextMenuPlugin />
-      <KeyboardShortcutPlugin />
+      <KeyboardShortcutPlugin
+        canUndo={canUndo}
+        setCanUndo={setCanUndo}
+        canRedo={canRedo}
+        setCanRedo={setCanRedo}
+      />
       <ClipboardPlugin />
       <ScriptureReferencePlugin scrRef={scrRef} setScrRef={setScrRef} />
     </LexicalComposer>
