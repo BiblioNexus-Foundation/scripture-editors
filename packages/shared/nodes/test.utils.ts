@@ -16,10 +16,12 @@ export type TestEnv = {
 /**
  * Create basic Lexical test environment.
  * @param nodes - Array of nodes for the test environment.
+ * @param $initialEditorState - Optional function to set the initial editor state.
  * @returns a test environment.
  */
 export function createBasicTestEnvironment(
   nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> = scriptureUsjNodes,
+  $initialEditorState?: () => void,
 ): TestEnv {
   const container = document.createElement("div");
   document.body.appendChild(container);
@@ -33,6 +35,7 @@ export function createBasicTestEnvironment(
   };
   const editor = createEditor(config);
   editor.setRootElement(container);
+  if ($initialEditorState) editor.update($initialEditorState, { discrete: true });
 
   const testEnv: TestEnv = {
     container,

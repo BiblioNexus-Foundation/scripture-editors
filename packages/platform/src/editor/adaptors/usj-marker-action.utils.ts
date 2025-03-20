@@ -6,6 +6,7 @@ import {
   $isElementNode,
   $isRangeSelection,
   $isTextNode,
+  EditorUpdateOptions,
   LexicalEditor,
   LexicalNode,
   RangeSelection,
@@ -65,11 +66,11 @@ const markerActions: {
         marker: "f",
         caller: GENERATOR_NOTE_CALLER,
         content: [
-          { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum} `] },
+          { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum}`] },
           {
             type: "char",
             marker: "ft",
-            content: [" "],
+            content: ["-"],
           },
         ],
       };
@@ -84,11 +85,11 @@ const markerActions: {
         marker: "x",
         caller: GENERATOR_NOTE_CALLER,
         content: [
-          { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum} `] },
+          { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum}`] },
           {
             type: "char",
             marker: "xt",
-            content: [" "],
+            content: ["-"],
           },
         ],
       };
@@ -102,6 +103,8 @@ export function getUsjMarkerAction(
   marker: string,
   _markerData?: Marker,
   viewOptions?: ViewOptions,
+  /** Included for tests, e.g. `{ discrete: true }` */
+  editorUpdateOptions?: EditorUpdateOptions,
 ): MarkerAction {
   const markerAction = getMarkerAction(marker);
   const action = (currentEditor: { reference: SerializedVerseRef; editor: LexicalEditor }) => {
@@ -131,14 +134,16 @@ export function getUsjMarkerAction(
           }
         } else {
           selection.insertNodes([nodeToInsert]);
-          $moveTextLeadingSpaceToPreviousNode(nodeToInsert);
           $moveVerseFollowingSpaceToPreviousNode(nodeToInsert);
+          const nextNode = nodeToInsert.getNextSibling();
+          if (nextNode) nextNode.selectStart();
+          else nodeToInsert.selectStart();
         }
       } else {
         // Insert the node directly
         selection?.insertNodes([nodeToInsert]);
       }
-    });
+    }, editorUpdateOptions);
   };
   return { action, label: markerAction?.label };
 }
@@ -169,7 +174,7 @@ function getMarkerAction(marker: string): {
           const content: MarkerContent = {
             type: CharNode.getType(),
             marker,
-            content: [" "],
+            content: ["-"],
           };
           return [content];
         },
@@ -303,26 +308,6 @@ function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
 }
 
 // #endregion
-
-/**
- * Moves the leading space of a text node to the previous node.
- *
- * This function checks if the given node is a text node and if it starts with a space. If both
- * conditions are met, it trims the leading space from the text node and appends a space to the
- * previous node if it is a text node and doesn't end in a space already.
- *
- * @param node - The node to check for leading space.
- */
-function $moveTextLeadingSpaceToPreviousNode(node: LexicalNode): void {
-  if (!$isTextNode(node) || !node.getTextContent().startsWith(" ")) return;
-
-  node.setTextContent(node.getTextContent().trimStart());
-  const previousNode = node.getPreviousSibling();
-  if ($isTextNode(previousNode)) {
-    const previousText = previousNode.getTextContent();
-    if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
-  }
-}
 
 /**
  * Moves the leading space of a node following a verse node to the previous node.

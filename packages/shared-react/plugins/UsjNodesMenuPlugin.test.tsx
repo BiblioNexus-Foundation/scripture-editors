@@ -217,9 +217,11 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
  * @param editor - The LexicalEditor instance where the selection will be set.
  * @param verseToInsert - The verse to insert at the selection.
  * @param startNode - The starting TextNode of the selection.
- * @param startOffset - The offset within the startNode where the selection begins. Defaults to the end of the startNode's text content.
+ * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
+ *   end of the startNode's text content.
  * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the startOffset.
+ * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
+ *   end of the endNode's text content.
  */
 async function insertVerseNodeAtSelection(
   editor: LexicalEditor,
@@ -231,9 +233,9 @@ async function insertVerseNodeAtSelection(
 ) {
   await act(async () => {
     editor.update(() => {
-      if (!startOffset) startOffset = startNode.getTextContentSize();
+      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
+      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
       if (!endNode) endNode = startNode;
-      if (!endOffset) endOffset = startOffset;
       const rangeSelection = $createRangeSelection();
       rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
       rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
