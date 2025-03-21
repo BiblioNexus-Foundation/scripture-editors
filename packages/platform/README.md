@@ -59,15 +59,15 @@ const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: 
 const options: EditorOptions = { isReadonly: false, textDirection: "ltr", nodes: nodeOptions };
 // Word "man" inside first q1 of PSA 1:1.
 const annotationRange1 = {
-  start: { jsonPathIndexes: [3, 1], offset: 15 },
-  end: { jsonPathIndexes: [3, 1], offset: 18 },
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 18 },
 };
 // Phrase "man who" inside first q1 of PSA 1:1.
 const annotationRange2 = {
-  start: { jsonPathIndexes: [3, 1], offset: 15 },
-  end: { jsonPathIndexes: [3, 1], offset: 22 },
+  start: { jsonPath: "$.content[3].content[1]", offset: 15 },
+  end: { jsonPath: "$.content[3].content[1]", offset: 22 },
 };
-const cursorLocation = { start: { jsonPathIndexes: [3, 1], offset: 15 } };
+const cursorLocation = { start: { jsonPath: "$.content[3].content[1]", offset: 15 } };
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
