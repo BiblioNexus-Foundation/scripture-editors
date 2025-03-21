@@ -1,0 +1,290 @@
+import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  $createImmutableVerseNode,
+  $isImmutableVerseNode,
+  ImmutableVerseNode,
+} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { createBasicTestEnvironment } from "shared/nodes/test.utils";
+import { getUsjMarkerAction } from "./usj-marker-action.utils";
+import {
+  $createPoint,
+  $createRangeSelection,
+  $createTextNode,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $setSelection,
+  LexicalEditor,
+  TextNode,
+} from "lexical";
+import { $isCharNode } from "shared/nodes/scripture/usj/CharNode";
+import {
+  $createImmutableChapterNode,
+  $isImmutableChapterNode,
+} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+
+const nodes = [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes];
+const reference = { book: "GEN", chapterNum: 1, verseNum: 1 };
+
+let secondVerseTextNode: TextNode;
+
+describe("USJ Marker Action Utils", () => {
+  it("should load default initialEditorState and set selection (sanity check)", async () => {
+    const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+    setSelection(editor, secondVerseTextNode);
+
+    editor.getEditorState().read(() => {
+      const root = $getRoot();
+      expect(root.getTextContent()).toBe("first verse text \n\nsecond verse text ");
+      expect(root.getChildren().length).toBe(3);
+      $expectSelectionToBe(secondVerseTextNode);
+    });
+  });
+
+  it("should insert a chapter", () => {
+    const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+    const markerAction = getUsjMarkerAction("c", undefined, undefined, { discrete: true });
+    setSelection(editor, secondVerseTextNode);
+
+    markerAction.action({ editor, reference });
+
+    editor.getEditorState().read(() => {
+      const children = $getRoot().getChildren();
+      expect(children.length).toBe(5);
+      if (!$isImmutableChapterNode(children[3])) fail("Inserted node is not a chapter");
+      expect(children[3].getNumber()).toBe("2");
+      if (!$isParaNode(children[4])) fail("Inserted node after inserted chapter is not a ParaNode");
+    });
+  });
+
+  describe("should insert a verse", () => {
+    it("with no leading space", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("v", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 7);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isImmutableVerseNode(insertedNode)) fail("Inserted node is not a verse");
+        expect(insertedNode.getMarker()).toBe("v");
+        // Note that renumbering happens in the `UsjNodesMenuPlugin` which isn't in scope here.
+        expect(insertedNode.getNumber()).toBe("2");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe("verse text ");
+        $expectSelectionToBe(tailTextNode, 0);
+      });
+    });
+
+    it("but move leading space to previous node", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("v", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 6);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isImmutableVerseNode(insertedNode)) fail("Inserted node is not a verse");
+        expect(insertedNode.getMarker()).toBe("v");
+        // Note that renumbering happens in the `UsjNodesMenuPlugin` which isn't in scope here.
+        expect(insertedNode.getNumber()).toBe("2");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe("verse text ");
+        $expectSelectionToBe(tailTextNode, 0);
+      });
+    });
+  });
+
+  describe("should insert a char", () => {
+    it("with no leading space", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 7);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
+        expect(insertedNode.getMarker()).toBe("wj");
+        expect(insertedNode.getTextContent()).toBe("-");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe("verse text ");
+        $expectSelectionToBe(tailTextNode, 0);
+      });
+    });
+
+    it("with leading space", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 6);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
+        expect(insertedNode.getMarker()).toBe("wj");
+        expect(insertedNode.getTextContent()).toBe("-");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe(" verse text ");
+        $expectSelectionToBe(tailTextNode, 0);
+      });
+    });
+
+    it("at end of para", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second verse text ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
+        expect(insertedNode.getMarker()).toBe("wj");
+        expect(insertedNode.getTextContent()).toBe("-");
+        $expectSelectionToBe(insertedNode, 0);
+      });
+    });
+  });
+
+  describe("should wrap selection in char", () => {
+    it("with no leading space", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 7, secondVerseTextNode, 12);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
+        expect(insertedNode.getMarker()).toBe("wj");
+        expect(insertedNode.getTextContent()).toBe("verse");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe(" text ");
+        $expectSelectionToBe(insertedNode);
+      });
+    });
+
+    it("but move leading space to previous node", () => {
+      const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
+      const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
+      setSelection(editor, secondVerseTextNode, 6, secondVerseTextNode, 12);
+
+      markerAction.action({ editor, reference });
+
+      editor.getEditorState().read(() => {
+        expect(secondVerseTextNode.getTextContent()).toBe("second ");
+        const insertedNode = secondVerseTextNode.getNextSibling();
+        if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
+        expect(insertedNode.getMarker()).toBe("wj");
+        expect(insertedNode.getTextContent()).toBe("verse");
+        const tailTextNode = insertedNode.getNextSibling();
+        if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
+        expect(tailTextNode.getTextContent()).toBe(" text ");
+        $expectSelectionToBe(insertedNode);
+      });
+    });
+  });
+});
+
+function $defaultInitialEditorState() {
+  const firstVerseNode = $createImmutableVerseNode("1");
+  const firstVerseTextNode = $createTextNode("first verse text ");
+  const secondVerseNode = $createImmutableVerseNode("2");
+  secondVerseTextNode = $createTextNode("second verse text ");
+
+  $getRoot().append(
+    $createImmutableChapterNode("1"),
+    $createParaNode().append(firstVerseNode, firstVerseTextNode),
+    $createParaNode().append(secondVerseNode, secondVerseTextNode),
+  );
+}
+
+/**
+ * Sets the selection range in the LexicalEditor.
+ *
+ * @param editor - The LexicalEditor instance where the selection will be set.
+ * @param $createNoteNodeToInsert - A callback function to create the NoteNode to insert at the
+ *   selection.
+ * @param startNode - The starting TextNode of the selection.
+ * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
+ *   end of the startNode's text content.
+ * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
+ * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
+ *   startOffset.
+ */
+function setSelection(
+  editor: LexicalEditor,
+  startNode: TextNode,
+  startOffset?: number,
+  endNode?: TextNode,
+  endOffset?: number,
+) {
+  editor.update(
+    () => {
+      if (!startOffset) startOffset = startNode.getTextContentSize();
+      if (!endNode) endNode = startNode;
+      if (!endOffset) endOffset = startOffset;
+      const rangeSelection = $createRangeSelection();
+      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
+      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
+      $setSelection(rangeSelection);
+    },
+    { discrete: true },
+  );
+}
+
+/**
+ * Checks the selection range in the LexicalEditor is at the specified location.
+ *
+ * @param startNode - The starting TextNode of the expected selection.
+ * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
+ *   end of the startNode's text content.
+ * @param endNode - The ending TextNode of the expected selection. Defaults to the startNode.
+ * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
+ *   end of the endNode's text content.
+ */
+function $expectSelectionToBe(
+  startNode: TextNode,
+  startOffset?: number,
+  endNode?: TextNode,
+  endOffset?: number,
+) {
+  if (startOffset === undefined) startOffset = startNode.getTextContentSize();
+  if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
+  if (!endNode) endNode = startNode;
+
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) fail("Selection is not a range selection");
+  const selectionStart = selection.isBackward() ? selection.focus : selection.anchor;
+  const selectionEnd = selection.isBackward() ? selection.anchor : selection.focus;
+  expect(selectionStart).toEqual({
+    key: startNode.getKey(),
+    offset: startOffset,
+    type: "text",
+  });
+  expect(selectionEnd).toEqual({
+    key: endNode.getKey(),
+    offset: endOffset,
+    type: "text",
+  });
+}

@@ -268,7 +268,7 @@ async function testEnvironment(
  *   end of the startNode's text content.
  * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
  * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   startOffset.
+ *   end of the endNode's text content.
  * @returns The inserted NoteNode.
  */
 async function insertNoteNodeAtSelection(
@@ -282,9 +282,9 @@ async function insertNoteNodeAtSelection(
   let insertedNoteNode: NoteNode | undefined;
   await act(async () => {
     editor.update(() => {
-      if (!startOffset) startOffset = startNode.getTextContentSize();
+      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
+      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
       if (!endNode) endNode = startNode;
-      if (!endOffset) endOffset = startOffset;
       const rangeSelection = $createRangeSelection();
       rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
       rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
