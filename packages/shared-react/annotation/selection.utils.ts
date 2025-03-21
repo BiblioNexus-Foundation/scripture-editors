@@ -1,4 +1,8 @@
 import {
+  indexesFromUsjJsonPath,
+  usjJsonPathFromIndexes,
+} from "@biblionexus-foundation/scripture-utilities";
+import {
   $createPoint,
   $createRangeSelection,
   $getRoot,
@@ -48,8 +52,9 @@ function $findTextNodeInMarks(
 function $getNodeFromLocation(
   location: UsjLocation,
 ): [LexicalNode | undefined, number | undefined] {
+  const jsonPathIndexes = indexesFromUsjJsonPath(location.jsonPath);
   let currentNode: LexicalNode | undefined = $getRoot();
-  for (const index of location.jsonPathIndexes) {
+  for (const index of jsonPathIndexes) {
     if (!currentNode || !$isElementNode(currentNode)) return [undefined, undefined];
 
     currentNode = currentNode.getChildAtIndex(index) ?? undefined;
@@ -111,7 +116,7 @@ function getLocationFromNode(node: LexicalNode, offset: number): UsjLocation {
     }
     current = parent;
   }
-  return { jsonPathIndexes, offset };
+  return { jsonPath: usjJsonPathFromIndexes(jsonPathIndexes), offset };
 }
 
 /**
