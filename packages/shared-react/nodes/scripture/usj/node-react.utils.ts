@@ -1,4 +1,4 @@
-import { $isElementNode, LexicalNode } from "lexical";
+import { $getNodeByKey, $isElementNode, $isTextNode, LexicalEditor, LexicalNode } from "lexical";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
@@ -217,4 +217,36 @@ export function $isReactNodeWithMarker(
   node: LexicalNode | null | undefined,
 ): node is NodesWithMarker | ImmutableVerseNode {
   return $isNodeWithMarker(node) || $isImmutableVerseNode(node);
+}
+
+/**
+ * Add trailing space to a TextNode
+ * @param node - Text node to add trailing space to.
+ */
+export function $addTrailingSpace(node: LexicalNode | null | undefined) {
+  if ($isTextNode(node)) {
+    const text = node.getTextContent();
+    if (!text.endsWith(" ")) node.setTextContent(`${text} `);
+  }
+}
+
+/**
+ * Removes the any leading space from a TextNode.
+ * @param node - Text node to remove leading space from.
+ */
+export function $removeLeadingSpace(node: LexicalNode | null | undefined) {
+  if ($isTextNode(node)) {
+    const text = node.getTextContent();
+    if (text.startsWith(" ")) node.setTextContent(text.trimStart());
+  }
+}
+
+/**
+ * Checks if the node was created since the previous editor state.
+ * @param editor - The lexical editor instance.
+ * @param nodeKey - The key of the node.
+ * @returns `true` if the node was created, and `false` otherwise.
+ */
+export function wasNodeCreated(editor: LexicalEditor, nodeKey: string) {
+  return editor.getEditorState().read(() => !$getNodeByKey(nodeKey));
 }

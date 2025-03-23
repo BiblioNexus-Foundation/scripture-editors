@@ -33,6 +33,7 @@ import {
   $findImmutableNoteCallerNodes,
   CallerData,
   generateNoteCaller,
+  wasNodeCreated,
 } from "../nodes/scripture/usj/node-react.utils";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 
@@ -132,8 +133,7 @@ function $noteCallerNodeInsertedTransform(
 ) {
   if ($hasUpdateTag(EXTERNAL_USJ_MUTATION_TAG)) return;
 
-  // check if the node exists in the previous state
-  const nodeWasCreated = editor.getEditorState().read(() => !$getNodeByKey(node.getKey()));
+  const nodeWasCreated = wasNodeCreated(editor, node.getKey());
   const parent = node?.getParent();
   if (
     nodeWasCreated &&

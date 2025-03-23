@@ -25,6 +25,7 @@ import {
   $isReactNodeWithMarker,
   $isSomeVerseNode,
   SomeVerseNode,
+  wasNodeCreated,
 } from "../nodes/scripture/usj/node-react.utils";
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
@@ -134,8 +135,7 @@ function $verseNodeInsertedTransform(
 ) {
   if ($hasUpdateTag(EXTERNAL_USJ_MUTATION_TAG)) return;
 
-  // check if the node exists in the previous state
-  const nodeWasCreated = editor.getEditorState().read(() => !$getNodeByKey(node.getKey()));
+  const nodeWasCreated = wasNodeCreated(editor, node.getKey());
   if (nodeWasCreated) $renumberFollowingVerses(node, verseNodeKeysByChapter);
 }
 

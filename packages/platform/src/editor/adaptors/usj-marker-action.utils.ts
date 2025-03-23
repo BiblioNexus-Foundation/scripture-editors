@@ -21,7 +21,11 @@ import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
-import { $isSomeVerseNode } from "shared-react/nodes/scripture/usj/node-react.utils";
+import {
+  $isSomeVerseNode,
+  $removeLeadingSpace,
+  $addTrailingSpace,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 import { ViewOptions } from "./view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
@@ -292,12 +296,8 @@ function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
     if ($isTextNode(node) && wrapper.isInline() && text.startsWith(" ")) {
       text = text.trimStart();
       const previousNode = wrapper.getPreviousSibling();
-      if ($isTextNode(previousNode)) {
-        const previousText = previousNode.getTextContent();
-        if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
-      } else {
-        wrapper.insertBefore($createTextNode(" "));
-      }
+      $addTrailingSpace(previousNode);
+      if (!$isTextNode(previousNode)) wrapper.insertBefore($createTextNode(" "));
     }
     wrapper.setTextContent(text);
     node.remove();
@@ -320,15 +320,6 @@ function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
 function $moveVerseFollowingSpaceToPreviousNode(node: LexicalNode) {
   if (!$isSomeVerseNode(node)) return;
 
-  const previousNode = node.getPreviousSibling();
-  if ($isTextNode(previousNode)) {
-    const previousText = previousNode.getTextContent();
-    if (!previousText.endsWith(" ")) previousNode.setTextContent(`${previousText} `);
-  }
-
-  const nextNode = node.getNextSibling();
-  if ($isTextNode(nextNode)) {
-    const nextText = nextNode.getTextContent();
-    if (nextText.startsWith(" ")) nextNode.setTextContent(nextText.trimStart());
-  }
+  $addTrailingSpace(node.getPreviousSibling());
+  $removeLeadingSpace(node.getNextSibling());
 }
