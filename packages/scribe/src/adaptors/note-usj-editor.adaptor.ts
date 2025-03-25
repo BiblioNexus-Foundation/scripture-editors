@@ -88,6 +88,7 @@ import {
   ImmutableNoteCallerNode,
   OnClick,
   SerializedImmutableNoteCallerNode,
+  defaultNoteCallers,
   immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
@@ -114,14 +115,15 @@ const callerData: CallerData = {
   count: 0,
 };
 
+/** List of possible note callers. */
+let noteCallers: string[] = defaultNoteCallers;
+
 /** View options - view mode parameters */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node */
 let _nodeOptions: UsjNodeOptions | undefined;
-/** List of possible note callers. */
-let noteCallers: string[] | undefined;
 /** Logger instance */
-let _logger: LoggerBasic;
+let _logger: LoggerBasic | undefined;
 
 export function initialize(
   nodeOptions: UsjNodeOptions | undefined,

@@ -176,3 +176,33 @@ export function isSerializedImmutableNoteCallerNode(
 ): node is SerializedImmutableNoteCallerNode {
   return node?.type === ImmutableNoteCallerNode.getType();
 }
+
+/** Possible note callers to use when caller is '+'. Up to 2 characters are used, e.g. a-zz */
+export const defaultNoteCallers = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+];

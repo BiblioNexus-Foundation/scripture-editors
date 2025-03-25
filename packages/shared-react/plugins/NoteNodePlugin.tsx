@@ -26,6 +26,7 @@ import {
 } from "shared/nodes/scripture/usj/node.utils";
 import {
   $isImmutableNoteCallerNode,
+  defaultNoteCallers,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
 } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -163,8 +164,8 @@ function $generateAllNoteCallers(nodeOptions: UsjNodeOptions, logger?: LoggerBas
   });
   // generate caller for each
   const callerData: CallerData = { count: 0 };
+  const noteCallers = nodeOptions[immutableNoteCallerNodeName]?.noteCallers ?? defaultNoteCallers;
   noteCallerNodes.forEach((noteCallerNode) => {
-    const noteCallers = nodeOptions[immutableNoteCallerNodeName]?.noteCallers;
     const caller = generateNoteCaller(GENERATOR_NOTE_CALLER, noteCallers, callerData, logger);
     if (noteCallerNode.__caller !== caller) noteCallerNode.setCaller(caller);
   });
