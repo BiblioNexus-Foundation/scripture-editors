@@ -107,6 +107,7 @@ import {
   ImmutableNoteCallerNode,
   OnClick,
   SerializedImmutableNoteCallerNode,
+  defaultNoteCallers,
   immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
@@ -139,16 +140,17 @@ const callerData: CallerData = {
 
 /** Comment IDs in the USJ. */
 let commentIds: string[] = [];
+/** List of possible note callers. */
+let noteCallers: string[] = defaultNoteCallers;
+
 /** View options - view mode parameters. */
 let _viewOptions: ViewOptions | undefined;
 /** Options for each node. */
 let _nodeOptions: UsjNodeOptions | undefined;
-/** List of possible note callers. */
-let noteCallers: string[] | undefined;
 /** Method to add missing comments. */
-let addMissingComments: AddMissingComments;
+let addMissingComments: AddMissingComments | undefined;
 /** Logger instance. */
-let _logger: LoggerBasic;
+let _logger: LoggerBasic | undefined;
 
 export function initialize(
   nodeOptions: UsjNodeOptions | undefined,

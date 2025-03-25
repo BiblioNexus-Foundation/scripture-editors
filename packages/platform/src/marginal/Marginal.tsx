@@ -60,6 +60,7 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
   const { children, onCommentChange, onUsjChange, ...editorProps } = props as PropsWithChildren<
     MarginalProps<TLogger>
   >;
+  const { options: isReadonly } = props;
   const [commentStoreRef, setCommentStoreRef] = useCommentStoreRef();
   useMissingCommentsProps(editorProps, commentStoreRef);
 
@@ -126,7 +127,7 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
       <CommentPlugin
         setCommentStore={setCommentStoreRef}
         onChange={handleCommentChange}
-        showCommentsContainerRef={toolbarEndRef}
+        showCommentsContainerRef={isReadonly ? null : toolbarEndRef}
         commentContainerRef={commentContainerRef}
         logger={editorProps.logger}
       />

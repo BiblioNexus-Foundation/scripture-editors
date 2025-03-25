@@ -93,7 +93,7 @@ function getOptions(
 
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
-  const [definedOptions, setDefinedOptions] = useState(true);
+  const [definedOptions, setDefinedOptions] = useState(false);
   const [isReadonly, setIsReadonly] = useState(false);
   const [hasSpellCheck, setHasSpellCheck] = useState(false);
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
@@ -102,8 +102,9 @@ export default function App() {
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");
 
-  const options = useMemo<EditorOptions>(
-    () => (definedOptions ? getOptions(isReadonly, hasSpellCheck, textDirection, viewMode) : {}),
+  const options = useMemo<EditorOptions | undefined>(
+    () =>
+      definedOptions ? getOptions(isReadonly, hasSpellCheck, textDirection, viewMode) : undefined,
     [definedOptions, isReadonly, hasSpellCheck, textDirection, viewMode],
   );
 

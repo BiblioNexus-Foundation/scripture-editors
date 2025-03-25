@@ -28,7 +28,10 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
   logger?: TLogger;
 }): null {
   const [editor] = useLexicalComposerContext();
-  editorAdaptor.initialize?.(nodeOptions, logger);
+
+  useEffect(() => {
+    editorAdaptor.initialize?.(nodeOptions, logger);
+  }, [editorAdaptor, logger, nodeOptions]);
 
   useEffect(() => {
     editorAdaptor.reset?.();

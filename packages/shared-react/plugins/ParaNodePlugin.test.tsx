@@ -22,8 +22,6 @@ import {
 import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
 import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
-import useDefaultNodeOptions from "../nodes/scripture/usj/use-default-node-options.hook";
-import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 import ParaNodePlugin from "./ParaNodePlugin";
 
 let firstVerseTextNode: TextNode;
@@ -92,10 +90,7 @@ function $defaultInitialEditorState() {
   );
 }
 
-async function testEnvironment(
-  nodeOptions: UsjNodeOptions = {},
-  $initialEditorState: () => void = $defaultInitialEditorState,
-) {
+async function testEnvironment($initialEditorState: () => void = $defaultInitialEditorState) {
   let editor: LexicalEditor;
 
   function GrabEditor() {
@@ -104,8 +99,6 @@ async function testEnvironment(
   }
 
   function App() {
-    useDefaultNodeOptions(nodeOptions);
-
     return (
       <LexicalComposer
         initialConfig={{

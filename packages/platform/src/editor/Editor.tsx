@@ -32,7 +32,6 @@ import {
 } from "shared-react/annotation/selection.utils";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
@@ -191,12 +190,11 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
   const {
     isReadonly = false,
     hasSpellCheck = false,
-    textDirection = "auto",
+    textDirection = "ltr",
     markerMenuTrigger = "\\",
     view: viewOptions = defaultViewOptions,
     nodes: nodeOptions = {},
   } = options ?? {};
-  useDefaultNodeOptions(nodeOptions);
 
   editorConfig.editable = !isReadonly;
   editorUsjAdaptor.initialize(logger);

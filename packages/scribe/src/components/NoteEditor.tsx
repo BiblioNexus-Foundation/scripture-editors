@@ -10,7 +10,6 @@ import { EditorState } from "lexical";
 import { useCallback, useEffect } from "react";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
@@ -35,8 +34,6 @@ export const NoteEditor = ({
   nodeOptions = {},
   scrollId,
 }: NoteEditorProps) => {
-  useDefaultNodeOptions(nodeOptions);
-
   const initialConfig = {
     namespace: "ScribeNoteEditor",
     editable: true,

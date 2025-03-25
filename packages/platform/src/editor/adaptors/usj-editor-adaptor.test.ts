@@ -3,10 +3,10 @@ import { SerializedEditorState } from "lexical";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import {
+  defaultNoteCallers,
   immutableNoteCallerNodeName,
   SerializedImmutableNoteCallerNode,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { defaultNoteCallers } from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries

@@ -12,7 +12,6 @@ import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import useDefaultNodeOptions from "shared-react/nodes/scripture/usj/use-default-node-options.hook";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
@@ -75,7 +74,6 @@ const Editor = forwardRef(function Editor(
   const editedUsjRef = useRef<Usj>();
   const [usj, setUsj] = useState(usjInput);
   const [loadedUsj] = useDeferredState(usj);
-  useDefaultNodeOptions(nodeOptions);
   const autoNumbering = false;
   const initialConfig = {
     namespace: "ScribeEditor",
