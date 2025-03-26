@@ -18,7 +18,6 @@
 .editor-inner {
   background: #fff;
   position: relative;
-  display: flex;
 }
 
 .editor-input {
