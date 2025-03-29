@@ -2100,6 +2100,24 @@ body {
   background-color: inherit;
 }
 
+@counter-style custom-letters {
+  system: alphabetic;
+  symbols: "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v"
+    "w" "x" "y" "z";
+  suffix: " ";
+}
+.editor-input {
+  counter-reset: caller 0;
+}
+
+.note[data-caller="+"] > .immutable-note-caller {
+  counter-increment: caller 1;
+}
+
+.note[data-caller="+"] > .immutable-note-caller > button::before {
+  content: counter(caller, custom-letters);
+}
+
 .immutable-note-caller[data-caller="-"] {
   display: none;
 }

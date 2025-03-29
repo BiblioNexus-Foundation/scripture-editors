@@ -2,51 +2,29 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
   $createRangeSelection,
-  $getNodeByKey,
-  $getRoot,
   $getSelection,
-  $hasUpdateTag,
   $isRangeSelection,
   $isTextNode,
   $setSelection,
   COMMAND_PRIORITY_HIGH,
-  EditorState,
   KEY_DOWN_COMMAND,
   LexicalEditor,
-  NodeMutation,
 } from "lexical";
 import { useEffect } from "react";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isNoteNode, GENERATOR_NOTE_CALLER, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-constants";
+import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import {
   getNodeElementTagName,
   getNoteCallerPreviewText,
 } from "shared/nodes/scripture/usj/node.utils";
 import {
   $isImmutableNoteCallerNode,
-  defaultNoteCallers,
   ImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
 } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $findImmutableNoteCallerNodes,
-  CallerData,
-  generateNoteCaller,
-  wasNodeCreated,
-} from "../nodes/scripture/usj/node-react.utils";
-import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 
-export default function NoteNodePlugin<TLogger extends LoggerBasic>({
-  nodeOptions,
-  logger,
-}: {
-  nodeOptions: UsjNodeOptions;
-  logger?: TLogger;
-}): null {
+export default function NoteNodePlugin(): null {
   const [editor] = useLexicalComposerContext();
-  useNoteNode(editor, nodeOptions, logger);
+  useNoteNode(editor);
   useArrowKeys(editor);
   return null;
 }
@@ -54,10 +32,8 @@ export default function NoteNodePlugin<TLogger extends LoggerBasic>({
 /**
  * This hook is responsible for handling NoteNode and NoteNodeCaller interactions.
  * @param editor - The LexicalEditor instance used to access the DOM.
- * @param nodeOptions - Node options that includes the list of potential node callers.
- * @param logger - Logger to use, if any.
  */
-function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?: LoggerBasic) {
+function useNoteNode(editor: LexicalEditor) {
   useEffect(() => {
     if (!editor.hasNodes([CharNode, NoteNode, ImmutableNoteCallerNode])) {
       throw new Error(
@@ -72,24 +48,6 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
       // Update NoteNodeCaller preview text when NoteNode children text is changed.
       editor.registerNodeTransform(CharNode, $noteCharNodeTransform),
 
-      // Re-generate all note callers when a note is added.
-      editor.registerNodeTransform(ImmutableNoteCallerNode, (node) =>
-        $noteCallerNodeInsertedTransform(node, editor, nodeOptions, logger),
-      ),
-
-      // Re-generate all note callers when a note is removed.
-      editor.registerMutationListener(
-        ImmutableNoteCallerNode,
-        (nodeMutations, { prevEditorState }) =>
-          $generateNoteCallersOnDestroy(
-            nodeMutations,
-            prevEditorState,
-            editor,
-            nodeOptions,
-            logger,
-          ),
-      ),
-
       // Handle double-click of a word immediately following a NoteNode (no space between).
       editor.registerRootListener(
         (rootElement: HTMLElement | null, prevRootElement: HTMLElement | null) => {
@@ -102,7 +60,7 @@ function useNoteNode(editor: LexicalEditor, nodeOptions: UsjNodeOptions, logger?
         },
       ),
     );
-  }, [editor, logger, nodeOptions]);
+  }, [editor]);
 }
 
 /**
@@ -117,95 +75,6 @@ function $noteCharNodeTransform(node: CharNode): void {
 
   const previewText = getNoteCallerPreviewText(children);
   noteCaller.setPreviewText(previewText);
-}
-
-/**
- * When a NoteNode is added, generate a caller for it and all following NoteNodes.
- * @param node - The NoteNode that was added.
- * @param editor - The LexicalEditor instance used to access the DOM.
- * @param nodeOptions - Node options that includes the list of potential node callers.
- * @param logger - Logger to use, if any.
- */
-function $noteCallerNodeInsertedTransform(
-  node: ImmutableNoteCallerNode,
-  editor: LexicalEditor,
-  nodeOptions: UsjNodeOptions,
-  logger?: LoggerBasic,
-) {
-  if ($hasUpdateTag(EXTERNAL_USJ_MUTATION_TAG)) return;
-
-  const nodeWasCreated = wasNodeCreated(editor, node.getKey());
-  const parent = node?.getParent();
-  if (
-    nodeWasCreated &&
-    $isImmutableNoteCallerNode(node) &&
-    $isNoteNode(parent) &&
-    parent.getCaller() === GENERATOR_NOTE_CALLER
-  ) {
-    $generateAllNoteCallers(nodeOptions, logger);
-  }
-}
-
-/**
- * This will regenerate all the changed node callers to keep them sequential. E.g. use this method
- * if a caller node is inserted so that node and all following caller nodes will get regenerated
- * callers. Also if a caller node is deleted following caller nodes get regenerated callers.
- * @param nodeOptions - Node options that includes the list of potential node callers.
- * @param logger - Logger to use, if any.
- */
-function $generateAllNoteCallers(nodeOptions: UsjNodeOptions, logger?: LoggerBasic) {
-  const children = $getRoot().getChildren();
-  // find all ImmutableNoteCallerNodes whose parent NoteNode caller requires generating
-  const noteCallerNodes = $findImmutableNoteCallerNodes(children).filter((node) => {
-    const parent = node.getParentOrThrow();
-    if (!$isNoteNode(parent)) return false;
-
-    return parent.getCaller() === GENERATOR_NOTE_CALLER;
-  });
-  // generate caller for each
-  const callerData: CallerData = { count: 0 };
-  const noteCallers = nodeOptions[immutableNoteCallerNodeName]?.noteCallers ?? defaultNoteCallers;
-  noteCallerNodes.forEach((noteCallerNode) => {
-    const caller = generateNoteCaller(GENERATOR_NOTE_CALLER, noteCallers, callerData, logger);
-    if (noteCallerNode.__caller !== caller) noteCallerNode.setCaller(caller);
-  });
-}
-
-/**
- * When a NoteNode is destroyed, check if it was generated by the NoteNodeCaller generator and
- * regenerate all NoteNodeCallers if it was.
- * @param nodeMutations - Map of node mutations.
- * @param prevEditorState - The previous EditorState.
- * @param editor - The LexicalEditor instance used to access the DOM.
- * @param nodeOptions - Node options that includes the list of potential node callers.
- * @param logger - Logger to use, if any.
- */
-function $generateNoteCallersOnDestroy(
-  nodeMutations: Map<string, NodeMutation>,
-  prevEditorState: EditorState,
-  editor: LexicalEditor,
-  nodeOptions: UsjNodeOptions,
-  logger?: LoggerBasic,
-) {
-  editor.update(
-    () => {
-      for (const [nodeKey, mutation] of nodeMutations) {
-        if (mutation !== "destroyed") continue;
-
-        const nodeWasGenerated = prevEditorState.read(() => {
-          const node = $getNodeByKey<ImmutableNoteCallerNode>(nodeKey);
-          const parent = node?.getParent();
-          return (
-            $isImmutableNoteCallerNode(node) &&
-            $isNoteNode(parent) &&
-            parent.getCaller() === GENERATOR_NOTE_CALLER
-          );
-        });
-        if (nodeWasGenerated) $generateAllNoteCallers(nodeOptions, logger);
-      }
-    },
-    { tag: "history-merge" },
-  );
 }
 
 /**

@@ -127,9 +127,11 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
   decorate(): JSX.Element {
     const callerId = `${this.__caller}_${this.__previewText}}`.replace(/\s+/g, "").substring(0, 25);
     return (
-      <button onClick={this.__onClick} title={this.__previewText} data-caller-id={callerId}>
-        {this.__caller}
-      </button>
+      <button
+        onClick={this.__onClick}
+        title={this.__previewText}
+        data-caller-id={callerId}
+      ></button>
     );
   }
 
