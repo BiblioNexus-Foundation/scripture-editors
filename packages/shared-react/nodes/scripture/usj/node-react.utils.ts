@@ -1,7 +1,5 @@
 import { $getNodeByKey, $isElementNode, $isTextNode, LexicalEditor, LexicalNode } from "lexical";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import {
   $isNodeWithMarker,
   $isSomeChapterNode,

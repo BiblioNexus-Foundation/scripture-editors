@@ -279,7 +279,7 @@ export const editorStateGen1v1 = {
             children: [
               {
                 type: "immutable-note-caller",
-                caller: "a",
+                caller: "+",
                 previewText: "3:2  The Hebrew word rendered “God” is “אֱלֹהִ֑ים” (Elohim).",
                 version: 1,
               },
@@ -1446,7 +1446,7 @@ export const editorStateWithUnknownItems = {
             children: [
               {
                 type: "immutable-note-caller",
-                caller: "a",
+                caller: "+",
                 previewText: "3:2",
                 version: 1,
               },

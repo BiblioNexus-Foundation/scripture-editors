@@ -94,54 +94,6 @@ describe("USJ Editor Adaptor", () => {
     expect(serializedEditorState).toEqual(editorStateGen1v1Editable);
   });
 
-  it("should convert from USJ to Lexical editor state JSON with caller clocked", () => {
-    reset(25);
-
-    // SUT
-    let serializedEditorState = serializeEditorState(usjGen1v1);
-
-    const editorStateCallerUpdated = editorStateGen1v1;
-    const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
-      .children[NOTE_INDEX] as SerializedNoteNode;
-    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
-    noteCaller.caller = "z";
-    removeOnClick(serializedEditorState);
-    expect(serializedEditorState).toEqual(editorStateCallerUpdated);
-
-    reset(52);
-
-    // SUT
-    serializedEditorState = serializeEditorState(usjGen1v1);
-
-    noteCaller.caller = "ba";
-    removeOnClick(serializedEditorState);
-    expect(serializedEditorState).toEqual(editorStateCallerUpdated);
-  });
-
-  it("should reset if the note caller count is too large", () => {
-    reset(701);
-
-    // SUT
-    let serializedEditorState = serializeEditorState(usjGen1v1);
-
-    const editorStateCallerUpdated = editorStateGen1v1;
-    const note = (editorStateCallerUpdated.root.children[NOTE_PARA_INDEX] as SerializedParaNode)
-      .children[NOTE_INDEX] as SerializedNoteNode;
-    const noteCaller = note.children[NOTE_CALLER_INDEX] as SerializedImmutableNoteCallerNode;
-    noteCaller.caller = "zz";
-    removeOnClick(serializedEditorState);
-    expect(serializedEditorState).toEqual(editorStateCallerUpdated);
-
-    reset(702);
-
-    // SUT
-    serializedEditorState = serializeEditorState(usjGen1v1);
-
-    noteCaller.caller = "a";
-    removeOnClick(serializedEditorState);
-    expect(serializedEditorState).toEqual(editorStateCallerUpdated);
-  });
-
   it("should convert from USJ to Lexical editor state JSON including the hidden caller", () => {
     const usjGen1v1Updated = usjGen1v1;
     const usjNote = (
