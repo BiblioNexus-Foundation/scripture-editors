@@ -9,6 +9,7 @@ import {
 } from "lexical";
 import { useEffect, useRef } from "react";
 import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
+import { CURSOR_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
 import {
   $findChapter,
   $findNextChapter,
@@ -16,9 +17,12 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
+import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import { $findThisVerse, $findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
-import { CURSOR_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
+import {
+  $findThisVerse,
+  $findVerseOrPara,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.
@@ -98,11 +102,12 @@ function $moveCursorToVerseStart(chapterNum: number, verseNum: number) {
   const nextChapterNode = $findNextChapter(nodesInChapter, !!chapterNode);
   if ((nextChapterNode && !chapterNode) || !chapterNode) return;
 
-  removeNodeAndAfter(nodesInChapter, chapterNode, nextChapterNode);
-  const verseNode = $findVerse(nodesInChapter, verseNum);
-  if (!verseNode || verseNode.isSelected()) return;
+  removeNodeAndAfter(nodesInChapter, nextChapterNode);
+  const verseOrParaNode = $findVerseOrPara(nodesInChapter, verseNum);
+  if (!verseOrParaNode || verseOrParaNode.isSelected()) return;
 
-  verseNode.selectNext(0, 0);
+  if ($isParaNode(verseOrParaNode)) verseOrParaNode.select(0, 0);
+  else verseOrParaNode.selectNext(0, 0);
 }
 
 function $findAndSetChapterAndVerse(

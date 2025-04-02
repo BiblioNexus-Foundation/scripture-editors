@@ -139,18 +139,14 @@ export function $findThisChapter(node: LexicalNode | null | undefined) {
 /**
  * Remove the given node and all the nodes after.
  * @param nodes - Nodes to prune.
- * @param firstNode - First node in nodes.
  * @param pruneNode - Node to prune and all nodes after.
  */
-export function removeNodeAndAfter(
-  nodes: LexicalNode[],
-  firstNode: LexicalNode,
-  pruneNode: LexicalNode | undefined,
-) {
-  if (pruneNode) {
-    // prune node and after
-    nodes.length = pruneNode.getIndexWithinParent() - firstNode.getIndexWithinParent();
-  }
+export function removeNodeAndAfter(nodes: LexicalNode[], pruneNode: LexicalNode | undefined) {
+  if (!pruneNode) return;
+
+  const pruneNodeIndex = nodes.findIndex((node) => node === pruneNode);
+  // prune node and after
+  if (pruneNodeIndex) nodes.length = pruneNodeIndex;
 }
 
 /**
@@ -165,7 +161,8 @@ export function removeNodesBeforeNode(
 ): LexicalNode[] {
   if (!firstNode) return nodes;
 
-  return nodes.splice(firstNode.getIndexWithinParent(), nodes.length - 1);
+  const firstNodeIndex = firstNode.getIndexWithinParent();
+  return nodes.splice(firstNodeIndex + 1, nodes.length - firstNodeIndex - 1);
 }
 
 /**
@@ -346,6 +343,26 @@ export function getNextVerse(verseNum: number, verse: string | undefined): strin
 
   const nextSegmentChar = String.fromCharCode(verseSegment[2].charCodeAt(0) + 1);
   return `${verseSegment[1]}${nextSegmentChar}`;
+}
+
+/**
+ * Determines if the verse number is in the given verse range. Verse segments are accounted for.
+ * @param verseNum - The current verse number.
+ * @param verseRange - The verse range including segments.
+ * @returns `true` if the verse number is in the range, `false` otherwise.
+ * @example
+ *   verseRange "1-2" - verseNum 1 and 2 are `true`
+ *   verseRange "1a-2b" - verseNum 1 and 2 are `true`
+ *   verseRange "1-3" -  verseNum 1, 2, and 3 are `true`
+ */
+export function isVerseInRange(verseNum: number, verseRange: string): boolean {
+  const verseNumParts = verseRange.split("-").map((v) => parseInt(v));
+  if (verseNumParts.length < 1 || verseNumParts.length > 2)
+    throw new Error("isVerseInRange: invalid range");
+
+  return verseNumParts.length === 1
+    ? verseNum === verseNumParts[0]
+    : verseNum >= verseNumParts[0] && verseNum <= verseNumParts[1];
 }
 
 /**
