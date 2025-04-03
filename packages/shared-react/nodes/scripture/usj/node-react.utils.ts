@@ -5,8 +5,10 @@ import { GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
 import {
   $isNodeWithMarker,
   $isSomeChapterNode,
+  isVerseInRange,
   NodesWithMarker,
 } from "shared/nodes/scripture/usj/node.utils";
+import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { $isVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
 import { $isImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
@@ -85,6 +87,15 @@ export function $isSomeVerseNode(node: LexicalNode | null | undefined): node is 
 }
 
 /**
+ * Finds the first paragraph that is not a book or chapter node.
+ * @param nodes - Nodes to look in.
+ * @returns the first paragraph node.
+ */
+export function $getFirstPara(nodes: LexicalNode[]) {
+  return nodes.find((node) => $isParaNode(node));
+}
+
+/**
  * Find the given verse in the children of the node.
  * @param node - Node with potential verses in children.
  * @param verseNum - Verse number to look for.
@@ -95,7 +106,7 @@ export function $findVerseInNode(node: LexicalNode, verseNum: number) {
 
   const children = node.getChildren();
   const verseNode = children.find(
-    (node) => $isSomeVerseNode(node) && node.getNumber() === verseNum.toString(),
+    (node) => $isSomeVerseNode(node) && isVerseInRange(verseNum, node.getNumber()),
   );
   return verseNode as SomeVerseNode | undefined;
 }
@@ -104,15 +115,15 @@ export function $findVerseInNode(node: LexicalNode, verseNum: number) {
  * Finds the verse node with the given verse number amongst the children of nodes.
  * @param nodes - Nodes to look in.
  * @param verseNum - Verse number to look for.
- * @returns the verse node if found, `undefined` otherwise.
+ * @returns the verse node if found, or the first paragraph if verse 0, `undefined` otherwise.
  */
-export function $findVerse(nodes: LexicalNode[], verseNum: number) {
-  return (
-    nodes
-      .map((node) => $findVerseInNode(node, verseNum))
-      // remove any undefined results and take the first found
-      .filter((verseNode) => verseNode)[0]
-  );
+export function $findVerseOrPara(nodes: LexicalNode[], verseNum: number) {
+  return verseNum === 0
+    ? $getFirstPara(nodes)
+    : nodes
+        .map((node) => $findVerseInNode(node, verseNum))
+        // remove any undefined results and take the first found
+        .filter((verseNode) => verseNode)[0];
 }
 
 /**

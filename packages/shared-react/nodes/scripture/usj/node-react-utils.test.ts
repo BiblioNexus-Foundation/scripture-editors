@@ -1,5 +1,6 @@
-import { $createTextNode, $getNodeByKey, $getRoot } from "lexical";
+import { $createTextNode, $getNodeByKey, $getRoot, NodeKey } from "lexical";
 import { $createTypedMarkNode, TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { $createBookNode } from "shared/nodes/scripture/usj/BookNode";
 import {
   $createImmutableChapterNode,
   ImmutableChapterNode,
@@ -7,11 +8,141 @@ import {
 import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { $createVerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { createBasicTestEnvironment } from "shared/nodes/test.utils";
-import { $findLastVerse, $findThisVerse } from "./node-react.utils";
+import {
+  $findLastVerse,
+  $findThisVerse,
+  $findVerseOrPara,
+  $findVerseInNode,
+} from "./node-react.utils";
 import { $createImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
 
 describe("Editor Node Utilities", () => {
-  describe("findLastVerse()", () => {
+  describe("$findVerseInNode()", () => {
+    it("should find the given verse in the node", () => {
+      const { editor } = createBasicTestEnvironment();
+      editor.update(
+        () => {
+          const root = $getRoot();
+          const p1 = $createParaNode();
+          const v1 = $createVerseNode("1");
+          const v2 = $createVerseNode("2");
+          const t1 = $createTextNode("text1");
+          const t2 = $createTextNode("text2");
+          root.append(p1);
+          p1.append(v1, t1, v2, t2);
+        },
+        { discrete: true },
+      );
+
+      editor.getEditorState().read(() => {
+        const verseNode = $findVerseInNode($getRoot().getChildren()[0], 2);
+
+        expect(verseNode).toBeDefined();
+        expect(verseNode?.getNumber()).toEqual("2");
+      });
+    });
+
+    it("should find the first verse in the node when the verse is a range", () => {
+      const { editor } = createBasicTestEnvironment();
+      editor.update(
+        () => {
+          const root = $getRoot();
+          const p1 = $createParaNode();
+          const v1 = $createVerseNode("1");
+          const v2 = $createVerseNode("2-3");
+          const t1 = $createTextNode("text1");
+          const t2 = $createTextNode("text2");
+          root.append(p1);
+          p1.append(v1, t1, v2, t2);
+        },
+        { discrete: true },
+      );
+
+      editor.getEditorState().read(() => {
+        const verseNode = $findVerseInNode($getRoot().getChildren()[0], 2);
+
+        expect(verseNode).toBeDefined();
+        expect(verseNode?.getNumber()).toEqual("2-3");
+      });
+    });
+
+    it("should find the last verse in the node when the verse is a range", () => {
+      const { editor } = createBasicTestEnvironment();
+      editor.update(
+        () => {
+          const root = $getRoot();
+          const p1 = $createParaNode();
+          const v1 = $createVerseNode("1");
+          const v2 = $createVerseNode("2-3");
+          const t1 = $createTextNode("text1");
+          const t2 = $createTextNode("text2");
+          root.append(p1);
+          p1.append(v1, t1, v2, t2);
+        },
+        { discrete: true },
+      );
+
+      editor.getEditorState().read(() => {
+        const verseNode = $findVerseInNode($getRoot().getChildren()[0], 3);
+
+        expect(verseNode).toBeDefined();
+        expect(verseNode?.getNumber()).toEqual("2-3");
+      });
+    });
+
+    it("should find the first verse in the node when the verse is a range with segments", () => {
+      const { editor } = createBasicTestEnvironment();
+      editor.update(
+        () => {
+          const root = $getRoot();
+          const p1 = $createParaNode();
+          const v1 = $createVerseNode("1");
+          const v2 = $createVerseNode("2a-3b");
+          const t1 = $createTextNode("text1");
+          const t2 = $createTextNode("text2");
+          root.append(p1);
+          p1.append(v1, t1, v2, t2);
+        },
+        { discrete: true },
+      );
+
+      editor.getEditorState().read(() => {
+        const verseNode = $findVerseInNode($getRoot().getChildren()[0], 2);
+
+        expect(verseNode).toBeDefined();
+        expect(verseNode?.getNumber()).toEqual("2a-3b");
+      });
+    });
+  });
+
+  describe("$findVerseOrPara()", () => {
+    let s1NodeKey: NodeKey;
+
+    it("should find the given verse in the nodes before the first verse", () => {
+      const { editor } = createBasicTestEnvironment();
+      editor.update(
+        () => {
+          const root = $getRoot();
+          const id = $createBookNode("GEN");
+          const s1 = $createParaNode("s1");
+          const h1 = $createParaNode("h");
+          const p1 = $createParaNode();
+          root.append(id, s1, h1, p1);
+          s1NodeKey = s1.getKey();
+        },
+        { discrete: true },
+      );
+
+      editor.getEditorState().read(() => {
+        const sectionNode = $findVerseOrPara($getRoot().getChildren(), 0);
+
+        expect(sectionNode).toBeDefined();
+        expect(sectionNode?.getKey()).toBe(s1NodeKey);
+      });
+    });
+  });
+
+  describe("$findLastVerse()", () => {
     it("should find the last verse in node", () => {
       const { editor } = createBasicTestEnvironment();
       editor.update(
@@ -29,8 +160,7 @@ describe("Editor Node Utilities", () => {
       );
 
       editor.getEditorState().read(() => {
-        const root = $getRoot();
-        const verseNode = $findLastVerse(root.getChildren());
+        const verseNode = $findLastVerse($getRoot().getChildren());
 
         expect(verseNode).toBeDefined();
         expect(verseNode?.getNumber()).toEqual("2");
@@ -54,8 +184,7 @@ describe("Editor Node Utilities", () => {
       );
 
       editor.getEditorState().read(() => {
-        const root = $getRoot();
-        const verseNode = $findLastVerse(root.getChildren());
+        const verseNode = $findLastVerse($getRoot().getChildren());
 
         expect(verseNode).toBeDefined();
         expect(verseNode?.getNumber()).toEqual("2");
@@ -63,7 +192,7 @@ describe("Editor Node Utilities", () => {
     });
   });
 
-  describe("findThisVerse()", () => {
+  describe("$findThisVerse()", () => {
     it("should find the last verse in node", () => {
       let t2Key: string;
       const { editor } = createBasicTestEnvironment([ParaNode, ImmutableVerseNode]);

@@ -17,7 +17,11 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
-import { $findThisVerse, $findVerse } from "shared-react/nodes/scripture/usj/node-react.utils";
+import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import {
+  $findThisVerse,
+  $findVerseOrPara,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.
@@ -109,11 +113,12 @@ function $moveCursorToVerseStart(
   const nextChapterNode = $findNextChapter(nodesInChapter, !!chapterNode);
   if ((nextChapterNode && !chapterNode) || !chapterNode) return;
 
-  removeNodeAndAfter(nodesInChapter, chapterNode, nextChapterNode);
-  const verseNode = $findVerse(nodesInChapter, verseNum);
-  if (!verseNode || verseNode.isSelected()) return;
+  removeNodeAndAfter(nodesInChapter, nextChapterNode);
+  const verseOrParaNode = $findVerseOrPara(nodesInChapter, verseNum);
+  if (!verseOrParaNode || verseOrParaNode.isSelected()) return;
 
-  verseNode.selectNext(0, 0);
+  if ($isParaNode(verseOrParaNode)) verseOrParaNode.select(0, 0);
+  else verseOrParaNode.selectNext(0, 0);
   hasScrRefChangedRef.current = true;
 }
 
