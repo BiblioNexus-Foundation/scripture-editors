@@ -107,7 +107,6 @@ import {
   ImmutableNoteCallerNode,
   OnClick,
   SerializedImmutableNoteCallerNode,
-  defaultNoteCallers,
   immutableNoteCallerNodeName,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
@@ -115,7 +114,7 @@ import {
   IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { CallerData, generateNoteCaller } from "shared-react/nodes/scripture/usj/node-react.utils";
+import { CallerData } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
   MarkNodeName,
@@ -140,8 +139,6 @@ const callerData: CallerData = {
 
 /** Comment IDs in the USJ. */
 let commentIds: string[] = [];
-/** List of possible note callers. */
-let noteCallers: string[] = defaultNoteCallers;
 
 /** View options - view mode parameters. */
 let _viewOptions: ViewOptions | undefined;
@@ -213,15 +210,9 @@ export function serializeEditorState(
 function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
 
-  // Set list of possible note callers.
-  if (_nodeOptions && _nodeOptions[immutableNoteCallerNodeName]) {
-    const optionsNoteCallers = _nodeOptions[immutableNoteCallerNodeName].noteCallers;
-    if (optionsNoteCallers && optionsNoteCallers.length > 0) noteCallers = optionsNoteCallers;
-  }
-
   // Set the `addMissingComments` method.
   if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
-    addMissingComments = nodeOptions[MarkNodeName].addMissingComments as AddMissingComments;
+    addMissingComments = nodeOptions[MarkNodeName].addMissingComments;
   }
 }
 
@@ -428,8 +419,7 @@ function createNote(
   if (_viewOptions?.markerMode === "editable") {
     callerNode = createText(getEditableCallerText(caller));
   } else {
-    const noteCaller = generateNoteCaller(markerObject.caller, noteCallers, callerData, _logger);
-    callerNode = createNoteCaller(noteCaller, childNodes);
+    callerNode = createNoteCaller(caller, childNodes);
     childNodes.forEach((node) => {
       if (isSerializedCharNode(node)) {
         node.mode = "token";

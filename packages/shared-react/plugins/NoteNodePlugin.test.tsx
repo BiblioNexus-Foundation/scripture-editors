@@ -4,27 +4,16 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
-import {
-  $getRoot,
-  $createTextNode,
-  LexicalEditor,
-  $setSelection,
-  $createRangeSelection,
-  $createPoint,
-  TextNode,
-} from "lexical";
+import { $getRoot, $createTextNode, LexicalEditor, TextNode } from "lexical";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
-  $createNoteNode,
-  GENERATOR_NOTE_CALLER,
-  NoteNode,
-} from "shared/nodes/scripture/usj/NoteNode";
+import { $createNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import {
   $createImmutableNoteCallerNode,
   defaultNoteCallers,
+  GENERATOR_NOTE_CALLER,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
 } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -39,7 +28,6 @@ let firstVerseTextNode: TextNode;
 let firstNoteNode: NoteNode;
 let secondNoteNode: NoteNode;
 let thirdNoteNode: NoteNode;
-let insertedNoteNode: NoteNode | undefined;
 
 describe("NoteNodePlugin", () => {
   it("should load default initialEditorState (sanity check)", async () => {
@@ -52,116 +40,6 @@ describe("NoteNodePlugin", () => {
       expect(getNoteCaller(firstNoteNode)).toBe("a");
       expect(getNoteCaller(secondNoteNode)).toBe("b");
       expect(getNoteCaller(thirdNoteNode)).toBe("c");
-    });
-  });
-
-  describe("Note Caller Renumbering", () => {
-    it("should insert footnote after the first footnote and renumber", async () => {
-      const { editor } = await testEnvironment();
-      const $createNoteNodeToInsert = () =>
-        $createFootnoteNode(GENERATOR_NOTE_CALLER, "1:1 ", "Inserted footnote text ");
-
-      insertedNoteNode = await insertNoteNodeAtSelection(
-        editor,
-        $createNoteNodeToInsert,
-        firstVerseTextNode,
-      );
-
-      editor.getEditorState().read(() => {
-        expect(getNoteCaller(firstNoteNode)).toBe("a");
-        expect(getNoteCaller(insertedNoteNode)).toBe("b");
-        expect(getNoteCaller(secondNoteNode)).toBe("c");
-        expect(getNoteCaller(thirdNoteNode)).toBe("d");
-      });
-    });
-
-    it("should remove note and renumber", async () => {
-      const { editor } = await testEnvironment();
-
-      await removeNode(editor, firstNoteNode);
-
-      editor.getEditorState().read(() => {
-        expect(firstNoteNode.isAttached()).toBe(false);
-        expect(getNoteCaller(secondNoteNode)).toBe("a");
-        expect(getNoteCaller(thirdNoteNode)).toBe("b");
-      });
-    });
-
-    it("should insert footnote after the first footnote and renumber with caller subset", async () => {
-      const nodeOptions: UsjNodeOptions = {
-        [immutableNoteCallerNodeName]: { noteCallers: ["a", "b", "c"] },
-      };
-      const { editor } = await testEnvironment(nodeOptions);
-      const $createNoteNodeToInsert = () =>
-        $createFootnoteNode(GENERATOR_NOTE_CALLER, "1:1 ", "Inserted footnote text ");
-
-      insertedNoteNode = await insertNoteNodeAtSelection(
-        editor,
-        $createNoteNodeToInsert,
-        firstVerseTextNode,
-      );
-
-      editor.getEditorState().read(() => {
-        expect(getNoteCaller(firstNoteNode)).toBe("a");
-        expect(getNoteCaller(insertedNoteNode)).toBe("b");
-        expect(getNoteCaller(secondNoteNode)).toBe("c");
-        expect(getNoteCaller(thirdNoteNode)).toBe("aa");
-      });
-    });
-  });
-
-  describe("Note Caller Renumbering Across Chapters", () => {
-    let ch2FirstNoteNode: NoteNode;
-    let ch2SecondNoteNode: NoteNode;
-
-    function $initialEditorState() {
-      $defaultInitialEditorState();
-      const ch2FirstVerseNode = $createImmutableVerseNode("1");
-      ch2FirstNoteNode = $createFootnoteNode("d", "1:1 ", "First footnote text ");
-      const ch2FirstVerseTextNode = $createTextNode("first verse text ");
-      const ch2SecondVerseNode = $createImmutableVerseNode("2");
-      ch2SecondNoteNode = $createFootnoteNode("e", "1:2 ", "Second footnote text ");
-      const ch2SecondVerseTextNode = $createTextNode("second verse text ");
-      $getRoot().append(
-        $createImmutableChapterNode("2"),
-        $createParaNode().append(ch2FirstVerseNode, ch2FirstNoteNode, ch2FirstVerseTextNode),
-        $createParaNode().append(ch2SecondVerseNode, ch2SecondNoteNode, ch2SecondVerseTextNode),
-      );
-    }
-
-    it("should insert footnote after the first footnote and renumber", async () => {
-      const { editor } = await testEnvironment(undefined, $initialEditorState);
-      editor.getEditorState().read(() => {
-        expect(getNoteCaller(ch2FirstNoteNode)).toBe("d");
-        expect(getNoteCaller(ch2SecondNoteNode)).toBe("e");
-      });
-      const $createFootnoteNodeToInsert = () =>
-        $createFootnoteNode(GENERATOR_NOTE_CALLER, "1:1 ", "Inserted footnote text ");
-
-      insertedNoteNode = await insertNoteNodeAtSelection(
-        editor,
-        $createFootnoteNodeToInsert,
-        firstVerseTextNode,
-      );
-
-      editor.getEditorState().read(() => {
-        expect(getNoteCaller(ch2FirstNoteNode)).toBe("e");
-        expect(getNoteCaller(ch2SecondNoteNode)).toBe("f");
-      });
-    });
-
-    it("should remove note and renumber", async () => {
-      const { editor } = await testEnvironment(undefined, $initialEditorState);
-
-      await removeNode(editor, firstNoteNode);
-
-      editor.getEditorState().read(() => {
-        expect(firstNoteNode.isAttached()).toBe(false);
-        expect(getNoteCaller(secondNoteNode)).toBe("a");
-        expect(getNoteCaller(thirdNoteNode)).toBe("b");
-        expect(getNoteCaller(ch2FirstNoteNode)).toBe("c");
-        expect(getNoteCaller(ch2SecondNoteNode)).toBe("d");
-      });
     });
   });
 
@@ -255,60 +133,6 @@ async function testEnvironment(
   // `editor` is defined on React render.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return { editor: editor! };
-}
-
-/**
- * Insert a NoteNode at the selection range in the LexicalEditor.
- *
- * @param editor - The LexicalEditor instance where the selection will be set.
- * @param $createNoteNodeToInsert - A callback function to create the NoteNode to insert at the
- *   selection.
- * @param startNode - The starting TextNode of the selection.
- * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
- *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   end of the endNode's text content.
- * @returns The inserted NoteNode.
- */
-async function insertNoteNodeAtSelection(
-  editor: LexicalEditor,
-  $createNoteNodeToInsert: () => NoteNode,
-  startNode: TextNode,
-  startOffset?: number,
-  endNode?: TextNode,
-  endOffset?: number,
-) {
-  let insertedNoteNode: NoteNode | undefined;
-  await act(async () => {
-    editor.update(() => {
-      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-      if (!endNode) endNode = startNode;
-      const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
-      $setSelection(rangeSelection);
-      insertedNoteNode = $createNoteNodeToInsert();
-      rangeSelection.insertNodes([insertedNoteNode]);
-    });
-  });
-  return insertedNoteNode;
-}
-
-/**
- * Removes a specified NoteNode from the LexicalEditor.
- *
- * @param editor - The LexicalEditor instance from which the node will be removed.
- * @param nodeToRemove - The NoteNode instance that needs to be removed.
- * @returns A promise that resolves once the node has been removed.
- */
-async function removeNode(editor: LexicalEditor, nodeToRemove: NoteNode) {
-  await act(async () => {
-    editor.update(() => {
-      nodeToRemove.remove();
-    });
-  });
 }
 
 /**

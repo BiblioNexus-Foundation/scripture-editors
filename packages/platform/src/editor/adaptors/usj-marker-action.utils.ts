@@ -15,12 +15,13 @@ import {
 import { $createNodeFromSerializedNode } from "shared/converters/usfm/emptyUsfmNodes";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { CharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isNoteNode, GENERATOR_NOTE_CALLER } from "shared/nodes/scripture/usj/NoteNode";
+import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { getNextVerse } from "shared/nodes/scripture/usj/node.utils";
 import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
+import { GENERATOR_NOTE_CALLER } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import {
   $isSomeVerseNode,
   $removeLeadingSpace,
