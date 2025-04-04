@@ -141,13 +141,12 @@ function generateNoteCallersOnDestroy(
     const editorElement = document.querySelector<HTMLElement>(".editor-input");
     if (!nodeWasGenerated || !editorElement) continue;
 
-    const originalDisplay = editorElement.style.display;
-    editorElement.style.display = "none";
+    editorElement.classList.add("reset-counters");
 
     // Force a reflow to ensure the counter reset is applied
     void editorElement.offsetHeight;
 
-    editorElement.style.display = originalDisplay;
+    editorElement.classList.remove("reset-counters");
   }
 }
 
