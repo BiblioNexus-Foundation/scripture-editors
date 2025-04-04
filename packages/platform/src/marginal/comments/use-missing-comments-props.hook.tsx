@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { typedMarkNodeName } from "shared/nodes/features/TypedMarkNode";
 import { CommentStore, Comments } from "./commenting";
 import { EditorProps } from "../../editor/Editor";
 
@@ -56,8 +56,9 @@ export default function useMissingCommentsProps<TLogger extends LoggerBasic>(
   useEffect(() => {
     if (!editorProps.options) editorProps.options = {};
     if (!editorProps.options.nodes) editorProps.options.nodes = {};
-    if (!editorProps.options.nodes[MarkNodeName]) editorProps.options.nodes[MarkNodeName] = {};
-    editorProps.options.nodes[MarkNodeName].addMissingComments = (usjCommentIds: string[]) => {
+    if (!editorProps.options.nodes[typedMarkNodeName])
+      editorProps.options.nodes[typedMarkNodeName] = {};
+    editorProps.options.nodes[typedMarkNodeName].addMissingComments = (usjCommentIds: string[]) => {
       addMissingComments(usjCommentIds, commentStoreRef);
     };
   }, [commentStoreRef, editorProps]);

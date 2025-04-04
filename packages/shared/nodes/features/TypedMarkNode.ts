@@ -37,6 +37,8 @@ export type SerializedTypedMarkNode = Spread<
 
 /** Reserved type for CommentPlugin. */
 export const COMMENT_MARK_TYPE = "comment";
+export const typedMarkNodeName = "TypedMarkNode";
+
 const reservedTypes = [COMMENT_MARK_TYPE];
 const TYPED_MARK_VERSION = 1;
 

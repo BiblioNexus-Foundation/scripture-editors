@@ -1,7 +1,6 @@
 import { NodeOptions } from "shared/adaptors/editor-adaptor.model";
+import { typedMarkNodeName } from "shared/nodes/features/TypedMarkNode";
 import { OnClick, immutableNoteCallerNodeName } from "./ImmutableNoteCallerNode";
-
-export const MarkNodeName = "MarkNode";
 
 export type AddMissingComments = (usjCommentIds: string[]) => void;
 
@@ -13,7 +12,7 @@ export interface UsjNodeOptions extends NodeOptions {
     /** Click handler method. */
     onClick?: OnClick;
   };
-  [MarkNodeName]?: {
+  [typedMarkNodeName]?: {
     /** Method to add missing comments. */
     addMissingComments?: AddMissingComments;
   };
