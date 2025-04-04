@@ -1,5 +1,6 @@
 import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedEditorState } from "lexical";
+import { typedMarkNodeName } from "shared/nodes/features/TypedMarkNode";
 import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import {
@@ -7,7 +8,6 @@ import {
   immutableNoteCallerNodeName,
   SerializedImmutableNoteCallerNode,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { MarkNodeName } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
@@ -121,7 +121,7 @@ describe("USJ Editor Adaptor", () => {
 
   it("should call `addMissingComments` if it's set", () => {
     const mockAddMissingComments = jest.fn();
-    const nodeOptions = { [MarkNodeName]: { addMissingComments: mockAddMissingComments } };
+    const nodeOptions = { [typedMarkNodeName]: { addMissingComments: mockAddMissingComments } };
     initialize(nodeOptions, console);
 
     const serializedEditorState = serializeEditorState(usjMarks);

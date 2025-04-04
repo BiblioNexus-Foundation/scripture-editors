@@ -27,6 +27,7 @@ import {
   COMMENT_MARK_TYPE,
   SerializedTypedMarkNode,
   TypedMarkNode,
+  typedMarkNodeName,
 } from "shared/nodes/features/TypedMarkNode";
 import {
   SerializedUnknownNode,
@@ -117,7 +118,6 @@ import {
 import { CallerData } from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
-  MarkNodeName,
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
@@ -211,8 +211,8 @@ function setNodeOptions(nodeOptions: UsjNodeOptions | undefined) {
   if (nodeOptions) _nodeOptions = nodeOptions;
 
   // Set the `addMissingComments` method.
-  if (nodeOptions?.[MarkNodeName]?.addMissingComments) {
-    addMissingComments = nodeOptions[MarkNodeName].addMissingComments;
+  if (nodeOptions?.[typedMarkNodeName]?.addMissingComments) {
+    addMissingComments = nodeOptions[typedMarkNodeName].addMissingComments;
   }
 }
 
