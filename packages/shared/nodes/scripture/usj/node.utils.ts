@@ -4,6 +4,7 @@ import { MARKER_OBJECT_PROPS, MarkerObject } from "@biblionexus-foundation/scrip
 import {
   $getCommonAncestor,
   $isElementNode,
+  BaseSelection,
   LexicalEditor,
   LexicalNode,
   SerializedLexicalNode,
@@ -319,6 +320,41 @@ export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is
 }
 
 /**
+ * Find a common ancestor of a and b and return the common ancestor,
+ * or undefined if there is no common ancestor between the two nodes.
+ *
+ * This function is compatible with the deprecated `LexicalNode.getCommonAncestor` function but
+ * uses the new (as of Lexical v0.26.0) NodeCaret APIs.
+ *
+ * @param a A LexicalNode
+ * @param b A LexicalNode
+ * @returns The common ancestor between the two nodes or undefined if they have no common ancestor
+ */
+export function $getCommonAncestorCompatible(
+  a: LexicalNode,
+  b: LexicalNode,
+): LexicalNode | undefined {
+  const a1 = $isElementNode(a) ? a : a.getParent();
+  const b1 = $isElementNode(b) ? b : b.getParent();
+  const result = a1 && b1 ? $getCommonAncestor(a1, b1) : undefined;
+  return result ? result.commonAncestor : undefined;
+}
+
+/**
+ * Get the start node of the selection.
+ * @param selection - The selection to get the start node from.
+ * @returns The start node of the selection or `undefined` if no selection is provided.
+ */
+export function getSelectionStartNode(selection: BaseSelection | null): LexicalNode | undefined {
+  if (!selection) return undefined;
+
+  const nodes = selection.getNodes();
+  if (nodes.length > 0) {
+    return selection.isBackward() ? nodes[1] : nodes[0];
+  }
+}
+
+/**
  * Get the next verse number or segment.
  *
  * A verse range increments the end of the range (even if the range includes segments), and a verse
@@ -355,33 +391,15 @@ export function getNextVerse(verseNum: number, verse: string | undefined): strin
  *   verseRange "1a-2b" - verseNum 1 and 2 are `true`
  *   verseRange "1-3" -  verseNum 1, 2, and 3 are `true`
  */
-export function isVerseInRange(verseNum: number, verseRange: string): boolean {
+export function isVerseInRange(verseNum: number, verseRange: string | undefined): boolean {
+  if (!verseRange) return false;
+
   const verseNumParts = verseRange.split("-").map((v) => parseInt(v));
   if (verseNumParts.length < 1 || verseNumParts.length > 2)
     throw new Error("isVerseInRange: invalid range");
 
-  return verseNumParts.length === 1
-    ? verseNum === verseNumParts[0]
-    : verseNum >= verseNumParts[0] && verseNum <= verseNumParts[1];
-}
-
-/**
- * Find a common ancestor of a and b and return the common ancestor,
- * or undefined if there is no common ancestor between the two nodes.
- *
- * This function is compatible with the deprecated `LexicalNode.getCommonAncestor` function but
- * uses the new (as of Lexical v0.26.0) NodeCaret APIs.
- *
- * @param a A LexicalNode
- * @param b A LexicalNode
- * @returns The common ancestor between the two nodes or undefined if they have no common ancestor
- */
-export function $getCommonAncestorCompatible(
-  a: LexicalNode,
-  b: LexicalNode,
-): LexicalNode | undefined {
-  const a1 = $isElementNode(a) ? a : a.getParent();
-  const b1 = $isElementNode(b) ? b : b.getParent();
-  const result = a1 && b1 ? $getCommonAncestor(a1, b1) : undefined;
-  return result ? result.commonAncestor : undefined;
+  if (verseNumParts.length === 1) return verseNum === verseNumParts[0];
+  if (verseNumParts.length === 2 && isNaN(verseNumParts[1])) return verseNum >= verseNumParts[0];
+  if (verseNumParts.length === 2 && isNaN(verseNumParts[0])) return verseNum <= verseNumParts[1];
+  return verseNum >= verseNumParts[0] && verseNum <= verseNumParts[1];
 }

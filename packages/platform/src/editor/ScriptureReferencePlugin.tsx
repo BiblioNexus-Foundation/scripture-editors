@@ -14,6 +14,8 @@ import {
   $findChapter,
   $findNextChapter,
   $findThisChapter,
+  getSelectionStartNode,
+  isVerseInRange,
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
@@ -40,7 +42,7 @@ export default function ScriptureReferencePlugin({
   /** Prevents the cursor being moved again after a selection has changed. */
   const hasSelectionChangedRef = useRef(false);
   /** Prevents the `scrRef` updating again after the cursor has moved. */
-  const hasScrRefChangedRef = useRef(false);
+  const hasCursorMovedRef = useRef(false);
   const { book, chapterNum, verseNum } = scrRef;
 
   // Book loaded or changed
@@ -54,7 +56,7 @@ export default function ScriptureReferencePlugin({
               for (const [nodeKey, mutation] of nodeMutations) {
                 const bookNode = $getNodeByKey<BookNode>(nodeKey);
                 if (bookNode && $isBookNode(bookNode) && mutation === "created") {
-                  $moveCursorToVerseStart(chapterNum, verseNum, hasScrRefChangedRef);
+                  $moveCursorToVerseStart(chapterNum, verseNum, hasCursorMovedRef);
                 }
               }
             },
@@ -70,7 +72,7 @@ export default function ScriptureReferencePlugin({
   useEffect(() => {
     if (hasSelectionChangedRef.current) hasSelectionChangedRef.current = false;
     else {
-      editor.update(() => $moveCursorToVerseStart(chapterNum, verseNum, hasScrRefChangedRef), {
+      editor.update(() => $moveCursorToVerseStart(chapterNum, verseNum, hasCursorMovedRef), {
         tag: CURSOR_CHANGE_TAG,
       });
     }
@@ -82,7 +84,7 @@ export default function ScriptureReferencePlugin({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          if (hasScrRefChangedRef.current) hasScrRefChangedRef.current = false;
+          if (hasCursorMovedRef.current) hasCursorMovedRef.current = false;
           else {
             $findAndSetChapterAndVerse(
               book,
@@ -105,8 +107,12 @@ export default function ScriptureReferencePlugin({
 function $moveCursorToVerseStart(
   chapterNum: number,
   verseNum: number,
-  hasScrRefChangedRef: React.MutableRefObject<boolean>,
+  hasCursorMovedRef: React.MutableRefObject<boolean>,
 ) {
+  const startNode = getSelectionStartNode($getSelection());
+  const selectedVerse = $findThisVerse(startNode)?.getNumber();
+  if (isVerseInRange(verseNum, selectedVerse)) return;
+
   const children = $getRoot().getChildren();
   const chapterNode = $findChapter(children, chapterNum);
   const nodesInChapter = removeNodesBeforeNode(children, chapterNode);
@@ -115,11 +121,11 @@ function $moveCursorToVerseStart(
 
   removeNodeAndAfter(nodesInChapter, nextChapterNode);
   const verseOrParaNode = $findVerseOrPara(nodesInChapter, verseNum);
-  if (!verseOrParaNode || verseOrParaNode.isSelected()) return;
+  if (!verseOrParaNode) return;
 
   if ($isParaNode(verseOrParaNode)) verseOrParaNode.select(0, 0);
   else verseOrParaNode.selectNext(0, 0);
-  hasScrRefChangedRef.current = true;
+  hasCursorMovedRef.current = true;
 }
 
 function $findAndSetChapterAndVerse(
@@ -129,7 +135,7 @@ function $findAndSetChapterAndVerse(
   onScrRefChange: (scrRef: SerializedVerseRef) => void,
   hasSelectionChangedRef: React.MutableRefObject<boolean>,
 ) {
-  const startNode = $getSelection()?.getNodes()[0];
+  const startNode = getSelectionStartNode($getSelection());
   if (!startNode) return;
 
   const chapterNode = $findThisChapter(startNode);
