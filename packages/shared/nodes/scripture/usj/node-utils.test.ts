@@ -290,6 +290,7 @@ describe("Editor Node Utilities", () => {
   describe("isVerseInRange()", () => {
     it("should be in range", () => {
       expect(isVerseInRange(1, "1")).toBe(true);
+      expect(isVerseInRange(1, "1a")).toBe(true);
 
       expect(isVerseInRange(1, "1-2")).toBe(true);
       expect(isVerseInRange(2, "1-2")).toBe(true);
@@ -329,8 +330,11 @@ describe("Editor Node Utilities", () => {
       expect(isVerseInRange(4, "-3")).toBe(false);
       expect(isVerseInRange(5, "-3")).toBe(false);
       expect(isVerseInRange(1, "-0")).toBe(false);
+    });
 
+    it("should throw", () => {
       expect(() => isVerseInRange(0, "1-2-3")).toThrow();
+      expect(() => isVerseInRange(0, "2-1")).toThrow();
     });
   });
 });

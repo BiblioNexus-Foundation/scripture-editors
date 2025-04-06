@@ -5,20 +5,13 @@ import {
   ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { createBasicTestEnvironment } from "shared/nodes/test.utils";
-import { getUsjMarkerAction } from "./usj-marker-action.utils";
 import {
-  $createPoint,
-  $createRangeSelection,
-  $createTextNode,
-  $getRoot,
-  $getSelection,
-  $isRangeSelection,
-  $isTextNode,
-  $setSelection,
-  LexicalEditor,
-  TextNode,
-} from "lexical";
+  $expectSelectionToBe,
+  createBasicTestEnvironment,
+  updateSelection,
+} from "shared/nodes/test.utils";
+import { getUsjMarkerAction } from "./usj-marker-action.utils";
+import { $createTextNode, $getRoot, $isTextNode, TextNode } from "lexical";
 import { $isCharNode } from "shared/nodes/scripture/usj/CharNode";
 import {
   $createImmutableChapterNode,
@@ -34,7 +27,7 @@ let secondVerseTextNode: TextNode;
 describe("USJ Marker Action Utils", () => {
   it("should load default initialEditorState and set selection (sanity check)", async () => {
     const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
-    setSelection(editor, secondVerseTextNode);
+    updateSelection(editor, secondVerseTextNode);
 
     editor.getEditorState().read(() => {
       const root = $getRoot();
@@ -47,7 +40,7 @@ describe("USJ Marker Action Utils", () => {
   it("should insert a chapter", () => {
     const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
     const markerAction = getUsjMarkerAction("c", undefined, undefined, { discrete: true });
-    setSelection(editor, secondVerseTextNode);
+    updateSelection(editor, secondVerseTextNode);
 
     markerAction.action({ editor, reference });
 
@@ -64,7 +57,7 @@ describe("USJ Marker Action Utils", () => {
     it("with no leading space", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("v", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 7);
+      updateSelection(editor, secondVerseTextNode, 7);
 
       markerAction.action({ editor, reference });
 
@@ -85,7 +78,7 @@ describe("USJ Marker Action Utils", () => {
     it("but move leading space to previous node", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("v", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 6);
+      updateSelection(editor, secondVerseTextNode, 6);
 
       markerAction.action({ editor, reference });
 
@@ -108,7 +101,7 @@ describe("USJ Marker Action Utils", () => {
     it("with no leading space", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 7);
+      updateSelection(editor, secondVerseTextNode, 7);
 
       markerAction.action({ editor, reference });
 
@@ -128,7 +121,7 @@ describe("USJ Marker Action Utils", () => {
     it("with leading space", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 6);
+      updateSelection(editor, secondVerseTextNode, 6);
 
       markerAction.action({ editor, reference });
 
@@ -148,7 +141,7 @@ describe("USJ Marker Action Utils", () => {
     it("at end of para", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode);
+      updateSelection(editor, secondVerseTextNode);
 
       markerAction.action({ editor, reference });
 
@@ -167,7 +160,7 @@ describe("USJ Marker Action Utils", () => {
     it("with no leading space", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 7, secondVerseTextNode, 12);
+      updateSelection(editor, secondVerseTextNode, 7, secondVerseTextNode, 12);
 
       markerAction.action({ editor, reference });
 
@@ -187,7 +180,7 @@ describe("USJ Marker Action Utils", () => {
     it("but move leading space to previous node", () => {
       const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
       const markerAction = getUsjMarkerAction("wj", undefined, undefined, { discrete: true });
-      setSelection(editor, secondVerseTextNode, 6, secondVerseTextNode, 12);
+      updateSelection(editor, secondVerseTextNode, 6, secondVerseTextNode, 12);
 
       markerAction.action({ editor, reference });
 
@@ -217,74 +210,4 @@ function $defaultInitialEditorState() {
     $createParaNode().append(firstVerseNode, firstVerseTextNode),
     $createParaNode().append(secondVerseNode, secondVerseTextNode),
   );
-}
-
-/**
- * Sets the selection range in the LexicalEditor.
- *
- * @param editor - The LexicalEditor instance where the selection will be set.
- * @param $createNoteNodeToInsert - A callback function to create the NoteNode to insert at the
- *   selection.
- * @param startNode - The starting TextNode of the selection.
- * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
- *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   startOffset.
- */
-function setSelection(
-  editor: LexicalEditor,
-  startNode: TextNode,
-  startOffset?: number,
-  endNode?: TextNode,
-  endOffset?: number,
-) {
-  editor.update(
-    () => {
-      if (!startOffset) startOffset = startNode.getTextContentSize();
-      if (!endNode) endNode = startNode;
-      if (!endOffset) endOffset = startOffset;
-      const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
-      $setSelection(rangeSelection);
-    },
-    { discrete: true },
-  );
-}
-
-/**
- * Checks the selection range in the LexicalEditor is at the specified location.
- *
- * @param startNode - The starting TextNode of the expected selection.
- * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
- *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the expected selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   end of the endNode's text content.
- */
-function $expectSelectionToBe(
-  startNode: TextNode,
-  startOffset?: number,
-  endNode?: TextNode,
-  endOffset?: number,
-) {
-  if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-  if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-  if (!endNode) endNode = startNode;
-
-  const selection = $getSelection();
-  if (!$isRangeSelection(selection)) fail("Selection is not a range selection");
-  const selectionStart = selection.isBackward() ? selection.focus : selection.anchor;
-  const selectionEnd = selection.isBackward() ? selection.anchor : selection.focus;
-  expect(selectionStart).toEqual({
-    key: startNode.getKey(),
-    offset: startOffset,
-    type: "text",
-  });
-  expect(selectionEnd).toEqual({
-    key: endNode.getKey(),
-    offset: endOffset,
-    type: "text",
-  });
 }

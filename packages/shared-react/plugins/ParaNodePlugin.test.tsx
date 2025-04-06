@@ -4,22 +4,14 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
-import {
-  $getRoot,
-  $createTextNode,
-  LexicalEditor,
-  TextNode,
-  $createPoint,
-  $createRangeSelection,
-  $setSelection,
-  KEY_ENTER_COMMAND,
-} from "lexical";
+import { $getRoot, $createTextNode, LexicalEditor, TextNode } from "lexical";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import {
   $createImmutableChapterNode,
   $isImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { pressEnterAtSelection } from "shared/nodes/test.utils";
 import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
 import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
 import ParaNodePlugin from "./ParaNodePlugin";
@@ -129,36 +121,4 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
   // `editor` is defined on React render.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return { editor: editor! };
-}
-
-/**
- * Press the enter key at the selection range in the LexicalEditor.
- *
- * @param editor - The LexicalEditor instance where the selection will be set.
- * @param startNode - The starting TextNode of the selection.
- * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
- *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   end of the endNode's text content.
- */
-async function pressEnterAtSelection(
-  editor: LexicalEditor,
-  startNode: TextNode,
-  startOffset?: number,
-  endNode?: TextNode,
-  endOffset?: number,
-) {
-  await act(async () => {
-    editor.update(() => {
-      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-      if (!endNode) endNode = startNode;
-      const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
-      $setSelection(rangeSelection);
-    });
-    editor.dispatchCommand(KEY_ENTER_COMMAND, null);
-  });
 }

@@ -4,6 +4,7 @@ import {
   $getNodeByKey,
   $getRoot,
   $getSelection,
+  $isTextNode,
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
@@ -16,6 +17,7 @@ import {
   $findThisChapter,
   getSelectionStartNode,
   isVerseInRange,
+  isVerseRange,
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "shared/nodes/scripture/usj/node.utils";
@@ -111,7 +113,7 @@ function $moveCursorToVerseStart(
 ) {
   const startNode = getSelectionStartNode($getSelection());
   const selectedVerse = $findThisVerse(startNode)?.getNumber();
-  if (isVerseInRange(verseNum, selectedVerse)) return;
+  if (isVerseRange(selectedVerse) && isVerseInRange(verseNum, selectedVerse)) return;
 
   const children = $getRoot().getChildren();
   const chapterNode = $findChapter(children, chapterNum);
@@ -123,8 +125,11 @@ function $moveCursorToVerseStart(
   const verseOrParaNode = $findVerseOrPara(nodesInChapter, verseNum);
   if (!verseOrParaNode) return;
 
-  if ($isParaNode(verseOrParaNode)) verseOrParaNode.select(0, 0);
-  else verseOrParaNode.selectNext(0, 0);
+  if ($isParaNode(verseOrParaNode)) {
+    const firstChild = verseOrParaNode.getFirstChild();
+    if ($isTextNode(firstChild)) firstChild.select(0, 0);
+    else verseOrParaNode.select(0, 0);
+  } else verseOrParaNode.selectNext(0, 0);
   hasCursorMovedRef.current = true;
 }
 

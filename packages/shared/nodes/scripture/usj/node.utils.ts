@@ -346,11 +346,11 @@ export function $getCommonAncestorCompatible(
  * @returns The start node of the selection or `undefined` if no selection is provided.
  */
 export function getSelectionStartNode(selection: BaseSelection | null): LexicalNode | undefined {
-  if (!selection) return undefined;
+  if (!selection) return;
 
   const nodes = selection.getNodes();
   if (nodes.length > 0) {
-    return selection.isBackward() ? nodes[1] : nodes[0];
+    return selection.isBackward() ? nodes[nodes.length - 1] : nodes[0];
   }
 }
 
@@ -395,11 +395,20 @@ export function isVerseInRange(verseNum: number, verseRange: string | undefined)
   if (!verseRange) return false;
 
   const verseNumParts = verseRange.split("-").map((v) => parseInt(v));
-  if (verseNumParts.length < 1 || verseNumParts.length > 2)
+  if (verseNumParts.length < 1 || verseNumParts.length > 2 || verseNumParts[0] > verseNumParts[1])
     throw new Error("isVerseInRange: invalid range");
 
   if (verseNumParts.length === 1) return verseNum === verseNumParts[0];
   if (verseNumParts.length === 2 && isNaN(verseNumParts[1])) return verseNum >= verseNumParts[0];
   if (verseNumParts.length === 2 && isNaN(verseNumParts[0])) return verseNum <= verseNumParts[1];
   return verseNum >= verseNumParts[0] && verseNum <= verseNumParts[1];
+}
+
+/**
+ * Checks if the given verse range is a range (i.e. contains a dash).
+ * @param verseRange - The verse range to check.
+ * @returns `true` if the verse range is a range, `false` otherwise.
+ */
+export function isVerseRange(verseRange: string | undefined): boolean {
+  return !!verseRange && verseRange.includes("-");
 }
