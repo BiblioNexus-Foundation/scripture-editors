@@ -289,6 +289,8 @@ describe("Editor Node Utilities", () => {
 
   describe("isVerseInRange()", () => {
     it("should be in range", () => {
+      expect(isVerseInRange(1, "1")).toBe(true);
+
       expect(isVerseInRange(1, "1-2")).toBe(true);
       expect(isVerseInRange(2, "1-2")).toBe(true);
 
@@ -298,9 +300,19 @@ describe("Editor Node Utilities", () => {
       expect(isVerseInRange(2, "2-4")).toBe(true);
       expect(isVerseInRange(3, "2-4")).toBe(true);
       expect(isVerseInRange(4, "2-4")).toBe(true);
+
+      expect(isVerseInRange(1, "1-")).toBe(true);
+      expect(isVerseInRange(3, "1-")).toBe(true);
+
+      expect(isVerseInRange(3, "-3")).toBe(true);
+      expect(isVerseInRange(1, "-3")).toBe(true);
+      expect(isVerseInRange(0, "-0")).toBe(true);
     });
 
     it("should not be in range", () => {
+      expect(isVerseInRange(0, "1")).toBe(false);
+      expect(isVerseInRange(2, "1")).toBe(false);
+
       expect(isVerseInRange(0, "1-2")).toBe(false);
       expect(isVerseInRange(3, "1-2")).toBe(false);
 
@@ -309,6 +321,16 @@ describe("Editor Node Utilities", () => {
 
       expect(isVerseInRange(1, "2-4")).toBe(false);
       expect(isVerseInRange(5, "2-4")).toBe(false);
+
+      expect(isVerseInRange(0, "3-")).toBe(false);
+      expect(isVerseInRange(1, "3-")).toBe(false);
+      expect(isVerseInRange(2, "3-")).toBe(false);
+
+      expect(isVerseInRange(4, "-3")).toBe(false);
+      expect(isVerseInRange(5, "-3")).toBe(false);
+      expect(isVerseInRange(1, "-0")).toBe(false);
+
+      expect(() => isVerseInRange(0, "1-2-3")).toThrow();
     });
   });
 });
