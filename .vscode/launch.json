@@ -2,6 +2,51 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Jest Tests - perf-react",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": ["nx", "test", "perf-react", "--runInBand", "--watch=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Jest Tests - platform",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": ["nx", "test", "platform", "--runInBand", "--watch=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Jest Tests - shared",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": ["nx", "test", "shared", "--runInBand", "--watch=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Jest Tests - shared-react",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": ["nx", "test", "shared-react", "--runInBand", "--watch=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Jest Tests - utilities",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": ["nx", "test", "utilities", "--runInBand", "--watch=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
       "name": "Chrome: Launch vite for debugging",
       "type": "chrome",
       "request": "launch",
