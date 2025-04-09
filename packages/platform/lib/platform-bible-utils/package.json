@@ -53,7 +53,7 @@
     "jsonpath-plus": "^10.3.0"
   },
   "devDependencies": {
-    "@biblionexus-foundation/scripture-utilities": "^0.0.7",
+    "@biblionexus-foundation/scripture-utilities": "^0.0.8",
     "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
@@ -68,7 +68,7 @@
     "tslib": "^2.8.1",
     "typedoc": "^0.27.9",
     "typescript": "^5.4.5",
-    "vite": "^5.4.14",
+    "vite": "^6.2.5",
     "vitest": "^3.0.7"
   },
   "volta": {

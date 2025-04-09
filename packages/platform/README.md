@@ -54,7 +54,7 @@ const usx = `
 </usx>
 `;
 const defaultUsj = usxStringToUsj(emptyUsx);
-const defaultScrRef = { /* PSA */ bookNum: 19, chapterNum: 1, verseNum: 1 };
+const defaultScrRef = { book: "PSA", chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = { [immutableNoteCallerNodeName]: { onClick: () => console.log('Note was clicked!') } };
 const options: EditorOptions = { isReadonly: false, textDirection: "ltr", nodes: nodeOptions };
 // Word "man" inside first q1 of PSA 1:1.
@@ -98,7 +98,7 @@ export default function App() {
   return (
     <>
       <div className="controls">
-        <BookChapterControl handleSubmit={setScrRef} scrRef={scrRef} />
+        <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
       </div>
       <Marginal
         ref={marginalRef}

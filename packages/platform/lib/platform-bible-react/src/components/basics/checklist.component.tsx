@@ -1,5 +1,6 @@
-import Checkbox from "@/components/shadcn-ui/checkbox";
-import { Label } from "@/components/shadcn-ui/label";
+import { Checkbox } from "@/components/shadcn-ui/checkbox";
+import { ReactNode } from "react";
+import SmartLabel from "./smart-label.component";
 
 export type ChecklistProps = {
   /** Optional string representing the id attribute of the Checklist */
@@ -25,16 +26,27 @@ export type ChecklistProps = {
    * @returns A string representing the label text for the checkbox associated with that item
    */
   createLabel?: (item: string) => string;
+
+  /**
+   * Optional function creates a label for a provided checkable item
+   *
+   * @param item The item for which a label is to be created, including text and any additional
+   *   elements (e.g. links)
+   * @returns A react node representing the label text and any additional elements (e.g. links) for
+   *   the checkbox associated with that item
+   */
+  createComplexLabel?: (item: string) => ReactNode;
 };
 
 /** Renders a list of checkboxes. Each checkbox corresponds to an item from the `listItems` array. */
-export default function Checklist({
+export function Checklist({
   id,
   className,
   listItems,
   selectedListItems,
   handleSelectListItem,
   createLabel,
+  createComplexLabel,
 }: ChecklistProps) {
   return (
     <div id={id} className={className}>
@@ -45,9 +57,15 @@ export default function Checklist({
             checked={selectedListItems.includes(item)}
             onCheckedChange={(value: boolean) => handleSelectListItem(item, value)}
           />
-          <Label>{createLabel ? createLabel(item) : item}</Label>
+          <SmartLabel
+            item={item}
+            createLabel={createLabel}
+            createComplexLabel={createComplexLabel}
+          />
         </div>
       ))}
     </div>
   );
 }
+
+export default Checklist;

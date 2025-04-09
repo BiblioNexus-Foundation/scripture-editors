@@ -1,4 +1,4 @@
-import ComboBox, { ComboBoxOption } from "@/components/basics/combo-box.component";
+import { ComboBox, ComboBoxOption } from "@/components/basics/combo-box.component";
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
 } from "@/components/shadcn-ui/sidebar";
 import { cn } from "@/utils/shadcn-ui.util";
+import { ScrollText } from "lucide-react";
 import { useCallback } from "react";
 
 export type SelectedSettingsSidebarItem = {
@@ -24,7 +25,7 @@ export type SettingsSidebarProps = {
   id?: string;
 
   /** Extension labels from contribution */
-  extensionLabels: string[];
+  extensionLabels: Record<string, string>;
 
   /** Project names and ids */
   projectInfo: ProjectInfo[];
@@ -43,9 +44,12 @@ export type SettingsSidebarProps = {
 
   /** Placeholder text for the button */
   buttonPlaceholderText: string;
+
+  /** Additional css classes to help with unique styling of the sidebar */
+  className?: string;
 };
 
-export default function SettingsSidebar({
+export function SettingsSidebar({
   id,
   extensionLabels,
   projectInfo,
@@ -54,6 +58,7 @@ export default function SettingsSidebar({
   extensionsSidebarGroupLabel,
   projectsSidebarGroupLabel,
   buttonPlaceholderText,
+  className,
 }: SettingsSidebarProps) {
   const handleSelectItem = useCallback(
     (item: string, projectId?: string) => {
@@ -80,24 +85,20 @@ export default function SettingsSidebar({
       id={id}
       collapsible="none"
       variant="inset"
-      className="tw-w-96 tw-gap-2 tw-overflow-y-auto tw-rounded tw-bg-slate-100"
+      className={cn("tw-w-96 tw-gap-2 tw-overflow-y-auto", className)}
     >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="tw-text-sm tw-text-gray-400">
+          <SidebarGroupLabel className="tw-text-sm">
             {extensionsSidebarGroupLabel}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {extensionLabels.map((label) => (
-                <SidebarMenuItem key={label}>
+              {Object.entries(extensionLabels).map(([key, label]) => (
+                <SidebarMenuItem key={key}>
                   <SidebarMenuButton
-                    className={cn(
-                      "tw-rounded tw-py-2 tw-text-sm tw-text-gray-500 hover:tw-bg-white hover:tw-text-gray-900 hover:tw-shadow-sm active:tw-bg-white",
-                      { "tw-bg-white tw-text-gray-900 tw-shadow-sm": getIsActive(label) },
-                    )}
-                    onClick={() => handleSelectItem(label)}
-                    isActive={getIsActive(label)}
+                    onClick={() => handleSelectItem(key)}
+                    isActive={getIsActive(key)}
                   >
                     <span className="tw-pl-3">{label}</span>
                   </SidebarMenuButton>
@@ -107,11 +108,14 @@ export default function SettingsSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel className="tw-text-sm tw-text-gray-400">
-            {projectsSidebarGroupLabel}
-          </SidebarGroupLabel>
+          <SidebarGroupLabel className="tw-text-sm">{projectsSidebarGroupLabel}</SidebarGroupLabel>
           <SidebarGroupContent className="tw-pl-3">
             <ComboBox
+              buttonVariant="ghost"
+              buttonClassName={cn("tw-w-full", {
+                "tw-bg-sidebar-accent tw-text-sidebar-accent-foreground":
+                  selectedSidebarItem?.projectId,
+              })}
               popoverContentClassName="tw-z-[1000]"
               options={projectInfo.flatMap((info) => info.projectId)}
               getOptionLabel={(projectId: ComboBoxOption) => {
@@ -125,6 +129,7 @@ export default function SettingsSidebar({
                 handleSelectItem(selectedProjectName, projectId);
               }}
               value={selectedSidebarItem?.projectId ?? undefined}
+              icon={<ScrollText />}
             />
           </SidebarGroupContent>
         </SidebarGroup>
@@ -132,3 +137,5 @@ export default function SettingsSidebar({
     </Sidebar>
   );
 }
+
+export default SettingsSidebar;

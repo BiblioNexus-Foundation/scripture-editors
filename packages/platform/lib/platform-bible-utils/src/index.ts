@@ -1,17 +1,19 @@
 // Classes
-export { default as AsyncVariable } from "./async-variable";
-export { default as Collator } from "./intl-collator";
-export { default as DateTimeFormat } from "./intl-date-time-format";
-export { default as DocumentCombiner } from "./document-combiner";
-export { default as Mutex } from "./mutex";
-export { default as MutexMap } from "./mutex-map";
-export { default as NonValidatingDocumentCombiner } from "./non-validating-document-combiner";
-export { default as NumberFormat } from "./intl-number-format";
-export { default as PlatformEventEmitter } from "./platform-event-emitter.model";
-export { default as PromiseChainingMap } from "./promise-chaining-map";
-export { default as UnsubscriberAsyncList } from "./unsubscriber-async-list";
+export { AsyncVariable } from "./async-variable";
+export { Collator } from "./intl-collator";
+export { DateTimeFormat } from "./intl-date-time-format";
+export { DocumentCombiner } from "./document-combiner";
+export { EventRollingTimeCounter } from "./event-rolling-time-counter";
+export { Mutex } from "./mutex";
+export { MutexMap } from "./mutex-map";
+export { NonValidatingDocumentCombiner } from "./non-validating-document-combiner";
+export { NumberFormat } from "./intl-number-format";
+export { PlatformEventEmitter } from "./platform-event-emitter.model";
+export { PromiseChainingMap } from "./promise-chaining-map";
+export { UnsubscriberAsyncList } from "./unsubscriber-async-list";
 
 // Consts
+export { PLATFORM_ERROR_VERSION } from "./platform-error";
 export {
   getChaptersForBook,
   offsetBook,
@@ -30,16 +32,18 @@ export { CHAPTER_TYPE, VERSE_TYPE } from "./usj-reader-writer.model";
 
 // Functions
 export {
-  newGuid,
-  isString,
-  deepClone,
+  createSyncProxyForAsyncObject,
   debounce,
-  groupBy,
+  deepClone,
+  getAllObjectFunctionNames,
   getErrorMessage,
+  groupBy,
+  isErrorMessageAboutParatextBlockingInternetAccess,
+  isErrorMessageAboutRegistryAuthFailure,
+  isString,
+  newGuid,
   wait,
   waitForDuration,
-  getAllObjectFunctionNames,
-  createSyncProxyForAsyncObject,
 } from "./util";
 export {
   areUsjContentsEqualExceptWhitespace,
@@ -47,6 +51,7 @@ export {
   formatScrRef,
   getLocalizedIdFromBookNumber,
   normalizeScriptureSpaces,
+  scrRefToBBBCCC,
   scrRefToBBBCCCVVV,
 } from "./scripture-util";
 export {
@@ -70,11 +75,13 @@ export {
   startsWith,
   substring,
   toArray,
+  toKebabCase,
   ordinalCompare,
   transformAndEnsureRegExpRegExpArray,
   transformAndEnsureRegExpArray,
   isWhiteSpace,
 } from "./string-util";
+export { newPlatformError, isPlatformError } from "./platform-error";
 export { default as deepEqual } from "./equality-checking";
 export { default as isSubset } from "./subset-checking";
 export { serialize, deserialize, isSerializable, htmlEncode } from "./serialization";
@@ -91,10 +98,10 @@ export type {
   CannotHaveOnDidDispose,
   CanHaveOnDidDispose,
 } from "./disposal.model";
+export type { PlatformError } from "./platform-error";
 export type { PlatformEventHandler, PlatformEvent, PlatformEventAsync } from "./platform-event";
 export type {
   BookInfo,
-  ScriptureReference,
   ScrollGroupId,
   ScriptureNode,
   ScriptureSelection,

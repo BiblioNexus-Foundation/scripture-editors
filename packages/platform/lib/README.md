@@ -4,6 +4,6 @@ The following packages have been copied for development use only. They are NOT i
 published with this package to npm.
 
 - `platform-bible-utils`
-  - 17 October 2024 taken from https://github.com/paranext/paranext-core/tree/16c5c86532fcf66a9517a40a1931f9c3876affe1/lib/platform-bible-utils
+  - 11 April 2025 taken from https://github.com/paranext/paranext-core/tree/e6576ed5848cd18380ac5bec4bffd063984f158c/lib/platform-bible-utils
 - `platform-bible-react`
-  - 17 October 2024 taken from https://github.com/paranext/paranext-core/tree/16c5c86532fcf66a9517a40a1931f9c3876affe1/lib/platform-bible-react
+  - 11 April 2025 taken from https://github.com/paranext/paranext-core/tree/e6576ed5848cd18380ac5bec4bffd063984f158c/lib/platform-bible-react

@@ -26,6 +26,10 @@ body {
   color: black;
 }
 
+.controls > .pr-twp.tw-flex {
+  background-color: transparent;
+}
+
 .controls button {
   cursor: pointer;
   border: 0;

@@ -1,9 +1,9 @@
-var au = Object.defineProperty;
-var su = (e, t, r) => t in e ? au(e, t, { enumerable: !0, configurable: !0, writable: !0, value: r }) : e[t] = r;
-var I = (e, t, r) => su(e, typeof t != "symbol" ? t + "" : t, r);
-import { Mutex as cu } from "async-mutex";
-import { JSONPath as dr } from "jsonpath-plus";
-class ja {
+var Jr = Object.defineProperty;
+var Xr = (t, e, n) => e in t ? Jr(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n;
+var W = (t, e, n) => Xr(t, typeof e != "symbol" ? e + "" : e, n);
+import { Mutex as Yr } from "async-mutex";
+import { JSONPath as Wt } from "jsonpath-plus";
+class Pu {
   /**
    * Creates an instance of the class
    *
@@ -12,16 +12,16 @@ class ja {
    *   settled (resolved or rejected); will reject if it has not settled by that time. Use -1 if you
    *   do not want a timeout at all. Defaults to 10000 ms
    */
-  constructor(t, r = 1e4) {
-    I(this, "variableName");
-    I(this, "promiseToValue");
-    I(this, "resolver");
-    I(this, "rejecter");
-    this.variableName = t, this.promiseToValue = new Promise((n, u) => {
-      this.resolver = n, this.rejecter = u;
-    }), r > 0 && setTimeout(() => {
+  constructor(e, n = 1e4) {
+    W(this, "variableName");
+    W(this, "promiseToValue");
+    W(this, "resolver");
+    W(this, "rejecter");
+    this.variableName = e, this.promiseToValue = new Promise((i, o) => {
+      this.resolver = i, this.rejecter = o;
+    }), n > 0 && setTimeout(() => {
       this.rejecter && (this.rejecter(`Timeout reached when waiting for ${this.variableName} to settle`), this.complete());
-    }, r), Object.seal(this);
+    }, n), Object.seal(this);
   }
   /**
    * Get this variable's promise to a value. This always returns the same promise even after the
@@ -47,11 +47,11 @@ class ja {
    * @param throwIfAlreadySettled Determines whether to throw if the variable was already resolved
    *   or rejected. Defaults to `false`
    */
-  resolveToValue(t, r = !1) {
+  resolveToValue(e, n = !1) {
     if (this.resolver)
-      console.debug(`${this.variableName} is being resolved now`), this.resolver(t), this.complete();
+      console.debug(`${this.variableName} is being resolved now`), this.resolver(e), this.complete();
     else {
-      if (r) throw Error(`${this.variableName} was already settled`);
+      if (n) throw Error(`${this.variableName} was already settled`);
       console.debug(`Ignoring subsequent resolution of ${this.variableName}`);
     }
   }
@@ -62,11 +62,11 @@ class ja {
    * @param throwIfAlreadySettled Determines whether to throw if the variable was already resolved
    *   or rejected. Defaults to `false`
    */
-  rejectWithReason(t, r = !1) {
+  rejectWithReason(e, n = !1) {
     if (this.rejecter)
-      console.debug(`${this.variableName} is being rejected now`), this.rejecter(t), this.complete();
+      console.debug(`${this.variableName} is being rejected now`), this.rejecter(e), this.complete();
     else {
-      if (r) throw Error(`${this.variableName} was already settled`);
+      if (n) throw Error(`${this.variableName} was already settled`);
       console.debug(`Ignoring subsequent rejection of ${this.variableName}`);
     }
   }
@@ -75,10 +75,10 @@ class ja {
     this.resolver = void 0, this.rejecter = void 0, Object.freeze(this);
   }
 }
-class Ua {
-  constructor(t, r) {
-    I(this, "collator");
-    this.collator = new Intl.Collator(t, r);
+class Lu {
+  constructor(e, n) {
+    W(this, "collator");
+    this.collator = new Intl.Collator(e, n);
   }
   /**
    * Compares two strings according to the sort order of this Collator object
@@ -89,8 +89,8 @@ class Ua {
    *   sort order of this Collator object. Negative value if string1 comes before string2. Positive
    *   value if string1 comes after string2. 0 if they are considered equal.
    */
-  compare(t, r) {
-    return this.collator.compare(t, r);
+  compare(e, n) {
+    return this.collator.compare(e, n);
   }
   /**
    * Returns a new object with properties reflecting the locale and collation options computed
@@ -102,10 +102,10 @@ class Ua {
     return this.collator.resolvedOptions();
   }
 }
-class lu {
-  constructor(t, r) {
-    I(this, "dateTimeFormatter");
-    this.dateTimeFormatter = new Intl.DateTimeFormat(t, r);
+class Wr {
+  constructor(e, n) {
+    W(this, "dateTimeFormatter");
+    this.dateTimeFormatter = new Intl.DateTimeFormat(e, n);
   }
   /**
    * Formats a date according to the locale and formatting option for this DateTimeFormat object
@@ -114,8 +114,8 @@ class lu {
    * @returns String representing the given date formatted according to the locale and formatting
    *   options of this DateTimeFormat object
    */
-  format(t) {
-    return this.dateTimeFormatter.format(t);
+  format(e) {
+    return this.dateTimeFormatter.format(e);
   }
   /**
    * Formats a date range in the most concise way based on the locales and options provided when
@@ -126,8 +126,8 @@ class lu {
    * @returns String representing the given date range formatted according to the locale and
    *   formatting options of this DateTimeFormat object
    */
-  formatRange(t, r) {
-    return this.dateTimeFormatter.formatRange(t, r);
+  formatRange(e, n) {
+    return this.dateTimeFormatter.formatRange(e, n);
   }
   /**
    * Returns an array of locale-specific tokens representing each part of the formatted date range
@@ -137,8 +137,8 @@ class lu {
    * @param endDate Date object representing the end of the date range
    * @returns Array of DateTimeRangeFormatPart objects
    */
-  formatRangeToParts(t, r) {
-    return this.dateTimeFormatter.formatRangeToParts(t, r);
+  formatRangeToParts(e, n) {
+    return this.dateTimeFormatter.formatRangeToParts(e, n);
   }
   /**
    * Allows locale-aware formatting of strings produced by this DateTimeFormat object
@@ -146,8 +146,8 @@ class lu {
    * @param date The date to format
    * @returns Array of DateTimeFormatPart objects
    */
-  formatToParts(t) {
-    return this.dateTimeFormatter.formatToParts(t);
+  formatToParts(e) {
+    return this.dateTimeFormatter.formatToParts(e);
   }
   /**
    * Returns a new object with properties reflecting the locale and date and time formatting options
@@ -159,7 +159,7 @@ class lu {
     return this.dateTimeFormatter.resolvedOptions();
   }
 }
-class fu {
+class Kr {
   constructor() {
     /**
      * Subscribes a function to run when this event is emitted.
@@ -169,22 +169,22 @@ class fu {
      *   emitted
      * @alias event
      */
-    I(this, "subscribe", this.event);
+    W(this, "subscribe", this.event);
     /** All callback functions that will run when this event is emitted. Lazy loaded */
-    I(this, "subscriptions");
+    W(this, "subscriptions");
     /** Event for listeners to subscribe to. Lazy loaded */
-    I(this, "lazyEvent");
+    W(this, "lazyEvent");
     /** Whether this emitter has been disposed */
-    I(this, "isDisposed", !1);
+    W(this, "isDisposed", !1);
     /** Disposes of this event, preparing it to release from memory */
-    I(this, "dispose", () => this.disposeFn());
+    W(this, "dispose", () => this.disposeFn());
     /**
      * Runs the subscriptions for the event
      *
      * @param event Event data to provide to subscribed callbacks
      */
-    I(this, "emit", (t) => {
-      this.emitFn(t);
+    W(this, "emit", (e) => {
+      this.emitFn(e);
     });
   }
   /**
@@ -196,13 +196,13 @@ class fu {
    *   emitted
    */
   get event() {
-    return this.assertNotDisposed(), this.lazyEvent || (this.lazyEvent = (t) => {
-      if (!t || typeof t != "function")
+    return this.assertNotDisposed(), this.lazyEvent || (this.lazyEvent = (e) => {
+      if (!e || typeof e != "function")
         throw new Error("Event handler callback must be a function!");
-      return this.subscriptions || (this.subscriptions = []), this.subscriptions.push(t), () => {
+      return this.subscriptions || (this.subscriptions = []), this.subscriptions.push(e), () => {
         if (!this.subscriptions) return !1;
-        const r = this.subscriptions.indexOf(t);
-        return r < 0 ? !1 : (this.subscriptions.splice(r, 1), !0);
+        const n = this.subscriptions.indexOf(e);
+        return n < 0 ? !1 : (this.subscriptions.splice(n, 1), !0);
       };
     }), this.lazyEvent;
   }
@@ -210,8 +210,8 @@ class fu {
    * Function that runs the subscriptions for the event. Added here so children can override emit
    * and still call the base functionality. See NetworkEventEmitter.emit for example
    */
-  emitFn(t) {
-    this.assertNotDisposed(), [...this.subscriptions ?? []].forEach((n) => n(t));
+  emitFn(e) {
+    this.assertNotDisposed(), [...this.subscriptions ?? []].forEach((i) => i(e));
   }
   /** Check to make sure this emitter is not disposed. Throw if it is */
   assertNotDisposed() {
@@ -225,105 +225,113 @@ class fu {
     return this.assertNotDisposed(), this.isDisposed = !0, this.subscriptions = void 0, this.lazyEvent = void 0, Promise.resolve(!0);
   }
 }
-function Va() {
+function Fu() {
   return "00-0-4-1-000".replace(
     /[^-]/g,
-    (e) => (
+    (t) => (
       // @ts-expect-error ts(2363) this works fine
       // eslint-disable-next-line no-bitwise
-      ((Math.random() + ~~e) * 65536 >> e).toString(16).padStart(4, "0")
+      ((Math.random() + ~~t) * 65536 >> t).toString(16).padStart(4, "0")
     )
   );
 }
-function ae(e) {
-  return typeof e == "string" || e instanceof String;
+function Be(t) {
+  return typeof t == "string" || t instanceof String;
 }
-function Ye(e) {
-  return JSON.parse(JSON.stringify(e));
+function wt(t) {
+  return JSON.parse(JSON.stringify(t));
 }
-function Ha(e, t = 300) {
-  if (ae(e)) throw new Error("Tried to debounce a string! Could be XSS");
-  let r;
-  return (...n) => {
-    clearTimeout(r), r = setTimeout(() => e(...n), t);
+function ku(t, e = 300) {
+  if (Be(t)) throw new Error("Tried to debounce a string! Could be XSS");
+  let n;
+  return (...i) => {
+    clearTimeout(n), n = setTimeout(() => t(...i), e);
   };
 }
-function Ga(e, t, r) {
-  const n = /* @__PURE__ */ new Map();
-  return e.forEach((u) => {
-    const i = t(u), a = n.get(i), o = r ? r(u, i) : u;
-    a ? a.push(o) : n.set(i, [o]);
-  }), n;
+function qu(t, e, n) {
+  const i = /* @__PURE__ */ new Map();
+  return t.forEach((o) => {
+    const a = e(o), h = i.get(a), p = n ? n(o, a) : o;
+    h ? h.push(p) : i.set(a, [p]);
+  }), i;
 }
-function pu(e) {
-  return typeof e == "object" && // We're potentially dealing with objects we didn't create, so they might contain `null`
+function Qr(t) {
+  return typeof t == "object" && // We're potentially dealing with objects we didn't create, so they might contain `null`
   // eslint-disable-next-line no-null/no-null
-  e !== null && "message" in e && // Type assert `error` to check it's `message`.
+  t !== null && "message" in t && // Type assert `error` to check it's `message`.
   // eslint-disable-next-line no-type-assertion/no-type-assertion
-  typeof e.message == "string";
+  typeof t.message == "string";
 }
-function hu(e) {
-  if (pu(e)) return e;
+function Zr(t) {
+  if (Qr(t)) return t;
   try {
-    return new Error(JSON.stringify(e));
+    return new Error(JSON.stringify(t));
   } catch {
-    return new Error(String(e));
+    return new Error(String(t));
   }
 }
-function za(e) {
-  return hu(e).message;
+function Or(t) {
+  return Zr(t).message;
 }
-function du(e) {
-  return new Promise((t) => setTimeout(t, e));
+function en(t) {
+  return new Promise((e) => setTimeout(e, t));
 }
-function Ja(e, t) {
-  const r = du(t).then(() => {
+function Uu(t, e) {
+  const n = en(e).then(() => {
   });
-  return Promise.any([r, e()]);
+  return Promise.any([n, t()]);
 }
-function Xa(e, t = "obj") {
-  const r = /* @__PURE__ */ new Set();
-  Object.getOwnPropertyNames(e).forEach((u) => {
+function ju(t, e = "obj") {
+  const n = /* @__PURE__ */ new Set();
+  Object.getOwnPropertyNames(t).forEach((o) => {
     try {
-      typeof e[u] == "function" && r.add(u);
+      typeof t[o] == "function" && n.add(o);
     } catch {
     }
   });
-  let n = Object.getPrototypeOf(e);
-  for (; n && Object.getPrototypeOf(n); )
-    Object.getOwnPropertyNames(n).forEach((u) => {
+  let i = Object.getPrototypeOf(t);
+  for (; i && Object.getPrototypeOf(i); )
+    Object.getOwnPropertyNames(i).forEach((o) => {
       try {
-        typeof e[u] == "function" && r.add(u);
+        typeof t[o] == "function" && n.add(o);
       } catch {
       }
-    }), n = Object.getPrototypeOf(n);
-  return r;
+    }), i = Object.getPrototypeOf(i);
+  return n;
 }
-function Ya(e, t = {}) {
-  return new Proxy(t, {
-    get(r, n) {
-      return n in r ? r[n] : async (...u) => (await e())[n](...u);
+function $u(t, e = {}) {
+  return new Proxy(e, {
+    get(n, i) {
+      return i in n ? n[i] : async (...o) => (await t())[i](...o);
     }
   });
 }
-class mu {
+function Vu(t) {
+  const e = "Bug in Paratext caused attempted access to Internet. Request has been blocked.";
+  return Be(t) ? t.includes(e) : Or(t).includes(e);
+}
+function Gu(t) {
+  const e = "401 Unauthorized error while getting shared projects.", n = "User registration is not valid. Cannot retrieve resources from DBL.", i = Be(t) ? t : Or(t);
+  return i.includes(e) || i.includes(n);
+}
+class tn {
   /**
    * Create a DocumentCombiner instance
    *
    * @param baseDocument This is the first document that will be used when composing the output
    * @param options Options used by this object when combining documents
    */
-  constructor(t, r) {
-    I(this, "baseDocument");
-    I(this, "contributions", /* @__PURE__ */ new Map());
-    I(this, "latestOutput");
-    I(this, "options");
-    I(this, "onDidRebuildEmitter", new fu());
+  constructor(e, n) {
+    W(this, "baseDocument");
+    W(this, "contributions", /* @__PURE__ */ new Map());
+    W(this, "latestOutput");
+    W(this, "options");
+    W(this, "onDidRebuildEmitter", new Kr());
     /** Event that emits to announce that the document has been rebuilt and the output has been updated */
     // Need `onDidRebuildEmitter` to be instantiated before this line
     // eslint-disable-next-line @typescript-eslint/member-ordering
-    I(this, "onDidRebuild", this.onDidRebuildEmitter.subscribe);
-    this.baseDocument = t, this.options = r, this.updateBaseDocument(t);
+    W(this, "onDidRebuild", this.onDidRebuildEmitter.subscribe);
+    this.baseDocument = e, this.options = n, this.updateBaseDocument(e);
   }
   /**
    * Update the starting document for composition process
@@ -331,8 +339,8 @@ class mu {
    * @param baseDocument Base JSON document/JS object that all other documents are added to
    * @returns Recalculated output document given the new starting state and existing other documents
    */
-  updateBaseDocument(t) {
-    return this.validateBaseDocument(t), this.baseDocument = this.options.copyDocuments ? Ye(t) : t, this.baseDocument = this.transformBaseDocumentAfterValidation(this.baseDocument), this.rebuild();
+  updateBaseDocument(e) {
+    return this.validateBaseDocument(e), this.baseDocument = this.options.copyDocuments ? wt(e) : e, this.baseDocument = this.transformBaseDocumentAfterValidation(this.baseDocument), this.rebuild();
   }
   /**
    * Add or update one of the contribution documents for the composition process
@@ -349,15 +357,15 @@ class mu {
    * @returns Recalculated output document given the new or updated contribution and existing other
    *   documents
    */
-  addOrUpdateContribution(t, r) {
-    this.validateContribution(t, r);
-    const n = this.contributions.get(t);
-    let u = this.options.copyDocuments && r ? Ye(r) : r;
-    u = this.transformContributionAfterValidation(t, u), this.contributions.set(t, u);
+  addOrUpdateContribution(e, n) {
+    this.validateContribution(e, n);
+    const i = this.contributions.get(e);
+    let o = this.options.copyDocuments && n ? wt(n) : n;
+    o = this.transformContributionAfterValidation(e, o), this.contributions.set(e, o);
     try {
       return this.rebuild();
-    } catch (i) {
-      throw n ? this.contributions.set(t, n) : this.contributions.delete(t), new Error(`Error when setting the document named ${t}: ${i}`);
+    } catch (a) {
+      throw i ? this.contributions.set(e, i) : this.contributions.delete(e), new Error(`Error when setting the document named ${e}: ${a}`);
     }
   }
   /**
@@ -366,14 +374,14 @@ class mu {
    * @param documentName Name of the contributed document to delete
    * @returns Recalculated output document given the remaining other documents
    */
-  deleteContribution(t) {
-    const r = this.contributions.get(t);
-    if (!r) throw new Error(`${t} does not exist`);
-    this.contributions.delete(t);
+  deleteContribution(e) {
+    const n = this.contributions.get(e);
+    if (!n) throw new Error(`${e} does not exist`);
+    this.contributions.delete(e);
     try {
       return this.rebuild();
-    } catch (n) {
-      throw this.contributions.set(t, r), new Error(`Error when deleting the document named ${t}: ${n}`);
+    } catch (i) {
+      throw this.contributions.set(e, n), new Error(`Error when deleting the document named ${e}: ${i}`);
     }
   }
   /**
@@ -384,14 +392,14 @@ class mu {
    */
   deleteAllContributions() {
     if (this.contributions.size <= 0) return this.latestOutput;
-    const t = [...this.contributions.entries()];
-    t.forEach(([r]) => this.contributions.delete(r));
+    const e = [...this.contributions.entries()];
+    e.forEach(([n]) => this.contributions.delete(n));
     try {
       return this.rebuild();
-    } catch (r) {
-      throw t.forEach(
-        ([n, u]) => this.contributions.set(n, u)
-      ), new Error(`Error when deleting all contributions: ${r}`);
+    } catch (n) {
+      throw e.forEach(
+        ([i, o]) => this.contributions.set(i, o)
+      ), new Error(`Error when deleting all contributions: ${n}`);
     }
   }
   /**
@@ -402,17 +410,17 @@ class mu {
    */
   rebuild() {
     if (this.contributions.size === 0) {
-      let r = Ye(this.baseDocument);
-      return r = this.transformFinalOutputBeforeValidation(r), this.validateOutput(r), this.latestOutput = r, this.onDidRebuildEmitter.emit(void 0), this.latestOutput;
+      let n = wt(this.baseDocument);
+      return n = this.transformFinalOutputBeforeValidation(n), this.validateOutput(n), this.latestOutput = n, this.onDidRebuildEmitter.emit(void 0), this.latestOutput;
     }
-    let t = this.baseDocument;
-    return this.contributions.forEach((r) => {
-      t = Eu(
-        t,
-        r,
+    let e = this.baseDocument;
+    return this.contributions.forEach((n) => {
+      e = rn(
+        e,
+        n,
         this.options.ignoreDuplicateProperties
-      ), this.validateOutput(t);
-    }), t = this.transformFinalOutputBeforeValidation(t), this.validateOutput(t), this.latestOutput = t, this.onDidRebuildEmitter.emit(void 0), this.latestOutput;
+      ), this.validateOutput(e);
+    }), e = this.transformFinalOutputBeforeValidation(e), this.validateOutput(e), this.latestOutput = e, this.onDidRebuildEmitter.emit(void 0), this.latestOutput;
   }
   /**
    * Transform the starting document that is given to the combiner. This transformation occurs after
@@ -427,8 +435,8 @@ class mu {
   // We just don't need `this` here. This is basically a no-op function that is available to child
   // classes to override
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
-  transformBaseDocumentAfterValidation(t) {
-    return t;
+  transformBaseDocumentAfterValidation(e) {
+    return e;
   }
   /**
    * Transform the contributed document associated with `documentName`. This transformation occurs
@@ -445,8 +453,8 @@ class mu {
   // We just don't need `this` here. This is basically a no-op function that is available to child
   // classes to override
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
-  transformContributionAfterValidation(t, r) {
-    return r;
+  transformContributionAfterValidation(e, n) {
+    return n;
   }
   /**
    * Throw an error if the provided document is not a valid starting document.
@@ -456,7 +464,7 @@ class mu {
   // no-op intended to be overridden by child classes. Can't be static
   // @ts-expect-error ts(6133) parameter doesn't need to be used but still needs the right name
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-  validateBaseDocument(t) {
+  validateBaseDocument(e) {
   }
   /**
    * Throw an error if the provided document is not a valid contribution document.
@@ -467,7 +475,7 @@ class mu {
   // no-op intended to be overridden by child classes. Can't be static
   // @ts-expect-error ts(6133) parameter doesn't need to be used but still needs the right name
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-  validateContribution(t, r) {
+  validateContribution(e, n) {
   }
   /**
    * Throw an error if the provided output is not valid.
@@ -477,7 +485,7 @@ class mu {
   // no-op intended to be overridden by child classes. Can't be static
   // @ts-expect-error ts(6133) parameter doesn't need to be used but still needs the right name
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, @typescript-eslint/no-unused-vars
-  validateOutput(t) {
+  validateOutput(e) {
   }
   /**
    * Transform the document that is the composition of the base document and all contribution
@@ -489,78 +497,119 @@ class mu {
    */
   // no-op intended to be overridden by child classes. Can't be static
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this
-  transformFinalOutputBeforeValidation(t) {
-    return t;
+  transformFinalOutputBeforeValidation(e) {
+    return e;
   }
 }
-function mr(...e) {
-  let t = !0;
-  return e.forEach((r) => {
-    (!r || typeof r != "object" || Array.isArray(r)) && (t = !1);
-  }), t;
+function Kt(...t) {
+  let e = !0;
+  return t.forEach((n) => {
+    (!n || typeof n != "object" || Array.isArray(n)) && (e = !1);
+  }), e;
 }
-function Er(...e) {
-  let t = !0;
-  return e.forEach((r) => {
-    (!r || typeof r != "object" || !Array.isArray(r)) && (t = !1);
-  }), t;
+function Qt(...t) {
+  let e = !0;
+  return t.forEach((n) => {
+    (!n || typeof n != "object" || !Array.isArray(n)) && (e = !1);
+  }), e;
 }
-function Eu(e, t, r) {
-  const n = Ye(e);
-  return t ? nn(n, Ye(t), r) : n;
+function rn(t, e, n) {
+  const i = wt(t);
+  return e ? Ir(i, wt(e), n) : i;
 }
-function nn(e, t, r) {
-  if (!t) return e;
-  if (mr(e, t)) {
-    const n = e, u = t;
-    Object.keys(u).forEach((i) => {
-      if (Object.hasOwn(n, i)) {
-        if (mr(n[i], u[i]))
-          n[i] = nn(
+function Ir(t, e, n) {
+  if (!e) return t;
+  if (Kt(t, e)) {
+    const i = t, o = e;
+    Object.keys(o).forEach((a) => {
+      if (Object.hasOwn(i, a)) {
+        if (Kt(i[a], o[a]))
+          i[a] = Ir(
             // We know these are objects from the `if` check
             /* eslint-disable no-type-assertion/no-type-assertion */
-            n[i],
-            u[i],
-            r
+            i[a],
+            o[a],
+            n
             /* eslint-enable no-type-assertion/no-type-assertion */
           );
-        else if (Er(n[i], u[i]))
-          n[i] = n[i].concat(
-            u[i]
+        else if (Qt(i[a], o[a]))
+          i[a] = i[a].concat(
+            o[a]
           );
-        else if (!r)
-          throw new Error(`Cannot merge objects: key "${i}" already exists in the target object`);
+        else if (!n)
+          throw new Error(`Cannot merge objects: key "${a}" already exists in the target object`);
       } else
-        n[i] = u[i];
+        i[a] = o[a];
     });
-  } else Er(e, t) && e.push(...t);
-  return e;
+  } else Qt(t, e) && t.push(...e);
+  return t;
 }
-class gu extends cu {
+class zu {
+  /**
+   * Create a new instance of the InstanceTimeCounter class
+   *
+   * @param bufferSize - Maximum number of instances to track
+   */
+  constructor(e) {
+    /** The ring buffer to store times */
+    W(this, "ringBuffer");
+    /** The size of the ring buffer */
+    W(this, "bufferSize");
+    /** The next location where a time will be written */
+    W(this, "writerIndex");
+    /** The location where the first time in the buffer will be read */
+    W(this, "readerIndex");
+    /** The most recent difference in time between the newest and oldest events */
+    W(this, "lastTimeDifference");
+    /** How many instances in total have been recorded */
+    W(this, "totalInstanceCount");
+    this.bufferSize = e, this.ringBuffer = new Array(e).fill(0), this.writerIndex = 0, this.readerIndex = 0, this.lastTimeDifference = 0, this.totalInstanceCount = 0;
+  }
+  /** Get the total number of instances that have been recorded */
+  get totalInstances() {
+    return this.totalInstanceCount;
+  }
+  /** Add a new time measurement for an instance of an event */
+  recordInstance() {
+    this.totalInstanceCount += 1;
+    const e = performance.now();
+    this.lastTimeDifference = e - this.ringBuffer[this.readerIndex], this.ringBuffer[this.writerIndex] = e, this.writerIndex += 1, this.writerIndex >= this.bufferSize && (this.writerIndex %= this.bufferSize), this.writerIndex === this.readerIndex && (this.readerIndex += 1, this.readerIndex >= this.bufferSize && (this.readerIndex %= this.bufferSize));
+  }
+  /**
+   * Check if the time between the last N events is less than the provided threshold
+   *
+   * @param minRollingTimeMs - Minimum time that must have passed when the last N events occurred
+   * @returns - True if the threshold is violated, false otherwise
+   */
+  hasViolatedThreshold(e) {
+    return this.totalInstanceCount >= this.bufferSize && this.lastTimeDifference < e;
+  }
 }
-class Ka {
+class nn extends Yr {
+}
+class Hu {
   constructor() {
-    I(this, "mutexesByID", /* @__PURE__ */ new Map());
+    W(this, "mutexesByID", /* @__PURE__ */ new Map());
   }
-  get(t) {
-    let r = this.mutexesByID.get(t);
-    return r || (r = new gu(), this.mutexesByID.set(t, r), r);
+  get(e) {
+    let n = this.mutexesByID.get(e);
+    return n || (n = new nn(), this.mutexesByID.set(e, n), n);
   }
 }
-class Wa extends mu {
+class Ju extends tn {
   // Making the protected base constructor public
   // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-  constructor(t, r) {
-    super(t, r);
+  constructor(e, n) {
+    super(e, n);
   }
   get output() {
     return this.latestOutput;
   }
 }
-class Du {
-  constructor(t, r) {
-    I(this, "numberFormatter");
-    this.numberFormatter = new Intl.NumberFormat(t, r);
+class un {
+  constructor(e, n) {
+    W(this, "numberFormatter");
+    this.numberFormatter = new Intl.NumberFormat(e, n);
   }
   /**
    * Formats a number according to the locale and formatting options of this NumberFormat object
@@ -569,8 +618,8 @@ class Du {
    * @returns String representing the given number formatted according to the locale and formatting
    *   options of this NumberFormat object
    */
-  format(t) {
-    return this.numberFormatter.format(t);
+  format(e) {
+    return this.numberFormatter.format(e);
   }
   /**
    * Formats a range of numbers according to the locale and formatting options of this NumberFormat
@@ -581,8 +630,8 @@ class Du {
    * @returns String representing the given range of numbers formatted according to the locale and
    *   formatting options of this NumberFormat object
    */
-  formatRange(t, r) {
-    return this.numberFormatter.formatRange(t, r);
+  formatRange(e, n) {
+    return this.numberFormatter.formatRange(e, n);
   }
   /**
    * Returns an array of objects containing the locale-specific tokens from which it is possible to
@@ -593,8 +642,8 @@ class Du {
    * @returns Array of NumberRangeFormatPart objects containing the formatted range of numbers in
    *   parts
    */
-  formatRangeToParts(t, r) {
-    return this.numberFormatter.formatRangeToParts(t, r);
+  formatRangeToParts(e, n) {
+    return this.numberFormatter.formatRangeToParts(e, n);
   }
   /**
    * Allows locale-aware formatting of strings produced by this NumberFormat object
@@ -602,8 +651,8 @@ class Du {
    * @param value Number or bigint to format
    * @returns Array of NumberFormatPart objects containing the formatted number in parts
    */
-  formatToParts(t) {
-    return this.numberFormatter.formatToParts(t);
+  formatToParts(e) {
+    return this.numberFormatter.formatToParts(e);
   }
   /**
    * Returns a new object with properties reflecting the locale and number formatting options
@@ -615,18 +664,18 @@ class Du {
     return this.numberFormatter.resolvedOptions();
   }
 }
-const vu = Promise.resolve();
-class Qa {
+const on = Promise.resolve();
+class Xu {
   /**
    * Creates a new PromiseChainingMap
    *
    * @param logger Object with a `warn` method that will be called when a promise rejects. This
    *   defaults to `console`.
    */
-  constructor(t = console) {
-    I(this, "map", /* @__PURE__ */ new Map());
-    I(this, "logger");
-    this.logger = t;
+  constructor(e = console) {
+    W(this, "map", /* @__PURE__ */ new Map());
+    W(this, "logger");
+    this.logger = e;
   }
   /**
    * Adds a promise function to the map for a given key. If a promise is already running for the
@@ -636,9 +685,9 @@ class Qa {
    * @param key Unique key to identify a distinct promise chain
    * @param promiseFunction Function that returns a promise to add to the chain
    */
-  addPromiseFunction(t, r) {
-    const n = this.map.get(t);
-    this.map.set(t, n ? n.then(r) : r()), this.cleanupPromiseChain(t);
+  addPromiseFunction(e, n) {
+    const i = this.map.get(e);
+    this.map.set(e, i ? i.then(n) : n()), this.cleanupPromiseChain(e);
   }
   /**
    * Gets the current promise chain for the given key. This is mostly useful for testing. Normally
@@ -647,8 +696,8 @@ class Qa {
    * @param key Unique key to identify a distinct promise chain
    * @returns The current promise chain for the key
    */
-  get(t) {
-    return this.map.get(t);
+  get(e) {
+    return this.map.get(e);
   }
   /**
    * Configures a promise chain to be removed from the map for the given key after all the promises
@@ -656,28 +705,28 @@ class Qa {
    *
    * @param key Unique key to identify a distinct promise chain
    */
-  cleanupPromiseChain(t) {
-    const r = this.map.get(t);
-    if (!r) return;
-    const n = { promise: vu }, u = r.catch((i) => this.logger.warn(`Error in promise for ${t}: ${i.message}`)).finally(() => {
-      this.map.get(t) === n.promise && this.map.delete(t);
+  cleanupPromiseChain(e) {
+    const n = this.map.get(e);
+    if (!n) return;
+    const i = { promise: on }, o = n.catch((a) => this.logger.warn(`Error in promise for ${e}: ${a.message}`)).finally(() => {
+      this.map.get(e) === i.promise && this.map.delete(e);
     });
-    n.promise = u, this.map.set(t, u);
+    i.promise = o, this.map.set(e, o);
   }
 }
-class Za {
-  constructor(t = "Anonymous") {
-    I(this, "unsubscribers", /* @__PURE__ */ new Set());
-    this.name = t;
+class Yu {
+  constructor(e = "Anonymous") {
+    W(this, "unsubscribers", /* @__PURE__ */ new Set());
+    this.name = e;
   }
   /**
    * Add unsubscribers to the list. Note that duplicates are not added twice.
    *
    * @param unsubscribers - Objects that were returned from a registration process.
    */
-  add(...t) {
-    t.forEach((r) => {
-      "dispose" in r ? this.unsubscribers.add(r.dispose) : this.unsubscribers.add(r);
+  add(...e) {
+    e.forEach((n) => {
+      "dispose" in n ? this.unsubscribers.add(n.dispose.bind(n)) : this.unsubscribers.add(n);
     });
   }
   /**
@@ -686,12 +735,28 @@ class Za {
    * @returns `true` if all unsubscribers succeeded, `false` otherwise.
    */
   async runAllUnsubscribers() {
-    const t = [...this.unsubscribers].map((n) => n()), r = await Promise.all(t);
-    return this.unsubscribers.clear(), r.every((n, u) => (n || console.error(`UnsubscriberAsyncList ${this.name}: Unsubscriber at index ${u} failed!`), n));
+    const e = [...this.unsubscribers].map((i) => i()), n = await Promise.all(e);
+    return this.unsubscribers.clear(), n.every((i, o) => (i || console.error(`UnsubscriberAsyncList ${this.name}: Unsubscriber at index ${o} failed!`), i));
   }
 }
-var Au = Object.defineProperty, Nu = (e, t, r) => t in e ? Au(e, t, { enumerable: !0, configurable: !0, writable: !0, value: r }) : e[t] = r, N = (e, t, r) => Nu(e, typeof t != "symbol" ? t + "" : t, r);
-const me = [
+const It = 1;
+function Wu(t) {
+  if (!t) return { message: "", platformErrorVersion: It };
+  if (Be(t)) return { message: t, platformErrorVersion: It };
+  if (typeof t == "object" && "message" in t && typeof t.message == "string") {
+    const e = {
+      message: t.message,
+      platformErrorVersion: It
+    };
+    return Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)), Object.defineProperty(e, "message", { enumerable: !0 }), "stack" in e && Object.defineProperty(e, "stack", { enumerable: !0 }), "cause" in e && Object.defineProperty(e, "cause", { enumerable: !0 }), e;
+  }
+  return { cause: t, message: "", platformErrorVersion: It };
+}
+function Ku(t) {
+  return !!t && typeof t == "object" && "platformErrorVersion" in t;
+}
+var an = Object.defineProperty, sn = (t, e, n) => e in t ? an(t, e, { enumerable: !0, configurable: !0, writable: !0, value: n }) : t[e] = n, z = (t, e, n) => sn(t, typeof e != "symbol" ? e + "" : e, n);
+const it = [
   "GEN",
   "EXO",
   "LEV",
@@ -836,7 +901,7 @@ const me = [
   "REP",
   "4BA",
   "LAO"
-], Xt = [
+], $t = [
   "XXA",
   "XXB",
   "XXC",
@@ -852,7 +917,7 @@ const me = [
   "GLO",
   "TDX",
   "NDX"
-], un = [
+], xr = [
   "Genesis",
   "Exodus",
   "Leviticus",
@@ -978,132 +1043,132 @@ const me = [
   "Reproof (Proverbs 25-31)",
   "4 Baruch (Rest of Baruch)",
   "Laodiceans"
-], gr = Bu();
-function Pe(e, t = !0) {
-  return t && (e = e.toUpperCase()), e in gr ? gr[e] : 0;
+], Zt = Dn();
+function gt(t, e = !0) {
+  return e && (t = t.toUpperCase()), t in Zt ? Zt[t] : 0;
 }
-function Yt(e) {
-  return Pe(e) > 0;
+function Vt(t) {
+  return gt(t) > 0;
 }
-function bu(e) {
-  const t = typeof e == "string" ? Pe(e) : e;
-  return t >= 40 && t <= 66;
+function cn(t) {
+  const e = typeof t == "string" ? gt(t) : t;
+  return e >= 40 && e <= 66;
 }
-function yu(e) {
-  return (typeof e == "string" ? Pe(e) : e) <= 39;
+function ln(t) {
+  return (typeof t == "string" ? gt(t) : t) <= 39;
 }
-function on(e) {
-  return e <= 66;
+function Br(t) {
+  return t <= 66;
 }
-function Cu(e) {
-  const t = typeof e == "string" ? Pe(e) : e;
-  return cn(t) && !on(t);
+function fn(t) {
+  const e = typeof t == "string" ? gt(t) : t;
+  return _r(e) && !Br(e);
 }
-function* Tu() {
-  for (let e = 1; e <= me.length; e++) yield e;
+function* pn() {
+  for (let t = 1; t <= it.length; t++) yield t;
 }
-const wu = 1, an = me.length;
-function Su() {
+const hn = 1, Mr = it.length;
+function dn() {
   return ["XXA", "XXB", "XXC", "XXD", "XXE", "XXF", "XXG"];
 }
-function Kt(e, t = "***") {
-  const r = e - 1;
-  return r < 0 || r >= me.length ? t : me[r];
+function Gt(t, e = "***") {
+  const n = t - 1;
+  return n < 0 || n >= it.length ? e : it[n];
 }
-function sn(e) {
-  return e <= 0 || e > an ? "******" : un[e - 1];
+function Rr(t) {
+  return t <= 0 || t > Mr ? "******" : xr[t - 1];
 }
-function Ou(e) {
-  return sn(Pe(e));
+function mn(t) {
+  return Rr(gt(t));
 }
-function cn(e) {
-  const t = typeof e == "number" ? Kt(e) : e;
-  return Yt(t) && !Xt.includes(t);
+function _r(t) {
+  const e = typeof t == "number" ? Gt(t) : t;
+  return Vt(e) && !$t.includes(e);
 }
-function Iu(e) {
-  const t = typeof e == "number" ? Kt(e) : e;
-  return Yt(t) && Xt.includes(t);
+function En(t) {
+  const e = typeof t == "number" ? Gt(t) : t;
+  return Vt(e) && $t.includes(e);
 }
-function Ru(e) {
-  return un[e - 1].includes("*obsolete*");
+function gn(t) {
+  return xr[t - 1].includes("*obsolete*");
 }
-function Bu() {
-  const e = {};
-  for (let t = 0; t < me.length; t++)
-    e[me[t]] = t + 1;
-  return e;
+function Dn() {
+  const t = {};
+  for (let e = 0; e < it.length; e++)
+    t[it[e]] = e + 1;
+  return t;
 }
-const Q = {
-  allBookIds: me,
-  nonCanonicalIds: Xt,
-  bookIdToNumber: Pe,
-  isBookIdValid: Yt,
-  isBookNT: bu,
-  isBookOT: yu,
-  isBookOTNT: on,
-  isBookDC: Cu,
-  allBookNumbers: Tu,
-  firstBook: wu,
-  lastBook: an,
-  extraBooks: Su,
-  bookNumberToId: Kt,
-  bookNumberToEnglishName: sn,
-  bookIdToEnglishName: Ou,
-  isCanonical: cn,
-  isExtraMaterial: Iu,
-  isObsolete: Ru
+const be = {
+  allBookIds: it,
+  nonCanonicalIds: $t,
+  bookIdToNumber: gt,
+  isBookIdValid: Vt,
+  isBookNT: cn,
+  isBookOT: ln,
+  isBookOTNT: Br,
+  isBookDC: fn,
+  allBookNumbers: pn,
+  firstBook: hn,
+  lastBook: Mr,
+  extraBooks: dn,
+  bookNumberToId: Gt,
+  bookNumberToEnglishName: Rr,
+  bookIdToEnglishName: mn,
+  isCanonical: _r,
+  isExtraMaterial: En,
+  isObsolete: gn
 };
-var ee = /* @__PURE__ */ ((e) => (e[e.Unknown = 0] = "Unknown", e[e.Original = 1] = "Original", e[e.Septuagint = 2] = "Septuagint", e[e.Vulgate = 3] = "Vulgate", e[e.English = 4] = "English", e[e.RussianProtestant = 5] = "RussianProtestant", e[e.RussianOrthodox = 6] = "RussianOrthodox", e))(ee || {});
-const z = class {
+var Le = /* @__PURE__ */ ((t) => (t[t.Unknown = 0] = "Unknown", t[t.Original = 1] = "Original", t[t.Septuagint = 2] = "Septuagint", t[t.Vulgate = 3] = "Vulgate", t[t.English = 4] = "English", t[t.RussianProtestant = 5] = "RussianProtestant", t[t.RussianOrthodox = 6] = "RussianOrthodox", t))(Le || {});
+const Te = class {
   // private versInfo: Versification;
-  constructor(t) {
-    if (N(this, "name"), N(this, "fullPath"), N(this, "isPresent"), N(this, "hasVerseSegments"), N(this, "isCustomized"), N(this, "baseVersification"), N(this, "scriptureBooks"), N(this, "_type"), t == null)
+  constructor(e) {
+    if (z(this, "name"), z(this, "fullPath"), z(this, "isPresent"), z(this, "hasVerseSegments"), z(this, "isCustomized"), z(this, "baseVersification"), z(this, "scriptureBooks"), z(this, "_type"), e == null)
       throw new Error("Argument undefined");
-    typeof t == "string" ? (this.name = t, this._type = ee[t]) : (this._type = t, this.name = ee[t]);
+    typeof e == "string" ? (this.name = e, this._type = Le[e]) : (this._type = e, this.name = Le[e]);
   }
   get type() {
     return this._type;
   }
-  equals(t) {
-    return !t.type || !this.type ? !1 : t.type === this.type;
+  equals(e) {
+    return !e.type || !this.type ? !1 : e.type === this.type;
   }
 };
-N(z, "Original", new z(ee.Original)), N(z, "Septuagint", new z(ee.Septuagint)), N(z, "Vulgate", new z(ee.Vulgate)), N(z, "English", new z(ee.English)), N(z, "RussianProtestant", new z(ee.RussianProtestant)), N(z, "RussianOrthodox", new z(ee.RussianOrthodox));
-let oe = z;
-function Dr(e, t) {
-  const r = t[0];
-  for (let n = 1; n < t.length; n++)
-    e = e.split(t[n]).join(r);
-  return e.split(r);
+z(Te, "Original", new Te(Le.Original)), z(Te, "Septuagint", new Te(Le.Septuagint)), z(Te, "Vulgate", new Te(Le.Vulgate)), z(Te, "English", new Te(Le.English)), z(Te, "RussianProtestant", new Te(Le.RussianProtestant)), z(Te, "RussianOrthodox", new Te(Le.RussianOrthodox));
+let nt = Te;
+function er(t, e) {
+  const n = e[0];
+  for (let i = 1; i < e.length; i++)
+    t = t.split(e[i]).join(n);
+  return t.split(n);
 }
-var ln = /* @__PURE__ */ ((e) => (e[e.Valid = 0] = "Valid", e[e.UnknownVersification = 1] = "UnknownVersification", e[e.OutOfRange = 2] = "OutOfRange", e[e.VerseOutOfOrder = 3] = "VerseOutOfOrder", e[e.VerseRepeated = 4] = "VerseRepeated", e))(ln || {});
-const k = class T {
-  constructor(t, r, n, u) {
-    if (N(this, "firstChapter"), N(this, "lastChapter"), N(this, "lastVerse"), N(this, "hasSegmentsDefined"), N(this, "text"), N(this, "BBBCCCVVVS"), N(this, "longHashCode"), N(this, "versification"), N(this, "rtlMark", "‏"), N(this, "_bookNum", 0), N(this, "_chapterNum", 0), N(this, "_verseNum", 0), N(this, "_verse"), n == null && u == null)
-      if (t != null && typeof t == "string") {
-        const i = t, a = r != null && r instanceof oe ? r : void 0;
-        this.setEmpty(a), this.parse(i);
-      } else if (t != null && typeof t == "number") {
-        const i = r != null && r instanceof oe ? r : void 0;
-        this.setEmpty(i), this._verseNum = t % T.chapterDigitShifter, this._chapterNum = Math.floor(
-          t % T.bookDigitShifter / T.chapterDigitShifter
-        ), this._bookNum = Math.floor(t / T.bookDigitShifter);
-      } else if (r == null)
-        if (t != null && t instanceof T) {
-          const i = t;
-          this._bookNum = i.bookNum, this._chapterNum = i.chapterNum, this._verseNum = i.verseNum, this._verse = i.verse, this.versification = i.versification;
+var Pr = /* @__PURE__ */ ((t) => (t[t.Valid = 0] = "Valid", t[t.UnknownVersification = 1] = "UnknownVersification", t[t.OutOfRange = 2] = "OutOfRange", t[t.VerseOutOfOrder = 3] = "VerseOutOfOrder", t[t.VerseRepeated = 4] = "VerseRepeated", t))(Pr || {});
+const De = class Y {
+  constructor(e, n, i, o) {
+    if (z(this, "firstChapter"), z(this, "lastChapter"), z(this, "lastVerse"), z(this, "hasSegmentsDefined"), z(this, "text"), z(this, "BBBCCCVVVS"), z(this, "longHashCode"), z(this, "versification"), z(this, "rtlMark", "‏"), z(this, "_bookNum", 0), z(this, "_chapterNum", 0), z(this, "_verseNum", 0), z(this, "_verse"), i == null && o == null)
+      if (e != null && typeof e == "string") {
+        const a = e, h = n != null && n instanceof nt ? n : void 0;
+        this.setEmpty(h), this.parse(a);
+      } else if (e != null && typeof e == "number") {
+        const a = n != null && n instanceof nt ? n : void 0;
+        this.setEmpty(a), this._verseNum = e % Y.chapterDigitShifter, this._chapterNum = Math.floor(
+          e % Y.bookDigitShifter / Y.chapterDigitShifter
+        ), this._bookNum = Math.floor(e / Y.bookDigitShifter);
+      } else if (n == null)
+        if (e != null && e instanceof Y) {
+          const a = e;
+          this._bookNum = a.bookNum, this._chapterNum = a.chapterNum, this._verseNum = a.verseNum, this._verse = a.verse, this.versification = a.versification;
         } else {
-          if (t == null) return;
-          const i = t instanceof oe ? t : T.defaultVersification;
-          this.setEmpty(i);
+          if (e == null) return;
+          const a = e instanceof nt ? e : Y.defaultVersification;
+          this.setEmpty(a);
         }
       else
         throw new Error("VerseRef constructor not supported.");
-    else if (t != null && r != null && n != null)
-      if (typeof t == "string" && typeof r == "string" && typeof n == "string")
-        this.setEmpty(u), this.updateInternal(t, r, n);
-      else if (typeof t == "number" && typeof r == "number" && typeof n == "number")
-        this._bookNum = t, this._chapterNum = r, this._verseNum = n, this.versification = u ?? T.defaultVersification;
+    else if (e != null && n != null && i != null)
+      if (typeof e == "string" && typeof n == "string" && typeof i == "string")
+        this.setEmpty(o), this.updateInternal(e, n, i);
+      else if (typeof e == "number" && typeof n == "number" && typeof i == "number")
+        this._bookNum = e, this._chapterNum = n, this._verseNum = i, this.versification = o ?? Y.defaultVersification;
       else
         throw new Error("VerseRef constructor not supported.");
     else
@@ -1112,8 +1177,8 @@ const k = class T {
   /**
    * Determines if the verse string is in a valid format (does not consider versification).
    */
-  static isVerseParseable(t) {
-    return t.length > 0 && "0123456789".includes(t[0]) && !t.endsWith(this.verseRangeSeparator) && !t.endsWith(this.verseSequenceIndicator);
+  static isVerseParseable(e) {
+    return e.length > 0 && "0123456789".includes(e[0]) && !e.endsWith(this.verseRangeSeparator) && !e.endsWith(this.verseSequenceIndicator);
   }
   /**
    * Tries to parse the specified string into a verse reference.
@@ -1121,14 +1186,14 @@ const k = class T {
    * @returns success: `true` if the specified string was successfully parsed, `false` otherwise.
    * @returns verseRef: The result of the parse if successful, or empty VerseRef if it failed
    */
-  static tryParse(t) {
-    let r;
+  static tryParse(e) {
+    let n;
     try {
-      return r = new T(t), { success: !0, verseRef: r };
-    } catch (n) {
-      if (n instanceof Ve)
-        return r = new T(), { success: !1, verseRef: r };
-      throw n;
+      return n = new Y(e), { success: !0, verseRef: n };
+    } catch (i) {
+      if (i instanceof Ct)
+        return n = new Y(), { success: !1, verseRef: n };
+      throw i;
     }
   }
   /**
@@ -1140,18 +1205,18 @@ const k = class T {
    * @returns The reference as a comparable integer where the book, chapter, and verse each occupy 3
    * digits.
    */
-  static getBBBCCCVVV(t, r, n) {
-    return t % T.bcvMaxValue * T.bookDigitShifter + (r >= 0 ? r % T.bcvMaxValue * T.chapterDigitShifter : 0) + (n >= 0 ? n % T.bcvMaxValue : 0);
+  static getBBBCCCVVV(e, n, i) {
+    return e % Y.bcvMaxValue * Y.bookDigitShifter + (n >= 0 ? n % Y.bcvMaxValue * Y.chapterDigitShifter : 0) + (i >= 0 ? i % Y.bcvMaxValue : 0);
   }
   /**
    * Deserializes a serialized VerseRef.
    * @param serializedVerseRef - Serialized VerseRef to create from.
    * @returns the deserialized VerseRef.
    */
-  static fromJSON(t) {
-    const { book: r, chapterNum: n, verseNum: u, verse: i, versificationStr: a } = t, o = i || u.toString();
-    let s;
-    return a && (s = new oe(a)), r ? new T(r, n.toString(), o, s) : new T();
+  static fromJSON(e) {
+    const { book: n, chapterNum: i, verseNum: o, verse: a, versificationStr: h } = e, p = a || o.toString();
+    let f;
+    return h && (f = new nt(h)), n ? new Y(n, i.toString(), p, f) : new Y();
   }
   /**
    * Parses a verse string and gets the leading numeric portion as a number.
@@ -1159,19 +1224,19 @@ const k = class T {
    * @returns true if the entire string could be parsed as a single, simple verse number (1-999);
    *    false if the verse string represented a verse bridge, contained segment letters, or was invalid
    */
-  static tryGetVerseNum(t) {
-    let r;
-    if (!t)
-      return r = -1, { success: !0, vNum: r };
-    r = 0;
+  static tryGetVerseNum(e) {
     let n;
-    for (let u = 0; u < t.length; u++) {
-      if (n = t[u], n < "0" || n > "9")
-        return u === 0 && (r = -1), { success: !1, vNum: r };
-      if (r = r * 10 + +n - 0, r > T.bcvMaxValue)
-        return r = -1, { success: !1, vNum: r };
+    if (!e)
+      return n = -1, { success: !0, vNum: n };
+    n = 0;
+    let i;
+    for (let o = 0; o < e.length; o++) {
+      if (i = e[o], i < "0" || i > "9")
+        return o === 0 && (n = -1), { success: !1, vNum: n };
+      if (n = n * 10 + +i - 0, n > Y.bcvMaxValue)
+        return n = -1, { success: !1, vNum: n };
     }
-    return { success: !0, vNum: r };
+    return { success: !0, vNum: n };
   }
   /**
    * Checks to see if a VerseRef hasn't been set - all values are the default.
@@ -1183,17 +1248,17 @@ const k = class T {
    * Gets whether the verse contains multiple verses.
    */
   get hasMultiple() {
-    return this._verse != null && (this._verse.includes(T.verseRangeSeparator) || this._verse.includes(T.verseSequenceIndicator));
+    return this._verse != null && (this._verse.includes(Y.verseRangeSeparator) || this._verse.includes(Y.verseSequenceIndicator));
   }
   /**
    * Gets or sets the book of the reference. Book is the 3-letter abbreviation in capital letters,
    * e.g. `'MAT'`.
    */
   get book() {
-    return Q.bookNumberToId(this.bookNum, "");
+    return be.bookNumberToId(this.bookNum, "");
   }
-  set book(t) {
-    this.bookNum = Q.bookIdToNumber(t);
+  set book(e) {
+    this.bookNum = be.bookIdToNumber(e);
   }
   /**
    * Gets or sets the chapter of the reference,. e.g. `'3'`.
@@ -1201,9 +1266,9 @@ const k = class T {
   get chapter() {
     return this.isDefault || this._chapterNum < 0 ? "" : this._chapterNum.toString();
   }
-  set chapter(t) {
-    const r = +t;
-    this._chapterNum = Number.isInteger(r) ? r : -1;
+  set chapter(e) {
+    const n = +e;
+    this._chapterNum = Number.isInteger(n) ? n : -1;
   }
   /**
    * Gets or sets the verse of the reference, including range, segments, and sequences, e.g. `'4'`,
@@ -1212,9 +1277,9 @@ const k = class T {
   get verse() {
     return this._verse != null ? this._verse : this.isDefault || this._verseNum < 0 ? "" : this._verseNum.toString();
   }
-  set verse(t) {
-    const { success: r, vNum: n } = T.tryGetVerseNum(t);
-    this._verse = r ? void 0 : t.replace(this.rtlMark, ""), this._verseNum = n, !(this._verseNum >= 0) && ({ vNum: this._verseNum } = T.tryGetVerseNum(this._verse));
+  set verse(e) {
+    const { success: n, vNum: i } = Y.tryGetVerseNum(e);
+    this._verse = n ? void 0 : e.replace(this.rtlMark, ""), this._verseNum = i, !(this._verseNum >= 0) && ({ vNum: this._verseNum } = Y.tryGetVerseNum(this._verse));
   }
   /**
    * Get or set Book based on book number, e.g. `42`.
@@ -1222,12 +1287,12 @@ const k = class T {
   get bookNum() {
     return this._bookNum;
   }
-  set bookNum(t) {
-    if (t <= 0 || t > Q.lastBook)
-      throw new Ve(
+  set bookNum(e) {
+    if (e <= 0 || e > be.lastBook)
+      throw new Ct(
         "BookNum must be greater than zero and less than or equal to last book"
       );
-    this._bookNum = t;
+    this._bookNum = e;
   }
   /**
    * Gets or sets the chapter number, e.g. `3`. `-1` if not valid.
@@ -1235,8 +1300,8 @@ const k = class T {
   get chapterNum() {
     return this._chapterNum;
   }
-  set chapterNum(t) {
-    this.chapterNum = t;
+  set chapterNum(e) {
+    this.chapterNum = e;
   }
   /**
    * Gets or sets verse start number, e.g. `4`. `-1` if not valid.
@@ -1244,8 +1309,8 @@ const k = class T {
   get verseNum() {
     return this._verseNum;
   }
-  set verseNum(t) {
-    this._verseNum = t;
+  set verseNum(e) {
+    this._verseNum = e;
   }
   /**
    * String representing the versification (should ONLY be used for serialization/deserialization).
@@ -1253,11 +1318,11 @@ const k = class T {
    * @remarks This is for backwards compatibility when ScrVers was an enumeration.
    */
   get versificationStr() {
-    var t;
-    return (t = this.versification) == null ? void 0 : t.name;
+    var e;
+    return (e = this.versification) == null ? void 0 : e.name;
   }
-  set versificationStr(t) {
-    this.versification = this.versification != null ? new oe(t) : void 0;
+  set versificationStr(e) {
+    this.versification = this.versification != null ? new nt(e) : void 0;
   }
   /**
    * Determines if the reference is valid.
@@ -1269,14 +1334,14 @@ const k = class T {
    * Get the valid status for this reference.
    */
   get validStatus() {
-    return this.validateVerse(T.verseRangeSeparators, T.verseSequenceIndicators);
+    return this.validateVerse(Y.verseRangeSeparators, Y.verseSequenceIndicators);
   }
   /**
    * Gets the reference as a comparable integer where the book,
    * chapter, and verse each occupy three digits and the verse is 0.
    */
   get BBBCCC() {
-    return T.getBBBCCCVVV(this._bookNum, this._chapterNum, 0);
+    return Y.getBBBCCCVVV(this._bookNum, this._chapterNum, 0);
   }
   /**
    * Gets the reference as a comparable integer where the book,
@@ -1285,7 +1350,7 @@ const k = class T {
    * segments or bridge) this cannot be used for an exact comparison.
    */
   get BBBCCCVVV() {
-    return T.getBBBCCCVVV(this._bookNum, this._chapterNum, this._verseNum);
+    return Y.getBBBCCCVVV(this._bookNum, this._chapterNum, this._verseNum);
   }
   /**
    * Gets whether the verse is defined as an excluded verse in the versification.
@@ -1305,24 +1370,24 @@ const k = class T {
    * - versification is invalid
    * @param verseStr - string to parse e.g. 'MAT 3:11'
    */
-  parse(t) {
-    if (t = t.replace(this.rtlMark, ""), t.includes("/")) {
-      const i = t.split("/");
-      if (t = i[0], i.length > 1)
+  parse(e) {
+    if (e = e.replace(this.rtlMark, ""), e.includes("/")) {
+      const a = e.split("/");
+      if (e = a[0], a.length > 1)
         try {
-          const a = +i[1].trim();
-          this.versification = new oe(ee[a]);
+          const h = +a[1].trim();
+          this.versification = new nt(Le[h]);
         } catch {
-          throw new Ve("Invalid reference : " + t);
+          throw new Ct("Invalid reference : " + e);
         }
     }
-    const r = t.trim().split(" ");
-    if (r.length !== 2)
-      throw new Ve("Invalid reference : " + t);
-    const n = r[1].split(":"), u = +n[0];
-    if (n.length !== 2 || Q.bookIdToNumber(r[0]) === 0 || !Number.isInteger(u) || u < 0 || !T.isVerseParseable(n[1]))
-      throw new Ve("Invalid reference : " + t);
-    this.updateInternal(r[0], n[0], n[1]);
+    const n = e.trim().split(" ");
+    if (n.length !== 2)
+      throw new Ct("Invalid reference : " + e);
+    const i = n[1].split(":"), o = +i[0];
+    if (i.length !== 2 || be.bookIdToNumber(n[0]) === 0 || !Number.isInteger(o) || o < 0 || !Y.isVerseParseable(i[1]))
+      throw new Ct("Invalid reference : " + e);
+    this.updateInternal(n[0], i[0], i[1]);
   }
   /**
    * Simplifies this verse ref so that it has no bridging of verses or
@@ -1337,31 +1402,31 @@ const k = class T {
    * @returns The cloned VerseRef.
    */
   clone() {
-    return new T(this);
+    return new Y(this);
   }
   toString() {
-    const t = this.book;
-    return t === "" ? "" : `${t} ${this.chapter}:${this.verse}`;
+    const e = this.book;
+    return e === "" ? "" : `${e} ${this.chapter}:${this.verse}`;
   }
   toJSON() {
-    let t = this.verse;
-    (t === "" || t === this.verseNum.toString()) && (t = void 0);
-    const r = {
+    let e = this.verse;
+    (e === "" || e === this.verseNum.toString()) && (e = void 0);
+    const n = {
       book: this.book,
       chapterNum: this.chapterNum,
       verseNum: this.verseNum,
-      verse: t,
+      verse: e,
       versificationStr: this.versificationStr
     };
-    return t || delete r.verse, r;
+    return e || delete n.verse, n;
   }
   /**
    * Compares this `VerseRef` with supplied one.
    * @param verseRef - object to compare this one to.
    * @returns `true` if this `VerseRef` is equal to the supplied one, `false` otherwise.
    */
-  equals(t) {
-    return t instanceof T ? t._bookNum === this._bookNum && t._chapterNum === this._chapterNum && t._verseNum === this._verseNum && t.verse === this.verse && (t.versification == null && this.versification == null || t.versification != null && this.versification != null && t.versification.equals(this.versification)) : !1;
+  equals(e) {
+    return e instanceof Y ? e._bookNum === this._bookNum && e._chapterNum === this._chapterNum && e._verseNum === this._verseNum && e.verse === this.verse && (e.versification == null && this.versification == null || e.versification != null && this.versification != null && e.versification.equals(this.versification)) : !1;
   }
   /**
    * Enumerate all individual verses contained in a VerseRef.
@@ -1379,48 +1444,48 @@ const k = class T {
    * Defaults to `VerseRef.verseSequenceIndicators`.
    * @returns An array of all single verse references in this VerseRef.
    */
-  allVerses(t = !1, r = T.verseRangeSeparators, n = T.verseSequenceIndicators) {
+  allVerses(e = !1, n = Y.verseRangeSeparators, i = Y.verseSequenceIndicators) {
     if (this._verse == null || this.chapterNum <= 0)
       return [this.clone()];
-    const u = [], i = Dr(this._verse, n);
-    for (const a of i.map((o) => Dr(o, r))) {
-      const o = this.clone();
-      o.verse = a[0];
-      const s = o.verseNum;
-      if (u.push(o), a.length > 1) {
-        const c = this.clone();
-        if (c.verse = a[1], !t)
-          for (let f = s + 1; f < c.verseNum; f++) {
-            const l = new T(
+    const o = [], a = er(this._verse, i);
+    for (const h of a.map((p) => er(p, n))) {
+      const p = this.clone();
+      p.verse = h[0];
+      const f = p.verseNum;
+      if (o.push(p), h.length > 1) {
+        const m = this.clone();
+        if (m.verse = h[1], !e)
+          for (let E = f + 1; E < m.verseNum; E++) {
+            const l = new Y(
               this._bookNum,
               this._chapterNum,
-              f,
+              E,
               this.versification
             );
-            this.isExcluded || u.push(l);
+            this.isExcluded || o.push(l);
           }
-        u.push(c);
+        o.push(m);
       }
     }
-    return u;
+    return o;
   }
   /**
    * Validates a verse number using the supplied separators rather than the defaults.
    */
-  validateVerse(t, r) {
+  validateVerse(e, n) {
     if (!this.verse)
       return this.internalValid;
-    let n = 0;
-    for (const u of this.allVerses(!0, t, r)) {
-      const i = u.internalValid;
-      if (i !== 0)
-        return i;
-      const a = u.BBBCCCVVV;
-      if (n > a)
+    let i = 0;
+    for (const o of this.allVerses(!0, e, n)) {
+      const a = o.internalValid;
+      if (a !== 0)
+        return a;
+      const h = o.BBBCCCVVV;
+      if (i > h)
         return 3;
-      if (n === a)
+      if (i === h)
         return 4;
-      n = a;
+      i = h;
     }
     return 0;
   }
@@ -1428,5274 +1493,5288 @@ const k = class T {
    * Gets whether a single verse reference is valid.
    */
   get internalValid() {
-    return this.versification == null ? 1 : this._bookNum <= 0 || this._bookNum > Q.lastBook ? 2 : (Q.isCanonical(this._bookNum), 0);
+    return this.versification == null ? 1 : this._bookNum <= 0 || this._bookNum > be.lastBook ? 2 : (be.isCanonical(this._bookNum), 0);
   }
-  setEmpty(t = T.defaultVersification) {
-    this._bookNum = 0, this._chapterNum = -1, this._verse = void 0, this.versification = t;
+  setEmpty(e = Y.defaultVersification) {
+    this._bookNum = 0, this._chapterNum = -1, this._verse = void 0, this.versification = e;
   }
-  updateInternal(t, r, n) {
-    this.bookNum = Q.bookIdToNumber(t), this.chapter = r, this.verse = n;
+  updateInternal(e, n, i) {
+    this.bookNum = be.bookIdToNumber(e), this.chapter = n, this.verse = i;
   }
 };
-N(k, "defaultVersification", oe.English), N(k, "verseRangeSeparator", "-"), N(k, "verseSequenceIndicator", ","), N(k, "verseRangeSeparators", [k.verseRangeSeparator]), N(k, "verseSequenceIndicators", [k.verseSequenceIndicator]), N(k, "chapterDigitShifter", 1e3), N(k, "bookDigitShifter", k.chapterDigitShifter * k.chapterDigitShifter), N(k, "bcvMaxValue", k.chapterDigitShifter - 1), /**
+z(De, "defaultVersification", nt.English), z(De, "verseRangeSeparator", "-"), z(De, "verseSequenceIndicator", ","), z(De, "verseRangeSeparators", [De.verseRangeSeparator]), z(De, "verseSequenceIndicators", [De.verseSequenceIndicator]), z(De, "chapterDigitShifter", 1e3), z(De, "bookDigitShifter", De.chapterDigitShifter * De.chapterDigitShifter), z(De, "bcvMaxValue", De.chapterDigitShifter - 1), /**
 * The valid status of the VerseRef.
 */
-N(k, "ValidStatusType", ln);
-let Wt = k;
-class Ve extends Error {
+z(De, "ValidStatusType", Pr);
+let Lr = De;
+class Ct extends Error {
 }
-var vr = typeof globalThis < "u" ? globalThis : typeof window < "u" ? window : typeof global < "u" ? global : typeof self < "u" ? self : {}, B = {};
-function xu(e, t, r) {
-  if (r === void 0 && (r = Array.prototype), e && typeof r.find == "function")
-    return r.find.call(e, t);
-  for (var n = 0; n < e.length; n++)
-    if (ve(e, n)) {
-      var u = e[n];
-      if (t.call(void 0, u, n, e))
-        return u;
-    }
-}
-function Le(e, t) {
-  return t === void 0 && (t = Object), t && typeof t.getOwnPropertyDescriptors == "function" && (e = t.create(null, t.getOwnPropertyDescriptors(e))), t && typeof t.freeze == "function" ? t.freeze(e) : e;
-}
-function ve(e, t) {
-  return Object.prototype.hasOwnProperty.call(e, t);
-}
-function Mu(e, t) {
-  if (e === null || typeof e != "object")
-    throw new TypeError("target is not an object");
-  for (var r in t)
-    ve(t, r) && (e[r] = t[r]);
-  return e;
-}
-var fn = Le({
-  allowfullscreen: !0,
-  async: !0,
-  autofocus: !0,
-  autoplay: !0,
-  checked: !0,
-  controls: !0,
-  default: !0,
-  defer: !0,
-  disabled: !0,
-  formnovalidate: !0,
-  hidden: !0,
-  ismap: !0,
-  itemscope: !0,
-  loop: !0,
-  multiple: !0,
-  muted: !0,
-  nomodule: !0,
-  novalidate: !0,
-  open: !0,
-  playsinline: !0,
-  readonly: !0,
-  required: !0,
-  reversed: !0,
-  selected: !0
-});
-function _u(e) {
-  return ve(fn, e.toLowerCase());
-}
-var pn = Le({
-  area: !0,
-  base: !0,
-  br: !0,
-  col: !0,
-  embed: !0,
-  hr: !0,
-  img: !0,
-  input: !0,
-  link: !0,
-  meta: !0,
-  param: !0,
-  source: !0,
-  track: !0,
-  wbr: !0
-});
-function Pu(e) {
-  return ve(pn, e.toLowerCase());
-}
-var We = Le({
-  script: !1,
-  style: !1,
-  textarea: !0,
-  title: !0
-});
-function Lu(e) {
-  var t = e.toLowerCase();
-  return ve(We, t) && !We[t];
-}
-function Fu(e) {
-  var t = e.toLowerCase();
-  return ve(We, t) && We[t];
-}
-function hn(e) {
-  return e === Qe.HTML;
-}
-function ku(e) {
-  return hn(e) || e === Qe.XML_XHTML_APPLICATION;
-}
-var Qe = Le({
-  /**
-   * `text/html`, the only mime type that triggers treating an XML document as HTML.
-   *
-   * @see https://www.iana.org/assignments/media-types/text/html IANA MimeType registration
-   * @see https://en.wikipedia.org/wiki/HTML Wikipedia
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString MDN
-   * @see https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#dom-domparser-parsefromstring
-   *      WHATWG HTML Spec
-   */
-  HTML: "text/html",
-  /**
-   * `application/xml`, the standard mime type for XML documents.
-   *
-   * @see https://www.iana.org/assignments/media-types/application/xml IANA MimeType
-   *      registration
-   * @see https://tools.ietf.org/html/rfc7303#section-9.1 RFC 7303
-   * @see https://en.wikipedia.org/wiki/XML_and_MIME Wikipedia
-   */
-  XML_APPLICATION: "application/xml",
-  /**
-   * `text/html`, an alias for `application/xml`.
-   *
-   * @see https://tools.ietf.org/html/rfc7303#section-9.2 RFC 7303
-   * @see https://www.iana.org/assignments/media-types/text/xml IANA MimeType registration
-   * @see https://en.wikipedia.org/wiki/XML_and_MIME Wikipedia
-   */
-  XML_TEXT: "text/xml",
-  /**
-   * `application/xhtml+xml`, indicates an XML document that has the default HTML namespace,
-   * but is parsed as an XML document.
-   *
-   * @see https://www.iana.org/assignments/media-types/application/xhtml+xml IANA MimeType
-   *      registration
-   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocument WHATWG DOM Spec
-   * @see https://en.wikipedia.org/wiki/XHTML Wikipedia
-   */
-  XML_XHTML_APPLICATION: "application/xhtml+xml",
-  /**
-   * `image/svg+xml`,
-   *
-   * @see https://www.iana.org/assignments/media-types/image/svg+xml IANA MimeType registration
-   * @see https://www.w3.org/TR/SVG11/ W3C SVG 1.1
-   * @see https://en.wikipedia.org/wiki/Scalable_Vector_Graphics Wikipedia
-   */
-  XML_SVG_IMAGE: "image/svg+xml"
-}), qu = Object.keys(Qe).map(function(e) {
-  return Qe[e];
-});
-function $u(e) {
-  return qu.indexOf(e) > -1;
-}
-var ju = Le({
-  /**
-   * The XHTML namespace.
-   *
-   * @see http://www.w3.org/1999/xhtml
-   */
-  HTML: "http://www.w3.org/1999/xhtml",
-  /**
-   * The SVG namespace.
-   *
-   * @see http://www.w3.org/2000/svg
-   */
-  SVG: "http://www.w3.org/2000/svg",
-  /**
-   * The `xml:` namespace.
-   *
-   * @see http://www.w3.org/XML/1998/namespace
-   */
-  XML: "http://www.w3.org/XML/1998/namespace",
-  /**
-   * The `xmlns:` namespace.
-   *
-   * @see https://www.w3.org/2000/xmlns/
-   */
-  XMLNS: "http://www.w3.org/2000/xmlns/"
-});
-B.assign = Mu;
-B.find = xu;
-B.freeze = Le;
-B.HTML_BOOLEAN_ATTRIBUTES = fn;
-B.HTML_RAW_TEXT_ELEMENTS = We;
-B.HTML_VOID_ELEMENTS = pn;
-B.hasDefaultHTMLNamespace = ku;
-B.hasOwn = ve;
-B.isHTMLBooleanAttribute = _u;
-B.isHTMLRawTextElement = Lu;
-B.isHTMLEscapableRawTextElement = Fu;
-B.isHTMLMimeType = hn;
-B.isHTMLVoidElement = Pu;
-B.isValidMimeType = $u;
-B.MIME_TYPE = Qe;
-B.NAMESPACE = ju;
-var Ae = {}, Uu = B;
-function dn(e, t) {
-  e.prototype = Object.create(Error.prototype, {
-    constructor: { value: e },
-    name: { value: e.name, enumerable: !0, writable: t }
+var H = {}, se = {}, tr;
+function Dt() {
+  if (tr) return se;
+  tr = 1;
+  function t(R, k, $) {
+    if ($ === void 0 && ($ = Array.prototype), R && typeof $.find == "function")
+      return $.find.call(R, k);
+    for (var ne = 0; ne < R.length; ne++)
+      if (n(R, ne)) {
+        var le = R[ne];
+        if (k.call(void 0, le, ne, R))
+          return le;
+      }
+  }
+  function e(R, k) {
+    return k === void 0 && (k = Object), k && typeof k.getOwnPropertyDescriptors == "function" && (R = k.create(null, k.getOwnPropertyDescriptors(R))), k && typeof k.freeze == "function" ? k.freeze(R) : R;
+  }
+  function n(R, k) {
+    return Object.prototype.hasOwnProperty.call(R, k);
+  }
+  function i(R, k) {
+    if (R === null || typeof R != "object")
+      throw new TypeError("target is not an object");
+    for (var $ in k)
+      n(k, $) && (R[$] = k[$]);
+    return R;
+  }
+  var o = e({
+    allowfullscreen: !0,
+    async: !0,
+    autofocus: !0,
+    autoplay: !0,
+    checked: !0,
+    controls: !0,
+    default: !0,
+    defer: !0,
+    disabled: !0,
+    formnovalidate: !0,
+    hidden: !0,
+    ismap: !0,
+    itemscope: !0,
+    loop: !0,
+    multiple: !0,
+    muted: !0,
+    nomodule: !0,
+    novalidate: !0,
+    open: !0,
+    playsinline: !0,
+    readonly: !0,
+    required: !0,
+    reversed: !0,
+    selected: !0
   });
+  function a(R) {
+    return n(o, R.toLowerCase());
+  }
+  var h = e({
+    area: !0,
+    base: !0,
+    br: !0,
+    col: !0,
+    embed: !0,
+    hr: !0,
+    img: !0,
+    input: !0,
+    link: !0,
+    meta: !0,
+    param: !0,
+    source: !0,
+    track: !0,
+    wbr: !0
+  });
+  function p(R) {
+    return n(h, R.toLowerCase());
+  }
+  var f = e({
+    script: !1,
+    style: !1,
+    textarea: !0,
+    title: !0
+  });
+  function m(R) {
+    var k = R.toLowerCase();
+    return n(f, k) && !f[k];
+  }
+  function E(R) {
+    var k = R.toLowerCase();
+    return n(f, k) && f[k];
+  }
+  function l(R) {
+    return R === O.HTML;
+  }
+  function v(R) {
+    return l(R) || R === O.XML_XHTML_APPLICATION;
+  }
+  var O = e({
+    /**
+     * `text/html`, the only mime type that triggers treating an XML document as HTML.
+     *
+     * @see https://www.iana.org/assignments/media-types/text/html IANA MimeType registration
+     * @see https://en.wikipedia.org/wiki/HTML Wikipedia
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString MDN
+     * @see https://html.spec.whatwg.org/multipage/dynamic-markup-insertion.html#dom-domparser-parsefromstring
+     *      WHATWG HTML Spec
+     */
+    HTML: "text/html",
+    /**
+     * `application/xml`, the standard mime type for XML documents.
+     *
+     * @see https://www.iana.org/assignments/media-types/application/xml IANA MimeType
+     *      registration
+     * @see https://tools.ietf.org/html/rfc7303#section-9.1 RFC 7303
+     * @see https://en.wikipedia.org/wiki/XML_and_MIME Wikipedia
+     */
+    XML_APPLICATION: "application/xml",
+    /**
+     * `text/xml`, an alias for `application/xml`.
+     *
+     * @see https://tools.ietf.org/html/rfc7303#section-9.2 RFC 7303
+     * @see https://www.iana.org/assignments/media-types/text/xml IANA MimeType registration
+     * @see https://en.wikipedia.org/wiki/XML_and_MIME Wikipedia
+     */
+    XML_TEXT: "text/xml",
+    /**
+     * `application/xhtml+xml`, indicates an XML document that has the default HTML namespace,
+     * but is parsed as an XML document.
+     *
+     * @see https://www.iana.org/assignments/media-types/application/xhtml+xml IANA MimeType
+     *      registration
+     * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocument WHATWG DOM Spec
+     * @see https://en.wikipedia.org/wiki/XHTML Wikipedia
+     */
+    XML_XHTML_APPLICATION: "application/xhtml+xml",
+    /**
+     * `image/svg+xml`,
+     *
+     * @see https://www.iana.org/assignments/media-types/image/svg+xml IANA MimeType registration
+     * @see https://www.w3.org/TR/SVG11/ W3C SVG 1.1
+     * @see https://en.wikipedia.org/wiki/Scalable_Vector_Graphics Wikipedia
+     */
+    XML_SVG_IMAGE: "image/svg+xml"
+  }), b = Object.keys(O).map(function(R) {
+    return O[R];
+  });
+  function C(R) {
+    return b.indexOf(R) > -1;
+  }
+  var j = e({
+    /**
+     * The XHTML namespace.
+     *
+     * @see http://www.w3.org/1999/xhtml
+     */
+    HTML: "http://www.w3.org/1999/xhtml",
+    /**
+     * The SVG namespace.
+     *
+     * @see http://www.w3.org/2000/svg
+     */
+    SVG: "http://www.w3.org/2000/svg",
+    /**
+     * The `xml:` namespace.
+     *
+     * @see http://www.w3.org/XML/1998/namespace
+     */
+    XML: "http://www.w3.org/XML/1998/namespace",
+    /**
+     * The `xmlns:` namespace.
+     *
+     * @see https://www.w3.org/2000/xmlns/
+     */
+    XMLNS: "http://www.w3.org/2000/xmlns/"
+  });
+  return se.assign = i, se.find = t, se.freeze = e, se.HTML_BOOLEAN_ATTRIBUTES = o, se.HTML_RAW_TEXT_ELEMENTS = f, se.HTML_VOID_ELEMENTS = h, se.hasDefaultHTMLNamespace = v, se.hasOwn = n, se.isHTMLBooleanAttribute = a, se.isHTMLRawTextElement = m, se.isHTMLEscapableRawTextElement = E, se.isHTMLMimeType = l, se.isHTMLVoidElement = p, se.isValidMimeType = C, se.MIME_TYPE = O, se.NAMESPACE = j, se;
 }
-var Ze = Uu.freeze({
-  /**
-   * the default value as defined by the spec
-   */
-  Error: "Error",
-  /**
-   * @deprecated
-   * Use RangeError instead.
-   */
-  IndexSizeError: "IndexSizeError",
-  /**
-   * @deprecated
-   * Just to match the related static code, not part of the spec.
-   */
-  DomstringSizeError: "DomstringSizeError",
-  HierarchyRequestError: "HierarchyRequestError",
-  WrongDocumentError: "WrongDocumentError",
-  InvalidCharacterError: "InvalidCharacterError",
-  /**
-   * @deprecated
-   * Just to match the related static code, not part of the spec.
-   */
-  NoDataAllowedError: "NoDataAllowedError",
-  NoModificationAllowedError: "NoModificationAllowedError",
-  NotFoundError: "NotFoundError",
-  NotSupportedError: "NotSupportedError",
-  InUseAttributeError: "InUseAttributeError",
-  InvalidStateError: "InvalidStateError",
-  SyntaxError: "SyntaxError",
-  InvalidModificationError: "InvalidModificationError",
-  NamespaceError: "NamespaceError",
-  /**
-   * @deprecated
-   * Use TypeError for invalid arguments,
-   * "NotSupportedError" DOMException for unsupported operations,
-   * and "NotAllowedError" DOMException for denied requests instead.
-   */
-  InvalidAccessError: "InvalidAccessError",
-  /**
-   * @deprecated
-   * Just to match the related static code, not part of the spec.
-   */
-  ValidationError: "ValidationError",
-  /**
-   * @deprecated
-   * Use TypeError instead.
-   */
-  TypeMismatchError: "TypeMismatchError",
-  SecurityError: "SecurityError",
-  NetworkError: "NetworkError",
-  AbortError: "AbortError",
-  /**
-   * @deprecated
-   * Just to match the related static code, not part of the spec.
-   */
-  URLMismatchError: "URLMismatchError",
-  QuotaExceededError: "QuotaExceededError",
-  TimeoutError: "TimeoutError",
-  InvalidNodeTypeError: "InvalidNodeTypeError",
-  DataCloneError: "DataCloneError",
-  EncodingError: "EncodingError",
-  NotReadableError: "NotReadableError",
-  UnknownError: "UnknownError",
-  ConstraintError: "ConstraintError",
-  DataError: "DataError",
-  TransactionInactiveError: "TransactionInactiveError",
-  ReadOnlyError: "ReadOnlyError",
-  VersionError: "VersionError",
-  OperationError: "OperationError",
-  NotAllowedError: "NotAllowedError",
-  OptOutError: "OptOutError"
-}), mn = Object.keys(Ze);
-function En(e) {
-  return typeof e == "number" && e >= 1 && e <= 25;
+var dt = {}, rr;
+function _t() {
+  if (rr) return dt;
+  rr = 1;
+  var t = Dt();
+  function e(v, O) {
+    v.prototype = Object.create(Error.prototype, {
+      constructor: { value: v },
+      name: { value: v.name, enumerable: !0, writable: O }
+    });
+  }
+  var n = t.freeze({
+    /**
+     * the default value as defined by the spec
+     */
+    Error: "Error",
+    /**
+     * @deprecated
+     * Use RangeError instead.
+     */
+    IndexSizeError: "IndexSizeError",
+    /**
+     * @deprecated
+     * Just to match the related static code, not part of the spec.
+     */
+    DomstringSizeError: "DomstringSizeError",
+    HierarchyRequestError: "HierarchyRequestError",
+    WrongDocumentError: "WrongDocumentError",
+    InvalidCharacterError: "InvalidCharacterError",
+    /**
+     * @deprecated
+     * Just to match the related static code, not part of the spec.
+     */
+    NoDataAllowedError: "NoDataAllowedError",
+    NoModificationAllowedError: "NoModificationAllowedError",
+    NotFoundError: "NotFoundError",
+    NotSupportedError: "NotSupportedError",
+    InUseAttributeError: "InUseAttributeError",
+    InvalidStateError: "InvalidStateError",
+    SyntaxError: "SyntaxError",
+    InvalidModificationError: "InvalidModificationError",
+    NamespaceError: "NamespaceError",
+    /**
+     * @deprecated
+     * Use TypeError for invalid arguments,
+     * "NotSupportedError" DOMException for unsupported operations,
+     * and "NotAllowedError" DOMException for denied requests instead.
+     */
+    InvalidAccessError: "InvalidAccessError",
+    /**
+     * @deprecated
+     * Just to match the related static code, not part of the spec.
+     */
+    ValidationError: "ValidationError",
+    /**
+     * @deprecated
+     * Use TypeError instead.
+     */
+    TypeMismatchError: "TypeMismatchError",
+    SecurityError: "SecurityError",
+    NetworkError: "NetworkError",
+    AbortError: "AbortError",
+    /**
+     * @deprecated
+     * Just to match the related static code, not part of the spec.
+     */
+    URLMismatchError: "URLMismatchError",
+    QuotaExceededError: "QuotaExceededError",
+    TimeoutError: "TimeoutError",
+    InvalidNodeTypeError: "InvalidNodeTypeError",
+    DataCloneError: "DataCloneError",
+    EncodingError: "EncodingError",
+    NotReadableError: "NotReadableError",
+    UnknownError: "UnknownError",
+    ConstraintError: "ConstraintError",
+    DataError: "DataError",
+    TransactionInactiveError: "TransactionInactiveError",
+    ReadOnlyError: "ReadOnlyError",
+    VersionError: "VersionError",
+    OperationError: "OperationError",
+    NotAllowedError: "NotAllowedError",
+    OptOutError: "OptOutError"
+  }), i = Object.keys(n);
+  function o(v) {
+    return typeof v == "number" && v >= 1 && v <= 25;
+  }
+  function a(v) {
+    return typeof v == "string" && v.substring(v.length - n.Error.length) === n.Error;
+  }
+  function h(v, O) {
+    o(v) ? (this.name = i[v], this.message = O || "") : (this.message = v, this.name = a(O) ? O : n.Error), Error.captureStackTrace && Error.captureStackTrace(this, h);
+  }
+  e(h, !0), Object.defineProperties(h.prototype, {
+    code: {
+      enumerable: !0,
+      get: function() {
+        var v = i.indexOf(this.name);
+        return o(v) ? v : 0;
+      }
+    }
+  });
+  for (var p = {
+    INDEX_SIZE_ERR: 1,
+    DOMSTRING_SIZE_ERR: 2,
+    HIERARCHY_REQUEST_ERR: 3,
+    WRONG_DOCUMENT_ERR: 4,
+    INVALID_CHARACTER_ERR: 5,
+    NO_DATA_ALLOWED_ERR: 6,
+    NO_MODIFICATION_ALLOWED_ERR: 7,
+    NOT_FOUND_ERR: 8,
+    NOT_SUPPORTED_ERR: 9,
+    INUSE_ATTRIBUTE_ERR: 10,
+    INVALID_STATE_ERR: 11,
+    SYNTAX_ERR: 12,
+    INVALID_MODIFICATION_ERR: 13,
+    NAMESPACE_ERR: 14,
+    INVALID_ACCESS_ERR: 15,
+    VALIDATION_ERR: 16,
+    TYPE_MISMATCH_ERR: 17,
+    SECURITY_ERR: 18,
+    NETWORK_ERR: 19,
+    ABORT_ERR: 20,
+    URL_MISMATCH_ERR: 21,
+    QUOTA_EXCEEDED_ERR: 22,
+    TIMEOUT_ERR: 23,
+    INVALID_NODE_TYPE_ERR: 24,
+    DATA_CLONE_ERR: 25
+  }, f = Object.entries(p), m = 0; m < f.length; m++) {
+    var E = f[m][0];
+    h[E] = f[m][1];
+  }
+  function l(v, O) {
+    this.message = v, this.locator = O, Error.captureStackTrace && Error.captureStackTrace(this, l);
+  }
+  return e(l), dt.DOMException = h, dt.DOMExceptionName = n, dt.ExceptionCode = p, dt.ParseError = l, dt;
 }
-function Vu(e) {
-  return typeof e == "string" && e.substring(e.length - Ze.Error.length) === Ze.Error;
+var re = {}, U = {}, nr;
+function Fr() {
+  if (nr) return U;
+  nr = 1;
+  function t(ue) {
+    try {
+      typeof ue != "function" && (ue = RegExp);
+      var he = new ue("𝌆", "u").exec("𝌆");
+      return !!he && he[0].length === 2;
+    } catch {
+    }
+    return !1;
+  }
+  var e = t();
+  function n(ue) {
+    if (ue.source[0] !== "[")
+      throw new Error(ue + " can not be used with chars");
+    return ue.source.slice(1, ue.source.lastIndexOf("]"));
+  }
+  function i(ue, he) {
+    if (ue.source[0] !== "[")
+      throw new Error("/" + ue.source + "/ can not be used with chars_without");
+    if (!he || typeof he != "string")
+      throw new Error(JSON.stringify(he) + " is not a valid search");
+    if (ue.source.indexOf(he) === -1)
+      throw new Error('"' + he + '" is not is /' + ue.source + "/");
+    if (he === "-" && ue.source.indexOf(he) !== 1)
+      throw new Error('"' + he + '" is not at the first postion of /' + ue.source + "/");
+    return new RegExp(ue.source.replace(he, ""), e ? "u" : "");
+  }
+  function o(ue) {
+    var he = this;
+    return new RegExp(
+      Array.prototype.slice.call(arguments).map(function(ke) {
+        var qe = typeof ke == "string";
+        if (qe && he === void 0 && ke === "|")
+          throw new Error("use regg instead of reg to wrap expressions with `|`!");
+        return qe ? ke : ke.source;
+      }).join(""),
+      e ? "mu" : "m"
+    );
+  }
+  function a(ue) {
+    if (arguments.length === 0)
+      throw new Error("no parameters provided");
+    return o.apply(a, ["(?:"].concat(Array.prototype.slice.call(arguments), [")"]));
+  }
+  var h = "�", p = /[-\x09\x0A\x0D\x20-\x2C\x2E-\uD7FF\uE000-\uFFFD]/;
+  e && (p = o("[", n(p), "\\u{10000}-\\u{10FFFF}", "]"));
+  var f = /[\x20\x09\x0D\x0A]/, m = n(f), E = o(f, "+"), l = o(f, "*"), v = /[:_a-zA-Z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
+  e && (v = o("[", n(v), "\\u{10000}-\\u{10FFFF}", "]"));
+  var O = n(v), b = o("[", O, n(/[-.0-9\xB7]/), n(/[\u0300-\u036F\u203F-\u2040]/), "]"), C = o(v, b, "*"), j = o(b, "+"), R = o("&", C, ";"), k = a(/&#[0-9]+;|&#x[0-9a-fA-F]+;/), $ = a(R, "|", k), ne = o("%", C, ";"), le = a(
+    o('"', a(/[^%&"]/, "|", ne, "|", $), "*", '"'),
+    "|",
+    o("'", a(/[^%&']/, "|", ne, "|", $), "*", "'")
+  ), g = a('"', a(/[^<&"]/, "|", $), "*", '"', "|", "'", a(/[^<&']/, "|", $), "*", "'"), x = i(v, ":"), F = i(b, ":"), G = o(x, F, "*"), K = o(G, a(":", G), "?"), ee = o("^", K, "$"), Ie = o("(", K, ")"), te = a(/"[^"]*"|'[^']*'/), Me = o(/^<\?/, "(", C, ")", a(E, "(", p, "*?)"), "?", /\?>/), d = /[\x20\x0D\x0Aa-zA-Z0-9-'()+,./:=?;!*#@$_%]/, N = a('"', d, '*"', "|", "'", i(d, "'"), "*'"), w = "<!--", y = "-->", B = o(w, a(i(p, "-"), "|", o("-", i(p, "-"))), "*", y), A = "#PCDATA", M = a(
+    o(/\(/, l, A, a(l, /\|/, l, K), "*", l, /\)\*/),
+    "|",
+    o(/\(/, l, A, l, /\)/)
+  ), J = /[?*+]?/, _ = o(
+    /\([^>]+\)/,
+    J
+    /*regg(choice, '|', seq), _children_quantity*/
+  ), T = a("EMPTY", "|", "ANY", "|", M, "|", _), I = "<!ELEMENT", L = o(I, E, a(K, "|", ne), E, a(T, "|", ne), l, ">"), V = o("NOTATION", E, /\(/, l, C, a(l, /\|/, l, C), "*", l, /\)/), fe = o(/\(/, l, j, a(l, /\|/, l, j), "*", l, /\)/), we = a(V, "|", fe), ve = a(/CDATA|ID|IDREF|IDREFS|ENTITY|ENTITIES|NMTOKEN|NMTOKENS/, "|", we), ie = a(/#REQUIRED|#IMPLIED/, "|", a(a("#FIXED", E), "?", g)), P = a(E, C, E, ve, E, ie), $e = "<!ATTLIST", Re = o($e, E, C, P, "*", l, ">"), pe = "about:legacy-compat", Ve = a('"' + pe + '"', "|", "'" + pe + "'"), _e = "SYSTEM", Se = "PUBLIC", Fe = a(a(_e, E, te), "|", a(Se, E, N, E, te)), He = o(
+    "^",
+    a(
+      a(_e, E, "(?<SystemLiteralOnly>", te, ")"),
+      "|",
+      a(Se, E, "(?<PubidLiteral>", N, ")", E, "(?<SystemLiteral>", te, ")")
+    )
+  ), Je = a(E, "NDATA", E, C), Ce = a(le, "|", a(Fe, Je, "?")), Q = "<!ENTITY", Ge = o(Q, E, C, E, Ce, l, ">"), oe = a(le, "|", Fe), Xe = o(Q, E, "%", E, C, E, oe, l, ">"), vt = a(Ge, "|", Xe), Ye = o(Se, E, N), We = o("<!NOTATION", E, C, E, a(Fe, "|", Ye), l, ">"), q = o(l, "=", l), Z = /1[.]\d+/, Ae = o(E, "version", q, a("'", Z, "'", "|", '"', Z, '"')), Ne = /[A-Za-z][-A-Za-z0-9._]*/, Ke = a(E, "encoding", q, a('"', Ne, '"', "|", "'", Ne, "'")), st = a(E, "standalone", q, a("'", a("yes", "|", "no"), "'", "|", '"', a("yes", "|", "no"), '"')), ct = o(/^<\?xml/, Ae, Ke, "?", st, "?", l, /\?>/), lt = "<!DOCTYPE", At = "<![CDATA[", Nt = "]]>", ft = /<!\[CDATA\[/, Qe = /\]\]>/, pt = o(p, "*?", Qe), Ot = o(ft, pt);
+  return U.chars = n, U.chars_without = i, U.detectUnicodeSupport = t, U.reg = o, U.regg = a, U.ABOUT_LEGACY_COMPAT = pe, U.ABOUT_LEGACY_COMPAT_SystemLiteral = Ve, U.AttlistDecl = Re, U.CDATA_START = At, U.CDATA_END = Nt, U.CDSect = Ot, U.Char = p, U.Comment = B, U.COMMENT_START = w, U.COMMENT_END = y, U.DOCTYPE_DECL_START = lt, U.elementdecl = L, U.EntityDecl = vt, U.EntityValue = le, U.ExternalID = Fe, U.ExternalID_match = He, U.Name = C, U.NotationDecl = We, U.Reference = $, U.PEReference = ne, U.PI = Me, U.PUBLIC = Se, U.PubidLiteral = N, U.QName = K, U.QName_exact = ee, U.QName_group = Ie, U.S = E, U.SChar_s = m, U.S_OPT = l, U.SYSTEM = _e, U.SystemLiteral = te, U.UNICODE_REPLACEMENT_CHARACTER = h, U.UNICODE_SUPPORT = e, U.XMLDecl = ct, U;
 }
-function at(e, t) {
-  En(e) ? (this.name = mn[e], this.message = t || "") : (this.message = e, this.name = Vu(t) ? t : Ze.Error), Error.captureStackTrace && Error.captureStackTrace(this, at);
-}
-dn(at, !0);
-Object.defineProperties(at.prototype, {
-  code: {
-    enumerable: !0,
-    get: function() {
-      var e = mn.indexOf(this.name);
-      return En(e) ? e : 0;
+var ur;
+function kr() {
+  if (ur) return re;
+  ur = 1;
+  var t = Dt(), e = t.find, n = t.hasDefaultHTMLNamespace, i = t.hasOwn, o = t.isHTMLMimeType, a = t.isHTMLRawTextElement, h = t.isHTMLVoidElement, p = t.MIME_TYPE, f = t.NAMESPACE, m = Symbol(), E = _t(), l = E.DOMException, v = E.DOMExceptionName, O = Fr();
+  function b(r) {
+    if (r !== m)
+      throw new TypeError("Illegal constructor");
+  }
+  function C(r) {
+    return r !== "";
+  }
+  function j(r) {
+    return r ? r.split(/[\t\n\f\r ]+/).filter(C) : [];
+  }
+  function R(r, u) {
+    return i(r, u) || (r[u] = !0), r;
+  }
+  function k(r) {
+    if (!r) return [];
+    var u = j(r);
+    return Object.keys(u.reduce(R, {}));
+  }
+  function $(r) {
+    return function(u) {
+      return r && r.indexOf(u) !== -1;
+    };
+  }
+  function ne(r) {
+    if (!O.QName_exact.test(r))
+      throw new l(l.INVALID_CHARACTER_ERR, 'invalid character in qualified name "' + r + '"');
+  }
+  function le(r, u) {
+    ne(u), r = r || null;
+    var s = null, c = u;
+    if (u.indexOf(":") >= 0) {
+      var D = u.split(":");
+      s = D[0], c = D[1];
+    }
+    if (s !== null && r === null)
+      throw new l(l.NAMESPACE_ERR, "prefix is non-null and namespace is null");
+    if (s === "xml" && r !== t.NAMESPACE.XML)
+      throw new l(l.NAMESPACE_ERR, 'prefix is "xml" and namespace is not the XML namespace');
+    if ((s === "xmlns" || u === "xmlns") && r !== t.NAMESPACE.XMLNS)
+      throw new l(
+        l.NAMESPACE_ERR,
+        'either qualifiedName or prefix is "xmlns" and namespace is not the XMLNS namespace'
+      );
+    if (r === t.NAMESPACE.XMLNS && s !== "xmlns" && u !== "xmlns")
+      throw new l(
+        l.NAMESPACE_ERR,
+        'namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns"'
+      );
+    return [r, s, c];
+  }
+  function g(r, u) {
+    for (var s in r)
+      i(r, s) && (u[s] = r[s]);
+  }
+  function x(r, u) {
+    var s = r.prototype;
+    if (!(s instanceof u)) {
+      let c = function() {
+      };
+      c.prototype = u.prototype, c = new c(), g(s, c), r.prototype = s = c;
+    }
+    s.constructor != r && (typeof r != "function" && console.error("unknown Class:" + r), s.constructor = r);
+  }
+  var F = {}, G = F.ELEMENT_NODE = 1, K = F.ATTRIBUTE_NODE = 2, ee = F.TEXT_NODE = 3, Ie = F.CDATA_SECTION_NODE = 4, te = F.ENTITY_REFERENCE_NODE = 5, Me = F.ENTITY_NODE = 6, d = F.PROCESSING_INSTRUCTION_NODE = 7, N = F.COMMENT_NODE = 8, w = F.DOCUMENT_NODE = 9, y = F.DOCUMENT_TYPE_NODE = 10, B = F.DOCUMENT_FRAGMENT_NODE = 11, A = F.NOTATION_NODE = 12, M = t.freeze({
+    DOCUMENT_POSITION_DISCONNECTED: 1,
+    DOCUMENT_POSITION_PRECEDING: 2,
+    DOCUMENT_POSITION_FOLLOWING: 4,
+    DOCUMENT_POSITION_CONTAINS: 8,
+    DOCUMENT_POSITION_CONTAINED_BY: 16,
+    DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: 32
+  });
+  function J(r, u) {
+    if (u.length < r.length) return J(u, r);
+    var s = null;
+    for (var c in r) {
+      if (r[c] !== u[c]) return s;
+      s = r[c];
+    }
+    return s;
+  }
+  function _(r) {
+    return r.guid || (r.guid = Math.random()), r.guid;
+  }
+  function T() {
+  }
+  T.prototype = {
+    /**
+     * The number of nodes in the list. The range of valid child node indices is 0 to length-1
+     * inclusive.
+     *
+     * @type {number}
+     */
+    length: 0,
+    /**
+     * Returns the item at `index`. If index is greater than or equal to the number of nodes in
+     * the list, this returns null.
+     *
+     * @param index
+     * Unsigned long Index into the collection.
+     * @returns {Node | null}
+     * The node at position `index` in the NodeList,
+     * or null if that is not a valid index.
+     */
+    item: function(r) {
+      return r >= 0 && r < this.length ? this[r] : null;
+    },
+    /**
+     * Returns a string representation of the NodeList.
+     *
+     * @param {unknown} nodeFilter
+     * __A filter function? Not implemented according to the spec?__.
+     * @returns {string}
+     * A string representation of the NodeList.
+     */
+    toString: function(r) {
+      for (var u = [], s = 0; s < this.length; s++)
+        qe(this[s], u, r);
+      return u.join("");
+    },
+    /**
+     * Filters the NodeList based on a predicate.
+     *
+     * @param {function(Node): boolean} predicate
+     * - A predicate function to filter the NodeList.
+     * @returns {Node[]}
+     * An array of nodes that satisfy the predicate.
+     * @private
+     */
+    filter: function(r) {
+      return Array.prototype.filter.call(this, r);
+    },
+    /**
+     * Returns the first index at which a given node can be found in the NodeList, or -1 if it is
+     * not present.
+     *
+     * @param {Node} item
+     * - The Node item to locate in the NodeList.
+     * @returns {number}
+     * The first index of the node in the NodeList; -1 if not found.
+     * @private
+     */
+    indexOf: function(r) {
+      return Array.prototype.indexOf.call(this, r);
+    }
+  }, T.prototype[Symbol.iterator] = function() {
+    var r = this, u = 0;
+    return {
+      next: function() {
+        return u < r.length ? {
+          value: r[u++],
+          done: !1
+        } : {
+          done: !0
+        };
+      },
+      return: function() {
+        return {
+          done: !0
+        };
+      }
+    };
+  };
+  function I(r, u) {
+    this._node = r, this._refresh = u, L(this);
+  }
+  function L(r) {
+    var u = r._node._inc || r._node.ownerDocument._inc;
+    if (r._inc !== u) {
+      var s = r._refresh(r._node);
+      if (Xt(r, "length", s.length), !r.$$length || s.length < r.$$length)
+        for (var c = s.length; c in r; c++)
+          i(r, c) && delete r[c];
+      g(s, r), r._inc = u;
     }
   }
-});
-var gn = {
-  INDEX_SIZE_ERR: 1,
-  DOMSTRING_SIZE_ERR: 2,
-  HIERARCHY_REQUEST_ERR: 3,
-  WRONG_DOCUMENT_ERR: 4,
-  INVALID_CHARACTER_ERR: 5,
-  NO_DATA_ALLOWED_ERR: 6,
-  NO_MODIFICATION_ALLOWED_ERR: 7,
-  NOT_FOUND_ERR: 8,
-  NOT_SUPPORTED_ERR: 9,
-  INUSE_ATTRIBUTE_ERR: 10,
-  INVALID_STATE_ERR: 11,
-  SYNTAX_ERR: 12,
-  INVALID_MODIFICATION_ERR: 13,
-  NAMESPACE_ERR: 14,
-  INVALID_ACCESS_ERR: 15,
-  VALIDATION_ERR: 16,
-  TYPE_MISMATCH_ERR: 17,
-  SECURITY_ERR: 18,
-  NETWORK_ERR: 19,
-  ABORT_ERR: 20,
-  URL_MISMATCH_ERR: 21,
-  QUOTA_EXCEEDED_ERR: 22,
-  TIMEOUT_ERR: 23,
-  INVALID_NODE_TYPE_ERR: 24,
-  DATA_CLONE_ERR: 25
-}, $t = Object.entries(gn);
-for (var dt = 0; dt < $t.length; dt++) {
-  var Hu = $t[dt][0];
-  at[Hu] = $t[dt][1];
-}
-function Qt(e, t) {
-  this.message = e, this.locator = t, Error.captureStackTrace && Error.captureStackTrace(this, Qt);
-}
-dn(Qt);
-Ae.DOMException = at;
-Ae.DOMExceptionName = Ze;
-Ae.ExceptionCode = gn;
-Ae.ParseError = Qt;
-var x = {}, v = {};
-function Dn(e) {
+  I.prototype.item = function(r) {
+    return L(this), this[r] || null;
+  }, x(I, T);
+  function V() {
+  }
+  function fe(r, u) {
+    for (var s = 0; s < r.length; ) {
+      if (r[s] === u)
+        return s;
+      s++;
+    }
+  }
+  function we(r, u, s, c) {
+    if (c ? u[fe(u, c)] = s : (u[u.length] = s, u.length++), r) {
+      s.ownerElement = r;
+      var D = r.ownerDocument;
+      D && (c && _e(D, r, c), Ve(D, r, s));
+    }
+  }
+  function ve(r, u, s) {
+    var c = fe(u, s);
+    if (c >= 0) {
+      for (var D = u.length - 1; c <= D; )
+        u[c] = u[++c];
+      if (u.length = D, r) {
+        var S = r.ownerDocument;
+        S && _e(S, r, s), s.ownerElement = null;
+      }
+    }
+  }
+  V.prototype = {
+    length: 0,
+    item: T.prototype.item,
+    /**
+     * Get an attribute by name. Note: Name is in lower case in case of HTML namespace and
+     * document.
+     *
+     * @param {string} localName
+     * The local name of the attribute.
+     * @returns {Attr | null}
+     * The attribute with the given local name, or null if no such attribute exists.
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name
+     */
+    getNamedItem: function(r) {
+      this._ownerElement && this._ownerElement._isInHTMLDocumentAndNamespace() && (r = r.toLowerCase());
+      for (var u = 0; u < this.length; ) {
+        var s = this[u];
+        if (s.nodeName === r)
+          return s;
+        u++;
+      }
+      return null;
+    },
+    /**
+     * Set an attribute.
+     *
+     * @param {Attr} attr
+     * The attribute to set.
+     * @returns {Attr | null}
+     * The old attribute with the same local name and namespace URI as the new one, or null if no
+     * such attribute exists.
+     * @throws {DOMException}
+     * With code:
+     * - {@link INUSE_ATTRIBUTE_ERR} - If the attribute is already an attribute of another
+     * element.
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
+     */
+    setNamedItem: function(r) {
+      var u = r.ownerElement;
+      if (u && u !== this._ownerElement)
+        throw new l(l.INUSE_ATTRIBUTE_ERR);
+      var s = this.getNamedItemNS(r.namespaceURI, r.localName);
+      return s === r ? r : (we(this._ownerElement, this, r, s), s);
+    },
+    /**
+     * Set an attribute, replacing an existing attribute with the same local name and namespace
+     * URI if one exists.
+     *
+     * @param {Attr} attr
+     * The attribute to set.
+     * @returns {Attr | null}
+     * The old attribute with the same local name and namespace URI as the new one, or null if no
+     * such attribute exists.
+     * @throws {DOMException}
+     * Throws a DOMException with the name "InUseAttributeError" if the attribute is already an
+     * attribute of another element.
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
+     */
+    setNamedItemNS: function(r) {
+      return this.setNamedItem(r);
+    },
+    /**
+     * Removes an attribute specified by the local name.
+     *
+     * @param {string} localName
+     * The local name of the attribute to be removed.
+     * @returns {Attr}
+     * The attribute node that was removed.
+     * @throws {DOMException}
+     * With code:
+     * - {@link DOMException.NOT_FOUND_ERR} if no attribute with the given name is found.
+     * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditem
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-name
+     */
+    removeNamedItem: function(r) {
+      var u = this.getNamedItem(r);
+      if (!u)
+        throw new l(l.NOT_FOUND_ERR, r);
+      return ve(this._ownerElement, this, u), u;
+    },
+    /**
+     * Removes an attribute specified by the namespace and local name.
+     *
+     * @param {string | null} namespaceURI
+     * The namespace URI of the attribute to be removed.
+     * @param {string} localName
+     * The local name of the attribute to be removed.
+     * @returns {Attr}
+     * The attribute node that was removed.
+     * @throws {DOMException}
+     * With code:
+     * - {@link DOMException.NOT_FOUND_ERR} if no attribute with the given namespace URI and local
+     * name is found.
+     * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditemns
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-namespace
+     */
+    removeNamedItemNS: function(r, u) {
+      var s = this.getNamedItemNS(r, u);
+      if (!s)
+        throw new l(l.NOT_FOUND_ERR, r ? r + " : " + u : u);
+      return ve(this._ownerElement, this, s), s;
+    },
+    /**
+     * Get an attribute by namespace and local name.
+     *
+     * @param {string | null} namespaceURI
+     * The namespace URI of the attribute.
+     * @param {string} localName
+     * The local name of the attribute.
+     * @returns {Attr | null}
+     * The attribute with the given namespace URI and local name, or null if no such attribute
+     * exists.
+     * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace
+     */
+    getNamedItemNS: function(r, u) {
+      r || (r = null);
+      for (var s = 0; s < this.length; ) {
+        var c = this[s];
+        if (c.localName === u && c.namespaceURI === r)
+          return c;
+        s++;
+      }
+      return null;
+    }
+  }, V.prototype[Symbol.iterator] = function() {
+    var r = this, u = 0;
+    return {
+      next: function() {
+        return u < r.length ? {
+          value: r[u++],
+          done: !1
+        } : {
+          done: !0
+        };
+      },
+      return: function() {
+        return {
+          done: !0
+        };
+      }
+    };
+  };
+  function ie() {
+  }
+  ie.prototype = {
+    /**
+     * Test if the DOM implementation implements a specific feature and version, as specified in
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/core.html#DOMFeatures DOM Features}.
+     *
+     * The DOMImplementation.hasFeature() method returns a Boolean flag indicating if a given
+     * feature is supported. The different implementations fairly diverged in what kind of
+     * features were reported. The latest version of the spec settled to force this method to
+     * always return true, where the functionality was accurate and in use.
+     *
+     * @deprecated
+     * It is deprecated and modern browsers return true in all cases.
+     * @function DOMImplementation#hasFeature
+     * @param {string} feature
+     * The name of the feature to test.
+     * @param {string} [version]
+     * This is the version number of the feature to test.
+     * @returns {boolean}
+     * Always returns true.
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/hasFeature MDN
+     * @see https://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html#ID-5CED94D7 DOM Level 1 Core
+     * @see https://dom.spec.whatwg.org/#dom-domimplementation-hasfeature DOM Living Standard
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-5CED94D7 DOM Level 3 Core
+     */
+    hasFeature: function(r, u) {
+      return !0;
+    },
+    /**
+     * Creates a DOM Document object of the specified type with its document element. Note that
+     * based on the {@link DocumentType}
+     * given to create the document, the implementation may instantiate specialized
+     * {@link Document} objects that support additional features than the "Core", such as "HTML"
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#DOM2HTML DOM Level 2 HTML}.
+     * On the other hand, setting the {@link DocumentType} after the document was created makes
+     * this very unlikely to happen. Alternatively, specialized {@link Document} creation methods,
+     * such as createHTMLDocument
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#DOM2HTML DOM Level 2 HTML},
+     * can be used to obtain specific types of {@link Document} objects.
+     *
+     * __It behaves slightly different from the description in the living standard__:
+     * - There is no interface/class `XMLDocument`, it returns a `Document`
+     * instance (with it's `type` set to `'xml'`).
+     * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
+     *
+     * @function DOMImplementation.createDocument
+     * @param {string | null} namespaceURI
+     * The
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-namespaceURI namespace URI}
+     * of the document element to create or null.
+     * @param {string | null} qualifiedName
+     * The
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-qualifiedname qualified name}
+     * of the document element to be created or null.
+     * @param {DocumentType | null} [doctype=null]
+     * The type of document to be created or null. When doctype is not null, its
+     * {@link Node#ownerDocument} attribute is set to the document being created. Default is
+     * `null`
+     * @returns {Document}
+     * A new {@link Document} object with its document element. If the NamespaceURI,
+     * qualifiedName, and doctype are null, the returned {@link Document} is empty with no
+     * document element.
+     * @throws {DOMException}
+     * With code:
+     *
+     * - `INVALID_CHARACTER_ERR`: Raised if the specified qualified name is not an XML name
+     * according to {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#XML XML 1.0}.
+     * - `NAMESPACE_ERR`: Raised if the qualifiedName is malformed, if the qualifiedName has a
+     * prefix and the namespaceURI is null, or if the qualifiedName is null and the namespaceURI
+     * is different from null, or if the qualifiedName has a prefix that is "xml" and the
+     * namespaceURI is different from "{@link http://www.w3.org/XML/1998/namespace}"
+     * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#Namespaces XML Namespaces},
+     * or if the DOM implementation does not support the "XML" feature but a non-null namespace
+     * URI was provided, since namespaces were defined by XML.
+     * - `WRONG_DOCUMENT_ERR`: Raised if doctype has already been used with a different document
+     * or was created from a different implementation.
+     * - `NOT_SUPPORTED_ERR`: May be raised if the implementation does not support the feature
+     * "XML" and the language exposed through the Document does not support XML Namespaces (such
+     * as {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#HTML40 HTML 4.01}).
+     * @since DOM Level 2.
+     * @see {@link #createHTMLDocument}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/createDocument MDN
+     * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocument DOM Living Standard
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Level-2-Core-DOM-createDocument DOM
+     *      Level 3 Core
+     * @see https://www.w3.org/TR/DOM-Level-2-Core/core.html#Level-2-Core-DOM-createDocument DOM
+     *      Level 2 Core (initial)
+     */
+    createDocument: function(r, u, s) {
+      var c = p.XML_APPLICATION;
+      r === f.HTML ? c = p.XML_XHTML_APPLICATION : r === f.SVG && (c = p.XML_SVG_IMAGE);
+      var D = new pe(m, { contentType: c });
+      if (D.implementation = this, D.childNodes = new T(), D.doctype = s || null, s && D.appendChild(s), u) {
+        var S = D.createElementNS(r, u);
+        D.appendChild(S);
+      }
+      return D;
+    },
+    /**
+     * Creates an empty DocumentType node. Entity declarations and notations are not made
+     * available. Entity reference expansions and default attribute additions do not occur.
+     *
+     * **This behavior is slightly different from the one in the specs**:
+     * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
+     * - `publicId` and `systemId` contain the raw data including any possible quotes,
+     *   so they can always be serialized back to the original value
+     * - `internalSubset` contains the raw string between `[` and `]` if present,
+     *   but is not parsed or validated in any form.
+     *
+     * @function DOMImplementation#createDocumentType
+     * @param {string} qualifiedName
+     * The {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-qualifiedname qualified
+     * name} of the document type to be created.
+     * @param {string} [publicId]
+     * The external subset public identifier.
+     * @param {string} [systemId]
+     * The external subset system identifier.
+     * @param {string} [internalSubset]
+     * the internal subset or an empty string if it is not present
+     * @returns {DocumentType}
+     * A new {@link DocumentType} node with {@link Node#ownerDocument} set to null.
+     * @throws {DOMException}
+     * With code:
+     *
+     * - `INVALID_CHARACTER_ERR`: Raised if the specified qualified name is not an XML name
+     * according to {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#XML XML 1.0}.
+     * - `NAMESPACE_ERR`: Raised if the qualifiedName is malformed.
+     * - `NOT_SUPPORTED_ERR`: May be raised if the implementation does not support the feature
+     * "XML" and the language exposed through the Document does not support XML Namespaces (such
+     * as {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#HTML40 HTML 4.01}).
+     * @since DOM Level 2.
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/createDocumentType
+     *      MDN
+     * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocumenttype DOM Living
+     *      Standard
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Level-3-Core-DOM-createDocType DOM
+     *      Level 3 Core
+     * @see https://www.w3.org/TR/DOM-Level-2-Core/core.html#Level-2-Core-DOM-createDocType DOM
+     *      Level 2 Core
+     * @see https://github.com/xmldom/xmldom/blob/master/CHANGELOG.md#050
+     * @see https://www.w3.org/TR/DOM-Level-2-Core/#core-ID-Core-DocType-internalSubset
+     * @prettierignore
+     */
+    createDocumentType: function(r, u, s, c) {
+      ne(r);
+      var D = new lt(m);
+      return D.name = r, D.nodeName = r, D.publicId = u || "", D.systemId = s || "", D.internalSubset = c || "", D.childNodes = new T(), D;
+    },
+    /**
+     * Returns an HTML document, that might already have a basic DOM structure.
+     *
+     * __It behaves slightly different from the description in the living standard__:
+     * - If the first argument is `false` no initial nodes are added (steps 3-7 in the specs are
+     * omitted)
+     * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
+     *
+     * @param {string | false} [title]
+     * A string containing the title to give the new HTML document.
+     * @returns {Document}
+     * The HTML document.
+     * @since WHATWG Living Standard.
+     * @see {@link #createDocument}
+     * @see https://dom.spec.whatwg.org/#dom-domimplementation-createhtmldocument
+     * @see https://dom.spec.whatwg.org/#html-document
+     */
+    createHTMLDocument: function(r) {
+      var u = new pe(m, { contentType: p.HTML });
+      if (u.implementation = this, u.childNodes = new T(), r !== !1) {
+        u.doctype = this.createDocumentType("html"), u.doctype.ownerDocument = u, u.appendChild(u.doctype);
+        var s = u.createElement("html");
+        u.appendChild(s);
+        var c = u.createElement("head");
+        if (s.appendChild(c), typeof r == "string") {
+          var D = u.createElement("title");
+          D.appendChild(u.createTextNode(r)), c.appendChild(D);
+        }
+        s.appendChild(u.createElement("body"));
+      }
+      return u;
+    }
+  };
+  function P(r) {
+    b(r);
+  }
+  P.prototype = {
+    /**
+     * The first child of this node.
+     *
+     * @type {Node | null}
+     */
+    firstChild: null,
+    /**
+     * The last child of this node.
+     *
+     * @type {Node | null}
+     */
+    lastChild: null,
+    /**
+     * The previous sibling of this node.
+     *
+     * @type {Node | null}
+     */
+    previousSibling: null,
+    /**
+     * The next sibling of this node.
+     *
+     * @type {Node | null}
+     */
+    nextSibling: null,
+    /**
+     * The parent node of this node.
+     *
+     * @type {Node | null}
+     */
+    parentNode: null,
+    /**
+     * The parent element of this node.
+     *
+     * @type {Element | null}
+     */
+    get parentElement() {
+      return this.parentNode && this.parentNode.nodeType === this.ELEMENT_NODE ? this.parentNode : null;
+    },
+    /**
+     * The child nodes of this node.
+     *
+     * @type {NodeList}
+     */
+    childNodes: null,
+    /**
+     * The document object associated with this node.
+     *
+     * @type {Document | null}
+     */
+    ownerDocument: null,
+    /**
+     * The value of this node.
+     *
+     * @type {string | null}
+     */
+    nodeValue: null,
+    /**
+     * The namespace URI of this node.
+     *
+     * @type {string | null}
+     */
+    namespaceURI: null,
+    /**
+     * The prefix of the namespace for this node.
+     *
+     * @type {string | null}
+     */
+    prefix: null,
+    /**
+     * The local part of the qualified name of this node.
+     *
+     * @type {string | null}
+     */
+    localName: null,
+    /**
+     * The baseURI is currently always `about:blank`,
+     * since that's what happens when you create a document from scratch.
+     *
+     * @type {'about:blank'}
+     */
+    baseURI: "about:blank",
+    /**
+     * Is true if this node is part of a document.
+     *
+     * @type {boolean}
+     */
+    get isConnected() {
+      var r = this.getRootNode();
+      return r && r.nodeType === r.DOCUMENT_NODE;
+    },
+    /**
+     * Checks whether `other` is an inclusive descendant of this node.
+     *
+     * @param {Node | null | undefined} other
+     * The node to check.
+     * @returns {boolean}
+     * True if `other` is an inclusive descendant of this node; false otherwise.
+     * @see https://dom.spec.whatwg.org/#dom-node-contains
+     */
+    contains: function(r) {
+      if (!r) return !1;
+      var u = r;
+      do {
+        if (this === u) return !0;
+        u = r.parentNode;
+      } while (u);
+      return !1;
+    },
+    /**
+     * @typedef GetRootNodeOptions
+     * @property {boolean} [composed=false]
+     */
+    /**
+     * Searches for the root node of this node.
+     *
+     * **This behavior is slightly different from the in the specs**:
+     * - ignores `options.composed`, since `ShadowRoot`s are unsupported, always returns root.
+     *
+     * @param {GetRootNodeOptions} [options]
+     * @returns {Node}
+     * Root node.
+     * @see https://dom.spec.whatwg.org/#dom-node-getrootnode
+     * @see https://dom.spec.whatwg.org/#concept-shadow-including-root
+     */
+    getRootNode: function(r) {
+      var u = this;
+      do {
+        if (!u.parentNode)
+          return u;
+        u = u.parentNode;
+      } while (u);
+    },
+    /**
+     * Checks whether the given node is equal to this node.
+     *
+     * @param {Node} [otherNode]
+     * @see https://dom.spec.whatwg.org/#concept-node-equals
+     */
+    isEqualNode: function(r) {
+      if (!r || this.nodeType !== r.nodeType) return !1;
+      switch (this.nodeType) {
+        case this.DOCUMENT_TYPE_NODE:
+          if (this.name !== r.name || this.publicId !== r.publicId || this.systemId !== r.systemId) return !1;
+          break;
+        case this.ELEMENT_NODE:
+          if (this.namespaceURI !== r.namespaceURI || this.prefix !== r.prefix || this.localName !== r.localName || this.attributes.length !== r.attributes.length) return !1;
+          for (var u = 0; u < this.attributes.length; u++) {
+            var s = this.attributes.item(u);
+            if (!s.isEqualNode(r.getAttributeNodeNS(s.namespaceURI, s.localName)))
+              return !1;
+          }
+          break;
+        case this.ATTRIBUTE_NODE:
+          if (this.namespaceURI !== r.namespaceURI || this.localName !== r.localName || this.value !== r.value) return !1;
+          break;
+        case this.PROCESSING_INSTRUCTION_NODE:
+          if (this.target !== r.target || this.data !== r.data)
+            return !1;
+          break;
+        case this.TEXT_NODE:
+        case this.COMMENT_NODE:
+          if (this.data !== r.data) return !1;
+          break;
+      }
+      if (this.childNodes.length !== r.childNodes.length)
+        return !1;
+      for (var u = 0; u < this.childNodes.length; u++)
+        if (!this.childNodes[u].isEqualNode(r.childNodes[u]))
+          return !1;
+      return !0;
+    },
+    /**
+     * Checks whether or not the given node is this node.
+     *
+     * @param {Node} [otherNode]
+     */
+    isSameNode: function(r) {
+      return this === r;
+    },
+    /**
+     * Inserts a node before a reference node as a child of this node.
+     *
+     * @param {Node} newChild
+     * The new child node to be inserted.
+     * @param {Node | null} refChild
+     * The reference node before which newChild will be inserted.
+     * @returns {Node}
+     * The new child node successfully inserted.
+     * @throws {DOMException}
+     * Throws a DOMException if inserting the node would result in a DOM tree that is not
+     * well-formed, or if `child` is provided but is not a child of `parent`.
+     * See {@link _insertBefore} for more details.
+     * @since Modified in DOM L2
+     */
+    insertBefore: function(r, u) {
+      return q(this, r, u);
+    },
+    /**
+     * Replaces an old child node with a new child node within this node.
+     *
+     * @param {Node} newChild
+     * The new node that is to replace the old node.
+     * If it already exists in the DOM, it is removed from its original position.
+     * @param {Node} oldChild
+     * The existing child node to be replaced.
+     * @returns {Node}
+     * Returns the replaced child node.
+     * @throws {DOMException}
+     * Throws a DOMException if replacing the node would result in a DOM tree that is not
+     * well-formed, or if `oldChild` is not a child of `this`.
+     * This can also occur if the pre-replacement validity assertion fails.
+     * See {@link _insertBefore}, {@link Node.removeChild}, and
+     * {@link assertPreReplacementValidityInDocument} for more details.
+     * @see https://dom.spec.whatwg.org/#concept-node-replace
+     */
+    replaceChild: function(r, u) {
+      q(this, r, u, We), u && this.removeChild(u);
+    },
+    /**
+     * Removes an existing child node from this node.
+     *
+     * @param {Node} oldChild
+     * The child node to be removed.
+     * @returns {Node}
+     * Returns the removed child node.
+     * @throws {DOMException}
+     * Throws a DOMException if `oldChild` is not a child of `this`.
+     * See {@link _removeChild} for more details.
+     */
+    removeChild: function(r) {
+      return Fe(this, r);
+    },
+    /**
+     * Appends a child node to this node.
+     *
+     * @param {Node} newChild
+     * The child node to be appended to this node.
+     * If it already exists in the DOM, it is removed from its original position.
+     * @returns {Node}
+     * Returns the appended child node.
+     * @throws {DOMException}
+     * Throws a DOMException if appending the node would result in a DOM tree that is not
+     * well-formed, or if `newChild` is not a valid Node.
+     * See {@link insertBefore} for more details.
+     */
+    appendChild: function(r) {
+      return this.insertBefore(r, null);
+    },
+    /**
+     * Determines whether this node has any child nodes.
+     *
+     * @returns {boolean}
+     * Returns true if this node has any child nodes, and false otherwise.
+     */
+    hasChildNodes: function() {
+      return this.firstChild != null;
+    },
+    /**
+     * Creates a copy of the calling node.
+     *
+     * @param {boolean} deep
+     * If true, the contents of the node are recursively copied.
+     * If false, only the node itself (and its attributes, if it is an element) are copied.
+     * @returns {Node}
+     * Returns the newly created copy of the node.
+     * @throws {DOMException}
+     * May throw a DOMException if operations within {@link Element#setAttributeNode} or
+     * {@link Node#appendChild} (which are potentially invoked in this method) do not meet their
+     * specific constraints.
+     * @see {@link cloneNode}
+     */
+    cloneNode: function(r) {
+      return Lt(this.ownerDocument || this, this, r);
+    },
+    /**
+     * Puts the specified node and all of its subtree into a "normalized" form. In a normalized
+     * subtree, no text nodes in the subtree are empty and there are no adjacent text nodes.
+     *
+     * Specifically, this method merges any adjacent text nodes (i.e., nodes for which `nodeType`
+     * is `TEXT_NODE`) into a single node with the combined data. It also removes any empty text
+     * nodes.
+     *
+     * This method operates recursively, so it also normalizes any and all descendent nodes within
+     * the subtree.
+     *
+     * @throws {DOMException}
+     * May throw a DOMException if operations within removeChild or appendData (which are
+     * potentially invoked in this method) do not meet their specific constraints.
+     * @since Modified in DOM Level 2
+     * @see {@link Node.removeChild}
+     * @see {@link CharacterData.appendData}
+     */
+    normalize: function() {
+      for (var r = this.firstChild; r; ) {
+        var u = r.nextSibling;
+        u && u.nodeType == ee && r.nodeType == ee ? (this.removeChild(u), r.appendData(u.data)) : (r.normalize(), r = u);
+      }
+    },
+    /**
+     * Checks whether the DOM implementation implements a specific feature and its version.
+     *
+     * @deprecated
+     * Since `DOMImplementation.hasFeature` is deprecated and always returns true.
+     * @param {string} feature
+     * The package name of the feature to test. This is the same name that can be passed to the
+     * method `hasFeature` on `DOMImplementation`.
+     * @param {string} version
+     * This is the version number of the package name to test.
+     * @returns {boolean}
+     * Returns true in all cases in the current implementation.
+     * @since Introduced in DOM Level 2
+     * @see {@link DOMImplementation.hasFeature}
+     */
+    isSupported: function(r, u) {
+      return this.ownerDocument.implementation.hasFeature(r, u);
+    },
+    /**
+     * Look up the prefix associated to the given namespace URI, starting from this node.
+     * **The default namespace declarations are ignored by this method.**
+     * See Namespace Prefix Lookup for details on the algorithm used by this method.
+     *
+     * **This behavior is different from the in the specs**:
+     * - no node type specific handling
+     * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
+     *
+     * @param {string | null} namespaceURI
+     * The namespace URI for which to find the associated prefix.
+     * @returns {string | null}
+     * The associated prefix, if found; otherwise, null.
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-lookupNamespacePrefix
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/namespaces-algorithms.html#lookupNamespacePrefixAlgo
+     * @see https://dom.spec.whatwg.org/#dom-node-lookupprefix
+     * @see https://github.com/xmldom/xmldom/issues/322
+     * @prettierignore
+     */
+    lookupPrefix: function(r) {
+      for (var u = this; u; ) {
+        var s = u._nsMap;
+        if (s) {
+          for (var c in s)
+            if (i(s, c) && s[c] === r)
+              return c;
+        }
+        u = u.nodeType == K ? u.ownerDocument : u.parentNode;
+      }
+      return null;
+    },
+    /**
+     * This function is used to look up the namespace URI associated with the given prefix,
+     * starting from this node.
+     *
+     * **This behavior is different from the in the specs**:
+     * - no node type specific handling
+     * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
+     *
+     * @param {string | null} prefix
+     * The prefix for which to find the associated namespace URI.
+     * @returns {string | null}
+     * The associated namespace URI, if found; otherwise, null.
+     * @since DOM Level 3
+     * @see https://dom.spec.whatwg.org/#dom-node-lookupnamespaceuri
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-lookupNamespaceURI
+     * @prettierignore
+     */
+    lookupNamespaceURI: function(r) {
+      for (var u = this; u; ) {
+        var s = u._nsMap;
+        if (s && i(s, r))
+          return s[r];
+        u = u.nodeType == K ? u.ownerDocument : u.parentNode;
+      }
+      return null;
+    },
+    /**
+     * Determines whether the given namespace URI is the default namespace.
+     *
+     * The function works by looking up the prefix associated with the given namespace URI. If no
+     * prefix is found (i.e., the namespace URI is not registered in the namespace map of this
+     * node or any of its ancestors), it returns `true`, implying the namespace URI is considered
+     * the default.
+     *
+     * **This behavior is different from the in the specs**:
+     * - no node type specific handling
+     * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
+     *
+     * @param {string | null} namespaceURI
+     * The namespace URI to be checked.
+     * @returns {boolean}
+     * Returns true if the given namespace URI is the default namespace, false otherwise.
+     * @since DOM Level 3
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-isDefaultNamespace
+     * @see https://dom.spec.whatwg.org/#dom-node-isdefaultnamespace
+     * @prettierignore
+     */
+    isDefaultNamespace: function(r) {
+      var u = this.lookupPrefix(r);
+      return u == null;
+    },
+    /**
+     * Compares the reference node with a node with regard to their position in the document and
+     * according to the document order.
+     *
+     * @param {Node} other
+     * The node to compare the reference node to.
+     * @returns {number}
+     * Returns how the node is positioned relatively to the reference node according to the
+     * bitmask. 0 if reference node and given node are the same.
+     * @since DOM Level 3
+     * @see https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-compare
+     * @see https://dom.spec.whatwg.org/#dom-node-comparedocumentposition
+     */
+    compareDocumentPosition: function(r) {
+      if (this === r) return 0;
+      var u = r, s = this, c = null, D = null;
+      if (u instanceof Ae && (c = u, u = c.ownerElement), s instanceof Ae && (D = s, s = D.ownerElement, c && u && s === u))
+        for (var S = 0, X; X = s.attributes[S]; S++) {
+          if (X === c)
+            return M.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + M.DOCUMENT_POSITION_PRECEDING;
+          if (X === D)
+            return M.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + M.DOCUMENT_POSITION_FOLLOWING;
+        }
+      if (!u || !s || s.ownerDocument !== u.ownerDocument)
+        return M.DOCUMENT_POSITION_DISCONNECTED + M.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + (_(s.ownerDocument) > _(u.ownerDocument) ? M.DOCUMENT_POSITION_FOLLOWING : M.DOCUMENT_POSITION_PRECEDING);
+      if (D && u === s)
+        return M.DOCUMENT_POSITION_CONTAINS + M.DOCUMENT_POSITION_PRECEDING;
+      if (c && u === s)
+        return M.DOCUMENT_POSITION_CONTAINED_BY + M.DOCUMENT_POSITION_FOLLOWING;
+      for (var ae = [], de = u.parentNode; de; ) {
+        if (!D && de === s)
+          return M.DOCUMENT_POSITION_CONTAINED_BY + M.DOCUMENT_POSITION_FOLLOWING;
+        ae.push(de), de = de.parentNode;
+      }
+      ae.reverse();
+      for (var ye = [], ge = s.parentNode; ge; ) {
+        if (!c && ge === u)
+          return M.DOCUMENT_POSITION_CONTAINS + M.DOCUMENT_POSITION_PRECEDING;
+        ye.push(ge), ge = ge.parentNode;
+      }
+      ye.reverse();
+      var Ze = J(ae, ye);
+      for (var Ue in Ze.childNodes) {
+        var Oe = Ze.childNodes[Ue];
+        if (Oe === s) return M.DOCUMENT_POSITION_FOLLOWING;
+        if (Oe === u) return M.DOCUMENT_POSITION_PRECEDING;
+        if (ye.indexOf(Oe) >= 0) return M.DOCUMENT_POSITION_FOLLOWING;
+        if (ae.indexOf(Oe) >= 0) return M.DOCUMENT_POSITION_PRECEDING;
+      }
+      return 0;
+    }
+  };
+  function $e(r) {
+    return r == "<" && "&lt;" || r == ">" && "&gt;" || r == "&" && "&amp;" || r == '"' && "&quot;" || "&#" + r.charCodeAt() + ";";
+  }
+  g(F, P), g(F, P.prototype), g(M, P), g(M, P.prototype);
+  function Re(r, u) {
+    if (u(r))
+      return !0;
+    if (r = r.firstChild)
+      do
+        if (Re(r, u))
+          return !0;
+      while (r = r.nextSibling);
+  }
+  function pe(r, u) {
+    b(r);
+    var s = u || {};
+    this.ownerDocument = this, this.contentType = s.contentType || p.XML_APPLICATION, this.type = o(this.contentType) ? "html" : "xml";
+  }
+  function Ve(r, u, s) {
+    r && r._inc++;
+    var c = s.namespaceURI;
+    c === f.XMLNS && (u._nsMap[s.prefix ? s.localName : ""] = s.value);
+  }
+  function _e(r, u, s, c) {
+    r && r._inc++;
+    var D = s.namespaceURI;
+    D === f.XMLNS && delete u._nsMap[s.prefix ? s.localName : ""];
+  }
+  function Se(r, u, s) {
+    if (r && r._inc) {
+      r._inc++;
+      var c = u.childNodes;
+      if (s && !s.nextSibling)
+        c[c.length++] = s;
+      else {
+        for (var D = u.firstChild, S = 0; D; )
+          c[S++] = D, D = D.nextSibling;
+        c.length = S, delete c[c.length];
+      }
+    }
+  }
+  function Fe(r, u) {
+    if (r !== u.parentNode)
+      throw new l(l.NOT_FOUND_ERR, "child's parent is not parent");
+    var s = u.previousSibling, c = u.nextSibling;
+    return s ? s.nextSibling = c : r.firstChild = c, c ? c.previousSibling = s : r.lastChild = s, Se(r.ownerDocument, r), u.parentNode = null, u.previousSibling = null, u.nextSibling = null, u;
+  }
+  function He(r) {
+    return r && (r.nodeType === P.DOCUMENT_NODE || r.nodeType === P.DOCUMENT_FRAGMENT_NODE || r.nodeType === P.ELEMENT_NODE);
+  }
+  function Je(r) {
+    return r && (r.nodeType === P.CDATA_SECTION_NODE || r.nodeType === P.COMMENT_NODE || r.nodeType === P.DOCUMENT_FRAGMENT_NODE || r.nodeType === P.DOCUMENT_TYPE_NODE || r.nodeType === P.ELEMENT_NODE || r.nodeType === P.PROCESSING_INSTRUCTION_NODE || r.nodeType === P.TEXT_NODE);
+  }
+  function Ce(r) {
+    return r && r.nodeType === P.DOCUMENT_TYPE_NODE;
+  }
+  function Q(r) {
+    return r && r.nodeType === P.ELEMENT_NODE;
+  }
+  function Ge(r) {
+    return r && r.nodeType === P.TEXT_NODE;
+  }
+  function oe(r, u) {
+    var s = r.childNodes || [];
+    if (e(s, Q) || Ce(u))
+      return !1;
+    var c = e(s, Ce);
+    return !(u && c && s.indexOf(c) > s.indexOf(u));
+  }
+  function Xe(r, u) {
+    var s = r.childNodes || [];
+    function c(S) {
+      return Q(S) && S !== u;
+    }
+    if (e(s, c))
+      return !1;
+    var D = e(s, Ce);
+    return !(u && D && s.indexOf(D) > s.indexOf(u));
+  }
+  function vt(r, u, s) {
+    if (!He(r))
+      throw new l(l.HIERARCHY_REQUEST_ERR, "Unexpected parent node type " + r.nodeType);
+    if (s && s.parentNode !== r)
+      throw new l(l.NOT_FOUND_ERR, "child not in parent");
+    if (
+      // 4. If `node` is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
+      !Je(u) || // 5. If either `node` is a Text node and `parent` is a document,
+      // the sax parser currently adds top level text nodes, this will be fixed in 0.9.0
+      // || (node.nodeType === Node.TEXT_NODE && parent.nodeType === Node.DOCUMENT_NODE)
+      // or `node` is a doctype and `parent` is not a document, then throw a "HierarchyRequestError" DOMException.
+      Ce(u) && r.nodeType !== P.DOCUMENT_NODE
+    )
+      throw new l(
+        l.HIERARCHY_REQUEST_ERR,
+        "Unexpected node type " + u.nodeType + " for parent node type " + r.nodeType
+      );
+  }
+  function Ye(r, u, s) {
+    var c = r.childNodes || [], D = u.childNodes || [];
+    if (u.nodeType === P.DOCUMENT_FRAGMENT_NODE) {
+      var S = D.filter(Q);
+      if (S.length > 1 || e(D, Ge))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "More than one element or text in fragment");
+      if (S.length === 1 && !oe(r, s))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Element in fragment can not be inserted before doctype");
+    }
+    if (Q(u) && !oe(r, s))
+      throw new l(l.HIERARCHY_REQUEST_ERR, "Only one element can be added and only after doctype");
+    if (Ce(u)) {
+      if (e(c, Ce))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Only one doctype is allowed");
+      var X = e(c, Q);
+      if (s && c.indexOf(X) < c.indexOf(s))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Doctype can only be inserted before an element");
+      if (!s && X)
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Doctype can not be appended since element is present");
+    }
+  }
+  function We(r, u, s) {
+    var c = r.childNodes || [], D = u.childNodes || [];
+    if (u.nodeType === P.DOCUMENT_FRAGMENT_NODE) {
+      var S = D.filter(Q);
+      if (S.length > 1 || e(D, Ge))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "More than one element or text in fragment");
+      if (S.length === 1 && !Xe(r, s))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Element in fragment can not be inserted before doctype");
+    }
+    if (Q(u) && !Xe(r, s))
+      throw new l(l.HIERARCHY_REQUEST_ERR, "Only one element can be added and only after doctype");
+    if (Ce(u)) {
+      if (e(c, function(de) {
+        return Ce(de) && de !== s;
+      }))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Only one doctype is allowed");
+      var X = e(c, Q);
+      if (s && c.indexOf(X) < c.indexOf(s))
+        throw new l(l.HIERARCHY_REQUEST_ERR, "Doctype can only be inserted before an element");
+    }
+  }
+  function q(r, u, s, c) {
+    vt(r, u, s), r.nodeType === P.DOCUMENT_NODE && (c || Ye)(r, u, s);
+    var D = u.parentNode;
+    if (D && D.removeChild(u), u.nodeType === B) {
+      var S = u.firstChild;
+      if (S == null)
+        return u;
+      var X = u.lastChild;
+    } else
+      S = X = u;
+    var ae = s ? s.previousSibling : r.lastChild;
+    S.previousSibling = ae, X.nextSibling = s, ae ? ae.nextSibling = S : r.firstChild = S, s == null ? r.lastChild = X : s.previousSibling = X;
+    do
+      S.parentNode = r;
+    while (S !== X && (S = S.nextSibling));
+    return Se(r.ownerDocument || r, r, u), u.nodeType == B && (u.firstChild = u.lastChild = null), u;
+  }
+  pe.prototype = {
+    /**
+     * The implementation that created this document.
+     *
+     * @type DOMImplementation
+     * @readonly
+     */
+    implementation: null,
+    nodeName: "#document",
+    nodeType: w,
+    /**
+     * The DocumentType node of the document.
+     *
+     * @type DocumentType
+     * @readonly
+     */
+    doctype: null,
+    documentElement: null,
+    _inc: 1,
+    insertBefore: function(r, u) {
+      if (r.nodeType === B) {
+        for (var s = r.firstChild; s; ) {
+          var c = s.nextSibling;
+          this.insertBefore(s, u), s = c;
+        }
+        return r;
+      }
+      return q(this, r, u), r.ownerDocument = this, this.documentElement === null && r.nodeType === G && (this.documentElement = r), r;
+    },
+    removeChild: function(r) {
+      var u = Fe(this, r);
+      return u === this.documentElement && (this.documentElement = null), u;
+    },
+    replaceChild: function(r, u) {
+      q(this, r, u, We), r.ownerDocument = this, u && this.removeChild(u), Q(r) && (this.documentElement = r);
+    },
+    // Introduced in DOM Level 2:
+    importNode: function(r, u) {
+      return Jt(this, r, u);
+    },
+    // Introduced in DOM Level 2:
+    getElementById: function(r) {
+      var u = null;
+      return Re(this.documentElement, function(s) {
+        if (s.nodeType == G && s.getAttribute("id") == r)
+          return u = s, !0;
+      }), u;
+    },
+    /**
+     * Creates a new `Element` that is owned by this `Document`.
+     * In HTML Documents `localName` is the lower cased `tagName`,
+     * otherwise no transformation is being applied.
+     * When `contentType` implies the HTML namespace, it will be set as `namespaceURI`.
+     *
+     * __This implementation differs from the specification:__ - The provided name is not checked
+     * against the `Name` production,
+     * so no related error will be thrown.
+     * - There is no interface `HTMLElement`, it is always an `Element`.
+     * - There is no support for a second argument to indicate using custom elements.
+     *
+     * @param {string} tagName
+     * @returns {Element}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+     * @see https://dom.spec.whatwg.org/#dom-document-createelement
+     * @see https://dom.spec.whatwg.org/#concept-create-element
+     */
+    createElement: function(r) {
+      var u = new Z(m);
+      u.ownerDocument = this, this.type === "html" && (r = r.toLowerCase()), n(this.contentType) && (u.namespaceURI = f.HTML), u.nodeName = r, u.tagName = r, u.localName = r, u.childNodes = new T();
+      var s = u.attributes = new V();
+      return s._ownerElement = u, u;
+    },
+    /**
+     * @returns {DocumentFragment}
+     */
+    createDocumentFragment: function() {
+      var r = new Qe(m);
+      return r.ownerDocument = this, r.childNodes = new T(), r;
+    },
+    /**
+     * @param {string} data
+     * @returns {Text}
+     */
+    createTextNode: function(r) {
+      var u = new Ke(m);
+      return u.ownerDocument = this, u.childNodes = new T(), u.appendData(r), u;
+    },
+    /**
+     * @param {string} data
+     * @returns {Comment}
+     */
+    createComment: function(r) {
+      var u = new st(m);
+      return u.ownerDocument = this, u.childNodes = new T(), u.appendData(r), u;
+    },
+    /**
+     * @param {string} data
+     * @returns {CDATASection}
+     */
+    createCDATASection: function(r) {
+      var u = new ct(m);
+      return u.ownerDocument = this, u.childNodes = new T(), u.appendData(r), u;
+    },
+    /**
+     * @param {string} target
+     * @param {string} data
+     * @returns {ProcessingInstruction}
+     */
+    createProcessingInstruction: function(r, u) {
+      var s = new pt(m);
+      return s.ownerDocument = this, s.childNodes = new T(), s.nodeName = s.target = r, s.nodeValue = s.data = u, s;
+    },
+    /**
+     * Creates an `Attr` node that is owned by this document.
+     * In HTML Documents `localName` is the lower cased `name`,
+     * otherwise no transformation is being applied.
+     *
+     * __This implementation differs from the specification:__ - The provided name is not checked
+     * against the `Name` production,
+     * so no related error will be thrown.
+     *
+     * @param {string} name
+     * @returns {Attr}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createAttribute
+     * @see https://dom.spec.whatwg.org/#dom-document-createattribute
+     */
+    createAttribute: function(r) {
+      if (!O.QName_exact.test(r))
+        throw new l(l.INVALID_CHARACTER_ERR, 'invalid character in name "' + r + '"');
+      return this.type === "html" && (r = r.toLowerCase()), this._createAttribute(r);
+    },
+    _createAttribute: function(r) {
+      var u = new Ae(m);
+      return u.ownerDocument = this, u.childNodes = new T(), u.name = r, u.nodeName = r, u.localName = r, u.specified = !0, u;
+    },
+    /**
+     * Creates an EntityReference object.
+     * The current implementation does not fill the `childNodes` with those of the corresponding
+     * `Entity`
+     *
+     * @deprecated
+     * In DOM Level 4.
+     * @param {string} name
+     * The name of the entity to reference. No namespace well-formedness checks are performed.
+     * @returns {EntityReference}
+     * @throws {DOMException}
+     * With code `INVALID_CHARACTER_ERR` when `name` is not valid.
+     * @throws {DOMException}
+     * with code `NOT_SUPPORTED_ERR` when the document is of type `html`
+     * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-392B75AE
+     */
+    createEntityReference: function(r) {
+      if (!O.Name.test(r))
+        throw new l(l.INVALID_CHARACTER_ERR, 'not a valid xml name "' + r + '"');
+      if (this.type === "html")
+        throw new l("document is an html document", v.NotSupportedError);
+      var u = new ft(m);
+      return u.ownerDocument = this, u.childNodes = new T(), u.nodeName = r, u;
+    },
+    // Introduced in DOM Level 2:
+    /**
+     * @param {string} namespaceURI
+     * @param {string} qualifiedName
+     * @returns {Element}
+     */
+    createElementNS: function(r, u) {
+      var s = le(r, u), c = new Z(m), D = c.attributes = new V();
+      return c.childNodes = new T(), c.ownerDocument = this, c.nodeName = u, c.tagName = u, c.namespaceURI = s[0], c.prefix = s[1], c.localName = s[2], D._ownerElement = c, c;
+    },
+    // Introduced in DOM Level 2:
+    /**
+     * @param {string} namespaceURI
+     * @param {string} qualifiedName
+     * @returns {Attr}
+     */
+    createAttributeNS: function(r, u) {
+      var s = le(r, u), c = new Ae(m);
+      return c.ownerDocument = this, c.childNodes = new T(), c.nodeName = u, c.name = u, c.specified = !0, c.namespaceURI = s[0], c.prefix = s[1], c.localName = s[2], c;
+    }
+  }, x(pe, P);
+  function Z(r) {
+    b(r), this._nsMap = /* @__PURE__ */ Object.create(null);
+  }
+  Z.prototype = {
+    nodeType: G,
+    /**
+     * The attributes of this element.
+     *
+     * @type {NamedNodeMap | null}
+     */
+    attributes: null,
+    getQualifiedName: function() {
+      return this.prefix ? this.prefix + ":" + this.localName : this.localName;
+    },
+    _isInHTMLDocumentAndNamespace: function() {
+      return this.ownerDocument.type === "html" && this.namespaceURI === f.HTML;
+    },
+    /**
+     * Implementaton of Level2 Core function hasAttributes.
+     *
+     * @returns {boolean}
+     * True if attribute list is not empty.
+     * @see https://www.w3.org/TR/DOM-Level-2-Core/#core-ID-NodeHasAttrs
+     */
+    hasAttributes: function() {
+      return !!(this.attributes && this.attributes.length);
+    },
+    hasAttribute: function(r) {
+      return !!this.getAttributeNode(r);
+    },
+    /**
+     * Returns element’s first attribute whose qualified name is `name`, and `null`
+     * if there is no such attribute.
+     *
+     * @param {string} name
+     * @returns {string | null}
+     */
+    getAttribute: function(r) {
+      var u = this.getAttributeNode(r);
+      return u ? u.value : null;
+    },
+    getAttributeNode: function(r) {
+      return this._isInHTMLDocumentAndNamespace() && (r = r.toLowerCase()), this.attributes.getNamedItem(r);
+    },
+    /**
+     * Sets the value of element’s first attribute whose qualified name is qualifiedName to value.
+     *
+     * @param {string} name
+     * @param {string} value
+     */
+    setAttribute: function(r, u) {
+      this._isInHTMLDocumentAndNamespace() && (r = r.toLowerCase());
+      var s = this.getAttributeNode(r);
+      s ? s.value = s.nodeValue = "" + u : (s = this.ownerDocument._createAttribute(r), s.value = s.nodeValue = "" + u, this.setAttributeNode(s));
+    },
+    removeAttribute: function(r) {
+      var u = this.getAttributeNode(r);
+      u && this.removeAttributeNode(u);
+    },
+    setAttributeNode: function(r) {
+      return this.attributes.setNamedItem(r);
+    },
+    setAttributeNodeNS: function(r) {
+      return this.attributes.setNamedItemNS(r);
+    },
+    removeAttributeNode: function(r) {
+      return this.attributes.removeNamedItem(r.nodeName);
+    },
+    //get real attribute name,and remove it by removeAttributeNode
+    removeAttributeNS: function(r, u) {
+      var s = this.getAttributeNodeNS(r, u);
+      s && this.removeAttributeNode(s);
+    },
+    hasAttributeNS: function(r, u) {
+      return this.getAttributeNodeNS(r, u) != null;
+    },
+    /**
+     * Returns element’s attribute whose namespace is `namespaceURI` and local name is
+     * `localName`,
+     * or `null` if there is no such attribute.
+     *
+     * @param {string} namespaceURI
+     * @param {string} localName
+     * @returns {string | null}
+     */
+    getAttributeNS: function(r, u) {
+      var s = this.getAttributeNodeNS(r, u);
+      return s ? s.value : null;
+    },
+    /**
+     * Sets the value of element’s attribute whose namespace is `namespaceURI` and local name is
+     * `localName` to value.
+     *
+     * @param {string} namespaceURI
+     * @param {string} qualifiedName
+     * @param {string} value
+     * @see https://dom.spec.whatwg.org/#dom-element-setattributens
+     */
+    setAttributeNS: function(r, u, s) {
+      var c = le(r, u), D = c[2], S = this.getAttributeNodeNS(r, D);
+      S ? S.value = S.nodeValue = "" + s : (S = this.ownerDocument.createAttributeNS(r, u), S.value = S.nodeValue = "" + s, this.setAttributeNode(S));
+    },
+    getAttributeNodeNS: function(r, u) {
+      return this.attributes.getNamedItemNS(r, u);
+    },
+    /**
+     * Returns a LiveNodeList of all child elements which have **all** of the given class name(s).
+     *
+     * Returns an empty list if `classNames` is an empty string or only contains HTML white space
+     * characters.
+     *
+     * Warning: This returns a live LiveNodeList.
+     * Changes in the DOM will reflect in the array as the changes occur.
+     * If an element selected by this array no longer qualifies for the selector,
+     * it will automatically be removed. Be aware of this for iteration purposes.
+     *
+     * @param {string} classNames
+     * Is a string representing the class name(s) to match; multiple class names are separated by
+     * (ASCII-)whitespace.
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByClassName
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName
+     * @see https://dom.spec.whatwg.org/#concept-getelementsbyclassname
+     */
+    getElementsByClassName: function(r) {
+      var u = k(r);
+      return new I(this, function(s) {
+        var c = [];
+        return u.length > 0 && Re(s, function(D) {
+          if (D !== s && D.nodeType === G) {
+            var S = D.getAttribute("class");
+            if (S) {
+              var X = r === S;
+              if (!X) {
+                var ae = k(S);
+                X = u.every($(ae));
+              }
+              X && c.push(D);
+            }
+          }
+        }), c;
+      });
+    },
+    /**
+     * Returns a LiveNodeList of elements with the given qualifiedName.
+     * Searching for all descendants can be done by passing `*` as `qualifiedName`.
+     *
+     * All descendants of the specified element are searched, but not the element itself.
+     * The returned list is live, which means it updates itself with the DOM tree automatically.
+     * Therefore, there is no need to call `Element.getElementsByTagName()`
+     * with the same element and arguments repeatedly if the DOM changes in between calls.
+     *
+     * When called on an HTML element in an HTML document,
+     * `getElementsByTagName` lower-cases the argument before searching for it.
+     * This is undesirable when trying to match camel-cased SVG elements (such as
+     * `<linearGradient>`) in an HTML document.
+     * Instead, use `Element.getElementsByTagNameNS()`,
+     * which preserves the capitalization of the tag name.
+     *
+     * `Element.getElementsByTagName` is similar to `Document.getElementsByTagName()`,
+     * except that it only searches for elements that are descendants of the specified element.
+     *
+     * @param {string} qualifiedName
+     * @returns {LiveNodeList}
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName
+     * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname
+     */
+    getElementsByTagName: function(r) {
+      var u = (this.nodeType === w ? this : this.ownerDocument).type === "html", s = r.toLowerCase();
+      return new I(this, function(c) {
+        var D = [];
+        return Re(c, function(S) {
+          if (!(S === c || S.nodeType !== G))
+            if (r === "*")
+              D.push(S);
+            else {
+              var X = S.getQualifiedName(), ae = u && S.namespaceURI === f.HTML ? s : r;
+              X === ae && D.push(S);
+            }
+        }), D;
+      });
+    },
+    getElementsByTagNameNS: function(r, u) {
+      return new I(this, function(s) {
+        var c = [];
+        return Re(s, function(D) {
+          D !== s && D.nodeType === G && (r === "*" || D.namespaceURI === r) && (u === "*" || D.localName == u) && c.push(D);
+        }), c;
+      });
+    }
+  }, pe.prototype.getElementsByClassName = Z.prototype.getElementsByClassName, pe.prototype.getElementsByTagName = Z.prototype.getElementsByTagName, pe.prototype.getElementsByTagNameNS = Z.prototype.getElementsByTagNameNS, x(Z, P);
+  function Ae(r) {
+    b(r), this.namespaceURI = null, this.prefix = null, this.ownerElement = null;
+  }
+  Ae.prototype.nodeType = K, x(Ae, P);
+  function Ne(r) {
+    b(r);
+  }
+  Ne.prototype = {
+    data: "",
+    substringData: function(r, u) {
+      return this.data.substring(r, r + u);
+    },
+    appendData: function(r) {
+      r = this.data + r, this.nodeValue = this.data = r, this.length = r.length;
+    },
+    insertData: function(r, u) {
+      this.replaceData(r, 0, u);
+    },
+    deleteData: function(r, u) {
+      this.replaceData(r, u, "");
+    },
+    replaceData: function(r, u, s) {
+      var c = this.data.substring(0, r), D = this.data.substring(r + u);
+      s = c + s + D, this.nodeValue = this.data = s, this.length = s.length;
+    }
+  }, x(Ne, P);
+  function Ke(r) {
+    b(r);
+  }
+  Ke.prototype = {
+    nodeName: "#text",
+    nodeType: ee,
+    splitText: function(r) {
+      var u = this.data, s = u.substring(r);
+      u = u.substring(0, r), this.data = this.nodeValue = u, this.length = u.length;
+      var c = this.ownerDocument.createTextNode(s);
+      return this.parentNode && this.parentNode.insertBefore(c, this.nextSibling), c;
+    }
+  }, x(Ke, Ne);
+  function st(r) {
+    b(r);
+  }
+  st.prototype = {
+    nodeName: "#comment",
+    nodeType: N
+  }, x(st, Ne);
+  function ct(r) {
+    b(r);
+  }
+  ct.prototype = {
+    nodeName: "#cdata-section",
+    nodeType: Ie
+  }, x(ct, Ke);
+  function lt(r) {
+    b(r);
+  }
+  lt.prototype.nodeType = y, x(lt, P);
+  function At(r) {
+    b(r);
+  }
+  At.prototype.nodeType = A, x(At, P);
+  function Nt(r) {
+    b(r);
+  }
+  Nt.prototype.nodeType = Me, x(Nt, P);
+  function ft(r) {
+    b(r);
+  }
+  ft.prototype.nodeType = te, x(ft, P);
+  function Qe(r) {
+    b(r);
+  }
+  Qe.prototype.nodeName = "#document-fragment", Qe.prototype.nodeType = B, x(Qe, P);
+  function pt(r) {
+    b(r);
+  }
+  pt.prototype.nodeType = d, x(pt, Ne);
+  function Ot() {
+  }
+  Ot.prototype.serializeToString = function(r, u) {
+    return ue.call(r, u);
+  }, P.prototype.toString = ue;
+  function ue(r) {
+    var u = [], s = this.nodeType === w && this.documentElement || this, c = s.prefix, D = s.namespaceURI;
+    if (D && c == null) {
+      var c = s.lookupPrefix(D);
+      if (c == null)
+        var S = [
+          { namespace: D, prefix: null }
+          //{namespace:uri,prefix:''}
+        ];
+    }
+    return qe(this, u, r, S), u.join("");
+  }
+  function he(r, u, s) {
+    var c = r.prefix || "", D = r.namespaceURI;
+    if (!D || c === "xml" && D === f.XML || D === f.XMLNS)
+      return !1;
+    for (var S = s.length; S--; ) {
+      var X = s[S];
+      if (X.prefix === c)
+        return X.namespace !== D;
+    }
+    return !0;
+  }
+  function ke(r, u, s) {
+    r.push(" ", u, '="', s.replace(/[<>&"\t\n\r]/g, $e), '"');
+  }
+  function qe(r, u, s, c) {
+    c || (c = []);
+    var D = r.nodeType === w ? r : r.ownerDocument, S = D.type === "html";
+    if (s)
+      if (r = s(r), r) {
+        if (typeof r == "string") {
+          u.push(r);
+          return;
+        }
+      } else
+        return;
+    switch (r.nodeType) {
+      case G:
+        var X = r.attributes, ae = X.length, me = r.firstChild, de = r.tagName, ye = de;
+        if (!S && !r.prefix && r.namespaceURI) {
+          for (var ge, Ze = 0; Ze < X.length; Ze++)
+            if (X.item(Ze).name === "xmlns") {
+              ge = X.item(Ze).value;
+              break;
+            }
+          if (!ge)
+            for (var Ue = c.length - 1; Ue >= 0; Ue--) {
+              var Oe = c[Ue];
+              if (Oe.prefix === "" && Oe.namespace === r.namespaceURI) {
+                ge = Oe.namespace;
+                break;
+              }
+            }
+          if (ge !== r.namespaceURI)
+            for (var Ue = c.length - 1; Ue >= 0; Ue--) {
+              var Oe = c[Ue];
+              if (Oe.namespace === r.namespaceURI) {
+                Oe.prefix && (ye = Oe.prefix + ":" + de);
+                break;
+              }
+            }
+        }
+        u.push("<", ye);
+        for (var et = 0; et < ae; et++) {
+          var Pe = X.item(et);
+          Pe.prefix == "xmlns" ? c.push({
+            prefix: Pe.localName,
+            namespace: Pe.value
+          }) : Pe.nodeName == "xmlns" && c.push({ prefix: "", namespace: Pe.value });
+        }
+        for (var et = 0; et < ae; et++) {
+          var Pe = X.item(et);
+          if (he(Pe, S, c)) {
+            var tt = Pe.prefix || "", bt = Pe.namespaceURI;
+            ke(u, tt ? "xmlns:" + tt : "xmlns", bt), c.push({ prefix: tt, namespace: bt });
+          }
+          qe(Pe, u, s, c);
+        }
+        if (de === ye && he(r, S, c)) {
+          var tt = r.prefix || "", bt = r.namespaceURI;
+          ke(u, tt ? "xmlns:" + tt : "xmlns", bt), c.push({ prefix: tt, namespace: bt });
+        }
+        var Ft = !me;
+        if (Ft && (S || r.namespaceURI === f.HTML) && (Ft = h(de)), Ft)
+          u.push("/>");
+        else {
+          if (u.push(">"), S && a(de))
+            for (; me; )
+              me.data ? u.push(me.data) : qe(me, u, s, c.slice()), me = me.nextSibling;
+          else
+            for (; me; )
+              qe(me, u, s, c.slice()), me = me.nextSibling;
+          u.push("</", ye, ">");
+        }
+        return;
+      case w:
+      case B:
+        for (var me = r.firstChild; me; )
+          qe(me, u, s, c.slice()), me = me.nextSibling;
+        return;
+      case K:
+        return ke(u, r.name, r.value);
+      case ee:
+        return u.push(r.data.replace(/[<&>]/g, $e));
+      case Ie:
+        return u.push(O.CDATA_START, r.data, O.CDATA_END);
+      case N:
+        return u.push(O.COMMENT_START, r.data, O.COMMENT_END);
+      case y:
+        var Yt = r.publicId, ht = r.systemId;
+        u.push(O.DOCTYPE_DECL_START, " ", r.name), Yt ? (u.push(" ", O.PUBLIC, " ", Yt), ht && ht !== "." && u.push(" ", ht)) : ht && ht !== "." && u.push(" ", O.SYSTEM, " ", ht), r.internalSubset && u.push(" [", r.internalSubset, "]"), u.push(">");
+        return;
+      case d:
+        return u.push("<?", r.target, " ", r.data, "?>");
+      case te:
+        return u.push("&", r.nodeName, ";");
+      //case ENTITY_NODE:
+      //case NOTATION_NODE:
+      default:
+        u.push("??", r.nodeName);
+    }
+  }
+  function Jt(r, u, s) {
+    var c;
+    switch (u.nodeType) {
+      case G:
+        c = u.cloneNode(!1), c.ownerDocument = r;
+      //var attrs = node2.attributes;
+      //var len = attrs.length;
+      //for(var i=0;i<len;i++){
+      //node2.setAttributeNodeNS(importNode(doc,attrs.item(i),deep));
+      //}
+      case B:
+        break;
+      case K:
+        s = !0;
+        break;
+    }
+    if (c || (c = u.cloneNode(!1)), c.ownerDocument = r, c.parentNode = null, s)
+      for (var D = u.firstChild; D; )
+        c.appendChild(Jt(r, D, s)), D = D.nextSibling;
+    return c;
+  }
+  function Lt(r, u, s) {
+    var c = new u.constructor(m);
+    for (var D in u)
+      if (i(u, D)) {
+        var S = u[D];
+        typeof S != "object" && S != c[D] && (c[D] = S);
+      }
+    switch (u.childNodes && (c.childNodes = new T()), c.ownerDocument = r, c.nodeType) {
+      case G:
+        var X = u.attributes, ae = c.attributes = new V(), de = X.length;
+        ae._ownerElement = c;
+        for (var ye = 0; ye < de; ye++)
+          c.setAttributeNode(Lt(r, X.item(ye), !0));
+        break;
+      case K:
+        s = !0;
+    }
+    if (s)
+      for (var ge = u.firstChild; ge; )
+        c.appendChild(Lt(r, ge, s)), ge = ge.nextSibling;
+    return c;
+  }
+  function Xt(r, u, s) {
+    r[u] = s;
+  }
   try {
-    typeof e != "function" && (e = RegExp);
-    var t = new e("𝌆", "u").exec("𝌆");
-    return !!t && t[0].length === 2;
+    if (Object.defineProperty) {
+      let r = function(u) {
+        switch (u.nodeType) {
+          case G:
+          case B:
+            var s = [];
+            for (u = u.firstChild; u; )
+              u.nodeType !== 7 && u.nodeType !== 8 && s.push(r(u)), u = u.nextSibling;
+            return s.join("");
+          default:
+            return u.nodeValue;
+        }
+      };
+      Object.defineProperty(I.prototype, "length", {
+        get: function() {
+          return L(this), this.$$length;
+        }
+      }), Object.defineProperty(P.prototype, "textContent", {
+        get: function() {
+          return r(this);
+        },
+        set: function(u) {
+          switch (this.nodeType) {
+            case G:
+            case B:
+              for (; this.firstChild; )
+                this.removeChild(this.firstChild);
+              (u || String(u)) && this.appendChild(this.ownerDocument.createTextNode(u));
+              break;
+            default:
+              this.data = u, this.value = u, this.nodeValue = u;
+          }
+        }
+      }), Xt = function(u, s, c) {
+        u["$$" + s] = c;
+      };
+    }
   } catch {
   }
-  return !1;
-}
-var st = Dn();
-function Ee(e) {
-  if (e.source[0] !== "[")
-    throw new Error(e + " can not be used with chars");
-  return e.source.slice(1, e.source.lastIndexOf("]"));
-}
-function Be(e, t) {
-  if (e.source[0] !== "[")
-    throw new Error("/" + e.source + "/ can not be used with chars_without");
-  if (!t || typeof t != "string")
-    throw new Error(JSON.stringify(t) + " is not a valid search");
-  if (e.source.indexOf(t) === -1)
-    throw new Error('"' + t + '" is not is /' + e.source + "/");
-  if (t === "-" && e.source.indexOf(t) !== 1)
-    throw new Error('"' + t + '" is not at the first postion of /' + e.source + "/");
-  return new RegExp(e.source.replace(t, ""), st ? "u" : "");
-}
-function A(e) {
-  var t = this;
-  return new RegExp(
-    Array.prototype.slice.call(arguments).map(function(r) {
-      var n = typeof r == "string";
-      if (n && t === void 0 && r === "|")
-        throw new Error("use regg instead of reg to wrap expressions with `|`!");
-      return n ? r : r.source;
-    }).join(""),
-    st ? "mu" : "m"
-  );
-}
-function E(e) {
-  if (arguments.length === 0)
-    throw new Error("no parameters provided");
-  return A.apply(E, ["(?:"].concat(Array.prototype.slice.call(arguments), [")"]));
-}
-var Gu = "�", ge = /[-\x09\x0A\x0D\x20-\x2C\x2E-\uD7FF\uE000-\uFFFD]/;
-st && (ge = A("[", Ee(ge), "\\u{10000}-\\u{10FFFF}", "]"));
-var Zt = /[\x20\x09\x0D\x0A]/, zu = Ee(Zt), S = A(Zt, "+"), R = A(Zt, "*"), et = /[:_a-zA-Z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
-st && (et = A("[", Ee(et), "\\u{10000}-\\u{10FFFF}", "]"));
-var Ju = Ee(et), er = A("[", Ju, Ee(/[-.0-9\xB7]/), Ee(/[\u0300-\u036F\u203F-\u2040]/), "]"), Y = A(et, er, "*"), Ar = A(er, "+"), Xu = A("&", Y, ";"), Yu = E(/&#[0-9]+;|&#x[0-9a-fA-F]+;/), tt = E(Xu, "|", Yu), rt = A("%", Y, ";"), tr = E(
-  A('"', E(/[^%&"]/, "|", rt, "|", tt), "*", '"'),
-  "|",
-  A("'", E(/[^%&']/, "|", rt, "|", tt), "*", "'")
-), Ku = E('"', E(/[^<&"]/, "|", tt), "*", '"', "|", "'", E(/[^<&']/, "|", tt), "*", "'"), Wu = Be(et, ":"), Qu = Be(er, ":"), Nr = A(Wu, Qu, "*"), ct = A(Nr, E(":", Nr), "?"), Zu = A("^", ct, "$"), ei = A("(", ct, ")"), nt = E(/"[^"]*"|'[^']*'/), ti = A(/^<\?/, "(", Y, ")", E(S, "(", ge, "*?)"), "?", /\?>/), br = /[\x20\x0D\x0Aa-zA-Z0-9-'()+,./:=?;!*#@$_%]/, yt = E('"', br, '*"', "|", "'", Be(br, "'"), "*'"), vn = "<!--", An = "-->", ri = A(vn, E(Be(ge, "-"), "|", A("-", Be(ge, "-"))), "*", An), yr = "#PCDATA", ni = E(
-  A(/\(/, R, yr, E(R, /\|/, R, ct), "*", R, /\)\*/),
-  "|",
-  A(/\(/, R, yr, R, /\)/)
-), ui = /[?*+]?/, ii = A(
-  /\([^>]+\)/,
-  ui
-  /*regg(choice, '|', seq), _children_quantity*/
-), oi = E("EMPTY", "|", "ANY", "|", ni, "|", ii), ai = "<!ELEMENT", si = A(ai, S, E(ct, "|", rt), S, E(oi, "|", rt), R, ">"), ci = A("NOTATION", S, /\(/, R, Y, E(R, /\|/, R, Y), "*", R, /\)/), li = A(/\(/, R, Ar, E(R, /\|/, R, Ar), "*", R, /\)/), fi = E(ci, "|", li), pi = E(/CDATA|ID|IDREF|IDREFS|ENTITY|ENTITIES|NMTOKEN|NMTOKENS/, "|", fi), hi = E(/#REQUIRED|#IMPLIED/, "|", E(E("#FIXED", S), "?", Ku)), di = E(S, Y, S, pi, S, hi), mi = "<!ATTLIST", Ei = A(mi, S, Y, di, "*", R, ">"), rr = "SYSTEM", Ct = "PUBLIC", Tt = E(E(rr, S, nt), "|", E(Ct, S, yt, S, nt)), gi = A(
-  "^",
-  E(
-    E(rr, S, "(?<SystemLiteralOnly>", nt, ")"),
-    "|",
-    E(Ct, S, "(?<PubidLiteral>", yt, ")", S, "(?<SystemLiteral>", nt, ")")
-  )
-), Di = E(S, "NDATA", S, Y), vi = E(tr, "|", E(Tt, Di, "?")), Nn = "<!ENTITY", Ai = A(Nn, S, Y, S, vi, R, ">"), Ni = E(tr, "|", Tt), bi = A(Nn, S, "%", S, Y, S, Ni, R, ">"), yi = E(Ai, "|", bi), Ci = A(Ct, S, yt), Ti = A("<!NOTATION", S, Y, S, E(Tt, "|", Ci), R, ">"), nr = A(R, "=", R), Cr = /1[.]\d+/, wi = A(S, "version", nr, E("'", Cr, "'", "|", '"', Cr, '"')), Tr = /[A-Za-z][-A-Za-z0-9._]*/, Si = E(S, "encoding", nr, E('"', Tr, '"', "|", "'", Tr, "'")), Oi = E(S, "standalone", nr, E("'", E("yes", "|", "no"), "'", "|", '"', E("yes", "|", "no"), '"')), Ii = A(/^<\?xml/, wi, Si, "?", Oi, "?", R, /\?>/), Ri = "<!DOCTYPE", Bi = "<![CDATA[", xi = "]]>", Mi = /<!\[CDATA\[/, _i = /\]\]>/, Pi = A(ge, "*?", _i), Li = A(Mi, Pi);
-v.chars = Ee;
-v.chars_without = Be;
-v.detectUnicodeSupport = Dn;
-v.reg = A;
-v.regg = E;
-v.AttlistDecl = Ei;
-v.CDATA_START = Bi;
-v.CDATA_END = xi;
-v.CDSect = Li;
-v.Char = ge;
-v.Comment = ri;
-v.COMMENT_START = vn;
-v.COMMENT_END = An;
-v.DOCTYPE_DECL_START = Ri;
-v.elementdecl = si;
-v.EntityDecl = yi;
-v.EntityValue = tr;
-v.ExternalID = Tt;
-v.ExternalID_match = gi;
-v.Name = Y;
-v.NotationDecl = Ti;
-v.Reference = tt;
-v.PEReference = rt;
-v.PI = ti;
-v.PUBLIC = Ct;
-v.PubidLiteral = yt;
-v.QName = ct;
-v.QName_exact = Zu;
-v.QName_group = ei;
-v.S = S;
-v.SChar_s = zu;
-v.S_OPT = R;
-v.SYSTEM = rr;
-v.SystemLiteral = nt;
-v.UNICODE_REPLACEMENT_CHARACTER = Gu;
-v.UNICODE_SUPPORT = st;
-v.XMLDecl = Ii;
-var X = B, te = X.find, Fi = X.hasDefaultHTMLNamespace, xe = X.hasOwn, ki = X.isHTMLMimeType, qi = X.isHTMLRawTextElement, $i = X.isHTMLVoidElement, Xe = X.MIME_TYPE, re = X.NAMESPACE, q = Symbol(), bn = Ae, d = bn.DOMException, ji = bn.DOMExceptionName, Z = v;
-function $(e) {
-  if (e !== q)
-    throw new TypeError("Illegal constructor");
-}
-function Ui(e) {
-  return e !== "";
-}
-function Vi(e) {
-  return e ? e.split(/[\t\n\f\r ]+/).filter(Ui) : [];
-}
-function Hi(e, t) {
-  return xe(e, t) || (e[t] = !0), e;
-}
-function wr(e) {
-  if (!e) return [];
-  var t = Vi(e);
-  return Object.keys(t.reduce(Hi, {}));
-}
-function Gi(e) {
-  return function(t) {
-    return e && e.indexOf(t) !== -1;
-  };
-}
-function yn(e) {
-  if (!Z.QName_exact.test(e))
-    throw new d(d.INVALID_CHARACTER_ERR, 'invalid character in qualified name "' + e + '"');
-}
-function Vt(e, t) {
-  yn(t), e = e || null;
-  var r = null, n = t;
-  if (t.indexOf(":") >= 0) {
-    var u = t.split(":");
-    r = u[0], n = u[1];
-  }
-  if (r !== null && e === null)
-    throw new d(d.NAMESPACE_ERR, "prefix is non-null and namespace is null");
-  if (r === "xml" && e !== X.NAMESPACE.XML)
-    throw new d(d.NAMESPACE_ERR, 'prefix is "xml" and namespace is not the XML namespace');
-  if ((r === "xmlns" || t === "xmlns") && e !== X.NAMESPACE.XMLNS)
-    throw new d(
-      d.NAMESPACE_ERR,
-      'either qualifiedName or prefix is "xmlns" and namespace is not the XMLNS namespace'
-    );
-  if (e === X.NAMESPACE.XMLNS && r !== "xmlns" && t !== "xmlns")
-    throw new d(
-      d.NAMESPACE_ERR,
-      'namespace is the XMLNS namespace and neither qualifiedName nor prefix is "xmlns"'
-    );
-  return [e, r, n];
-}
-function Fe(e, t) {
-  for (var r in e)
-    xe(e, r) && (t[r] = e[r]);
-}
-function j(e, t) {
-  var r = e.prototype;
-  if (!(r instanceof t)) {
-    let n = function() {
-    };
-    n.prototype = t.prototype, n = new n(), Fe(r, n), e.prototype = r = n;
-  }
-  r.constructor != e && (typeof e != "function" && console.error("unknown Class:" + e), r.constructor = e);
-}
-var U = {}, K = U.ELEMENT_NODE = 1, Me = U.ATTRIBUTE_NODE = 2, Nt = U.TEXT_NODE = 3, Cn = U.CDATA_SECTION_NODE = 4, Tn = U.ENTITY_REFERENCE_NODE = 5, zi = U.ENTITY_NODE = 6, wn = U.PROCESSING_INSTRUCTION_NODE = 7, Sn = U.COMMENT_NODE = 8, ut = U.DOCUMENT_NODE = 9, On = U.DOCUMENT_TYPE_NODE = 10, se = U.DOCUMENT_FRAGMENT_NODE = 11, Ji = U.NOTATION_NODE = 12, _ = X.freeze({
-  DOCUMENT_POSITION_DISCONNECTED: 1,
-  DOCUMENT_POSITION_PRECEDING: 2,
-  DOCUMENT_POSITION_FOLLOWING: 4,
-  DOCUMENT_POSITION_CONTAINS: 8,
-  DOCUMENT_POSITION_CONTAINED_BY: 16,
-  DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: 32
-});
-function Sr(e) {
-  for (var t = []; e.parentNode || e.ownerElement; )
-    e = e.parentNode || e.ownerElement, t.unshift(e);
-  return t;
-}
-function In(e, t) {
-  if (t.length < e.length) return In(t, e);
-  var r = null;
-  for (var n in e) {
-    if (e[n] !== t[n]) return r;
-    r = e[n];
-  }
-  return r;
-}
-function Or(e) {
-  return e.guid || (e.guid = Math.random()), e.guid;
-}
-function M() {
-}
-M.prototype = {
-  /**
-   * The number of nodes in the list. The range of valid child node indices is 0 to length-1
-   * inclusive.
-   *
-   * @type {number}
-   */
-  length: 0,
-  /**
-   * Returns the item at `index`. If index is greater than or equal to the number of nodes in
-   * the list, this returns null.
-   *
-   * @param index
-   * Unsigned long Index into the collection.
-   * @returns {Node | null}
-   * The node at position `index` in the NodeList,
-   * or null if that is not a valid index.
-   */
-  item: function(e) {
-    return e >= 0 && e < this.length ? this[e] : null;
-  },
-  /**
-   * Returns a string representation of the NodeList.
-   *
-   * @param {unknown} nodeFilter
-   * __A filter function? Not implemented according to the spec?__.
-   * @returns {string}
-   * A string representation of the NodeList.
-   */
-  toString: function(e) {
-    for (var t = [], r = 0; r < this.length; r++)
-      Ie(this[r], t, e);
-    return t.join("");
-  },
-  /**
-   * Filters the NodeList based on a predicate.
-   *
-   * @param {function(Node): boolean} predicate
-   * - A predicate function to filter the NodeList.
-   * @returns {Node[]}
-   * An array of nodes that satisfy the predicate.
-   * @private
-   */
-  filter: function(e) {
-    return Array.prototype.filter.call(this, e);
-  },
-  /**
-   * Returns the first index at which a given node can be found in the NodeList, or -1 if it is
-   * not present.
-   *
-   * @param {Node} item
-   * - The Node item to locate in the NodeList.
-   * @returns {number}
-   * The first index of the node in the NodeList; -1 if not found.
-   * @private
-   */
-  indexOf: function(e) {
-    return Array.prototype.indexOf.call(this, e);
-  }
-};
-M.prototype[Symbol.iterator] = function() {
-  var e = this, t = 0;
-  return {
-    next: function() {
-      return t < e.length ? {
-        value: e[t++],
-        done: !1
-      } : {
-        done: !0
-      };
-    },
-    return: function() {
-      return {
-        done: !0
-      };
-    }
-  };
-};
-function he(e, t) {
-  this._node = e, this._refresh = t, wt(this);
-}
-function wt(e) {
-  var t = e._node._inc || e._node.ownerDocument._inc;
-  if (e._inc !== t) {
-    var r = e._refresh(e._node);
-    if (jn(e, "length", r.length), !e.$$length || r.length < e.$$length)
-      for (var n = r.length; n in e; n++)
-        xe(e, n) && delete e[n];
-    Fe(r, e), e._inc = t;
-  }
-}
-he.prototype.item = function(e) {
-  return wt(this), this[e] || null;
-};
-j(he, M);
-function _e() {
-}
-function Rn(e, t) {
-  for (var r = 0; r < e.length; ) {
-    if (e[r] === t)
-      return r;
-    r++;
-  }
-}
-function Xi(e, t, r, n) {
-  if (n ? t[Rn(t, n)] = r : (t[t.length] = r, t.length++), e) {
-    r.ownerElement = e;
-    var u = e.ownerDocument;
-    u && (n && Mn(u, e, n), Yi(u, e, r));
-  }
-}
-function Ir(e, t, r) {
-  var n = Rn(t, r);
-  if (n >= 0) {
-    for (var u = t.length - 1; n <= u; )
-      t[n] = t[++n];
-    if (t.length = u, e) {
-      var i = e.ownerDocument;
-      i && Mn(i, e, r), r.ownerElement = null;
-    }
-  }
-}
-_e.prototype = {
-  length: 0,
-  item: M.prototype.item,
-  /**
-   * Get an attribute by name. Note: Name is in lower case in case of HTML namespace and
-   * document.
-   *
-   * @param {string} localName
-   * The local name of the attribute.
-   * @returns {Attr | null}
-   * The attribute with the given local name, or null if no such attribute exists.
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-name
-   */
-  getNamedItem: function(e) {
-    this._ownerElement && this._ownerElement._isInHTMLDocumentAndNamespace() && (e = e.toLowerCase());
-    for (var t = 0; t < this.length; ) {
-      var r = this[t];
-      if (r.nodeName === e)
-        return r;
-      t++;
-    }
-    return null;
-  },
-  /**
-   * Set an attribute.
-   *
-   * @param {Attr} attr
-   * The attribute to set.
-   * @returns {Attr | null}
-   * The old attribute with the same local name and namespace URI as the new one, or null if no
-   * such attribute exists.
-   * @throws {DOMException}
-   * With code:
-   * - {@link INUSE_ATTRIBUTE_ERR} - If the attribute is already an attribute of another
-   * element.
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
-   */
-  setNamedItem: function(e) {
-    var t = e.ownerElement;
-    if (t && t !== this._ownerElement)
-      throw new d(d.INUSE_ATTRIBUTE_ERR);
-    var r = this.getNamedItemNS(e.namespaceURI, e.localName);
-    return r === e ? e : (Xi(this._ownerElement, this, e, r), r);
-  },
-  /**
-   * Set an attribute, replacing an existing attribute with the same local name and namespace
-   * URI if one exists.
-   *
-   * @param {Attr} attr
-   * The attribute to set.
-   * @returns {Attr | null}
-   * The old attribute with the same local name and namespace URI as the new one, or null if no
-   * such attribute exists.
-   * @throws {DOMException}
-   * Throws a DOMException with the name "InUseAttributeError" if the attribute is already an
-   * attribute of another element.
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-set
-   */
-  setNamedItemNS: function(e) {
-    return this.setNamedItem(e);
-  },
-  /**
-   * Removes an attribute specified by the local name.
-   *
-   * @param {string} localName
-   * The local name of the attribute to be removed.
-   * @returns {Attr}
-   * The attribute node that was removed.
-   * @throws {DOMException}
-   * With code:
-   * - {@link DOMException.NOT_FOUND_ERR} if no attribute with the given name is found.
-   * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditem
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-name
-   */
-  removeNamedItem: function(e) {
-    var t = this.getNamedItem(e);
-    if (!t)
-      throw new d(d.NOT_FOUND_ERR, e);
-    return Ir(this._ownerElement, this, t), t;
-  },
-  /**
-   * Removes an attribute specified by the namespace and local name.
-   *
-   * @param {string | null} namespaceURI
-   * The namespace URI of the attribute to be removed.
-   * @param {string} localName
-   * The local name of the attribute to be removed.
-   * @returns {Attr}
-   * The attribute node that was removed.
-   * @throws {DOMException}
-   * With code:
-   * - {@link DOMException.NOT_FOUND_ERR} if no attribute with the given namespace URI and local
-   * name is found.
-   * @see https://dom.spec.whatwg.org/#dom-namednodemap-removenameditemns
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-remove-by-namespace
-   */
-  removeNamedItemNS: function(e, t) {
-    var r = this.getNamedItemNS(e, t);
-    if (!r)
-      throw new d(d.NOT_FOUND_ERR, e ? e + " : " + t : t);
-    return Ir(this._ownerElement, this, r), r;
-  },
-  /**
-   * Get an attribute by namespace and local name.
-   *
-   * @param {string | null} namespaceURI
-   * The namespace URI of the attribute.
-   * @param {string} localName
-   * The local name of the attribute.
-   * @returns {Attr | null}
-   * The attribute with the given namespace URI and local name, or null if no such attribute
-   * exists.
-   * @see https://dom.spec.whatwg.org/#concept-element-attributes-get-by-namespace
-   */
-  getNamedItemNS: function(e, t) {
-    e || (e = null);
-    for (var r = 0; r < this.length; ) {
-      var n = this[r];
-      if (n.localName === t && n.namespaceURI === e)
-        return n;
-      r++;
-    }
-    return null;
-  }
-};
-_e.prototype[Symbol.iterator] = function() {
-  var e = this, t = 0;
-  return {
-    next: function() {
-      return t < e.length ? {
-        value: e[t++],
-        done: !1
-      } : {
-        done: !0
-      };
-    },
-    return: function() {
-      return {
-        done: !0
-      };
-    }
-  };
-};
-function Bn() {
-}
-Bn.prototype = {
-  /**
-   * Test if the DOM implementation implements a specific feature and version, as specified in
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/core.html#DOMFeatures DOM Features}.
-   *
-   * The DOMImplementation.hasFeature() method returns a Boolean flag indicating if a given
-   * feature is supported. The different implementations fairly diverged in what kind of
-   * features were reported. The latest version of the spec settled to force this method to
-   * always return true, where the functionality was accurate and in use.
-   *
-   * @deprecated
-   * It is deprecated and modern browsers return true in all cases.
-   * @function DOMImplementation#hasFeature
-   * @param {string} feature
-   * The name of the feature to test.
-   * @param {string} [version]
-   * This is the version number of the feature to test.
-   * @returns {boolean}
-   * Always returns true.
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/hasFeature MDN
-   * @see https://www.w3.org/TR/REC-DOM-Level-1/level-one-core.html#ID-5CED94D7 DOM Level 1 Core
-   * @see https://dom.spec.whatwg.org/#dom-domimplementation-hasfeature DOM Living Standard
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-5CED94D7 DOM Level 3 Core
-   */
-  hasFeature: function(e, t) {
-    return !0;
-  },
-  /**
-   * Creates a DOM Document object of the specified type with its document element. Note that
-   * based on the {@link DocumentType}
-   * given to create the document, the implementation may instantiate specialized
-   * {@link Document} objects that support additional features than the "Core", such as "HTML"
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#DOM2HTML DOM Level 2 HTML}.
-   * On the other hand, setting the {@link DocumentType} after the document was created makes
-   * this very unlikely to happen. Alternatively, specialized {@link Document} creation methods,
-   * such as createHTMLDocument
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#DOM2HTML DOM Level 2 HTML},
-   * can be used to obtain specific types of {@link Document} objects.
-   *
-   * __It behaves slightly different from the description in the living standard__:
-   * - There is no interface/class `XMLDocument`, it returns a `Document`
-   * instance (with it's `type` set to `'xml'`).
-   * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
-   *
-   * @function DOMImplementation.createDocument
-   * @param {string | null} namespaceURI
-   * The
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-namespaceURI namespace URI}
-   * of the document element to create or null.
-   * @param {string | null} qualifiedName
-   * The
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-qualifiedname qualified name}
-   * of the document element to be created or null.
-   * @param {DocumentType | null} [doctype=null]
-   * The type of document to be created or null. When doctype is not null, its
-   * {@link Node#ownerDocument} attribute is set to the document being created. Default is
-   * `null`
-   * @returns {Document}
-   * A new {@link Document} object with its document element. If the NamespaceURI,
-   * qualifiedName, and doctype are null, the returned {@link Document} is empty with no
-   * document element.
-   * @throws {DOMException}
-   * With code:
-   *
-   * - `INVALID_CHARACTER_ERR`: Raised if the specified qualified name is not an XML name
-   * according to {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#XML XML 1.0}.
-   * - `NAMESPACE_ERR`: Raised if the qualifiedName is malformed, if the qualifiedName has a
-   * prefix and the namespaceURI is null, or if the qualifiedName is null and the namespaceURI
-   * is different from null, or if the qualifiedName has a prefix that is "xml" and the
-   * namespaceURI is different from "{@link http://www.w3.org/XML/1998/namespace}"
-   * {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#Namespaces XML Namespaces},
-   * or if the DOM implementation does not support the "XML" feature but a non-null namespace
-   * URI was provided, since namespaces were defined by XML.
-   * - `WRONG_DOCUMENT_ERR`: Raised if doctype has already been used with a different document
-   * or was created from a different implementation.
-   * - `NOT_SUPPORTED_ERR`: May be raised if the implementation does not support the feature
-   * "XML" and the language exposed through the Document does not support XML Namespaces (such
-   * as {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#HTML40 HTML 4.01}).
-   * @since DOM Level 2.
-   * @see {@link #createHTMLDocument}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/createDocument MDN
-   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocument DOM Living Standard
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Level-2-Core-DOM-createDocument DOM
-   *      Level 3 Core
-   * @see https://www.w3.org/TR/DOM-Level-2-Core/core.html#Level-2-Core-DOM-createDocument DOM
-   *      Level 2 Core (initial)
-   */
-  createDocument: function(e, t, r) {
-    var n = Xe.XML_APPLICATION;
-    e === re.HTML ? n = Xe.XML_XHTML_APPLICATION : e === re.SVG && (n = Xe.XML_SVG_IMAGE);
-    var u = new ce(q, { contentType: n });
-    if (u.implementation = this, u.childNodes = new M(), u.doctype = r || null, r && u.appendChild(r), t) {
-      var i = u.createElementNS(e, t);
-      u.appendChild(i);
-    }
-    return u;
-  },
-  /**
-   * Creates an empty DocumentType node. Entity declarations and notations are not made
-   * available. Entity reference expansions and default attribute additions do not occur.
-   *
-   * **This behavior is slightly different from the one in the specs**:
-   * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
-   * - `publicId` and `systemId` contain the raw data including any possible quotes,
-   *   so they can always be serialized back to the original value
-   * - `internalSubset` contains the raw string between `[` and `]` if present,
-   *   but is not parsed or validated in any form.
-   *
-   * @function DOMImplementation#createDocumentType
-   * @param {string} qualifiedName
-   * The {@link https://www.w3.org/TR/DOM-Level-3-Core/glossary.html#dt-qualifiedname qualified
-   * name} of the document type to be created.
-   * @param {string} [publicId]
-   * The external subset public identifier.
-   * @param {string} [systemId]
-   * The external subset system identifier.
-   * @param {string} [internalSubset]
-   * the internal subset or an empty string if it is not present
-   * @returns {DocumentType}
-   * A new {@link DocumentType} node with {@link Node#ownerDocument} set to null.
-   * @throws {DOMException}
-   * With code:
-   *
-   * - `INVALID_CHARACTER_ERR`: Raised if the specified qualified name is not an XML name
-   * according to {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#XML XML 1.0}.
-   * - `NAMESPACE_ERR`: Raised if the qualifiedName is malformed.
-   * - `NOT_SUPPORTED_ERR`: May be raised if the implementation does not support the feature
-   * "XML" and the language exposed through the Document does not support XML Namespaces (such
-   * as {@link https://www.w3.org/TR/DOM-Level-3-Core/references.html#HTML40 HTML 4.01}).
-   * @since DOM Level 2.
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMImplementation/createDocumentType
-   *      MDN
-   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createdocumenttype DOM Living
-   *      Standard
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Level-3-Core-DOM-createDocType DOM
-   *      Level 3 Core
-   * @see https://www.w3.org/TR/DOM-Level-2-Core/core.html#Level-2-Core-DOM-createDocType DOM
-   *      Level 2 Core
-   * @see https://github.com/xmldom/xmldom/blob/master/CHANGELOG.md#050
-   * @see https://www.w3.org/TR/DOM-Level-2-Core/#core-ID-Core-DocType-internalSubset
-   * @prettierignore
-   */
-  createDocumentType: function(e, t, r, n) {
-    yn(e);
-    var u = new It(q);
-    return u.name = e, u.nodeName = e, u.publicId = t || "", u.systemId = r || "", u.internalSubset = n || "", u.childNodes = new M(), u;
-  },
-  /**
-   * Returns an HTML document, that might already have a basic DOM structure.
-   *
-   * __It behaves slightly different from the description in the living standard__:
-   * - If the first argument is `false` no initial nodes are added (steps 3-7 in the specs are
-   * omitted)
-   * - `encoding`, `mode`, `origin`, `url` fields are currently not declared.
-   *
-   * @param {string | false} [title]
-   * A string containing the title to give the new HTML document.
-   * @returns {Document}
-   * The HTML document.
-   * @since WHATWG Living Standard.
-   * @see {@link #createDocument}
-   * @see https://dom.spec.whatwg.org/#dom-domimplementation-createhtmldocument
-   * @see https://dom.spec.whatwg.org/#html-document
-   */
-  createHTMLDocument: function(e) {
-    var t = new ce(q, { contentType: Xe.HTML });
-    if (t.implementation = this, t.childNodes = new M(), e !== !1) {
-      t.doctype = this.createDocumentType("html"), t.doctype.ownerDocument = t, t.appendChild(t.doctype);
-      var r = t.createElement("html");
-      t.appendChild(r);
-      var n = t.createElement("head");
-      if (r.appendChild(n), typeof e == "string") {
-        var u = t.createElement("title");
-        u.appendChild(t.createTextNode(e)), n.appendChild(u);
-      }
-      r.appendChild(t.createElement("body"));
-    }
-    return t;
-  }
-};
-function C(e) {
-  $(e);
-}
-C.prototype = {
-  /**
-   * The first child of this node.
-   *
-   * @type {Node | null}
-   */
-  firstChild: null,
-  /**
-   * The last child of this node.
-   *
-   * @type {Node | null}
-   */
-  lastChild: null,
-  /**
-   * The previous sibling of this node.
-   *
-   * @type {Node | null}
-   */
-  previousSibling: null,
-  /**
-   * The next sibling of this node.
-   *
-   * @type {Node | null}
-   */
-  nextSibling: null,
-  /**
-   * The parent node of this node.
-   *
-   * @type {Node | null}
-   */
-  parentNode: null,
-  /**
-   * The parent element of this node.
-   *
-   * @type {Element | null}
-   */
-  get parentElement() {
-    return this.parentNode && this.parentNode.nodeType === this.ELEMENT_NODE ? this.parentNode : null;
-  },
-  /**
-   * The child nodes of this node.
-   *
-   * @type {NodeList}
-   */
-  childNodes: null,
-  /**
-   * The document object associated with this node.
-   *
-   * @type {Document | null}
-   */
-  ownerDocument: null,
-  /**
-   * The value of this node.
-   *
-   * @type {string | null}
-   */
-  nodeValue: null,
-  /**
-   * The namespace URI of this node.
-   *
-   * @type {string | null}
-   */
-  namespaceURI: null,
-  /**
-   * The prefix of the namespace for this node.
-   *
-   * @type {string | null}
-   */
-  prefix: null,
-  /**
-   * The local part of the qualified name of this node.
-   *
-   * @type {string | null}
-   */
-  localName: null,
-  /**
-   * The baseURI is currently always `about:blank`,
-   * since that's what happens when you create a document from scratch.
-   *
-   * @type {'about:blank'}
-   */
-  baseURI: "about:blank",
-  /**
-   * Is true if this node is part of a document.
-   *
-   * @type {boolean}
-   */
-  get isConnected() {
-    var e = this.getRootNode();
-    return e && e.nodeType === e.DOCUMENT_NODE;
-  },
-  /**
-   * Checks whether `other` is an inclusive descendant of this node.
-   *
-   * @param {Node | null | undefined} other
-   * The node to check.
-   * @returns {boolean}
-   * True if `other` is an inclusive descendant of this node; false otherwise.
-   * @see https://dom.spec.whatwg.org/#dom-node-contains
-   */
-  contains: function(e) {
-    if (!e) return !1;
-    var t = e;
-    do {
-      if (this === t) return !0;
-      t = e.parentNode;
-    } while (t);
-    return !1;
-  },
-  /**
-   * @typedef GetRootNodeOptions
-   * @property {boolean} [composed=false]
-   */
-  /**
-   * Searches for the root node of this node.
-   *
-   * **This behavior is slightly different from the in the specs**:
-   * - ignores `options.composed`, since `ShadowRoot`s are unsupported, always returns root.
-   *
-   * @param {GetRootNodeOptions} [options]
-   * @returns {Node}
-   * Root node.
-   * @see https://dom.spec.whatwg.org/#dom-node-getrootnode
-   * @see https://dom.spec.whatwg.org/#concept-shadow-including-root
-   */
-  getRootNode: function(e) {
-    var t = this;
-    do {
-      if (!t.parentNode)
-        return t;
-      t = t.parentNode;
-    } while (t);
-  },
-  /**
-   * Checks whether the given node is equal to this node.
-   *
-   * @param {Node} [otherNode]
-   * @see https://dom.spec.whatwg.org/#concept-node-equals
-   */
-  isEqualNode: function(e) {
-    if (!e || this.nodeType !== e.nodeType) return !1;
-    switch (this.nodeType) {
-      case this.DOCUMENT_TYPE_NODE:
-        if (this.name !== e.name || this.publicId !== e.publicId || this.systemId !== e.systemId) return !1;
-        break;
-      case this.ELEMENT_NODE:
-        if (this.namespaceURI !== e.namespaceURI || this.prefix !== e.prefix || this.localName !== e.localName || this.attributes.length !== e.attributes.length) return !1;
-        for (var t = 0; t < this.attributes.length; t++) {
-          var r = this.attributes.item(t);
-          if (!r.isEqualNode(e.getAttributeNodeNS(r.namespaceURI, r.localName)))
-            return !1;
-        }
-        break;
-      case this.ATTRIBUTE_NODE:
-        if (this.namespaceURI !== e.namespaceURI || this.localName !== e.localName || this.value !== e.value) return !1;
-        break;
-      case this.PROCESSING_INSTRUCTION_NODE:
-        if (this.target !== e.target || this.data !== e.data)
-          return !1;
-        break;
-      case this.TEXT_NODE:
-      case this.COMMENT_NODE:
-        if (this.data !== e.data) return !1;
-        break;
-    }
-    if (this.childNodes.length !== e.childNodes.length)
-      return !1;
-    for (var t = 0; t < this.childNodes.length; t++)
-      if (!this.childNodes[t].isEqualNode(e.childNodes[t]))
-        return !1;
-    return !0;
-  },
-  /**
-   * Checks whether or not the given node is this node.
-   *
-   * @param {Node} [otherNode]
-   */
-  isSameNode: function(e) {
-    return this === e;
-  },
-  /**
-   * Inserts a node before a reference node as a child of this node.
-   *
-   * @param {Node} newChild
-   * The new child node to be inserted.
-   * @param {Node | null} refChild
-   * The reference node before which newChild will be inserted.
-   * @returns {Node}
-   * The new child node successfully inserted.
-   * @throws {DOMException}
-   * Throws a DOMException if inserting the node would result in a DOM tree that is not
-   * well-formed, or if `child` is provided but is not a child of `parent`.
-   * See {@link _insertBefore} for more details.
-   * @since Modified in DOM L2
-   */
-  insertBefore: function(e, t) {
-    return bt(this, e, t);
-  },
-  /**
-   * Replaces an old child node with a new child node within this node.
-   *
-   * @param {Node} newChild
-   * The new node that is to replace the old node.
-   * If it already exists in the DOM, it is removed from its original position.
-   * @param {Node} oldChild
-   * The existing child node to be replaced.
-   * @returns {Node}
-   * Returns the replaced child node.
-   * @throws {DOMException}
-   * Throws a DOMException if replacing the node would result in a DOM tree that is not
-   * well-formed, or if `oldChild` is not a child of `this`.
-   * This can also occur if the pre-replacement validity assertion fails.
-   * See {@link _insertBefore}, {@link Node.removeChild}, and
-   * {@link assertPreReplacementValidityInDocument} for more details.
-   * @see https://dom.spec.whatwg.org/#concept-node-replace
-   */
-  replaceChild: function(e, t) {
-    bt(this, e, t, Fn), t && this.removeChild(t);
-  },
-  /**
-   * Removes an existing child node from this node.
-   *
-   * @param {Node} oldChild
-   * The child node to be removed.
-   * @returns {Node}
-   * Returns the removed child node.
-   * @throws {DOMException}
-   * Throws a DOMException if `oldChild` is not a child of `this`.
-   * See {@link _removeChild} for more details.
-   */
-  removeChild: function(e) {
-    return Pn(this, e);
-  },
-  /**
-   * Appends a child node to this node.
-   *
-   * @param {Node} newChild
-   * The child node to be appended to this node.
-   * If it already exists in the DOM, it is removed from its original position.
-   * @returns {Node}
-   * Returns the appended child node.
-   * @throws {DOMException}
-   * Throws a DOMException if appending the node would result in a DOM tree that is not
-   * well-formed, or if `newChild` is not a valid Node.
-   * See {@link insertBefore} for more details.
-   */
-  appendChild: function(e) {
-    return this.insertBefore(e, null);
-  },
-  /**
-   * Determines whether this node has any child nodes.
-   *
-   * @returns {boolean}
-   * Returns true if this node has any child nodes, and false otherwise.
-   */
-  hasChildNodes: function() {
-    return this.firstChild != null;
-  },
-  /**
-   * Creates a copy of the calling node.
-   *
-   * @param {boolean} deep
-   * If true, the contents of the node are recursively copied.
-   * If false, only the node itself (and its attributes, if it is an element) are copied.
-   * @returns {Node}
-   * Returns the newly created copy of the node.
-   * @throws {DOMException}
-   * May throw a DOMException if operations within {@link Element#setAttributeNode} or
-   * {@link Node#appendChild} (which are potentially invoked in this method) do not meet their
-   * specific constraints.
-   * @see {@link cloneNode}
-   */
-  cloneNode: function(e) {
-    return Ht(this.ownerDocument || this, this, e);
-  },
-  /**
-   * Puts the specified node and all of its subtree into a "normalized" form. In a normalized
-   * subtree, no text nodes in the subtree are empty and there are no adjacent text nodes.
-   *
-   * Specifically, this method merges any adjacent text nodes (i.e., nodes for which `nodeType`
-   * is `TEXT_NODE`) into a single node with the combined data. It also removes any empty text
-   * nodes.
-   *
-   * This method operates recursively, so it also normalizes any and all descendent nodes within
-   * the subtree.
-   *
-   * @throws {DOMException}
-   * May throw a DOMException if operations within removeChild or appendData (which are
-   * potentially invoked in this method) do not meet their specific constraints.
-   * @since Modified in DOM Level 2
-   * @see {@link Node.removeChild}
-   * @see {@link CharacterData.appendData}
-   */
-  normalize: function() {
-    for (var e = this.firstChild; e; ) {
-      var t = e.nextSibling;
-      t && t.nodeType == Nt && e.nodeType == Nt ? (this.removeChild(t), e.appendData(t.data)) : (e.normalize(), e = t);
-    }
-  },
-  /**
-   * Checks whether the DOM implementation implements a specific feature and its version.
-   *
-   * @deprecated
-   * Since `DOMImplementation.hasFeature` is deprecated and always returns true.
-   * @param {string} feature
-   * The package name of the feature to test. This is the same name that can be passed to the
-   * method `hasFeature` on `DOMImplementation`.
-   * @param {string} version
-   * This is the version number of the package name to test.
-   * @returns {boolean}
-   * Returns true in all cases in the current implementation.
-   * @since Introduced in DOM Level 2
-   * @see {@link DOMImplementation.hasFeature}
-   */
-  isSupported: function(e, t) {
-    return this.ownerDocument.implementation.hasFeature(e, t);
-  },
-  /**
-   * Look up the prefix associated to the given namespace URI, starting from this node.
-   * **The default namespace declarations are ignored by this method.**
-   * See Namespace Prefix Lookup for details on the algorithm used by this method.
-   *
-   * **This behavior is different from the in the specs**:
-   * - no node type specific handling
-   * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
-   *
-   * @param {string | null} namespaceURI
-   * The namespace URI for which to find the associated prefix.
-   * @returns {string | null}
-   * The associated prefix, if found; otherwise, null.
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-lookupNamespacePrefix
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/namespaces-algorithms.html#lookupNamespacePrefixAlgo
-   * @see https://dom.spec.whatwg.org/#dom-node-lookupprefix
-   * @see https://github.com/xmldom/xmldom/issues/322
-   * @prettierignore
-   */
-  lookupPrefix: function(e) {
-    for (var t = this; t; ) {
-      var r = t._nsMap;
-      if (r) {
-        for (var n in r)
-          if (xe(r, n) && r[n] === e)
-            return n;
-      }
-      t = t.nodeType == Me ? t.ownerDocument : t.parentNode;
-    }
-    return null;
-  },
-  /**
-   * This function is used to look up the namespace URI associated with the given prefix,
-   * starting from this node.
-   *
-   * **This behavior is different from the in the specs**:
-   * - no node type specific handling
-   * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
-   *
-   * @param {string | null} prefix
-   * The prefix for which to find the associated namespace URI.
-   * @returns {string | null}
-   * The associated namespace URI, if found; otherwise, null.
-   * @since DOM Level 3
-   * @see https://dom.spec.whatwg.org/#dom-node-lookupnamespaceuri
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-lookupNamespaceURI
-   * @prettierignore
-   */
-  lookupNamespaceURI: function(e) {
-    for (var t = this; t; ) {
-      var r = t._nsMap;
-      if (r && xe(r, e))
-        return r[e];
-      t = t.nodeType == Me ? t.ownerDocument : t.parentNode;
-    }
-    return null;
-  },
-  /**
-   * Determines whether the given namespace URI is the default namespace.
-   *
-   * The function works by looking up the prefix associated with the given namespace URI. If no
-   * prefix is found (i.e., the namespace URI is not registered in the namespace map of this
-   * node or any of its ancestors), it returns `true`, implying the namespace URI is considered
-   * the default.
-   *
-   * **This behavior is different from the in the specs**:
-   * - no node type specific handling
-   * - uses the internal attribute _nsMap for resolving namespaces that is updated when changing attributes
-   *
-   * @param {string | null} namespaceURI
-   * The namespace URI to be checked.
-   * @returns {boolean}
-   * Returns true if the given namespace URI is the default namespace, false otherwise.
-   * @since DOM Level 3
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-isDefaultNamespace
-   * @see https://dom.spec.whatwg.org/#dom-node-isdefaultnamespace
-   * @prettierignore
-   */
-  isDefaultNamespace: function(e) {
-    var t = this.lookupPrefix(e);
-    return t == null;
-  },
-  /**
-   * Compares the reference node with a node with regard to their position in the document and
-   * according to the document order.
-   *
-   * @param {Node} other
-   * The node to compare the reference node to.
-   * @returns {number}
-   * Returns how the node is positioned relatively to the reference node according to the
-   * bitmask. 0 if reference node and given node are the same.
-   * @since DOM Level 3
-   * @see https://www.w3.org/TR/2004/REC-DOM-Level-3-Core-20040407/core.html#Node3-compare
-   * @see https://dom.spec.whatwg.org/#dom-node-comparedocumentposition
-   */
-  compareDocumentPosition: function(e) {
-    if (this === e) return 0;
-    var t = e, r = this, n = null, u = null;
-    if (t instanceof De && (n = t, t = n.ownerElement), r instanceof De && (u = r, r = u.ownerElement, n && t && r === t))
-      for (var i = 0, a; a = r.attributes[i]; i++) {
-        if (a === n)
-          return _.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + _.DOCUMENT_POSITION_PRECEDING;
-        if (a === u)
-          return _.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + _.DOCUMENT_POSITION_FOLLOWING;
-      }
-    if (!t || !r || r.ownerDocument !== t.ownerDocument)
-      return _.DOCUMENT_POSITION_DISCONNECTED + _.DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC + (Or(r.ownerDocument) > Or(t.ownerDocument) ? _.DOCUMENT_POSITION_FOLLOWING : _.DOCUMENT_POSITION_PRECEDING);
-    var o = Sr(t), s = Sr(r);
-    if (!n && s.indexOf(t) >= 0 || u && t === r)
-      return _.DOCUMENT_POSITION_CONTAINS + _.DOCUMENT_POSITION_PRECEDING;
-    if (!u && o.indexOf(r) >= 0 || n && t === r)
-      return _.DOCUMENT_POSITION_CONTAINED_BY + _.DOCUMENT_POSITION_FOLLOWING;
-    var c = In(s, o);
-    for (var f in c.childNodes) {
-      var l = c.childNodes[f];
-      if (l === r) return _.DOCUMENT_POSITION_FOLLOWING;
-      if (l === t) return _.DOCUMENT_POSITION_PRECEDING;
-      if (s.indexOf(l) >= 0) return _.DOCUMENT_POSITION_FOLLOWING;
-      if (o.indexOf(l) >= 0) return _.DOCUMENT_POSITION_PRECEDING;
-    }
-    return 0;
-  }
-};
-function xn(e) {
-  return e == "<" && "&lt;" || e == ">" && "&gt;" || e == "&" && "&amp;" || e == '"' && "&quot;" || "&#" + e.charCodeAt() + ";";
-}
-Fe(U, C);
-Fe(U, C.prototype);
-Fe(_, C);
-Fe(_, C.prototype);
-function Ke(e, t) {
-  if (t(e))
-    return !0;
-  if (e = e.firstChild)
-    do
-      if (Ke(e, t))
-        return !0;
-    while (e = e.nextSibling);
-}
-function ce(e, t) {
-  $(e);
-  var r = t || {};
-  this.ownerDocument = this, this.contentType = r.contentType || Xe.XML_APPLICATION, this.type = ki(this.contentType) ? "html" : "xml";
-}
-function Yi(e, t, r) {
-  e && e._inc++;
-  var n = r.namespaceURI;
-  n === re.XMLNS && (t._nsMap[r.prefix ? r.localName : ""] = r.value);
-}
-function Mn(e, t, r, n) {
-  e && e._inc++;
-  var u = r.namespaceURI;
-  u === re.XMLNS && delete t._nsMap[r.prefix ? r.localName : ""];
-}
-function _n(e, t, r) {
-  if (e && e._inc) {
-    e._inc++;
-    var n = t.childNodes;
-    if (r && !r.nextSibling)
-      n[n.length++] = r;
-    else {
-      for (var u = t.firstChild, i = 0; u; )
-        n[i++] = u, u = u.nextSibling;
-      n.length = i, delete n[n.length];
-    }
-  }
-}
-function Pn(e, t) {
-  if (e !== t.parentNode)
-    throw new d(d.NOT_FOUND_ERR, "child's parent is not parent");
-  var r = t.previousSibling, n = t.nextSibling;
-  return r ? r.nextSibling = n : e.firstChild = n, n ? n.previousSibling = r : e.lastChild = r, _n(e.ownerDocument, e), t.parentNode = null, t.previousSibling = null, t.nextSibling = null, t;
-}
-function Ki(e) {
-  return e && (e.nodeType === C.DOCUMENT_NODE || e.nodeType === C.DOCUMENT_FRAGMENT_NODE || e.nodeType === C.ELEMENT_NODE);
-}
-function Wi(e) {
-  return e && (e.nodeType === C.CDATA_SECTION_NODE || e.nodeType === C.COMMENT_NODE || e.nodeType === C.DOCUMENT_FRAGMENT_NODE || e.nodeType === C.DOCUMENT_TYPE_NODE || e.nodeType === C.ELEMENT_NODE || e.nodeType === C.PROCESSING_INSTRUCTION_NODE || e.nodeType === C.TEXT_NODE);
-}
-function le(e) {
-  return e && e.nodeType === C.DOCUMENT_TYPE_NODE;
-}
-function ue(e) {
-  return e && e.nodeType === C.ELEMENT_NODE;
-}
-function Ln(e) {
-  return e && e.nodeType === C.TEXT_NODE;
-}
-function Rr(e, t) {
-  var r = e.childNodes || [];
-  if (te(r, ue) || le(t))
-    return !1;
-  var n = te(r, le);
-  return !(t && n && r.indexOf(n) > r.indexOf(t));
-}
-function Br(e, t) {
-  var r = e.childNodes || [];
-  function n(i) {
-    return ue(i) && i !== t;
-  }
-  if (te(r, n))
-    return !1;
-  var u = te(r, le);
-  return !(t && u && r.indexOf(u) > r.indexOf(t));
-}
-function Qi(e, t, r) {
-  if (!Ki(e))
-    throw new d(d.HIERARCHY_REQUEST_ERR, "Unexpected parent node type " + e.nodeType);
-  if (r && r.parentNode !== e)
-    throw new d(d.NOT_FOUND_ERR, "child not in parent");
-  if (
-    // 4. If `node` is not a DocumentFragment, DocumentType, Element, or CharacterData node, then throw a "HierarchyRequestError" DOMException.
-    !Wi(t) || // 5. If either `node` is a Text node and `parent` is a document,
-    // the sax parser currently adds top level text nodes, this will be fixed in 0.9.0
-    // || (node.nodeType === Node.TEXT_NODE && parent.nodeType === Node.DOCUMENT_NODE)
-    // or `node` is a doctype and `parent` is not a document, then throw a "HierarchyRequestError" DOMException.
-    le(t) && e.nodeType !== C.DOCUMENT_NODE
-  )
-    throw new d(
-      d.HIERARCHY_REQUEST_ERR,
-      "Unexpected node type " + t.nodeType + " for parent node type " + e.nodeType
-    );
-}
-function Zi(e, t, r) {
-  var n = e.childNodes || [], u = t.childNodes || [];
-  if (t.nodeType === C.DOCUMENT_FRAGMENT_NODE) {
-    var i = u.filter(ue);
-    if (i.length > 1 || te(u, Ln))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "More than one element or text in fragment");
-    if (i.length === 1 && !Rr(e, r))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Element in fragment can not be inserted before doctype");
-  }
-  if (ue(t) && !Rr(e, r))
-    throw new d(d.HIERARCHY_REQUEST_ERR, "Only one element can be added and only after doctype");
-  if (le(t)) {
-    if (te(n, le))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Only one doctype is allowed");
-    var a = te(n, ue);
-    if (r && n.indexOf(a) < n.indexOf(r))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Doctype can only be inserted before an element");
-    if (!r && a)
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Doctype can not be appended since element is present");
-  }
-}
-function Fn(e, t, r) {
-  var n = e.childNodes || [], u = t.childNodes || [];
-  if (t.nodeType === C.DOCUMENT_FRAGMENT_NODE) {
-    var i = u.filter(ue);
-    if (i.length > 1 || te(u, Ln))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "More than one element or text in fragment");
-    if (i.length === 1 && !Br(e, r))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Element in fragment can not be inserted before doctype");
-  }
-  if (ue(t) && !Br(e, r))
-    throw new d(d.HIERARCHY_REQUEST_ERR, "Only one element can be added and only after doctype");
-  if (le(t)) {
-    if (te(n, function(s) {
-      return le(s) && s !== r;
-    }))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Only one doctype is allowed");
-    var a = te(n, ue);
-    if (r && n.indexOf(a) < n.indexOf(r))
-      throw new d(d.HIERARCHY_REQUEST_ERR, "Doctype can only be inserted before an element");
-  }
-}
-function bt(e, t, r, n) {
-  Qi(e, t, r), e.nodeType === C.DOCUMENT_NODE && (n || Zi)(e, t, r);
-  var u = t.parentNode;
-  if (u && u.removeChild(t), t.nodeType === se) {
-    var i = t.firstChild;
-    if (i == null)
-      return t;
-    var a = t.lastChild;
-  } else
-    i = a = t;
-  var o = r ? r.previousSibling : e.lastChild;
-  i.previousSibling = o, a.nextSibling = r, o ? o.nextSibling = i : e.firstChild = i, r == null ? e.lastChild = a : r.previousSibling = a;
-  do
-    i.parentNode = e;
-  while (i !== a && (i = i.nextSibling));
-  return _n(e.ownerDocument || e, e, t), t.nodeType == se && (t.firstChild = t.lastChild = null), t;
-}
-ce.prototype = {
-  /**
-   * The implementation that created this document.
-   *
-   * @type DOMImplementation
-   * @readonly
-   */
-  implementation: null,
-  nodeName: "#document",
-  nodeType: ut,
-  /**
-   * The DocumentType node of the document.
-   *
-   * @type DocumentType
-   * @readonly
-   */
-  doctype: null,
-  documentElement: null,
-  _inc: 1,
-  insertBefore: function(e, t) {
-    if (e.nodeType === se) {
-      for (var r = e.firstChild; r; ) {
-        var n = r.nextSibling;
-        this.insertBefore(r, t), r = n;
-      }
-      return e;
-    }
-    return bt(this, e, t), e.ownerDocument = this, this.documentElement === null && e.nodeType === K && (this.documentElement = e), e;
-  },
-  removeChild: function(e) {
-    var t = Pn(this, e);
-    return t === this.documentElement && (this.documentElement = null), t;
-  },
-  replaceChild: function(e, t) {
-    bt(this, e, t, Fn), e.ownerDocument = this, t && this.removeChild(t), ue(e) && (this.documentElement = e);
-  },
-  // Introduced in DOM Level 2:
-  importNode: function(e, t) {
-    return $n(this, e, t);
-  },
-  // Introduced in DOM Level 2:
-  getElementById: function(e) {
-    var t = null;
-    return Ke(this.documentElement, function(r) {
-      if (r.nodeType == K && r.getAttribute("id") == e)
-        return t = r, !0;
-    }), t;
-  },
-  /**
-   * Creates a new `Element` that is owned by this `Document`.
-   * In HTML Documents `localName` is the lower cased `tagName`,
-   * otherwise no transformation is being applied.
-   * When `contentType` implies the HTML namespace, it will be set as `namespaceURI`.
-   *
-   * __This implementation differs from the specification:__ - The provided name is not checked
-   * against the `Name` production,
-   * so no related error will be thrown.
-   * - There is no interface `HTMLElement`, it is always an `Element`.
-   * - There is no support for a second argument to indicate using custom elements.
-   *
-   * @param {string} tagName
-   * @returns {Element}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-   * @see https://dom.spec.whatwg.org/#dom-document-createelement
-   * @see https://dom.spec.whatwg.org/#concept-create-element
-   */
-  createElement: function(e) {
-    var t = new fe(q);
-    t.ownerDocument = this, this.type === "html" && (e = e.toLowerCase()), Fi(this.contentType) && (t.namespaceURI = re.HTML), t.nodeName = e, t.tagName = e, t.localName = e, t.childNodes = new M();
-    var r = t.attributes = new _e();
-    return r._ownerElement = t, t;
-  },
-  /**
-   * @returns {DocumentFragment}
-   */
-  createDocumentFragment: function() {
-    var e = new ft(q);
-    return e.ownerDocument = this, e.childNodes = new M(), e;
-  },
-  /**
-   * @param {string} data
-   * @returns {Text}
-   */
-  createTextNode: function(e) {
-    var t = new lt(q);
-    return t.ownerDocument = this, t.childNodes = new M(), t.appendData(e), t;
-  },
-  /**
-   * @param {string} data
-   * @returns {Comment}
-   */
-  createComment: function(e) {
-    var t = new St(q);
-    return t.ownerDocument = this, t.childNodes = new M(), t.appendData(e), t;
-  },
-  /**
-   * @param {string} data
-   * @returns {CDATASection}
-   */
-  createCDATASection: function(e) {
-    var t = new Ot(q);
-    return t.ownerDocument = this, t.childNodes = new M(), t.appendData(e), t;
-  },
-  /**
-   * @param {string} target
-   * @param {string} data
-   * @returns {ProcessingInstruction}
-   */
-  createProcessingInstruction: function(e, t) {
-    var r = new Bt(q);
-    return r.ownerDocument = this, r.childNodes = new M(), r.nodeName = r.target = e, r.nodeValue = r.data = t, r;
-  },
-  /**
-   * Creates an `Attr` node that is owned by this document.
-   * In HTML Documents `localName` is the lower cased `name`,
-   * otherwise no transformation is being applied.
-   *
-   * __This implementation differs from the specification:__ - The provided name is not checked
-   * against the `Name` production,
-   * so no related error will be thrown.
-   *
-   * @param {string} name
-   * @returns {Attr}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/createAttribute
-   * @see https://dom.spec.whatwg.org/#dom-document-createattribute
-   */
-  createAttribute: function(e) {
-    if (!Z.QName_exact.test(e))
-      throw new d(d.INVALID_CHARACTER_ERR, 'invalid character in name "' + e + '"');
-    return this.type === "html" && (e = e.toLowerCase()), this._createAttribute(e);
-  },
-  _createAttribute: function(e) {
-    var t = new De(q);
-    return t.ownerDocument = this, t.childNodes = new M(), t.name = e, t.nodeName = e, t.localName = e, t.specified = !0, t;
-  },
-  /**
-   * Creates an EntityReference object.
-   * The current implementation does not fill the `childNodes` with those of the corresponding
-   * `Entity`
-   *
-   * @deprecated
-   * In DOM Level 4.
-   * @param {string} name
-   * The name of the entity to reference. No namespace well-formedness checks are performed.
-   * @returns {EntityReference}
-   * @throws {DOMException}
-   * With code `INVALID_CHARACTER_ERR` when `name` is not valid.
-   * @throws {DOMException}
-   * with code `NOT_SUPPORTED_ERR` when the document is of type `html`
-   * @see https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-392B75AE
-   */
-  createEntityReference: function(e) {
-    if (!Z.Name.test(e))
-      throw new d(d.INVALID_CHARACTER_ERR, 'not a valid xml name "' + e + '"');
-    if (this.type === "html")
-      throw new d("document is an html document", ji.NotSupportedError);
-    var t = new Rt(q);
-    return t.ownerDocument = this, t.childNodes = new M(), t.nodeName = e, t;
-  },
-  // Introduced in DOM Level 2:
-  /**
-   * @param {string} namespaceURI
-   * @param {string} qualifiedName
-   * @returns {Element}
-   */
-  createElementNS: function(e, t) {
-    var r = Vt(e, t), n = new fe(q), u = n.attributes = new _e();
-    return n.childNodes = new M(), n.ownerDocument = this, n.nodeName = t, n.tagName = t, n.namespaceURI = r[0], n.prefix = r[1], n.localName = r[2], u._ownerElement = n, n;
-  },
-  // Introduced in DOM Level 2:
-  /**
-   * @param {string} namespaceURI
-   * @param {string} qualifiedName
-   * @returns {Attr}
-   */
-  createAttributeNS: function(e, t) {
-    var r = Vt(e, t), n = new De(q);
-    return n.ownerDocument = this, n.childNodes = new M(), n.nodeName = t, n.name = t, n.specified = !0, n.namespaceURI = r[0], n.prefix = r[1], n.localName = r[2], n;
-  }
-};
-j(ce, C);
-function fe(e) {
-  $(e), this._nsMap = /* @__PURE__ */ Object.create(null);
-}
-fe.prototype = {
-  nodeType: K,
-  /**
-   * The attributes of this element.
-   *
-   * @type {NamedNodeMap | null}
-   */
-  attributes: null,
-  getQualifiedName: function() {
-    return this.prefix ? this.prefix + ":" + this.localName : this.localName;
-  },
-  _isInHTMLDocumentAndNamespace: function() {
-    return this.ownerDocument.type === "html" && this.namespaceURI === re.HTML;
-  },
-  hasAttribute: function(e) {
-    return !!this.getAttributeNode(e);
-  },
-  /**
-   * Returns element’s first attribute whose qualified name is `name`, and `null`
-   * if there is no such attribute.
-   *
-   * @param {string} name
-   * @returns {string | null}
-   */
-  getAttribute: function(e) {
-    var t = this.getAttributeNode(e);
-    return t ? t.value : null;
-  },
-  getAttributeNode: function(e) {
-    return this._isInHTMLDocumentAndNamespace() && (e = e.toLowerCase()), this.attributes.getNamedItem(e);
-  },
-  /**
-   * Sets the value of element’s first attribute whose qualified name is qualifiedName to value.
-   *
-   * @param {string} name
-   * @param {string} value
-   */
-  setAttribute: function(e, t) {
-    this._isInHTMLDocumentAndNamespace() && (e = e.toLowerCase());
-    var r = this.getAttributeNode(e);
-    r ? r.value = r.nodeValue = "" + t : (r = this.ownerDocument._createAttribute(e), r.value = r.nodeValue = "" + t, this.setAttributeNode(r));
-  },
-  removeAttribute: function(e) {
-    var t = this.getAttributeNode(e);
-    t && this.removeAttributeNode(t);
-  },
-  setAttributeNode: function(e) {
-    return this.attributes.setNamedItem(e);
-  },
-  setAttributeNodeNS: function(e) {
-    return this.attributes.setNamedItemNS(e);
-  },
-  removeAttributeNode: function(e) {
-    return this.attributes.removeNamedItem(e.nodeName);
-  },
-  //get real attribute name,and remove it by removeAttributeNode
-  removeAttributeNS: function(e, t) {
-    var r = this.getAttributeNodeNS(e, t);
-    r && this.removeAttributeNode(r);
-  },
-  hasAttributeNS: function(e, t) {
-    return this.getAttributeNodeNS(e, t) != null;
-  },
-  /**
-   * Returns element’s attribute whose namespace is `namespaceURI` and local name is
-   * `localName`,
-   * or `null` if there is no such attribute.
-   *
-   * @param {string} namespaceURI
-   * @param {string} localName
-   * @returns {string | null}
-   */
-  getAttributeNS: function(e, t) {
-    var r = this.getAttributeNodeNS(e, t);
-    return r ? r.value : null;
-  },
-  /**
-   * Sets the value of element’s attribute whose namespace is `namespaceURI` and local name is
-   * `localName` to value.
-   *
-   * @param {string} namespaceURI
-   * @param {string} qualifiedName
-   * @param {string} value
-   * @see https://dom.spec.whatwg.org/#dom-element-setattributens
-   */
-  setAttributeNS: function(e, t, r) {
-    var n = Vt(e, t), u = n[2], i = this.getAttributeNodeNS(e, u);
-    i ? i.value = i.nodeValue = "" + r : (i = this.ownerDocument.createAttributeNS(e, t), i.value = i.nodeValue = "" + r, this.setAttributeNode(i));
-  },
-  getAttributeNodeNS: function(e, t) {
-    return this.attributes.getNamedItemNS(e, t);
-  },
-  /**
-   * Returns a LiveNodeList of all child elements which have **all** of the given class name(s).
-   *
-   * Returns an empty list if `classNames` is an empty string or only contains HTML white space
-   * characters.
-   *
-   * Warning: This returns a live LiveNodeList.
-   * Changes in the DOM will reflect in the array as the changes occur.
-   * If an element selected by this array no longer qualifies for the selector,
-   * it will automatically be removed. Be aware of this for iteration purposes.
-   *
-   * @param {string} classNames
-   * Is a string representing the class name(s) to match; multiple class names are separated by
-   * (ASCII-)whitespace.
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByClassName
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName
-   * @see https://dom.spec.whatwg.org/#concept-getelementsbyclassname
-   */
-  getElementsByClassName: function(e) {
-    var t = wr(e);
-    return new he(this, function(r) {
-      var n = [];
-      return t.length > 0 && Ke(r, function(u) {
-        if (u !== r && u.nodeType === K) {
-          var i = u.getAttribute("class");
-          if (i) {
-            var a = e === i;
-            if (!a) {
-              var o = wr(i);
-              a = t.every(Gi(o));
-            }
-            a && n.push(u);
-          }
-        }
-      }), n;
-    });
-  },
-  /**
-   * Returns a LiveNodeList of elements with the given qualifiedName.
-   * Searching for all descendants can be done by passing `*` as `qualifiedName`.
-   *
-   * All descendants of the specified element are searched, but not the element itself.
-   * The returned list is live, which means it updates itself with the DOM tree automatically.
-   * Therefore, there is no need to call `Element.getElementsByTagName()`
-   * with the same element and arguments repeatedly if the DOM changes in between calls.
-   *
-   * When called on an HTML element in an HTML document,
-   * `getElementsByTagName` lower-cases the argument before searching for it.
-   * This is undesirable when trying to match camel-cased SVG elements (such as
-   * `<linearGradient>`) in an HTML document.
-   * Instead, use `Element.getElementsByTagNameNS()`,
-   * which preserves the capitalization of the tag name.
-   *
-   * `Element.getElementsByTagName` is similar to `Document.getElementsByTagName()`,
-   * except that it only searches for elements that are descendants of the specified element.
-   *
-   * @param {string} qualifiedName
-   * @returns {LiveNodeList}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName
-   * @see https://dom.spec.whatwg.org/#concept-getelementsbytagname
-   */
-  getElementsByTagName: function(e) {
-    var t = (this.nodeType === ut ? this : this.ownerDocument).type === "html", r = e.toLowerCase();
-    return new he(this, function(n) {
-      var u = [];
-      return Ke(n, function(i) {
-        if (!(i === n || i.nodeType !== K))
-          if (e === "*")
-            u.push(i);
-          else {
-            var a = i.getQualifiedName(), o = t && i.namespaceURI === re.HTML ? r : e;
-            a === o && u.push(i);
-          }
-      }), u;
-    });
-  },
-  getElementsByTagNameNS: function(e, t) {
-    return new he(this, function(r) {
-      var n = [];
-      return Ke(r, function(u) {
-        u !== r && u.nodeType === K && (e === "*" || u.namespaceURI === e) && (t === "*" || u.localName == t) && n.push(u);
-      }), n;
-    });
-  }
-};
-ce.prototype.getElementsByClassName = fe.prototype.getElementsByClassName;
-ce.prototype.getElementsByTagName = fe.prototype.getElementsByTagName;
-ce.prototype.getElementsByTagNameNS = fe.prototype.getElementsByTagNameNS;
-j(fe, C);
-function De(e) {
-  $(e), this.namespaceURI = null, this.prefix = null, this.ownerElement = null;
-}
-De.prototype.nodeType = Me;
-j(De, C);
-function ke(e) {
-  $(e);
-}
-ke.prototype = {
-  data: "",
-  substringData: function(e, t) {
-    return this.data.substring(e, e + t);
-  },
-  appendData: function(e) {
-    e = this.data + e, this.nodeValue = this.data = e, this.length = e.length;
-  },
-  insertData: function(e, t) {
-    this.replaceData(e, 0, t);
-  },
-  deleteData: function(e, t) {
-    this.replaceData(e, t, "");
-  },
-  replaceData: function(e, t, r) {
-    var n = this.data.substring(0, e), u = this.data.substring(e + t);
-    r = n + r + u, this.nodeValue = this.data = r, this.length = r.length;
-  }
-};
-j(ke, C);
-function lt(e) {
-  $(e);
-}
-lt.prototype = {
-  nodeName: "#text",
-  nodeType: Nt,
-  splitText: function(e) {
-    var t = this.data, r = t.substring(e);
-    t = t.substring(0, e), this.data = this.nodeValue = t, this.length = t.length;
-    var n = this.ownerDocument.createTextNode(r);
-    return this.parentNode && this.parentNode.insertBefore(n, this.nextSibling), n;
-  }
-};
-j(lt, ke);
-function St(e) {
-  $(e);
-}
-St.prototype = {
-  nodeName: "#comment",
-  nodeType: Sn
-};
-j(St, ke);
-function Ot(e) {
-  $(e);
-}
-Ot.prototype = {
-  nodeName: "#cdata-section",
-  nodeType: Cn
-};
-j(Ot, lt);
-function It(e) {
-  $(e);
-}
-It.prototype.nodeType = On;
-j(It, C);
-function ur(e) {
-  $(e);
-}
-ur.prototype.nodeType = Ji;
-j(ur, C);
-function ir(e) {
-  $(e);
-}
-ir.prototype.nodeType = zi;
-j(ir, C);
-function Rt(e) {
-  $(e);
-}
-Rt.prototype.nodeType = Tn;
-j(Rt, C);
-function ft(e) {
-  $(e);
-}
-ft.prototype.nodeName = "#document-fragment";
-ft.prototype.nodeType = se;
-j(ft, C);
-function Bt(e) {
-  $(e);
-}
-Bt.prototype.nodeType = wn;
-j(Bt, ke);
-function kn() {
-}
-kn.prototype.serializeToString = function(e, t) {
-  return qn.call(e, t);
-};
-C.prototype.toString = qn;
-function qn(e) {
-  var t = [], r = this.nodeType === ut && this.documentElement || this, n = r.prefix, u = r.namespaceURI;
-  if (u && n == null) {
-    var n = r.lookupPrefix(u);
-    if (n == null)
-      var i = [
-        { namespace: u, prefix: null }
-        //{namespace:uri,prefix:''}
-      ];
-  }
-  return Ie(this, t, e, i), t.join("");
-}
-function xr(e, t, r) {
-  var n = e.prefix || "", u = e.namespaceURI;
-  if (!u || n === "xml" && u === re.XML || u === re.XMLNS)
-    return !1;
-  for (var i = r.length; i--; ) {
-    var a = r[i];
-    if (a.prefix === n)
-      return a.namespace !== u;
-  }
-  return !0;
-}
-function jt(e, t, r) {
-  e.push(" ", t, '="', r.replace(/[<>&"\t\n\r]/g, xn), '"');
-}
-function Ie(e, t, r, n) {
-  n || (n = []);
-  var u = e.nodeType === ut ? e : e.ownerDocument, i = u.type === "html";
-  if (r)
-    if (e = r(e), e) {
-      if (typeof e == "string") {
-        t.push(e);
-        return;
-      }
-    } else
-      return;
-  switch (e.nodeType) {
-    case K:
-      var a = e.attributes, o = a.length, b = e.firstChild, s = e.tagName, c = s;
-      if (!i && !e.prefix && e.namespaceURI) {
-        for (var f, l = 0; l < a.length; l++)
-          if (a.item(l).name === "xmlns") {
-            f = a.item(l).value;
-            break;
-          }
-        if (!f)
-          for (var p = n.length - 1; p >= 0; p--) {
-            var g = n[p];
-            if (g.prefix === "" && g.namespace === e.namespaceURI) {
-              f = g.namespace;
-              break;
-            }
-          }
-        if (f !== e.namespaceURI)
-          for (var p = n.length - 1; p >= 0; p--) {
-            var g = n[p];
-            if (g.namespace === e.namespaceURI) {
-              g.prefix && (c = g.prefix + ":" + s);
-              break;
-            }
-          }
-      }
-      t.push("<", c);
-      for (var m = 0; m < o; m++) {
-        var h = a.item(m);
-        h.prefix == "xmlns" ? n.push({
-          prefix: h.localName,
-          namespace: h.value
-        }) : h.nodeName == "xmlns" && n.push({ prefix: "", namespace: h.value });
-      }
-      for (var m = 0; m < o; m++) {
-        var h = a.item(m);
-        if (xr(h, i, n)) {
-          var D = h.prefix || "", O = h.namespaceURI;
-          jt(t, D ? "xmlns:" + D : "xmlns", O), n.push({ prefix: D, namespace: O });
-        }
-        Ie(h, t, r, n);
-      }
-      if (s === c && xr(e, i, n)) {
-        var D = e.prefix || "", O = e.namespaceURI;
-        jt(t, D ? "xmlns:" + D : "xmlns", O), n.push({ prefix: D, namespace: O });
-      }
-      var L = !b;
-      if (L && (i || e.namespaceURI === re.HTML) && (L = $i(s)), L)
-        t.push("/>");
-      else {
-        if (t.push(">"), i && qi(s))
-          for (; b; )
-            b.data ? t.push(b.data) : Ie(b, t, r, n.slice()), b = b.nextSibling;
-        else
-          for (; b; )
-            Ie(b, t, r, n.slice()), b = b.nextSibling;
-        t.push("</", c, ">");
-      }
-      return;
-    case ut:
-    case se:
-      for (var b = e.firstChild; b; )
-        Ie(b, t, r, n.slice()), b = b.nextSibling;
-      return;
-    case Me:
-      return jt(t, e.name, e.value);
-    case Nt:
-      return t.push(e.data.replace(/[<&>]/g, xn));
-    case Cn:
-      return t.push(Z.CDATA_START, e.data, Z.CDATA_END);
-    case Sn:
-      return t.push(Z.COMMENT_START, e.data, Z.COMMENT_END);
-    case On:
-      var W = e.publicId, V = e.systemId;
-      t.push(Z.DOCTYPE_DECL_START, " ", e.name), W ? (t.push(" ", Z.PUBLIC, " ", W), V && V !== "." && t.push(" ", V)) : V && V !== "." && t.push(" ", Z.SYSTEM, " ", V), e.internalSubset && t.push(" [", e.internalSubset, "]"), t.push(">");
-      return;
-    case wn:
-      return t.push("<?", e.target, " ", e.data, "?>");
-    case Tn:
-      return t.push("&", e.nodeName, ";");
-    default:
-      t.push("??", e.nodeName);
-  }
-}
-function $n(e, t, r) {
-  var n;
-  switch (t.nodeType) {
-    case K:
-      n = t.cloneNode(!1), n.ownerDocument = e;
-    case se:
-      break;
-    case Me:
-      r = !0;
-      break;
-  }
-  if (n || (n = t.cloneNode(!1)), n.ownerDocument = e, n.parentNode = null, r)
-    for (var u = t.firstChild; u; )
-      n.appendChild($n(e, u, r)), u = u.nextSibling;
-  return n;
-}
-function Ht(e, t, r) {
-  var n = new t.constructor(q);
-  for (var u in t)
-    if (xe(t, u)) {
-      var i = t[u];
-      typeof i != "object" && i != n[u] && (n[u] = i);
-    }
-  switch (t.childNodes && (n.childNodes = new M()), n.ownerDocument = e, n.nodeType) {
-    case K:
-      var a = t.attributes, o = n.attributes = new _e(), s = a.length;
-      o._ownerElement = n;
-      for (var c = 0; c < s; c++)
-        n.setAttributeNode(Ht(e, a.item(c), !0));
-      break;
-    case Me:
-      r = !0;
-  }
-  if (r)
-    for (var f = t.firstChild; f; )
-      n.appendChild(Ht(e, f, r)), f = f.nextSibling;
-  return n;
-}
-function jn(e, t, r) {
-  e[t] = r;
-}
-try {
-  if (Object.defineProperty) {
-    let e = function(t) {
-      switch (t.nodeType) {
-        case K:
-        case se:
-          var r = [];
-          for (t = t.firstChild; t; )
-            t.nodeType !== 7 && t.nodeType !== 8 && r.push(e(t)), t = t.nextSibling;
-          return r.join("");
-        default:
-          return t.nodeValue;
-      }
-    };
-    Object.defineProperty(he.prototype, "length", {
-      get: function() {
-        return wt(this), this.$$length;
-      }
-    }), Object.defineProperty(C.prototype, "textContent", {
-      get: function() {
-        return e(this);
-      },
-      set: function(t) {
-        switch (this.nodeType) {
-          case K:
-          case se:
-            for (; this.firstChild; )
-              this.removeChild(this.firstChild);
-            (t || String(t)) && this.appendChild(this.ownerDocument.createTextNode(t));
-            break;
-          default:
-            this.data = t, this.value = t, this.nodeValue = t;
-        }
-      }
-    }), jn = function(t, r, n) {
-      t["$$" + r] = n;
-    };
-  }
-} catch {
-}
-x._updateLiveList = wt;
-x.Attr = De;
-x.CDATASection = Ot;
-x.CharacterData = ke;
-x.Comment = St;
-x.Document = ce;
-x.DocumentFragment = ft;
-x.DocumentType = It;
-x.DOMImplementation = Bn;
-x.Element = fe;
-x.Entity = ir;
-x.EntityReference = Rt;
-x.LiveNodeList = he;
-x.NamedNodeMap = _e;
-x.Node = C;
-x.NodeList = M;
-x.Notation = ur;
-x.Text = lt;
-x.ProcessingInstruction = Bt;
-x.XMLSerializer = kn;
-var Un = {};
-(function(e) {
-  var t = B.freeze;
-  e.XML_ENTITIES = t({
-    amp: "&",
-    apos: "'",
-    gt: ">",
-    lt: "<",
-    quot: '"'
-  }), e.HTML_ENTITIES = t({
-    Aacute: "Á",
-    aacute: "á",
-    Abreve: "Ă",
-    abreve: "ă",
-    ac: "∾",
-    acd: "∿",
-    acE: "∾̳",
-    Acirc: "Â",
-    acirc: "â",
-    acute: "´",
-    Acy: "А",
-    acy: "а",
-    AElig: "Æ",
-    aelig: "æ",
-    af: "⁡",
-    Afr: "𝔄",
-    afr: "𝔞",
-    Agrave: "À",
-    agrave: "à",
-    alefsym: "ℵ",
-    aleph: "ℵ",
-    Alpha: "Α",
-    alpha: "α",
-    Amacr: "Ā",
-    amacr: "ā",
-    amalg: "⨿",
-    AMP: "&",
-    amp: "&",
-    And: "⩓",
-    and: "∧",
-    andand: "⩕",
-    andd: "⩜",
-    andslope: "⩘",
-    andv: "⩚",
-    ang: "∠",
-    ange: "⦤",
-    angle: "∠",
-    angmsd: "∡",
-    angmsdaa: "⦨",
-    angmsdab: "⦩",
-    angmsdac: "⦪",
-    angmsdad: "⦫",
-    angmsdae: "⦬",
-    angmsdaf: "⦭",
-    angmsdag: "⦮",
-    angmsdah: "⦯",
-    angrt: "∟",
-    angrtvb: "⊾",
-    angrtvbd: "⦝",
-    angsph: "∢",
-    angst: "Å",
-    angzarr: "⍼",
-    Aogon: "Ą",
-    aogon: "ą",
-    Aopf: "𝔸",
-    aopf: "𝕒",
-    ap: "≈",
-    apacir: "⩯",
-    apE: "⩰",
-    ape: "≊",
-    apid: "≋",
-    apos: "'",
-    ApplyFunction: "⁡",
-    approx: "≈",
-    approxeq: "≊",
-    Aring: "Å",
-    aring: "å",
-    Ascr: "𝒜",
-    ascr: "𝒶",
-    Assign: "≔",
-    ast: "*",
-    asymp: "≈",
-    asympeq: "≍",
-    Atilde: "Ã",
-    atilde: "ã",
-    Auml: "Ä",
-    auml: "ä",
-    awconint: "∳",
-    awint: "⨑",
-    backcong: "≌",
-    backepsilon: "϶",
-    backprime: "‵",
-    backsim: "∽",
-    backsimeq: "⋍",
-    Backslash: "∖",
-    Barv: "⫧",
-    barvee: "⊽",
-    Barwed: "⌆",
-    barwed: "⌅",
-    barwedge: "⌅",
-    bbrk: "⎵",
-    bbrktbrk: "⎶",
-    bcong: "≌",
-    Bcy: "Б",
-    bcy: "б",
-    bdquo: "„",
-    becaus: "∵",
-    Because: "∵",
-    because: "∵",
-    bemptyv: "⦰",
-    bepsi: "϶",
-    bernou: "ℬ",
-    Bernoullis: "ℬ",
-    Beta: "Β",
-    beta: "β",
-    beth: "ℶ",
-    between: "≬",
-    Bfr: "𝔅",
-    bfr: "𝔟",
-    bigcap: "⋂",
-    bigcirc: "◯",
-    bigcup: "⋃",
-    bigodot: "⨀",
-    bigoplus: "⨁",
-    bigotimes: "⨂",
-    bigsqcup: "⨆",
-    bigstar: "★",
-    bigtriangledown: "▽",
-    bigtriangleup: "△",
-    biguplus: "⨄",
-    bigvee: "⋁",
-    bigwedge: "⋀",
-    bkarow: "⤍",
-    blacklozenge: "⧫",
-    blacksquare: "▪",
-    blacktriangle: "▴",
-    blacktriangledown: "▾",
-    blacktriangleleft: "◂",
-    blacktriangleright: "▸",
-    blank: "␣",
-    blk12: "▒",
-    blk14: "░",
-    blk34: "▓",
-    block: "█",
-    bne: "=⃥",
-    bnequiv: "≡⃥",
-    bNot: "⫭",
-    bnot: "⌐",
-    Bopf: "𝔹",
-    bopf: "𝕓",
-    bot: "⊥",
-    bottom: "⊥",
-    bowtie: "⋈",
-    boxbox: "⧉",
-    boxDL: "╗",
-    boxDl: "╖",
-    boxdL: "╕",
-    boxdl: "┐",
-    boxDR: "╔",
-    boxDr: "╓",
-    boxdR: "╒",
-    boxdr: "┌",
-    boxH: "═",
-    boxh: "─",
-    boxHD: "╦",
-    boxHd: "╤",
-    boxhD: "╥",
-    boxhd: "┬",
-    boxHU: "╩",
-    boxHu: "╧",
-    boxhU: "╨",
-    boxhu: "┴",
-    boxminus: "⊟",
-    boxplus: "⊞",
-    boxtimes: "⊠",
-    boxUL: "╝",
-    boxUl: "╜",
-    boxuL: "╛",
-    boxul: "┘",
-    boxUR: "╚",
-    boxUr: "╙",
-    boxuR: "╘",
-    boxur: "└",
-    boxV: "║",
-    boxv: "│",
-    boxVH: "╬",
-    boxVh: "╫",
-    boxvH: "╪",
-    boxvh: "┼",
-    boxVL: "╣",
-    boxVl: "╢",
-    boxvL: "╡",
-    boxvl: "┤",
-    boxVR: "╠",
-    boxVr: "╟",
-    boxvR: "╞",
-    boxvr: "├",
-    bprime: "‵",
-    Breve: "˘",
-    breve: "˘",
-    brvbar: "¦",
-    Bscr: "ℬ",
-    bscr: "𝒷",
-    bsemi: "⁏",
-    bsim: "∽",
-    bsime: "⋍",
-    bsol: "\\",
-    bsolb: "⧅",
-    bsolhsub: "⟈",
-    bull: "•",
-    bullet: "•",
-    bump: "≎",
-    bumpE: "⪮",
-    bumpe: "≏",
-    Bumpeq: "≎",
-    bumpeq: "≏",
-    Cacute: "Ć",
-    cacute: "ć",
-    Cap: "⋒",
-    cap: "∩",
-    capand: "⩄",
-    capbrcup: "⩉",
-    capcap: "⩋",
-    capcup: "⩇",
-    capdot: "⩀",
-    CapitalDifferentialD: "ⅅ",
-    caps: "∩︀",
-    caret: "⁁",
-    caron: "ˇ",
-    Cayleys: "ℭ",
-    ccaps: "⩍",
-    Ccaron: "Č",
-    ccaron: "č",
-    Ccedil: "Ç",
-    ccedil: "ç",
-    Ccirc: "Ĉ",
-    ccirc: "ĉ",
-    Cconint: "∰",
-    ccups: "⩌",
-    ccupssm: "⩐",
-    Cdot: "Ċ",
-    cdot: "ċ",
-    cedil: "¸",
-    Cedilla: "¸",
-    cemptyv: "⦲",
-    cent: "¢",
-    CenterDot: "·",
-    centerdot: "·",
-    Cfr: "ℭ",
-    cfr: "𝔠",
-    CHcy: "Ч",
-    chcy: "ч",
-    check: "✓",
-    checkmark: "✓",
-    Chi: "Χ",
-    chi: "χ",
-    cir: "○",
-    circ: "ˆ",
-    circeq: "≗",
-    circlearrowleft: "↺",
-    circlearrowright: "↻",
-    circledast: "⊛",
-    circledcirc: "⊚",
-    circleddash: "⊝",
-    CircleDot: "⊙",
-    circledR: "®",
-    circledS: "Ⓢ",
-    CircleMinus: "⊖",
-    CirclePlus: "⊕",
-    CircleTimes: "⊗",
-    cirE: "⧃",
-    cire: "≗",
-    cirfnint: "⨐",
-    cirmid: "⫯",
-    cirscir: "⧂",
-    ClockwiseContourIntegral: "∲",
-    CloseCurlyDoubleQuote: "”",
-    CloseCurlyQuote: "’",
-    clubs: "♣",
-    clubsuit: "♣",
-    Colon: "∷",
-    colon: ":",
-    Colone: "⩴",
-    colone: "≔",
-    coloneq: "≔",
-    comma: ",",
-    commat: "@",
-    comp: "∁",
-    compfn: "∘",
-    complement: "∁",
-    complexes: "ℂ",
-    cong: "≅",
-    congdot: "⩭",
-    Congruent: "≡",
-    Conint: "∯",
-    conint: "∮",
-    ContourIntegral: "∮",
-    Copf: "ℂ",
-    copf: "𝕔",
-    coprod: "∐",
-    Coproduct: "∐",
-    COPY: "©",
-    copy: "©",
-    copysr: "℗",
-    CounterClockwiseContourIntegral: "∳",
-    crarr: "↵",
-    Cross: "⨯",
-    cross: "✗",
-    Cscr: "𝒞",
-    cscr: "𝒸",
-    csub: "⫏",
-    csube: "⫑",
-    csup: "⫐",
-    csupe: "⫒",
-    ctdot: "⋯",
-    cudarrl: "⤸",
-    cudarrr: "⤵",
-    cuepr: "⋞",
-    cuesc: "⋟",
-    cularr: "↶",
-    cularrp: "⤽",
-    Cup: "⋓",
-    cup: "∪",
-    cupbrcap: "⩈",
-    CupCap: "≍",
-    cupcap: "⩆",
-    cupcup: "⩊",
-    cupdot: "⊍",
-    cupor: "⩅",
-    cups: "∪︀",
-    curarr: "↷",
-    curarrm: "⤼",
-    curlyeqprec: "⋞",
-    curlyeqsucc: "⋟",
-    curlyvee: "⋎",
-    curlywedge: "⋏",
-    curren: "¤",
-    curvearrowleft: "↶",
-    curvearrowright: "↷",
-    cuvee: "⋎",
-    cuwed: "⋏",
-    cwconint: "∲",
-    cwint: "∱",
-    cylcty: "⌭",
-    Dagger: "‡",
-    dagger: "†",
-    daleth: "ℸ",
-    Darr: "↡",
-    dArr: "⇓",
-    darr: "↓",
-    dash: "‐",
-    Dashv: "⫤",
-    dashv: "⊣",
-    dbkarow: "⤏",
-    dblac: "˝",
-    Dcaron: "Ď",
-    dcaron: "ď",
-    Dcy: "Д",
-    dcy: "д",
-    DD: "ⅅ",
-    dd: "ⅆ",
-    ddagger: "‡",
-    ddarr: "⇊",
-    DDotrahd: "⤑",
-    ddotseq: "⩷",
-    deg: "°",
-    Del: "∇",
-    Delta: "Δ",
-    delta: "δ",
-    demptyv: "⦱",
-    dfisht: "⥿",
-    Dfr: "𝔇",
-    dfr: "𝔡",
-    dHar: "⥥",
-    dharl: "⇃",
-    dharr: "⇂",
-    DiacriticalAcute: "´",
-    DiacriticalDot: "˙",
-    DiacriticalDoubleAcute: "˝",
-    DiacriticalGrave: "`",
-    DiacriticalTilde: "˜",
-    diam: "⋄",
-    Diamond: "⋄",
-    diamond: "⋄",
-    diamondsuit: "♦",
-    diams: "♦",
-    die: "¨",
-    DifferentialD: "ⅆ",
-    digamma: "ϝ",
-    disin: "⋲",
-    div: "÷",
-    divide: "÷",
-    divideontimes: "⋇",
-    divonx: "⋇",
-    DJcy: "Ђ",
-    djcy: "ђ",
-    dlcorn: "⌞",
-    dlcrop: "⌍",
-    dollar: "$",
-    Dopf: "𝔻",
-    dopf: "𝕕",
-    Dot: "¨",
-    dot: "˙",
-    DotDot: "⃜",
-    doteq: "≐",
-    doteqdot: "≑",
-    DotEqual: "≐",
-    dotminus: "∸",
-    dotplus: "∔",
-    dotsquare: "⊡",
-    doublebarwedge: "⌆",
-    DoubleContourIntegral: "∯",
-    DoubleDot: "¨",
-    DoubleDownArrow: "⇓",
-    DoubleLeftArrow: "⇐",
-    DoubleLeftRightArrow: "⇔",
-    DoubleLeftTee: "⫤",
-    DoubleLongLeftArrow: "⟸",
-    DoubleLongLeftRightArrow: "⟺",
-    DoubleLongRightArrow: "⟹",
-    DoubleRightArrow: "⇒",
-    DoubleRightTee: "⊨",
-    DoubleUpArrow: "⇑",
-    DoubleUpDownArrow: "⇕",
-    DoubleVerticalBar: "∥",
-    DownArrow: "↓",
-    Downarrow: "⇓",
-    downarrow: "↓",
-    DownArrowBar: "⤓",
-    DownArrowUpArrow: "⇵",
-    DownBreve: "̑",
-    downdownarrows: "⇊",
-    downharpoonleft: "⇃",
-    downharpoonright: "⇂",
-    DownLeftRightVector: "⥐",
-    DownLeftTeeVector: "⥞",
-    DownLeftVector: "↽",
-    DownLeftVectorBar: "⥖",
-    DownRightTeeVector: "⥟",
-    DownRightVector: "⇁",
-    DownRightVectorBar: "⥗",
-    DownTee: "⊤",
-    DownTeeArrow: "↧",
-    drbkarow: "⤐",
-    drcorn: "⌟",
-    drcrop: "⌌",
-    Dscr: "𝒟",
-    dscr: "𝒹",
-    DScy: "Ѕ",
-    dscy: "ѕ",
-    dsol: "⧶",
-    Dstrok: "Đ",
-    dstrok: "đ",
-    dtdot: "⋱",
-    dtri: "▿",
-    dtrif: "▾",
-    duarr: "⇵",
-    duhar: "⥯",
-    dwangle: "⦦",
-    DZcy: "Џ",
-    dzcy: "џ",
-    dzigrarr: "⟿",
-    Eacute: "É",
-    eacute: "é",
-    easter: "⩮",
-    Ecaron: "Ě",
-    ecaron: "ě",
-    ecir: "≖",
-    Ecirc: "Ê",
-    ecirc: "ê",
-    ecolon: "≕",
-    Ecy: "Э",
-    ecy: "э",
-    eDDot: "⩷",
-    Edot: "Ė",
-    eDot: "≑",
-    edot: "ė",
-    ee: "ⅇ",
-    efDot: "≒",
-    Efr: "𝔈",
-    efr: "𝔢",
-    eg: "⪚",
-    Egrave: "È",
-    egrave: "è",
-    egs: "⪖",
-    egsdot: "⪘",
-    el: "⪙",
-    Element: "∈",
-    elinters: "⏧",
-    ell: "ℓ",
-    els: "⪕",
-    elsdot: "⪗",
-    Emacr: "Ē",
-    emacr: "ē",
-    empty: "∅",
-    emptyset: "∅",
-    EmptySmallSquare: "◻",
-    emptyv: "∅",
-    EmptyVerySmallSquare: "▫",
-    emsp: " ",
-    emsp13: " ",
-    emsp14: " ",
-    ENG: "Ŋ",
-    eng: "ŋ",
-    ensp: " ",
-    Eogon: "Ę",
-    eogon: "ę",
-    Eopf: "𝔼",
-    eopf: "𝕖",
-    epar: "⋕",
-    eparsl: "⧣",
-    eplus: "⩱",
-    epsi: "ε",
-    Epsilon: "Ε",
-    epsilon: "ε",
-    epsiv: "ϵ",
-    eqcirc: "≖",
-    eqcolon: "≕",
-    eqsim: "≂",
-    eqslantgtr: "⪖",
-    eqslantless: "⪕",
-    Equal: "⩵",
-    equals: "=",
-    EqualTilde: "≂",
-    equest: "≟",
-    Equilibrium: "⇌",
-    equiv: "≡",
-    equivDD: "⩸",
-    eqvparsl: "⧥",
-    erarr: "⥱",
-    erDot: "≓",
-    Escr: "ℰ",
-    escr: "ℯ",
-    esdot: "≐",
-    Esim: "⩳",
-    esim: "≂",
-    Eta: "Η",
-    eta: "η",
-    ETH: "Ð",
-    eth: "ð",
-    Euml: "Ë",
-    euml: "ë",
-    euro: "€",
-    excl: "!",
-    exist: "∃",
-    Exists: "∃",
-    expectation: "ℰ",
-    ExponentialE: "ⅇ",
-    exponentiale: "ⅇ",
-    fallingdotseq: "≒",
-    Fcy: "Ф",
-    fcy: "ф",
-    female: "♀",
-    ffilig: "ﬃ",
-    fflig: "ﬀ",
-    ffllig: "ﬄ",
-    Ffr: "𝔉",
-    ffr: "𝔣",
-    filig: "ﬁ",
-    FilledSmallSquare: "◼",
-    FilledVerySmallSquare: "▪",
-    fjlig: "fj",
-    flat: "♭",
-    fllig: "ﬂ",
-    fltns: "▱",
-    fnof: "ƒ",
-    Fopf: "𝔽",
-    fopf: "𝕗",
-    ForAll: "∀",
-    forall: "∀",
-    fork: "⋔",
-    forkv: "⫙",
-    Fouriertrf: "ℱ",
-    fpartint: "⨍",
-    frac12: "½",
-    frac13: "⅓",
-    frac14: "¼",
-    frac15: "⅕",
-    frac16: "⅙",
-    frac18: "⅛",
-    frac23: "⅔",
-    frac25: "⅖",
-    frac34: "¾",
-    frac35: "⅗",
-    frac38: "⅜",
-    frac45: "⅘",
-    frac56: "⅚",
-    frac58: "⅝",
-    frac78: "⅞",
-    frasl: "⁄",
-    frown: "⌢",
-    Fscr: "ℱ",
-    fscr: "𝒻",
-    gacute: "ǵ",
-    Gamma: "Γ",
-    gamma: "γ",
-    Gammad: "Ϝ",
-    gammad: "ϝ",
-    gap: "⪆",
-    Gbreve: "Ğ",
-    gbreve: "ğ",
-    Gcedil: "Ģ",
-    Gcirc: "Ĝ",
-    gcirc: "ĝ",
-    Gcy: "Г",
-    gcy: "г",
-    Gdot: "Ġ",
-    gdot: "ġ",
-    gE: "≧",
-    ge: "≥",
-    gEl: "⪌",
-    gel: "⋛",
-    geq: "≥",
-    geqq: "≧",
-    geqslant: "⩾",
-    ges: "⩾",
-    gescc: "⪩",
-    gesdot: "⪀",
-    gesdoto: "⪂",
-    gesdotol: "⪄",
-    gesl: "⋛︀",
-    gesles: "⪔",
-    Gfr: "𝔊",
-    gfr: "𝔤",
-    Gg: "⋙",
-    gg: "≫",
-    ggg: "⋙",
-    gimel: "ℷ",
-    GJcy: "Ѓ",
-    gjcy: "ѓ",
-    gl: "≷",
-    gla: "⪥",
-    glE: "⪒",
-    glj: "⪤",
-    gnap: "⪊",
-    gnapprox: "⪊",
-    gnE: "≩",
-    gne: "⪈",
-    gneq: "⪈",
-    gneqq: "≩",
-    gnsim: "⋧",
-    Gopf: "𝔾",
-    gopf: "𝕘",
-    grave: "`",
-    GreaterEqual: "≥",
-    GreaterEqualLess: "⋛",
-    GreaterFullEqual: "≧",
-    GreaterGreater: "⪢",
-    GreaterLess: "≷",
-    GreaterSlantEqual: "⩾",
-    GreaterTilde: "≳",
-    Gscr: "𝒢",
-    gscr: "ℊ",
-    gsim: "≳",
-    gsime: "⪎",
-    gsiml: "⪐",
-    Gt: "≫",
-    GT: ">",
-    gt: ">",
-    gtcc: "⪧",
-    gtcir: "⩺",
-    gtdot: "⋗",
-    gtlPar: "⦕",
-    gtquest: "⩼",
-    gtrapprox: "⪆",
-    gtrarr: "⥸",
-    gtrdot: "⋗",
-    gtreqless: "⋛",
-    gtreqqless: "⪌",
-    gtrless: "≷",
-    gtrsim: "≳",
-    gvertneqq: "≩︀",
-    gvnE: "≩︀",
-    Hacek: "ˇ",
-    hairsp: " ",
-    half: "½",
-    hamilt: "ℋ",
-    HARDcy: "Ъ",
-    hardcy: "ъ",
-    hArr: "⇔",
-    harr: "↔",
-    harrcir: "⥈",
-    harrw: "↭",
-    Hat: "^",
-    hbar: "ℏ",
-    Hcirc: "Ĥ",
-    hcirc: "ĥ",
-    hearts: "♥",
-    heartsuit: "♥",
-    hellip: "…",
-    hercon: "⊹",
-    Hfr: "ℌ",
-    hfr: "𝔥",
-    HilbertSpace: "ℋ",
-    hksearow: "⤥",
-    hkswarow: "⤦",
-    hoarr: "⇿",
-    homtht: "∻",
-    hookleftarrow: "↩",
-    hookrightarrow: "↪",
-    Hopf: "ℍ",
-    hopf: "𝕙",
-    horbar: "―",
-    HorizontalLine: "─",
-    Hscr: "ℋ",
-    hscr: "𝒽",
-    hslash: "ℏ",
-    Hstrok: "Ħ",
-    hstrok: "ħ",
-    HumpDownHump: "≎",
-    HumpEqual: "≏",
-    hybull: "⁃",
-    hyphen: "‐",
-    Iacute: "Í",
-    iacute: "í",
-    ic: "⁣",
-    Icirc: "Î",
-    icirc: "î",
-    Icy: "И",
-    icy: "и",
-    Idot: "İ",
-    IEcy: "Е",
-    iecy: "е",
-    iexcl: "¡",
-    iff: "⇔",
-    Ifr: "ℑ",
-    ifr: "𝔦",
-    Igrave: "Ì",
-    igrave: "ì",
-    ii: "ⅈ",
-    iiiint: "⨌",
-    iiint: "∭",
-    iinfin: "⧜",
-    iiota: "℩",
-    IJlig: "Ĳ",
-    ijlig: "ĳ",
-    Im: "ℑ",
-    Imacr: "Ī",
-    imacr: "ī",
-    image: "ℑ",
-    ImaginaryI: "ⅈ",
-    imagline: "ℐ",
-    imagpart: "ℑ",
-    imath: "ı",
-    imof: "⊷",
-    imped: "Ƶ",
-    Implies: "⇒",
-    in: "∈",
-    incare: "℅",
-    infin: "∞",
-    infintie: "⧝",
-    inodot: "ı",
-    Int: "∬",
-    int: "∫",
-    intcal: "⊺",
-    integers: "ℤ",
-    Integral: "∫",
-    intercal: "⊺",
-    Intersection: "⋂",
-    intlarhk: "⨗",
-    intprod: "⨼",
-    InvisibleComma: "⁣",
-    InvisibleTimes: "⁢",
-    IOcy: "Ё",
-    iocy: "ё",
-    Iogon: "Į",
-    iogon: "į",
-    Iopf: "𝕀",
-    iopf: "𝕚",
-    Iota: "Ι",
-    iota: "ι",
-    iprod: "⨼",
-    iquest: "¿",
-    Iscr: "ℐ",
-    iscr: "𝒾",
-    isin: "∈",
-    isindot: "⋵",
-    isinE: "⋹",
-    isins: "⋴",
-    isinsv: "⋳",
-    isinv: "∈",
-    it: "⁢",
-    Itilde: "Ĩ",
-    itilde: "ĩ",
-    Iukcy: "І",
-    iukcy: "і",
-    Iuml: "Ï",
-    iuml: "ï",
-    Jcirc: "Ĵ",
-    jcirc: "ĵ",
-    Jcy: "Й",
-    jcy: "й",
-    Jfr: "𝔍",
-    jfr: "𝔧",
-    jmath: "ȷ",
-    Jopf: "𝕁",
-    jopf: "𝕛",
-    Jscr: "𝒥",
-    jscr: "𝒿",
-    Jsercy: "Ј",
-    jsercy: "ј",
-    Jukcy: "Є",
-    jukcy: "є",
-    Kappa: "Κ",
-    kappa: "κ",
-    kappav: "ϰ",
-    Kcedil: "Ķ",
-    kcedil: "ķ",
-    Kcy: "К",
-    kcy: "к",
-    Kfr: "𝔎",
-    kfr: "𝔨",
-    kgreen: "ĸ",
-    KHcy: "Х",
-    khcy: "х",
-    KJcy: "Ќ",
-    kjcy: "ќ",
-    Kopf: "𝕂",
-    kopf: "𝕜",
-    Kscr: "𝒦",
-    kscr: "𝓀",
-    lAarr: "⇚",
-    Lacute: "Ĺ",
-    lacute: "ĺ",
-    laemptyv: "⦴",
-    lagran: "ℒ",
-    Lambda: "Λ",
-    lambda: "λ",
-    Lang: "⟪",
-    lang: "⟨",
-    langd: "⦑",
-    langle: "⟨",
-    lap: "⪅",
-    Laplacetrf: "ℒ",
-    laquo: "«",
-    Larr: "↞",
-    lArr: "⇐",
-    larr: "←",
-    larrb: "⇤",
-    larrbfs: "⤟",
-    larrfs: "⤝",
-    larrhk: "↩",
-    larrlp: "↫",
-    larrpl: "⤹",
-    larrsim: "⥳",
-    larrtl: "↢",
-    lat: "⪫",
-    lAtail: "⤛",
-    latail: "⤙",
-    late: "⪭",
-    lates: "⪭︀",
-    lBarr: "⤎",
-    lbarr: "⤌",
-    lbbrk: "❲",
-    lbrace: "{",
-    lbrack: "[",
-    lbrke: "⦋",
-    lbrksld: "⦏",
-    lbrkslu: "⦍",
-    Lcaron: "Ľ",
-    lcaron: "ľ",
-    Lcedil: "Ļ",
-    lcedil: "ļ",
-    lceil: "⌈",
-    lcub: "{",
-    Lcy: "Л",
-    lcy: "л",
-    ldca: "⤶",
-    ldquo: "“",
-    ldquor: "„",
-    ldrdhar: "⥧",
-    ldrushar: "⥋",
-    ldsh: "↲",
-    lE: "≦",
-    le: "≤",
-    LeftAngleBracket: "⟨",
-    LeftArrow: "←",
-    Leftarrow: "⇐",
-    leftarrow: "←",
-    LeftArrowBar: "⇤",
-    LeftArrowRightArrow: "⇆",
-    leftarrowtail: "↢",
-    LeftCeiling: "⌈",
-    LeftDoubleBracket: "⟦",
-    LeftDownTeeVector: "⥡",
-    LeftDownVector: "⇃",
-    LeftDownVectorBar: "⥙",
-    LeftFloor: "⌊",
-    leftharpoondown: "↽",
-    leftharpoonup: "↼",
-    leftleftarrows: "⇇",
-    LeftRightArrow: "↔",
-    Leftrightarrow: "⇔",
-    leftrightarrow: "↔",
-    leftrightarrows: "⇆",
-    leftrightharpoons: "⇋",
-    leftrightsquigarrow: "↭",
-    LeftRightVector: "⥎",
-    LeftTee: "⊣",
-    LeftTeeArrow: "↤",
-    LeftTeeVector: "⥚",
-    leftthreetimes: "⋋",
-    LeftTriangle: "⊲",
-    LeftTriangleBar: "⧏",
-    LeftTriangleEqual: "⊴",
-    LeftUpDownVector: "⥑",
-    LeftUpTeeVector: "⥠",
-    LeftUpVector: "↿",
-    LeftUpVectorBar: "⥘",
-    LeftVector: "↼",
-    LeftVectorBar: "⥒",
-    lEg: "⪋",
-    leg: "⋚",
-    leq: "≤",
-    leqq: "≦",
-    leqslant: "⩽",
-    les: "⩽",
-    lescc: "⪨",
-    lesdot: "⩿",
-    lesdoto: "⪁",
-    lesdotor: "⪃",
-    lesg: "⋚︀",
-    lesges: "⪓",
-    lessapprox: "⪅",
-    lessdot: "⋖",
-    lesseqgtr: "⋚",
-    lesseqqgtr: "⪋",
-    LessEqualGreater: "⋚",
-    LessFullEqual: "≦",
-    LessGreater: "≶",
-    lessgtr: "≶",
-    LessLess: "⪡",
-    lesssim: "≲",
-    LessSlantEqual: "⩽",
-    LessTilde: "≲",
-    lfisht: "⥼",
-    lfloor: "⌊",
-    Lfr: "𝔏",
-    lfr: "𝔩",
-    lg: "≶",
-    lgE: "⪑",
-    lHar: "⥢",
-    lhard: "↽",
-    lharu: "↼",
-    lharul: "⥪",
-    lhblk: "▄",
-    LJcy: "Љ",
-    ljcy: "љ",
-    Ll: "⋘",
-    ll: "≪",
-    llarr: "⇇",
-    llcorner: "⌞",
-    Lleftarrow: "⇚",
-    llhard: "⥫",
-    lltri: "◺",
-    Lmidot: "Ŀ",
-    lmidot: "ŀ",
-    lmoust: "⎰",
-    lmoustache: "⎰",
-    lnap: "⪉",
-    lnapprox: "⪉",
-    lnE: "≨",
-    lne: "⪇",
-    lneq: "⪇",
-    lneqq: "≨",
-    lnsim: "⋦",
-    loang: "⟬",
-    loarr: "⇽",
-    lobrk: "⟦",
-    LongLeftArrow: "⟵",
-    Longleftarrow: "⟸",
-    longleftarrow: "⟵",
-    LongLeftRightArrow: "⟷",
-    Longleftrightarrow: "⟺",
-    longleftrightarrow: "⟷",
-    longmapsto: "⟼",
-    LongRightArrow: "⟶",
-    Longrightarrow: "⟹",
-    longrightarrow: "⟶",
-    looparrowleft: "↫",
-    looparrowright: "↬",
-    lopar: "⦅",
-    Lopf: "𝕃",
-    lopf: "𝕝",
-    loplus: "⨭",
-    lotimes: "⨴",
-    lowast: "∗",
-    lowbar: "_",
-    LowerLeftArrow: "↙",
-    LowerRightArrow: "↘",
-    loz: "◊",
-    lozenge: "◊",
-    lozf: "⧫",
-    lpar: "(",
-    lparlt: "⦓",
-    lrarr: "⇆",
-    lrcorner: "⌟",
-    lrhar: "⇋",
-    lrhard: "⥭",
-    lrm: "‎",
-    lrtri: "⊿",
-    lsaquo: "‹",
-    Lscr: "ℒ",
-    lscr: "𝓁",
-    Lsh: "↰",
-    lsh: "↰",
-    lsim: "≲",
-    lsime: "⪍",
-    lsimg: "⪏",
-    lsqb: "[",
-    lsquo: "‘",
-    lsquor: "‚",
-    Lstrok: "Ł",
-    lstrok: "ł",
-    Lt: "≪",
-    LT: "<",
-    lt: "<",
-    ltcc: "⪦",
-    ltcir: "⩹",
-    ltdot: "⋖",
-    lthree: "⋋",
-    ltimes: "⋉",
-    ltlarr: "⥶",
-    ltquest: "⩻",
-    ltri: "◃",
-    ltrie: "⊴",
-    ltrif: "◂",
-    ltrPar: "⦖",
-    lurdshar: "⥊",
-    luruhar: "⥦",
-    lvertneqq: "≨︀",
-    lvnE: "≨︀",
-    macr: "¯",
-    male: "♂",
-    malt: "✠",
-    maltese: "✠",
-    Map: "⤅",
-    map: "↦",
-    mapsto: "↦",
-    mapstodown: "↧",
-    mapstoleft: "↤",
-    mapstoup: "↥",
-    marker: "▮",
-    mcomma: "⨩",
-    Mcy: "М",
-    mcy: "м",
-    mdash: "—",
-    mDDot: "∺",
-    measuredangle: "∡",
-    MediumSpace: " ",
-    Mellintrf: "ℳ",
-    Mfr: "𝔐",
-    mfr: "𝔪",
-    mho: "℧",
-    micro: "µ",
-    mid: "∣",
-    midast: "*",
-    midcir: "⫰",
-    middot: "·",
-    minus: "−",
-    minusb: "⊟",
-    minusd: "∸",
-    minusdu: "⨪",
-    MinusPlus: "∓",
-    mlcp: "⫛",
-    mldr: "…",
-    mnplus: "∓",
-    models: "⊧",
-    Mopf: "𝕄",
-    mopf: "𝕞",
-    mp: "∓",
-    Mscr: "ℳ",
-    mscr: "𝓂",
-    mstpos: "∾",
-    Mu: "Μ",
-    mu: "μ",
-    multimap: "⊸",
-    mumap: "⊸",
-    nabla: "∇",
-    Nacute: "Ń",
-    nacute: "ń",
-    nang: "∠⃒",
-    nap: "≉",
-    napE: "⩰̸",
-    napid: "≋̸",
-    napos: "ŉ",
-    napprox: "≉",
-    natur: "♮",
-    natural: "♮",
-    naturals: "ℕ",
-    nbsp: " ",
-    nbump: "≎̸",
-    nbumpe: "≏̸",
-    ncap: "⩃",
-    Ncaron: "Ň",
-    ncaron: "ň",
-    Ncedil: "Ņ",
-    ncedil: "ņ",
-    ncong: "≇",
-    ncongdot: "⩭̸",
-    ncup: "⩂",
-    Ncy: "Н",
-    ncy: "н",
-    ndash: "–",
-    ne: "≠",
-    nearhk: "⤤",
-    neArr: "⇗",
-    nearr: "↗",
-    nearrow: "↗",
-    nedot: "≐̸",
-    NegativeMediumSpace: "​",
-    NegativeThickSpace: "​",
-    NegativeThinSpace: "​",
-    NegativeVeryThinSpace: "​",
-    nequiv: "≢",
-    nesear: "⤨",
-    nesim: "≂̸",
-    NestedGreaterGreater: "≫",
-    NestedLessLess: "≪",
-    NewLine: `
+  return re._updateLiveList = L, re.Attr = Ae, re.CDATASection = ct, re.CharacterData = Ne, re.Comment = st, re.Document = pe, re.DocumentFragment = Qe, re.DocumentType = lt, re.DOMImplementation = ie, re.Element = Z, re.Entity = Nt, re.EntityReference = ft, re.LiveNodeList = I, re.NamedNodeMap = V, re.Node = P, re.NodeList = T, re.Notation = At, re.Text = Ke, re.ProcessingInstruction = pt, re.XMLSerializer = Ot, re;
+}
+var rt = {}, kt = {}, ir;
+function vn() {
+  return ir || (ir = 1, function(t) {
+    var e = Dt().freeze;
+    t.XML_ENTITIES = e({
+      amp: "&",
+      apos: "'",
+      gt: ">",
+      lt: "<",
+      quot: '"'
+    }), t.HTML_ENTITIES = e({
+      Aacute: "Á",
+      aacute: "á",
+      Abreve: "Ă",
+      abreve: "ă",
+      ac: "∾",
+      acd: "∿",
+      acE: "∾̳",
+      Acirc: "Â",
+      acirc: "â",
+      acute: "´",
+      Acy: "А",
+      acy: "а",
+      AElig: "Æ",
+      aelig: "æ",
+      af: "⁡",
+      Afr: "𝔄",
+      afr: "𝔞",
+      Agrave: "À",
+      agrave: "à",
+      alefsym: "ℵ",
+      aleph: "ℵ",
+      Alpha: "Α",
+      alpha: "α",
+      Amacr: "Ā",
+      amacr: "ā",
+      amalg: "⨿",
+      AMP: "&",
+      amp: "&",
+      And: "⩓",
+      and: "∧",
+      andand: "⩕",
+      andd: "⩜",
+      andslope: "⩘",
+      andv: "⩚",
+      ang: "∠",
+      ange: "⦤",
+      angle: "∠",
+      angmsd: "∡",
+      angmsdaa: "⦨",
+      angmsdab: "⦩",
+      angmsdac: "⦪",
+      angmsdad: "⦫",
+      angmsdae: "⦬",
+      angmsdaf: "⦭",
+      angmsdag: "⦮",
+      angmsdah: "⦯",
+      angrt: "∟",
+      angrtvb: "⊾",
+      angrtvbd: "⦝",
+      angsph: "∢",
+      angst: "Å",
+      angzarr: "⍼",
+      Aogon: "Ą",
+      aogon: "ą",
+      Aopf: "𝔸",
+      aopf: "𝕒",
+      ap: "≈",
+      apacir: "⩯",
+      apE: "⩰",
+      ape: "≊",
+      apid: "≋",
+      apos: "'",
+      ApplyFunction: "⁡",
+      approx: "≈",
+      approxeq: "≊",
+      Aring: "Å",
+      aring: "å",
+      Ascr: "𝒜",
+      ascr: "𝒶",
+      Assign: "≔",
+      ast: "*",
+      asymp: "≈",
+      asympeq: "≍",
+      Atilde: "Ã",
+      atilde: "ã",
+      Auml: "Ä",
+      auml: "ä",
+      awconint: "∳",
+      awint: "⨑",
+      backcong: "≌",
+      backepsilon: "϶",
+      backprime: "‵",
+      backsim: "∽",
+      backsimeq: "⋍",
+      Backslash: "∖",
+      Barv: "⫧",
+      barvee: "⊽",
+      Barwed: "⌆",
+      barwed: "⌅",
+      barwedge: "⌅",
+      bbrk: "⎵",
+      bbrktbrk: "⎶",
+      bcong: "≌",
+      Bcy: "Б",
+      bcy: "б",
+      bdquo: "„",
+      becaus: "∵",
+      Because: "∵",
+      because: "∵",
+      bemptyv: "⦰",
+      bepsi: "϶",
+      bernou: "ℬ",
+      Bernoullis: "ℬ",
+      Beta: "Β",
+      beta: "β",
+      beth: "ℶ",
+      between: "≬",
+      Bfr: "𝔅",
+      bfr: "𝔟",
+      bigcap: "⋂",
+      bigcirc: "◯",
+      bigcup: "⋃",
+      bigodot: "⨀",
+      bigoplus: "⨁",
+      bigotimes: "⨂",
+      bigsqcup: "⨆",
+      bigstar: "★",
+      bigtriangledown: "▽",
+      bigtriangleup: "△",
+      biguplus: "⨄",
+      bigvee: "⋁",
+      bigwedge: "⋀",
+      bkarow: "⤍",
+      blacklozenge: "⧫",
+      blacksquare: "▪",
+      blacktriangle: "▴",
+      blacktriangledown: "▾",
+      blacktriangleleft: "◂",
+      blacktriangleright: "▸",
+      blank: "␣",
+      blk12: "▒",
+      blk14: "░",
+      blk34: "▓",
+      block: "█",
+      bne: "=⃥",
+      bnequiv: "≡⃥",
+      bNot: "⫭",
+      bnot: "⌐",
+      Bopf: "𝔹",
+      bopf: "𝕓",
+      bot: "⊥",
+      bottom: "⊥",
+      bowtie: "⋈",
+      boxbox: "⧉",
+      boxDL: "╗",
+      boxDl: "╖",
+      boxdL: "╕",
+      boxdl: "┐",
+      boxDR: "╔",
+      boxDr: "╓",
+      boxdR: "╒",
+      boxdr: "┌",
+      boxH: "═",
+      boxh: "─",
+      boxHD: "╦",
+      boxHd: "╤",
+      boxhD: "╥",
+      boxhd: "┬",
+      boxHU: "╩",
+      boxHu: "╧",
+      boxhU: "╨",
+      boxhu: "┴",
+      boxminus: "⊟",
+      boxplus: "⊞",
+      boxtimes: "⊠",
+      boxUL: "╝",
+      boxUl: "╜",
+      boxuL: "╛",
+      boxul: "┘",
+      boxUR: "╚",
+      boxUr: "╙",
+      boxuR: "╘",
+      boxur: "└",
+      boxV: "║",
+      boxv: "│",
+      boxVH: "╬",
+      boxVh: "╫",
+      boxvH: "╪",
+      boxvh: "┼",
+      boxVL: "╣",
+      boxVl: "╢",
+      boxvL: "╡",
+      boxvl: "┤",
+      boxVR: "╠",
+      boxVr: "╟",
+      boxvR: "╞",
+      boxvr: "├",
+      bprime: "‵",
+      Breve: "˘",
+      breve: "˘",
+      brvbar: "¦",
+      Bscr: "ℬ",
+      bscr: "𝒷",
+      bsemi: "⁏",
+      bsim: "∽",
+      bsime: "⋍",
+      bsol: "\\",
+      bsolb: "⧅",
+      bsolhsub: "⟈",
+      bull: "•",
+      bullet: "•",
+      bump: "≎",
+      bumpE: "⪮",
+      bumpe: "≏",
+      Bumpeq: "≎",
+      bumpeq: "≏",
+      Cacute: "Ć",
+      cacute: "ć",
+      Cap: "⋒",
+      cap: "∩",
+      capand: "⩄",
+      capbrcup: "⩉",
+      capcap: "⩋",
+      capcup: "⩇",
+      capdot: "⩀",
+      CapitalDifferentialD: "ⅅ",
+      caps: "∩︀",
+      caret: "⁁",
+      caron: "ˇ",
+      Cayleys: "ℭ",
+      ccaps: "⩍",
+      Ccaron: "Č",
+      ccaron: "č",
+      Ccedil: "Ç",
+      ccedil: "ç",
+      Ccirc: "Ĉ",
+      ccirc: "ĉ",
+      Cconint: "∰",
+      ccups: "⩌",
+      ccupssm: "⩐",
+      Cdot: "Ċ",
+      cdot: "ċ",
+      cedil: "¸",
+      Cedilla: "¸",
+      cemptyv: "⦲",
+      cent: "¢",
+      CenterDot: "·",
+      centerdot: "·",
+      Cfr: "ℭ",
+      cfr: "𝔠",
+      CHcy: "Ч",
+      chcy: "ч",
+      check: "✓",
+      checkmark: "✓",
+      Chi: "Χ",
+      chi: "χ",
+      cir: "○",
+      circ: "ˆ",
+      circeq: "≗",
+      circlearrowleft: "↺",
+      circlearrowright: "↻",
+      circledast: "⊛",
+      circledcirc: "⊚",
+      circleddash: "⊝",
+      CircleDot: "⊙",
+      circledR: "®",
+      circledS: "Ⓢ",
+      CircleMinus: "⊖",
+      CirclePlus: "⊕",
+      CircleTimes: "⊗",
+      cirE: "⧃",
+      cire: "≗",
+      cirfnint: "⨐",
+      cirmid: "⫯",
+      cirscir: "⧂",
+      ClockwiseContourIntegral: "∲",
+      CloseCurlyDoubleQuote: "”",
+      CloseCurlyQuote: "’",
+      clubs: "♣",
+      clubsuit: "♣",
+      Colon: "∷",
+      colon: ":",
+      Colone: "⩴",
+      colone: "≔",
+      coloneq: "≔",
+      comma: ",",
+      commat: "@",
+      comp: "∁",
+      compfn: "∘",
+      complement: "∁",
+      complexes: "ℂ",
+      cong: "≅",
+      congdot: "⩭",
+      Congruent: "≡",
+      Conint: "∯",
+      conint: "∮",
+      ContourIntegral: "∮",
+      Copf: "ℂ",
+      copf: "𝕔",
+      coprod: "∐",
+      Coproduct: "∐",
+      COPY: "©",
+      copy: "©",
+      copysr: "℗",
+      CounterClockwiseContourIntegral: "∳",
+      crarr: "↵",
+      Cross: "⨯",
+      cross: "✗",
+      Cscr: "𝒞",
+      cscr: "𝒸",
+      csub: "⫏",
+      csube: "⫑",
+      csup: "⫐",
+      csupe: "⫒",
+      ctdot: "⋯",
+      cudarrl: "⤸",
+      cudarrr: "⤵",
+      cuepr: "⋞",
+      cuesc: "⋟",
+      cularr: "↶",
+      cularrp: "⤽",
+      Cup: "⋓",
+      cup: "∪",
+      cupbrcap: "⩈",
+      CupCap: "≍",
+      cupcap: "⩆",
+      cupcup: "⩊",
+      cupdot: "⊍",
+      cupor: "⩅",
+      cups: "∪︀",
+      curarr: "↷",
+      curarrm: "⤼",
+      curlyeqprec: "⋞",
+      curlyeqsucc: "⋟",
+      curlyvee: "⋎",
+      curlywedge: "⋏",
+      curren: "¤",
+      curvearrowleft: "↶",
+      curvearrowright: "↷",
+      cuvee: "⋎",
+      cuwed: "⋏",
+      cwconint: "∲",
+      cwint: "∱",
+      cylcty: "⌭",
+      Dagger: "‡",
+      dagger: "†",
+      daleth: "ℸ",
+      Darr: "↡",
+      dArr: "⇓",
+      darr: "↓",
+      dash: "‐",
+      Dashv: "⫤",
+      dashv: "⊣",
+      dbkarow: "⤏",
+      dblac: "˝",
+      Dcaron: "Ď",
+      dcaron: "ď",
+      Dcy: "Д",
+      dcy: "д",
+      DD: "ⅅ",
+      dd: "ⅆ",
+      ddagger: "‡",
+      ddarr: "⇊",
+      DDotrahd: "⤑",
+      ddotseq: "⩷",
+      deg: "°",
+      Del: "∇",
+      Delta: "Δ",
+      delta: "δ",
+      demptyv: "⦱",
+      dfisht: "⥿",
+      Dfr: "𝔇",
+      dfr: "𝔡",
+      dHar: "⥥",
+      dharl: "⇃",
+      dharr: "⇂",
+      DiacriticalAcute: "´",
+      DiacriticalDot: "˙",
+      DiacriticalDoubleAcute: "˝",
+      DiacriticalGrave: "`",
+      DiacriticalTilde: "˜",
+      diam: "⋄",
+      Diamond: "⋄",
+      diamond: "⋄",
+      diamondsuit: "♦",
+      diams: "♦",
+      die: "¨",
+      DifferentialD: "ⅆ",
+      digamma: "ϝ",
+      disin: "⋲",
+      div: "÷",
+      divide: "÷",
+      divideontimes: "⋇",
+      divonx: "⋇",
+      DJcy: "Ђ",
+      djcy: "ђ",
+      dlcorn: "⌞",
+      dlcrop: "⌍",
+      dollar: "$",
+      Dopf: "𝔻",
+      dopf: "𝕕",
+      Dot: "¨",
+      dot: "˙",
+      DotDot: "⃜",
+      doteq: "≐",
+      doteqdot: "≑",
+      DotEqual: "≐",
+      dotminus: "∸",
+      dotplus: "∔",
+      dotsquare: "⊡",
+      doublebarwedge: "⌆",
+      DoubleContourIntegral: "∯",
+      DoubleDot: "¨",
+      DoubleDownArrow: "⇓",
+      DoubleLeftArrow: "⇐",
+      DoubleLeftRightArrow: "⇔",
+      DoubleLeftTee: "⫤",
+      DoubleLongLeftArrow: "⟸",
+      DoubleLongLeftRightArrow: "⟺",
+      DoubleLongRightArrow: "⟹",
+      DoubleRightArrow: "⇒",
+      DoubleRightTee: "⊨",
+      DoubleUpArrow: "⇑",
+      DoubleUpDownArrow: "⇕",
+      DoubleVerticalBar: "∥",
+      DownArrow: "↓",
+      Downarrow: "⇓",
+      downarrow: "↓",
+      DownArrowBar: "⤓",
+      DownArrowUpArrow: "⇵",
+      DownBreve: "̑",
+      downdownarrows: "⇊",
+      downharpoonleft: "⇃",
+      downharpoonright: "⇂",
+      DownLeftRightVector: "⥐",
+      DownLeftTeeVector: "⥞",
+      DownLeftVector: "↽",
+      DownLeftVectorBar: "⥖",
+      DownRightTeeVector: "⥟",
+      DownRightVector: "⇁",
+      DownRightVectorBar: "⥗",
+      DownTee: "⊤",
+      DownTeeArrow: "↧",
+      drbkarow: "⤐",
+      drcorn: "⌟",
+      drcrop: "⌌",
+      Dscr: "𝒟",
+      dscr: "𝒹",
+      DScy: "Ѕ",
+      dscy: "ѕ",
+      dsol: "⧶",
+      Dstrok: "Đ",
+      dstrok: "đ",
+      dtdot: "⋱",
+      dtri: "▿",
+      dtrif: "▾",
+      duarr: "⇵",
+      duhar: "⥯",
+      dwangle: "⦦",
+      DZcy: "Џ",
+      dzcy: "џ",
+      dzigrarr: "⟿",
+      Eacute: "É",
+      eacute: "é",
+      easter: "⩮",
+      Ecaron: "Ě",
+      ecaron: "ě",
+      ecir: "≖",
+      Ecirc: "Ê",
+      ecirc: "ê",
+      ecolon: "≕",
+      Ecy: "Э",
+      ecy: "э",
+      eDDot: "⩷",
+      Edot: "Ė",
+      eDot: "≑",
+      edot: "ė",
+      ee: "ⅇ",
+      efDot: "≒",
+      Efr: "𝔈",
+      efr: "𝔢",
+      eg: "⪚",
+      Egrave: "È",
+      egrave: "è",
+      egs: "⪖",
+      egsdot: "⪘",
+      el: "⪙",
+      Element: "∈",
+      elinters: "⏧",
+      ell: "ℓ",
+      els: "⪕",
+      elsdot: "⪗",
+      Emacr: "Ē",
+      emacr: "ē",
+      empty: "∅",
+      emptyset: "∅",
+      EmptySmallSquare: "◻",
+      emptyv: "∅",
+      EmptyVerySmallSquare: "▫",
+      emsp: " ",
+      emsp13: " ",
+      emsp14: " ",
+      ENG: "Ŋ",
+      eng: "ŋ",
+      ensp: " ",
+      Eogon: "Ę",
+      eogon: "ę",
+      Eopf: "𝔼",
+      eopf: "𝕖",
+      epar: "⋕",
+      eparsl: "⧣",
+      eplus: "⩱",
+      epsi: "ε",
+      Epsilon: "Ε",
+      epsilon: "ε",
+      epsiv: "ϵ",
+      eqcirc: "≖",
+      eqcolon: "≕",
+      eqsim: "≂",
+      eqslantgtr: "⪖",
+      eqslantless: "⪕",
+      Equal: "⩵",
+      equals: "=",
+      EqualTilde: "≂",
+      equest: "≟",
+      Equilibrium: "⇌",
+      equiv: "≡",
+      equivDD: "⩸",
+      eqvparsl: "⧥",
+      erarr: "⥱",
+      erDot: "≓",
+      Escr: "ℰ",
+      escr: "ℯ",
+      esdot: "≐",
+      Esim: "⩳",
+      esim: "≂",
+      Eta: "Η",
+      eta: "η",
+      ETH: "Ð",
+      eth: "ð",
+      Euml: "Ë",
+      euml: "ë",
+      euro: "€",
+      excl: "!",
+      exist: "∃",
+      Exists: "∃",
+      expectation: "ℰ",
+      ExponentialE: "ⅇ",
+      exponentiale: "ⅇ",
+      fallingdotseq: "≒",
+      Fcy: "Ф",
+      fcy: "ф",
+      female: "♀",
+      ffilig: "ﬃ",
+      fflig: "ﬀ",
+      ffllig: "ﬄ",
+      Ffr: "𝔉",
+      ffr: "𝔣",
+      filig: "ﬁ",
+      FilledSmallSquare: "◼",
+      FilledVerySmallSquare: "▪",
+      fjlig: "fj",
+      flat: "♭",
+      fllig: "ﬂ",
+      fltns: "▱",
+      fnof: "ƒ",
+      Fopf: "𝔽",
+      fopf: "𝕗",
+      ForAll: "∀",
+      forall: "∀",
+      fork: "⋔",
+      forkv: "⫙",
+      Fouriertrf: "ℱ",
+      fpartint: "⨍",
+      frac12: "½",
+      frac13: "⅓",
+      frac14: "¼",
+      frac15: "⅕",
+      frac16: "⅙",
+      frac18: "⅛",
+      frac23: "⅔",
+      frac25: "⅖",
+      frac34: "¾",
+      frac35: "⅗",
+      frac38: "⅜",
+      frac45: "⅘",
+      frac56: "⅚",
+      frac58: "⅝",
+      frac78: "⅞",
+      frasl: "⁄",
+      frown: "⌢",
+      Fscr: "ℱ",
+      fscr: "𝒻",
+      gacute: "ǵ",
+      Gamma: "Γ",
+      gamma: "γ",
+      Gammad: "Ϝ",
+      gammad: "ϝ",
+      gap: "⪆",
+      Gbreve: "Ğ",
+      gbreve: "ğ",
+      Gcedil: "Ģ",
+      Gcirc: "Ĝ",
+      gcirc: "ĝ",
+      Gcy: "Г",
+      gcy: "г",
+      Gdot: "Ġ",
+      gdot: "ġ",
+      gE: "≧",
+      ge: "≥",
+      gEl: "⪌",
+      gel: "⋛",
+      geq: "≥",
+      geqq: "≧",
+      geqslant: "⩾",
+      ges: "⩾",
+      gescc: "⪩",
+      gesdot: "⪀",
+      gesdoto: "⪂",
+      gesdotol: "⪄",
+      gesl: "⋛︀",
+      gesles: "⪔",
+      Gfr: "𝔊",
+      gfr: "𝔤",
+      Gg: "⋙",
+      gg: "≫",
+      ggg: "⋙",
+      gimel: "ℷ",
+      GJcy: "Ѓ",
+      gjcy: "ѓ",
+      gl: "≷",
+      gla: "⪥",
+      glE: "⪒",
+      glj: "⪤",
+      gnap: "⪊",
+      gnapprox: "⪊",
+      gnE: "≩",
+      gne: "⪈",
+      gneq: "⪈",
+      gneqq: "≩",
+      gnsim: "⋧",
+      Gopf: "𝔾",
+      gopf: "𝕘",
+      grave: "`",
+      GreaterEqual: "≥",
+      GreaterEqualLess: "⋛",
+      GreaterFullEqual: "≧",
+      GreaterGreater: "⪢",
+      GreaterLess: "≷",
+      GreaterSlantEqual: "⩾",
+      GreaterTilde: "≳",
+      Gscr: "𝒢",
+      gscr: "ℊ",
+      gsim: "≳",
+      gsime: "⪎",
+      gsiml: "⪐",
+      Gt: "≫",
+      GT: ">",
+      gt: ">",
+      gtcc: "⪧",
+      gtcir: "⩺",
+      gtdot: "⋗",
+      gtlPar: "⦕",
+      gtquest: "⩼",
+      gtrapprox: "⪆",
+      gtrarr: "⥸",
+      gtrdot: "⋗",
+      gtreqless: "⋛",
+      gtreqqless: "⪌",
+      gtrless: "≷",
+      gtrsim: "≳",
+      gvertneqq: "≩︀",
+      gvnE: "≩︀",
+      Hacek: "ˇ",
+      hairsp: " ",
+      half: "½",
+      hamilt: "ℋ",
+      HARDcy: "Ъ",
+      hardcy: "ъ",
+      hArr: "⇔",
+      harr: "↔",
+      harrcir: "⥈",
+      harrw: "↭",
+      Hat: "^",
+      hbar: "ℏ",
+      Hcirc: "Ĥ",
+      hcirc: "ĥ",
+      hearts: "♥",
+      heartsuit: "♥",
+      hellip: "…",
+      hercon: "⊹",
+      Hfr: "ℌ",
+      hfr: "𝔥",
+      HilbertSpace: "ℋ",
+      hksearow: "⤥",
+      hkswarow: "⤦",
+      hoarr: "⇿",
+      homtht: "∻",
+      hookleftarrow: "↩",
+      hookrightarrow: "↪",
+      Hopf: "ℍ",
+      hopf: "𝕙",
+      horbar: "―",
+      HorizontalLine: "─",
+      Hscr: "ℋ",
+      hscr: "𝒽",
+      hslash: "ℏ",
+      Hstrok: "Ħ",
+      hstrok: "ħ",
+      HumpDownHump: "≎",
+      HumpEqual: "≏",
+      hybull: "⁃",
+      hyphen: "‐",
+      Iacute: "Í",
+      iacute: "í",
+      ic: "⁣",
+      Icirc: "Î",
+      icirc: "î",
+      Icy: "И",
+      icy: "и",
+      Idot: "İ",
+      IEcy: "Е",
+      iecy: "е",
+      iexcl: "¡",
+      iff: "⇔",
+      Ifr: "ℑ",
+      ifr: "𝔦",
+      Igrave: "Ì",
+      igrave: "ì",
+      ii: "ⅈ",
+      iiiint: "⨌",
+      iiint: "∭",
+      iinfin: "⧜",
+      iiota: "℩",
+      IJlig: "Ĳ",
+      ijlig: "ĳ",
+      Im: "ℑ",
+      Imacr: "Ī",
+      imacr: "ī",
+      image: "ℑ",
+      ImaginaryI: "ⅈ",
+      imagline: "ℐ",
+      imagpart: "ℑ",
+      imath: "ı",
+      imof: "⊷",
+      imped: "Ƶ",
+      Implies: "⇒",
+      in: "∈",
+      incare: "℅",
+      infin: "∞",
+      infintie: "⧝",
+      inodot: "ı",
+      Int: "∬",
+      int: "∫",
+      intcal: "⊺",
+      integers: "ℤ",
+      Integral: "∫",
+      intercal: "⊺",
+      Intersection: "⋂",
+      intlarhk: "⨗",
+      intprod: "⨼",
+      InvisibleComma: "⁣",
+      InvisibleTimes: "⁢",
+      IOcy: "Ё",
+      iocy: "ё",
+      Iogon: "Į",
+      iogon: "į",
+      Iopf: "𝕀",
+      iopf: "𝕚",
+      Iota: "Ι",
+      iota: "ι",
+      iprod: "⨼",
+      iquest: "¿",
+      Iscr: "ℐ",
+      iscr: "𝒾",
+      isin: "∈",
+      isindot: "⋵",
+      isinE: "⋹",
+      isins: "⋴",
+      isinsv: "⋳",
+      isinv: "∈",
+      it: "⁢",
+      Itilde: "Ĩ",
+      itilde: "ĩ",
+      Iukcy: "І",
+      iukcy: "і",
+      Iuml: "Ï",
+      iuml: "ï",
+      Jcirc: "Ĵ",
+      jcirc: "ĵ",
+      Jcy: "Й",
+      jcy: "й",
+      Jfr: "𝔍",
+      jfr: "𝔧",
+      jmath: "ȷ",
+      Jopf: "𝕁",
+      jopf: "𝕛",
+      Jscr: "𝒥",
+      jscr: "𝒿",
+      Jsercy: "Ј",
+      jsercy: "ј",
+      Jukcy: "Є",
+      jukcy: "є",
+      Kappa: "Κ",
+      kappa: "κ",
+      kappav: "ϰ",
+      Kcedil: "Ķ",
+      kcedil: "ķ",
+      Kcy: "К",
+      kcy: "к",
+      Kfr: "𝔎",
+      kfr: "𝔨",
+      kgreen: "ĸ",
+      KHcy: "Х",
+      khcy: "х",
+      KJcy: "Ќ",
+      kjcy: "ќ",
+      Kopf: "𝕂",
+      kopf: "𝕜",
+      Kscr: "𝒦",
+      kscr: "𝓀",
+      lAarr: "⇚",
+      Lacute: "Ĺ",
+      lacute: "ĺ",
+      laemptyv: "⦴",
+      lagran: "ℒ",
+      Lambda: "Λ",
+      lambda: "λ",
+      Lang: "⟪",
+      lang: "⟨",
+      langd: "⦑",
+      langle: "⟨",
+      lap: "⪅",
+      Laplacetrf: "ℒ",
+      laquo: "«",
+      Larr: "↞",
+      lArr: "⇐",
+      larr: "←",
+      larrb: "⇤",
+      larrbfs: "⤟",
+      larrfs: "⤝",
+      larrhk: "↩",
+      larrlp: "↫",
+      larrpl: "⤹",
+      larrsim: "⥳",
+      larrtl: "↢",
+      lat: "⪫",
+      lAtail: "⤛",
+      latail: "⤙",
+      late: "⪭",
+      lates: "⪭︀",
+      lBarr: "⤎",
+      lbarr: "⤌",
+      lbbrk: "❲",
+      lbrace: "{",
+      lbrack: "[",
+      lbrke: "⦋",
+      lbrksld: "⦏",
+      lbrkslu: "⦍",
+      Lcaron: "Ľ",
+      lcaron: "ľ",
+      Lcedil: "Ļ",
+      lcedil: "ļ",
+      lceil: "⌈",
+      lcub: "{",
+      Lcy: "Л",
+      lcy: "л",
+      ldca: "⤶",
+      ldquo: "“",
+      ldquor: "„",
+      ldrdhar: "⥧",
+      ldrushar: "⥋",
+      ldsh: "↲",
+      lE: "≦",
+      le: "≤",
+      LeftAngleBracket: "⟨",
+      LeftArrow: "←",
+      Leftarrow: "⇐",
+      leftarrow: "←",
+      LeftArrowBar: "⇤",
+      LeftArrowRightArrow: "⇆",
+      leftarrowtail: "↢",
+      LeftCeiling: "⌈",
+      LeftDoubleBracket: "⟦",
+      LeftDownTeeVector: "⥡",
+      LeftDownVector: "⇃",
+      LeftDownVectorBar: "⥙",
+      LeftFloor: "⌊",
+      leftharpoondown: "↽",
+      leftharpoonup: "↼",
+      leftleftarrows: "⇇",
+      LeftRightArrow: "↔",
+      Leftrightarrow: "⇔",
+      leftrightarrow: "↔",
+      leftrightarrows: "⇆",
+      leftrightharpoons: "⇋",
+      leftrightsquigarrow: "↭",
+      LeftRightVector: "⥎",
+      LeftTee: "⊣",
+      LeftTeeArrow: "↤",
+      LeftTeeVector: "⥚",
+      leftthreetimes: "⋋",
+      LeftTriangle: "⊲",
+      LeftTriangleBar: "⧏",
+      LeftTriangleEqual: "⊴",
+      LeftUpDownVector: "⥑",
+      LeftUpTeeVector: "⥠",
+      LeftUpVector: "↿",
+      LeftUpVectorBar: "⥘",
+      LeftVector: "↼",
+      LeftVectorBar: "⥒",
+      lEg: "⪋",
+      leg: "⋚",
+      leq: "≤",
+      leqq: "≦",
+      leqslant: "⩽",
+      les: "⩽",
+      lescc: "⪨",
+      lesdot: "⩿",
+      lesdoto: "⪁",
+      lesdotor: "⪃",
+      lesg: "⋚︀",
+      lesges: "⪓",
+      lessapprox: "⪅",
+      lessdot: "⋖",
+      lesseqgtr: "⋚",
+      lesseqqgtr: "⪋",
+      LessEqualGreater: "⋚",
+      LessFullEqual: "≦",
+      LessGreater: "≶",
+      lessgtr: "≶",
+      LessLess: "⪡",
+      lesssim: "≲",
+      LessSlantEqual: "⩽",
+      LessTilde: "≲",
+      lfisht: "⥼",
+      lfloor: "⌊",
+      Lfr: "𝔏",
+      lfr: "𝔩",
+      lg: "≶",
+      lgE: "⪑",
+      lHar: "⥢",
+      lhard: "↽",
+      lharu: "↼",
+      lharul: "⥪",
+      lhblk: "▄",
+      LJcy: "Љ",
+      ljcy: "љ",
+      Ll: "⋘",
+      ll: "≪",
+      llarr: "⇇",
+      llcorner: "⌞",
+      Lleftarrow: "⇚",
+      llhard: "⥫",
+      lltri: "◺",
+      Lmidot: "Ŀ",
+      lmidot: "ŀ",
+      lmoust: "⎰",
+      lmoustache: "⎰",
+      lnap: "⪉",
+      lnapprox: "⪉",
+      lnE: "≨",
+      lne: "⪇",
+      lneq: "⪇",
+      lneqq: "≨",
+      lnsim: "⋦",
+      loang: "⟬",
+      loarr: "⇽",
+      lobrk: "⟦",
+      LongLeftArrow: "⟵",
+      Longleftarrow: "⟸",
+      longleftarrow: "⟵",
+      LongLeftRightArrow: "⟷",
+      Longleftrightarrow: "⟺",
+      longleftrightarrow: "⟷",
+      longmapsto: "⟼",
+      LongRightArrow: "⟶",
+      Longrightarrow: "⟹",
+      longrightarrow: "⟶",
+      looparrowleft: "↫",
+      looparrowright: "↬",
+      lopar: "⦅",
+      Lopf: "𝕃",
+      lopf: "𝕝",
+      loplus: "⨭",
+      lotimes: "⨴",
+      lowast: "∗",
+      lowbar: "_",
+      LowerLeftArrow: "↙",
+      LowerRightArrow: "↘",
+      loz: "◊",
+      lozenge: "◊",
+      lozf: "⧫",
+      lpar: "(",
+      lparlt: "⦓",
+      lrarr: "⇆",
+      lrcorner: "⌟",
+      lrhar: "⇋",
+      lrhard: "⥭",
+      lrm: "‎",
+      lrtri: "⊿",
+      lsaquo: "‹",
+      Lscr: "ℒ",
+      lscr: "𝓁",
+      Lsh: "↰",
+      lsh: "↰",
+      lsim: "≲",
+      lsime: "⪍",
+      lsimg: "⪏",
+      lsqb: "[",
+      lsquo: "‘",
+      lsquor: "‚",
+      Lstrok: "Ł",
+      lstrok: "ł",
+      Lt: "≪",
+      LT: "<",
+      lt: "<",
+      ltcc: "⪦",
+      ltcir: "⩹",
+      ltdot: "⋖",
+      lthree: "⋋",
+      ltimes: "⋉",
+      ltlarr: "⥶",
+      ltquest: "⩻",
+      ltri: "◃",
+      ltrie: "⊴",
+      ltrif: "◂",
+      ltrPar: "⦖",
+      lurdshar: "⥊",
+      luruhar: "⥦",
+      lvertneqq: "≨︀",
+      lvnE: "≨︀",
+      macr: "¯",
+      male: "♂",
+      malt: "✠",
+      maltese: "✠",
+      Map: "⤅",
+      map: "↦",
+      mapsto: "↦",
+      mapstodown: "↧",
+      mapstoleft: "↤",
+      mapstoup: "↥",
+      marker: "▮",
+      mcomma: "⨩",
+      Mcy: "М",
+      mcy: "м",
+      mdash: "—",
+      mDDot: "∺",
+      measuredangle: "∡",
+      MediumSpace: " ",
+      Mellintrf: "ℳ",
+      Mfr: "𝔐",
+      mfr: "𝔪",
+      mho: "℧",
+      micro: "µ",
+      mid: "∣",
+      midast: "*",
+      midcir: "⫰",
+      middot: "·",
+      minus: "−",
+      minusb: "⊟",
+      minusd: "∸",
+      minusdu: "⨪",
+      MinusPlus: "∓",
+      mlcp: "⫛",
+      mldr: "…",
+      mnplus: "∓",
+      models: "⊧",
+      Mopf: "𝕄",
+      mopf: "𝕞",
+      mp: "∓",
+      Mscr: "ℳ",
+      mscr: "𝓂",
+      mstpos: "∾",
+      Mu: "Μ",
+      mu: "μ",
+      multimap: "⊸",
+      mumap: "⊸",
+      nabla: "∇",
+      Nacute: "Ń",
+      nacute: "ń",
+      nang: "∠⃒",
+      nap: "≉",
+      napE: "⩰̸",
+      napid: "≋̸",
+      napos: "ŉ",
+      napprox: "≉",
+      natur: "♮",
+      natural: "♮",
+      naturals: "ℕ",
+      nbsp: " ",
+      nbump: "≎̸",
+      nbumpe: "≏̸",
+      ncap: "⩃",
+      Ncaron: "Ň",
+      ncaron: "ň",
+      Ncedil: "Ņ",
+      ncedil: "ņ",
+      ncong: "≇",
+      ncongdot: "⩭̸",
+      ncup: "⩂",
+      Ncy: "Н",
+      ncy: "н",
+      ndash: "–",
+      ne: "≠",
+      nearhk: "⤤",
+      neArr: "⇗",
+      nearr: "↗",
+      nearrow: "↗",
+      nedot: "≐̸",
+      NegativeMediumSpace: "​",
+      NegativeThickSpace: "​",
+      NegativeThinSpace: "​",
+      NegativeVeryThinSpace: "​",
+      nequiv: "≢",
+      nesear: "⤨",
+      nesim: "≂̸",
+      NestedGreaterGreater: "≫",
+      NestedLessLess: "≪",
+      NewLine: `
 `,
-    nexist: "∄",
-    nexists: "∄",
-    Nfr: "𝔑",
-    nfr: "𝔫",
-    ngE: "≧̸",
-    nge: "≱",
-    ngeq: "≱",
-    ngeqq: "≧̸",
-    ngeqslant: "⩾̸",
-    nges: "⩾̸",
-    nGg: "⋙̸",
-    ngsim: "≵",
-    nGt: "≫⃒",
-    ngt: "≯",
-    ngtr: "≯",
-    nGtv: "≫̸",
-    nhArr: "⇎",
-    nharr: "↮",
-    nhpar: "⫲",
-    ni: "∋",
-    nis: "⋼",
-    nisd: "⋺",
-    niv: "∋",
-    NJcy: "Њ",
-    njcy: "њ",
-    nlArr: "⇍",
-    nlarr: "↚",
-    nldr: "‥",
-    nlE: "≦̸",
-    nle: "≰",
-    nLeftarrow: "⇍",
-    nleftarrow: "↚",
-    nLeftrightarrow: "⇎",
-    nleftrightarrow: "↮",
-    nleq: "≰",
-    nleqq: "≦̸",
-    nleqslant: "⩽̸",
-    nles: "⩽̸",
-    nless: "≮",
-    nLl: "⋘̸",
-    nlsim: "≴",
-    nLt: "≪⃒",
-    nlt: "≮",
-    nltri: "⋪",
-    nltrie: "⋬",
-    nLtv: "≪̸",
-    nmid: "∤",
-    NoBreak: "⁠",
-    NonBreakingSpace: " ",
-    Nopf: "ℕ",
-    nopf: "𝕟",
-    Not: "⫬",
-    not: "¬",
-    NotCongruent: "≢",
-    NotCupCap: "≭",
-    NotDoubleVerticalBar: "∦",
-    NotElement: "∉",
-    NotEqual: "≠",
-    NotEqualTilde: "≂̸",
-    NotExists: "∄",
-    NotGreater: "≯",
-    NotGreaterEqual: "≱",
-    NotGreaterFullEqual: "≧̸",
-    NotGreaterGreater: "≫̸",
-    NotGreaterLess: "≹",
-    NotGreaterSlantEqual: "⩾̸",
-    NotGreaterTilde: "≵",
-    NotHumpDownHump: "≎̸",
-    NotHumpEqual: "≏̸",
-    notin: "∉",
-    notindot: "⋵̸",
-    notinE: "⋹̸",
-    notinva: "∉",
-    notinvb: "⋷",
-    notinvc: "⋶",
-    NotLeftTriangle: "⋪",
-    NotLeftTriangleBar: "⧏̸",
-    NotLeftTriangleEqual: "⋬",
-    NotLess: "≮",
-    NotLessEqual: "≰",
-    NotLessGreater: "≸",
-    NotLessLess: "≪̸",
-    NotLessSlantEqual: "⩽̸",
-    NotLessTilde: "≴",
-    NotNestedGreaterGreater: "⪢̸",
-    NotNestedLessLess: "⪡̸",
-    notni: "∌",
-    notniva: "∌",
-    notnivb: "⋾",
-    notnivc: "⋽",
-    NotPrecedes: "⊀",
-    NotPrecedesEqual: "⪯̸",
-    NotPrecedesSlantEqual: "⋠",
-    NotReverseElement: "∌",
-    NotRightTriangle: "⋫",
-    NotRightTriangleBar: "⧐̸",
-    NotRightTriangleEqual: "⋭",
-    NotSquareSubset: "⊏̸",
-    NotSquareSubsetEqual: "⋢",
-    NotSquareSuperset: "⊐̸",
-    NotSquareSupersetEqual: "⋣",
-    NotSubset: "⊂⃒",
-    NotSubsetEqual: "⊈",
-    NotSucceeds: "⊁",
-    NotSucceedsEqual: "⪰̸",
-    NotSucceedsSlantEqual: "⋡",
-    NotSucceedsTilde: "≿̸",
-    NotSuperset: "⊃⃒",
-    NotSupersetEqual: "⊉",
-    NotTilde: "≁",
-    NotTildeEqual: "≄",
-    NotTildeFullEqual: "≇",
-    NotTildeTilde: "≉",
-    NotVerticalBar: "∤",
-    npar: "∦",
-    nparallel: "∦",
-    nparsl: "⫽⃥",
-    npart: "∂̸",
-    npolint: "⨔",
-    npr: "⊀",
-    nprcue: "⋠",
-    npre: "⪯̸",
-    nprec: "⊀",
-    npreceq: "⪯̸",
-    nrArr: "⇏",
-    nrarr: "↛",
-    nrarrc: "⤳̸",
-    nrarrw: "↝̸",
-    nRightarrow: "⇏",
-    nrightarrow: "↛",
-    nrtri: "⋫",
-    nrtrie: "⋭",
-    nsc: "⊁",
-    nsccue: "⋡",
-    nsce: "⪰̸",
-    Nscr: "𝒩",
-    nscr: "𝓃",
-    nshortmid: "∤",
-    nshortparallel: "∦",
-    nsim: "≁",
-    nsime: "≄",
-    nsimeq: "≄",
-    nsmid: "∤",
-    nspar: "∦",
-    nsqsube: "⋢",
-    nsqsupe: "⋣",
-    nsub: "⊄",
-    nsubE: "⫅̸",
-    nsube: "⊈",
-    nsubset: "⊂⃒",
-    nsubseteq: "⊈",
-    nsubseteqq: "⫅̸",
-    nsucc: "⊁",
-    nsucceq: "⪰̸",
-    nsup: "⊅",
-    nsupE: "⫆̸",
-    nsupe: "⊉",
-    nsupset: "⊃⃒",
-    nsupseteq: "⊉",
-    nsupseteqq: "⫆̸",
-    ntgl: "≹",
-    Ntilde: "Ñ",
-    ntilde: "ñ",
-    ntlg: "≸",
-    ntriangleleft: "⋪",
-    ntrianglelefteq: "⋬",
-    ntriangleright: "⋫",
-    ntrianglerighteq: "⋭",
-    Nu: "Ν",
-    nu: "ν",
-    num: "#",
-    numero: "№",
-    numsp: " ",
-    nvap: "≍⃒",
-    nVDash: "⊯",
-    nVdash: "⊮",
-    nvDash: "⊭",
-    nvdash: "⊬",
-    nvge: "≥⃒",
-    nvgt: ">⃒",
-    nvHarr: "⤄",
-    nvinfin: "⧞",
-    nvlArr: "⤂",
-    nvle: "≤⃒",
-    nvlt: "<⃒",
-    nvltrie: "⊴⃒",
-    nvrArr: "⤃",
-    nvrtrie: "⊵⃒",
-    nvsim: "∼⃒",
-    nwarhk: "⤣",
-    nwArr: "⇖",
-    nwarr: "↖",
-    nwarrow: "↖",
-    nwnear: "⤧",
-    Oacute: "Ó",
-    oacute: "ó",
-    oast: "⊛",
-    ocir: "⊚",
-    Ocirc: "Ô",
-    ocirc: "ô",
-    Ocy: "О",
-    ocy: "о",
-    odash: "⊝",
-    Odblac: "Ő",
-    odblac: "ő",
-    odiv: "⨸",
-    odot: "⊙",
-    odsold: "⦼",
-    OElig: "Œ",
-    oelig: "œ",
-    ofcir: "⦿",
-    Ofr: "𝔒",
-    ofr: "𝔬",
-    ogon: "˛",
-    Ograve: "Ò",
-    ograve: "ò",
-    ogt: "⧁",
-    ohbar: "⦵",
-    ohm: "Ω",
-    oint: "∮",
-    olarr: "↺",
-    olcir: "⦾",
-    olcross: "⦻",
-    oline: "‾",
-    olt: "⧀",
-    Omacr: "Ō",
-    omacr: "ō",
-    Omega: "Ω",
-    omega: "ω",
-    Omicron: "Ο",
-    omicron: "ο",
-    omid: "⦶",
-    ominus: "⊖",
-    Oopf: "𝕆",
-    oopf: "𝕠",
-    opar: "⦷",
-    OpenCurlyDoubleQuote: "“",
-    OpenCurlyQuote: "‘",
-    operp: "⦹",
-    oplus: "⊕",
-    Or: "⩔",
-    or: "∨",
-    orarr: "↻",
-    ord: "⩝",
-    order: "ℴ",
-    orderof: "ℴ",
-    ordf: "ª",
-    ordm: "º",
-    origof: "⊶",
-    oror: "⩖",
-    orslope: "⩗",
-    orv: "⩛",
-    oS: "Ⓢ",
-    Oscr: "𝒪",
-    oscr: "ℴ",
-    Oslash: "Ø",
-    oslash: "ø",
-    osol: "⊘",
-    Otilde: "Õ",
-    otilde: "õ",
-    Otimes: "⨷",
-    otimes: "⊗",
-    otimesas: "⨶",
-    Ouml: "Ö",
-    ouml: "ö",
-    ovbar: "⌽",
-    OverBar: "‾",
-    OverBrace: "⏞",
-    OverBracket: "⎴",
-    OverParenthesis: "⏜",
-    par: "∥",
-    para: "¶",
-    parallel: "∥",
-    parsim: "⫳",
-    parsl: "⫽",
-    part: "∂",
-    PartialD: "∂",
-    Pcy: "П",
-    pcy: "п",
-    percnt: "%",
-    period: ".",
-    permil: "‰",
-    perp: "⊥",
-    pertenk: "‱",
-    Pfr: "𝔓",
-    pfr: "𝔭",
-    Phi: "Φ",
-    phi: "φ",
-    phiv: "ϕ",
-    phmmat: "ℳ",
-    phone: "☎",
-    Pi: "Π",
-    pi: "π",
-    pitchfork: "⋔",
-    piv: "ϖ",
-    planck: "ℏ",
-    planckh: "ℎ",
-    plankv: "ℏ",
-    plus: "+",
-    plusacir: "⨣",
-    plusb: "⊞",
-    pluscir: "⨢",
-    plusdo: "∔",
-    plusdu: "⨥",
-    pluse: "⩲",
-    PlusMinus: "±",
-    plusmn: "±",
-    plussim: "⨦",
-    plustwo: "⨧",
-    pm: "±",
-    Poincareplane: "ℌ",
-    pointint: "⨕",
-    Popf: "ℙ",
-    popf: "𝕡",
-    pound: "£",
-    Pr: "⪻",
-    pr: "≺",
-    prap: "⪷",
-    prcue: "≼",
-    prE: "⪳",
-    pre: "⪯",
-    prec: "≺",
-    precapprox: "⪷",
-    preccurlyeq: "≼",
-    Precedes: "≺",
-    PrecedesEqual: "⪯",
-    PrecedesSlantEqual: "≼",
-    PrecedesTilde: "≾",
-    preceq: "⪯",
-    precnapprox: "⪹",
-    precneqq: "⪵",
-    precnsim: "⋨",
-    precsim: "≾",
-    Prime: "″",
-    prime: "′",
-    primes: "ℙ",
-    prnap: "⪹",
-    prnE: "⪵",
-    prnsim: "⋨",
-    prod: "∏",
-    Product: "∏",
-    profalar: "⌮",
-    profline: "⌒",
-    profsurf: "⌓",
-    prop: "∝",
-    Proportion: "∷",
-    Proportional: "∝",
-    propto: "∝",
-    prsim: "≾",
-    prurel: "⊰",
-    Pscr: "𝒫",
-    pscr: "𝓅",
-    Psi: "Ψ",
-    psi: "ψ",
-    puncsp: " ",
-    Qfr: "𝔔",
-    qfr: "𝔮",
-    qint: "⨌",
-    Qopf: "ℚ",
-    qopf: "𝕢",
-    qprime: "⁗",
-    Qscr: "𝒬",
-    qscr: "𝓆",
-    quaternions: "ℍ",
-    quatint: "⨖",
-    quest: "?",
-    questeq: "≟",
-    QUOT: '"',
-    quot: '"',
-    rAarr: "⇛",
-    race: "∽̱",
-    Racute: "Ŕ",
-    racute: "ŕ",
-    radic: "√",
-    raemptyv: "⦳",
-    Rang: "⟫",
-    rang: "⟩",
-    rangd: "⦒",
-    range: "⦥",
-    rangle: "⟩",
-    raquo: "»",
-    Rarr: "↠",
-    rArr: "⇒",
-    rarr: "→",
-    rarrap: "⥵",
-    rarrb: "⇥",
-    rarrbfs: "⤠",
-    rarrc: "⤳",
-    rarrfs: "⤞",
-    rarrhk: "↪",
-    rarrlp: "↬",
-    rarrpl: "⥅",
-    rarrsim: "⥴",
-    Rarrtl: "⤖",
-    rarrtl: "↣",
-    rarrw: "↝",
-    rAtail: "⤜",
-    ratail: "⤚",
-    ratio: "∶",
-    rationals: "ℚ",
-    RBarr: "⤐",
-    rBarr: "⤏",
-    rbarr: "⤍",
-    rbbrk: "❳",
-    rbrace: "}",
-    rbrack: "]",
-    rbrke: "⦌",
-    rbrksld: "⦎",
-    rbrkslu: "⦐",
-    Rcaron: "Ř",
-    rcaron: "ř",
-    Rcedil: "Ŗ",
-    rcedil: "ŗ",
-    rceil: "⌉",
-    rcub: "}",
-    Rcy: "Р",
-    rcy: "р",
-    rdca: "⤷",
-    rdldhar: "⥩",
-    rdquo: "”",
-    rdquor: "”",
-    rdsh: "↳",
-    Re: "ℜ",
-    real: "ℜ",
-    realine: "ℛ",
-    realpart: "ℜ",
-    reals: "ℝ",
-    rect: "▭",
-    REG: "®",
-    reg: "®",
-    ReverseElement: "∋",
-    ReverseEquilibrium: "⇋",
-    ReverseUpEquilibrium: "⥯",
-    rfisht: "⥽",
-    rfloor: "⌋",
-    Rfr: "ℜ",
-    rfr: "𝔯",
-    rHar: "⥤",
-    rhard: "⇁",
-    rharu: "⇀",
-    rharul: "⥬",
-    Rho: "Ρ",
-    rho: "ρ",
-    rhov: "ϱ",
-    RightAngleBracket: "⟩",
-    RightArrow: "→",
-    Rightarrow: "⇒",
-    rightarrow: "→",
-    RightArrowBar: "⇥",
-    RightArrowLeftArrow: "⇄",
-    rightarrowtail: "↣",
-    RightCeiling: "⌉",
-    RightDoubleBracket: "⟧",
-    RightDownTeeVector: "⥝",
-    RightDownVector: "⇂",
-    RightDownVectorBar: "⥕",
-    RightFloor: "⌋",
-    rightharpoondown: "⇁",
-    rightharpoonup: "⇀",
-    rightleftarrows: "⇄",
-    rightleftharpoons: "⇌",
-    rightrightarrows: "⇉",
-    rightsquigarrow: "↝",
-    RightTee: "⊢",
-    RightTeeArrow: "↦",
-    RightTeeVector: "⥛",
-    rightthreetimes: "⋌",
-    RightTriangle: "⊳",
-    RightTriangleBar: "⧐",
-    RightTriangleEqual: "⊵",
-    RightUpDownVector: "⥏",
-    RightUpTeeVector: "⥜",
-    RightUpVector: "↾",
-    RightUpVectorBar: "⥔",
-    RightVector: "⇀",
-    RightVectorBar: "⥓",
-    ring: "˚",
-    risingdotseq: "≓",
-    rlarr: "⇄",
-    rlhar: "⇌",
-    rlm: "‏",
-    rmoust: "⎱",
-    rmoustache: "⎱",
-    rnmid: "⫮",
-    roang: "⟭",
-    roarr: "⇾",
-    robrk: "⟧",
-    ropar: "⦆",
-    Ropf: "ℝ",
-    ropf: "𝕣",
-    roplus: "⨮",
-    rotimes: "⨵",
-    RoundImplies: "⥰",
-    rpar: ")",
-    rpargt: "⦔",
-    rppolint: "⨒",
-    rrarr: "⇉",
-    Rrightarrow: "⇛",
-    rsaquo: "›",
-    Rscr: "ℛ",
-    rscr: "𝓇",
-    Rsh: "↱",
-    rsh: "↱",
-    rsqb: "]",
-    rsquo: "’",
-    rsquor: "’",
-    rthree: "⋌",
-    rtimes: "⋊",
-    rtri: "▹",
-    rtrie: "⊵",
-    rtrif: "▸",
-    rtriltri: "⧎",
-    RuleDelayed: "⧴",
-    ruluhar: "⥨",
-    rx: "℞",
-    Sacute: "Ś",
-    sacute: "ś",
-    sbquo: "‚",
-    Sc: "⪼",
-    sc: "≻",
-    scap: "⪸",
-    Scaron: "Š",
-    scaron: "š",
-    sccue: "≽",
-    scE: "⪴",
-    sce: "⪰",
-    Scedil: "Ş",
-    scedil: "ş",
-    Scirc: "Ŝ",
-    scirc: "ŝ",
-    scnap: "⪺",
-    scnE: "⪶",
-    scnsim: "⋩",
-    scpolint: "⨓",
-    scsim: "≿",
-    Scy: "С",
-    scy: "с",
-    sdot: "⋅",
-    sdotb: "⊡",
-    sdote: "⩦",
-    searhk: "⤥",
-    seArr: "⇘",
-    searr: "↘",
-    searrow: "↘",
-    sect: "§",
-    semi: ";",
-    seswar: "⤩",
-    setminus: "∖",
-    setmn: "∖",
-    sext: "✶",
-    Sfr: "𝔖",
-    sfr: "𝔰",
-    sfrown: "⌢",
-    sharp: "♯",
-    SHCHcy: "Щ",
-    shchcy: "щ",
-    SHcy: "Ш",
-    shcy: "ш",
-    ShortDownArrow: "↓",
-    ShortLeftArrow: "←",
-    shortmid: "∣",
-    shortparallel: "∥",
-    ShortRightArrow: "→",
-    ShortUpArrow: "↑",
-    shy: "­",
-    Sigma: "Σ",
-    sigma: "σ",
-    sigmaf: "ς",
-    sigmav: "ς",
-    sim: "∼",
-    simdot: "⩪",
-    sime: "≃",
-    simeq: "≃",
-    simg: "⪞",
-    simgE: "⪠",
-    siml: "⪝",
-    simlE: "⪟",
-    simne: "≆",
-    simplus: "⨤",
-    simrarr: "⥲",
-    slarr: "←",
-    SmallCircle: "∘",
-    smallsetminus: "∖",
-    smashp: "⨳",
-    smeparsl: "⧤",
-    smid: "∣",
-    smile: "⌣",
-    smt: "⪪",
-    smte: "⪬",
-    smtes: "⪬︀",
-    SOFTcy: "Ь",
-    softcy: "ь",
-    sol: "/",
-    solb: "⧄",
-    solbar: "⌿",
-    Sopf: "𝕊",
-    sopf: "𝕤",
-    spades: "♠",
-    spadesuit: "♠",
-    spar: "∥",
-    sqcap: "⊓",
-    sqcaps: "⊓︀",
-    sqcup: "⊔",
-    sqcups: "⊔︀",
-    Sqrt: "√",
-    sqsub: "⊏",
-    sqsube: "⊑",
-    sqsubset: "⊏",
-    sqsubseteq: "⊑",
-    sqsup: "⊐",
-    sqsupe: "⊒",
-    sqsupset: "⊐",
-    sqsupseteq: "⊒",
-    squ: "□",
-    Square: "□",
-    square: "□",
-    SquareIntersection: "⊓",
-    SquareSubset: "⊏",
-    SquareSubsetEqual: "⊑",
-    SquareSuperset: "⊐",
-    SquareSupersetEqual: "⊒",
-    SquareUnion: "⊔",
-    squarf: "▪",
-    squf: "▪",
-    srarr: "→",
-    Sscr: "𝒮",
-    sscr: "𝓈",
-    ssetmn: "∖",
-    ssmile: "⌣",
-    sstarf: "⋆",
-    Star: "⋆",
-    star: "☆",
-    starf: "★",
-    straightepsilon: "ϵ",
-    straightphi: "ϕ",
-    strns: "¯",
-    Sub: "⋐",
-    sub: "⊂",
-    subdot: "⪽",
-    subE: "⫅",
-    sube: "⊆",
-    subedot: "⫃",
-    submult: "⫁",
-    subnE: "⫋",
-    subne: "⊊",
-    subplus: "⪿",
-    subrarr: "⥹",
-    Subset: "⋐",
-    subset: "⊂",
-    subseteq: "⊆",
-    subseteqq: "⫅",
-    SubsetEqual: "⊆",
-    subsetneq: "⊊",
-    subsetneqq: "⫋",
-    subsim: "⫇",
-    subsub: "⫕",
-    subsup: "⫓",
-    succ: "≻",
-    succapprox: "⪸",
-    succcurlyeq: "≽",
-    Succeeds: "≻",
-    SucceedsEqual: "⪰",
-    SucceedsSlantEqual: "≽",
-    SucceedsTilde: "≿",
-    succeq: "⪰",
-    succnapprox: "⪺",
-    succneqq: "⪶",
-    succnsim: "⋩",
-    succsim: "≿",
-    SuchThat: "∋",
-    Sum: "∑",
-    sum: "∑",
-    sung: "♪",
-    Sup: "⋑",
-    sup: "⊃",
-    sup1: "¹",
-    sup2: "²",
-    sup3: "³",
-    supdot: "⪾",
-    supdsub: "⫘",
-    supE: "⫆",
-    supe: "⊇",
-    supedot: "⫄",
-    Superset: "⊃",
-    SupersetEqual: "⊇",
-    suphsol: "⟉",
-    suphsub: "⫗",
-    suplarr: "⥻",
-    supmult: "⫂",
-    supnE: "⫌",
-    supne: "⊋",
-    supplus: "⫀",
-    Supset: "⋑",
-    supset: "⊃",
-    supseteq: "⊇",
-    supseteqq: "⫆",
-    supsetneq: "⊋",
-    supsetneqq: "⫌",
-    supsim: "⫈",
-    supsub: "⫔",
-    supsup: "⫖",
-    swarhk: "⤦",
-    swArr: "⇙",
-    swarr: "↙",
-    swarrow: "↙",
-    swnwar: "⤪",
-    szlig: "ß",
-    Tab: "	",
-    target: "⌖",
-    Tau: "Τ",
-    tau: "τ",
-    tbrk: "⎴",
-    Tcaron: "Ť",
-    tcaron: "ť",
-    Tcedil: "Ţ",
-    tcedil: "ţ",
-    Tcy: "Т",
-    tcy: "т",
-    tdot: "⃛",
-    telrec: "⌕",
-    Tfr: "𝔗",
-    tfr: "𝔱",
-    there4: "∴",
-    Therefore: "∴",
-    therefore: "∴",
-    Theta: "Θ",
-    theta: "θ",
-    thetasym: "ϑ",
-    thetav: "ϑ",
-    thickapprox: "≈",
-    thicksim: "∼",
-    ThickSpace: "  ",
-    thinsp: " ",
-    ThinSpace: " ",
-    thkap: "≈",
-    thksim: "∼",
-    THORN: "Þ",
-    thorn: "þ",
-    Tilde: "∼",
-    tilde: "˜",
-    TildeEqual: "≃",
-    TildeFullEqual: "≅",
-    TildeTilde: "≈",
-    times: "×",
-    timesb: "⊠",
-    timesbar: "⨱",
-    timesd: "⨰",
-    tint: "∭",
-    toea: "⤨",
-    top: "⊤",
-    topbot: "⌶",
-    topcir: "⫱",
-    Topf: "𝕋",
-    topf: "𝕥",
-    topfork: "⫚",
-    tosa: "⤩",
-    tprime: "‴",
-    TRADE: "™",
-    trade: "™",
-    triangle: "▵",
-    triangledown: "▿",
-    triangleleft: "◃",
-    trianglelefteq: "⊴",
-    triangleq: "≜",
-    triangleright: "▹",
-    trianglerighteq: "⊵",
-    tridot: "◬",
-    trie: "≜",
-    triminus: "⨺",
-    TripleDot: "⃛",
-    triplus: "⨹",
-    trisb: "⧍",
-    tritime: "⨻",
-    trpezium: "⏢",
-    Tscr: "𝒯",
-    tscr: "𝓉",
-    TScy: "Ц",
-    tscy: "ц",
-    TSHcy: "Ћ",
-    tshcy: "ћ",
-    Tstrok: "Ŧ",
-    tstrok: "ŧ",
-    twixt: "≬",
-    twoheadleftarrow: "↞",
-    twoheadrightarrow: "↠",
-    Uacute: "Ú",
-    uacute: "ú",
-    Uarr: "↟",
-    uArr: "⇑",
-    uarr: "↑",
-    Uarrocir: "⥉",
-    Ubrcy: "Ў",
-    ubrcy: "ў",
-    Ubreve: "Ŭ",
-    ubreve: "ŭ",
-    Ucirc: "Û",
-    ucirc: "û",
-    Ucy: "У",
-    ucy: "у",
-    udarr: "⇅",
-    Udblac: "Ű",
-    udblac: "ű",
-    udhar: "⥮",
-    ufisht: "⥾",
-    Ufr: "𝔘",
-    ufr: "𝔲",
-    Ugrave: "Ù",
-    ugrave: "ù",
-    uHar: "⥣",
-    uharl: "↿",
-    uharr: "↾",
-    uhblk: "▀",
-    ulcorn: "⌜",
-    ulcorner: "⌜",
-    ulcrop: "⌏",
-    ultri: "◸",
-    Umacr: "Ū",
-    umacr: "ū",
-    uml: "¨",
-    UnderBar: "_",
-    UnderBrace: "⏟",
-    UnderBracket: "⎵",
-    UnderParenthesis: "⏝",
-    Union: "⋃",
-    UnionPlus: "⊎",
-    Uogon: "Ų",
-    uogon: "ų",
-    Uopf: "𝕌",
-    uopf: "𝕦",
-    UpArrow: "↑",
-    Uparrow: "⇑",
-    uparrow: "↑",
-    UpArrowBar: "⤒",
-    UpArrowDownArrow: "⇅",
-    UpDownArrow: "↕",
-    Updownarrow: "⇕",
-    updownarrow: "↕",
-    UpEquilibrium: "⥮",
-    upharpoonleft: "↿",
-    upharpoonright: "↾",
-    uplus: "⊎",
-    UpperLeftArrow: "↖",
-    UpperRightArrow: "↗",
-    Upsi: "ϒ",
-    upsi: "υ",
-    upsih: "ϒ",
-    Upsilon: "Υ",
-    upsilon: "υ",
-    UpTee: "⊥",
-    UpTeeArrow: "↥",
-    upuparrows: "⇈",
-    urcorn: "⌝",
-    urcorner: "⌝",
-    urcrop: "⌎",
-    Uring: "Ů",
-    uring: "ů",
-    urtri: "◹",
-    Uscr: "𝒰",
-    uscr: "𝓊",
-    utdot: "⋰",
-    Utilde: "Ũ",
-    utilde: "ũ",
-    utri: "▵",
-    utrif: "▴",
-    uuarr: "⇈",
-    Uuml: "Ü",
-    uuml: "ü",
-    uwangle: "⦧",
-    vangrt: "⦜",
-    varepsilon: "ϵ",
-    varkappa: "ϰ",
-    varnothing: "∅",
-    varphi: "ϕ",
-    varpi: "ϖ",
-    varpropto: "∝",
-    vArr: "⇕",
-    varr: "↕",
-    varrho: "ϱ",
-    varsigma: "ς",
-    varsubsetneq: "⊊︀",
-    varsubsetneqq: "⫋︀",
-    varsupsetneq: "⊋︀",
-    varsupsetneqq: "⫌︀",
-    vartheta: "ϑ",
-    vartriangleleft: "⊲",
-    vartriangleright: "⊳",
-    Vbar: "⫫",
-    vBar: "⫨",
-    vBarv: "⫩",
-    Vcy: "В",
-    vcy: "в",
-    VDash: "⊫",
-    Vdash: "⊩",
-    vDash: "⊨",
-    vdash: "⊢",
-    Vdashl: "⫦",
-    Vee: "⋁",
-    vee: "∨",
-    veebar: "⊻",
-    veeeq: "≚",
-    vellip: "⋮",
-    Verbar: "‖",
-    verbar: "|",
-    Vert: "‖",
-    vert: "|",
-    VerticalBar: "∣",
-    VerticalLine: "|",
-    VerticalSeparator: "❘",
-    VerticalTilde: "≀",
-    VeryThinSpace: " ",
-    Vfr: "𝔙",
-    vfr: "𝔳",
-    vltri: "⊲",
-    vnsub: "⊂⃒",
-    vnsup: "⊃⃒",
-    Vopf: "𝕍",
-    vopf: "𝕧",
-    vprop: "∝",
-    vrtri: "⊳",
-    Vscr: "𝒱",
-    vscr: "𝓋",
-    vsubnE: "⫋︀",
-    vsubne: "⊊︀",
-    vsupnE: "⫌︀",
-    vsupne: "⊋︀",
-    Vvdash: "⊪",
-    vzigzag: "⦚",
-    Wcirc: "Ŵ",
-    wcirc: "ŵ",
-    wedbar: "⩟",
-    Wedge: "⋀",
-    wedge: "∧",
-    wedgeq: "≙",
-    weierp: "℘",
-    Wfr: "𝔚",
-    wfr: "𝔴",
-    Wopf: "𝕎",
-    wopf: "𝕨",
-    wp: "℘",
-    wr: "≀",
-    wreath: "≀",
-    Wscr: "𝒲",
-    wscr: "𝓌",
-    xcap: "⋂",
-    xcirc: "◯",
-    xcup: "⋃",
-    xdtri: "▽",
-    Xfr: "𝔛",
-    xfr: "𝔵",
-    xhArr: "⟺",
-    xharr: "⟷",
-    Xi: "Ξ",
-    xi: "ξ",
-    xlArr: "⟸",
-    xlarr: "⟵",
-    xmap: "⟼",
-    xnis: "⋻",
-    xodot: "⨀",
-    Xopf: "𝕏",
-    xopf: "𝕩",
-    xoplus: "⨁",
-    xotime: "⨂",
-    xrArr: "⟹",
-    xrarr: "⟶",
-    Xscr: "𝒳",
-    xscr: "𝓍",
-    xsqcup: "⨆",
-    xuplus: "⨄",
-    xutri: "△",
-    xvee: "⋁",
-    xwedge: "⋀",
-    Yacute: "Ý",
-    yacute: "ý",
-    YAcy: "Я",
-    yacy: "я",
-    Ycirc: "Ŷ",
-    ycirc: "ŷ",
-    Ycy: "Ы",
-    ycy: "ы",
-    yen: "¥",
-    Yfr: "𝔜",
-    yfr: "𝔶",
-    YIcy: "Ї",
-    yicy: "ї",
-    Yopf: "𝕐",
-    yopf: "𝕪",
-    Yscr: "𝒴",
-    yscr: "𝓎",
-    YUcy: "Ю",
-    yucy: "ю",
-    Yuml: "Ÿ",
-    yuml: "ÿ",
-    Zacute: "Ź",
-    zacute: "ź",
-    Zcaron: "Ž",
-    zcaron: "ž",
-    Zcy: "З",
-    zcy: "з",
-    Zdot: "Ż",
-    zdot: "ż",
-    zeetrf: "ℨ",
-    ZeroWidthSpace: "​",
-    Zeta: "Ζ",
-    zeta: "ζ",
-    Zfr: "ℨ",
-    zfr: "𝔷",
-    ZHcy: "Ж",
-    zhcy: "ж",
-    zigrarr: "⇝",
-    Zopf: "ℤ",
-    zopf: "𝕫",
-    Zscr: "𝒵",
-    zscr: "𝓏",
-    zwj: "‍",
-    zwnj: "‌"
-  }), e.entityMap = e.HTML_ENTITIES;
-})(Un);
-var xt = {}, qe = B, y = v, Vn = Ae, eo = qe.isHTMLEscapableRawTextElement, to = qe.isHTMLMimeType, ro = qe.isHTMLRawTextElement, it = qe.hasOwn, Mr = qe.NAMESPACE, _r = Vn.ParseError, no = Vn.DOMException, He = 0, ie = 1, Ce = 2, Ge = 3, Te = 4, we = 5, ze = 6, mt = 7;
-function Hn() {
+      nexist: "∄",
+      nexists: "∄",
+      Nfr: "𝔑",
+      nfr: "𝔫",
+      ngE: "≧̸",
+      nge: "≱",
+      ngeq: "≱",
+      ngeqq: "≧̸",
+      ngeqslant: "⩾̸",
+      nges: "⩾̸",
+      nGg: "⋙̸",
+      ngsim: "≵",
+      nGt: "≫⃒",
+      ngt: "≯",
+      ngtr: "≯",
+      nGtv: "≫̸",
+      nhArr: "⇎",
+      nharr: "↮",
+      nhpar: "⫲",
+      ni: "∋",
+      nis: "⋼",
+      nisd: "⋺",
+      niv: "∋",
+      NJcy: "Њ",
+      njcy: "њ",
+      nlArr: "⇍",
+      nlarr: "↚",
+      nldr: "‥",
+      nlE: "≦̸",
+      nle: "≰",
+      nLeftarrow: "⇍",
+      nleftarrow: "↚",
+      nLeftrightarrow: "⇎",
+      nleftrightarrow: "↮",
+      nleq: "≰",
+      nleqq: "≦̸",
+      nleqslant: "⩽̸",
+      nles: "⩽̸",
+      nless: "≮",
+      nLl: "⋘̸",
+      nlsim: "≴",
+      nLt: "≪⃒",
+      nlt: "≮",
+      nltri: "⋪",
+      nltrie: "⋬",
+      nLtv: "≪̸",
+      nmid: "∤",
+      NoBreak: "⁠",
+      NonBreakingSpace: " ",
+      Nopf: "ℕ",
+      nopf: "𝕟",
+      Not: "⫬",
+      not: "¬",
+      NotCongruent: "≢",
+      NotCupCap: "≭",
+      NotDoubleVerticalBar: "∦",
+      NotElement: "∉",
+      NotEqual: "≠",
+      NotEqualTilde: "≂̸",
+      NotExists: "∄",
+      NotGreater: "≯",
+      NotGreaterEqual: "≱",
+      NotGreaterFullEqual: "≧̸",
+      NotGreaterGreater: "≫̸",
+      NotGreaterLess: "≹",
+      NotGreaterSlantEqual: "⩾̸",
+      NotGreaterTilde: "≵",
+      NotHumpDownHump: "≎̸",
+      NotHumpEqual: "≏̸",
+      notin: "∉",
+      notindot: "⋵̸",
+      notinE: "⋹̸",
+      notinva: "∉",
+      notinvb: "⋷",
+      notinvc: "⋶",
+      NotLeftTriangle: "⋪",
+      NotLeftTriangleBar: "⧏̸",
+      NotLeftTriangleEqual: "⋬",
+      NotLess: "≮",
+      NotLessEqual: "≰",
+      NotLessGreater: "≸",
+      NotLessLess: "≪̸",
+      NotLessSlantEqual: "⩽̸",
+      NotLessTilde: "≴",
+      NotNestedGreaterGreater: "⪢̸",
+      NotNestedLessLess: "⪡̸",
+      notni: "∌",
+      notniva: "∌",
+      notnivb: "⋾",
+      notnivc: "⋽",
+      NotPrecedes: "⊀",
+      NotPrecedesEqual: "⪯̸",
+      NotPrecedesSlantEqual: "⋠",
+      NotReverseElement: "∌",
+      NotRightTriangle: "⋫",
+      NotRightTriangleBar: "⧐̸",
+      NotRightTriangleEqual: "⋭",
+      NotSquareSubset: "⊏̸",
+      NotSquareSubsetEqual: "⋢",
+      NotSquareSuperset: "⊐̸",
+      NotSquareSupersetEqual: "⋣",
+      NotSubset: "⊂⃒",
+      NotSubsetEqual: "⊈",
+      NotSucceeds: "⊁",
+      NotSucceedsEqual: "⪰̸",
+      NotSucceedsSlantEqual: "⋡",
+      NotSucceedsTilde: "≿̸",
+      NotSuperset: "⊃⃒",
+      NotSupersetEqual: "⊉",
+      NotTilde: "≁",
+      NotTildeEqual: "≄",
+      NotTildeFullEqual: "≇",
+      NotTildeTilde: "≉",
+      NotVerticalBar: "∤",
+      npar: "∦",
+      nparallel: "∦",
+      nparsl: "⫽⃥",
+      npart: "∂̸",
+      npolint: "⨔",
+      npr: "⊀",
+      nprcue: "⋠",
+      npre: "⪯̸",
+      nprec: "⊀",
+      npreceq: "⪯̸",
+      nrArr: "⇏",
+      nrarr: "↛",
+      nrarrc: "⤳̸",
+      nrarrw: "↝̸",
+      nRightarrow: "⇏",
+      nrightarrow: "↛",
+      nrtri: "⋫",
+      nrtrie: "⋭",
+      nsc: "⊁",
+      nsccue: "⋡",
+      nsce: "⪰̸",
+      Nscr: "𝒩",
+      nscr: "𝓃",
+      nshortmid: "∤",
+      nshortparallel: "∦",
+      nsim: "≁",
+      nsime: "≄",
+      nsimeq: "≄",
+      nsmid: "∤",
+      nspar: "∦",
+      nsqsube: "⋢",
+      nsqsupe: "⋣",
+      nsub: "⊄",
+      nsubE: "⫅̸",
+      nsube: "⊈",
+      nsubset: "⊂⃒",
+      nsubseteq: "⊈",
+      nsubseteqq: "⫅̸",
+      nsucc: "⊁",
+      nsucceq: "⪰̸",
+      nsup: "⊅",
+      nsupE: "⫆̸",
+      nsupe: "⊉",
+      nsupset: "⊃⃒",
+      nsupseteq: "⊉",
+      nsupseteqq: "⫆̸",
+      ntgl: "≹",
+      Ntilde: "Ñ",
+      ntilde: "ñ",
+      ntlg: "≸",
+      ntriangleleft: "⋪",
+      ntrianglelefteq: "⋬",
+      ntriangleright: "⋫",
+      ntrianglerighteq: "⋭",
+      Nu: "Ν",
+      nu: "ν",
+      num: "#",
+      numero: "№",
+      numsp: " ",
+      nvap: "≍⃒",
+      nVDash: "⊯",
+      nVdash: "⊮",
+      nvDash: "⊭",
+      nvdash: "⊬",
+      nvge: "≥⃒",
+      nvgt: ">⃒",
+      nvHarr: "⤄",
+      nvinfin: "⧞",
+      nvlArr: "⤂",
+      nvle: "≤⃒",
+      nvlt: "<⃒",
+      nvltrie: "⊴⃒",
+      nvrArr: "⤃",
+      nvrtrie: "⊵⃒",
+      nvsim: "∼⃒",
+      nwarhk: "⤣",
+      nwArr: "⇖",
+      nwarr: "↖",
+      nwarrow: "↖",
+      nwnear: "⤧",
+      Oacute: "Ó",
+      oacute: "ó",
+      oast: "⊛",
+      ocir: "⊚",
+      Ocirc: "Ô",
+      ocirc: "ô",
+      Ocy: "О",
+      ocy: "о",
+      odash: "⊝",
+      Odblac: "Ő",
+      odblac: "ő",
+      odiv: "⨸",
+      odot: "⊙",
+      odsold: "⦼",
+      OElig: "Œ",
+      oelig: "œ",
+      ofcir: "⦿",
+      Ofr: "𝔒",
+      ofr: "𝔬",
+      ogon: "˛",
+      Ograve: "Ò",
+      ograve: "ò",
+      ogt: "⧁",
+      ohbar: "⦵",
+      ohm: "Ω",
+      oint: "∮",
+      olarr: "↺",
+      olcir: "⦾",
+      olcross: "⦻",
+      oline: "‾",
+      olt: "⧀",
+      Omacr: "Ō",
+      omacr: "ō",
+      Omega: "Ω",
+      omega: "ω",
+      Omicron: "Ο",
+      omicron: "ο",
+      omid: "⦶",
+      ominus: "⊖",
+      Oopf: "𝕆",
+      oopf: "𝕠",
+      opar: "⦷",
+      OpenCurlyDoubleQuote: "“",
+      OpenCurlyQuote: "‘",
+      operp: "⦹",
+      oplus: "⊕",
+      Or: "⩔",
+      or: "∨",
+      orarr: "↻",
+      ord: "⩝",
+      order: "ℴ",
+      orderof: "ℴ",
+      ordf: "ª",
+      ordm: "º",
+      origof: "⊶",
+      oror: "⩖",
+      orslope: "⩗",
+      orv: "⩛",
+      oS: "Ⓢ",
+      Oscr: "𝒪",
+      oscr: "ℴ",
+      Oslash: "Ø",
+      oslash: "ø",
+      osol: "⊘",
+      Otilde: "Õ",
+      otilde: "õ",
+      Otimes: "⨷",
+      otimes: "⊗",
+      otimesas: "⨶",
+      Ouml: "Ö",
+      ouml: "ö",
+      ovbar: "⌽",
+      OverBar: "‾",
+      OverBrace: "⏞",
+      OverBracket: "⎴",
+      OverParenthesis: "⏜",
+      par: "∥",
+      para: "¶",
+      parallel: "∥",
+      parsim: "⫳",
+      parsl: "⫽",
+      part: "∂",
+      PartialD: "∂",
+      Pcy: "П",
+      pcy: "п",
+      percnt: "%",
+      period: ".",
+      permil: "‰",
+      perp: "⊥",
+      pertenk: "‱",
+      Pfr: "𝔓",
+      pfr: "𝔭",
+      Phi: "Φ",
+      phi: "φ",
+      phiv: "ϕ",
+      phmmat: "ℳ",
+      phone: "☎",
+      Pi: "Π",
+      pi: "π",
+      pitchfork: "⋔",
+      piv: "ϖ",
+      planck: "ℏ",
+      planckh: "ℎ",
+      plankv: "ℏ",
+      plus: "+",
+      plusacir: "⨣",
+      plusb: "⊞",
+      pluscir: "⨢",
+      plusdo: "∔",
+      plusdu: "⨥",
+      pluse: "⩲",
+      PlusMinus: "±",
+      plusmn: "±",
+      plussim: "⨦",
+      plustwo: "⨧",
+      pm: "±",
+      Poincareplane: "ℌ",
+      pointint: "⨕",
+      Popf: "ℙ",
+      popf: "𝕡",
+      pound: "£",
+      Pr: "⪻",
+      pr: "≺",
+      prap: "⪷",
+      prcue: "≼",
+      prE: "⪳",
+      pre: "⪯",
+      prec: "≺",
+      precapprox: "⪷",
+      preccurlyeq: "≼",
+      Precedes: "≺",
+      PrecedesEqual: "⪯",
+      PrecedesSlantEqual: "≼",
+      PrecedesTilde: "≾",
+      preceq: "⪯",
+      precnapprox: "⪹",
+      precneqq: "⪵",
+      precnsim: "⋨",
+      precsim: "≾",
+      Prime: "″",
+      prime: "′",
+      primes: "ℙ",
+      prnap: "⪹",
+      prnE: "⪵",
+      prnsim: "⋨",
+      prod: "∏",
+      Product: "∏",
+      profalar: "⌮",
+      profline: "⌒",
+      profsurf: "⌓",
+      prop: "∝",
+      Proportion: "∷",
+      Proportional: "∝",
+      propto: "∝",
+      prsim: "≾",
+      prurel: "⊰",
+      Pscr: "𝒫",
+      pscr: "𝓅",
+      Psi: "Ψ",
+      psi: "ψ",
+      puncsp: " ",
+      Qfr: "𝔔",
+      qfr: "𝔮",
+      qint: "⨌",
+      Qopf: "ℚ",
+      qopf: "𝕢",
+      qprime: "⁗",
+      Qscr: "𝒬",
+      qscr: "𝓆",
+      quaternions: "ℍ",
+      quatint: "⨖",
+      quest: "?",
+      questeq: "≟",
+      QUOT: '"',
+      quot: '"',
+      rAarr: "⇛",
+      race: "∽̱",
+      Racute: "Ŕ",
+      racute: "ŕ",
+      radic: "√",
+      raemptyv: "⦳",
+      Rang: "⟫",
+      rang: "⟩",
+      rangd: "⦒",
+      range: "⦥",
+      rangle: "⟩",
+      raquo: "»",
+      Rarr: "↠",
+      rArr: "⇒",
+      rarr: "→",
+      rarrap: "⥵",
+      rarrb: "⇥",
+      rarrbfs: "⤠",
+      rarrc: "⤳",
+      rarrfs: "⤞",
+      rarrhk: "↪",
+      rarrlp: "↬",
+      rarrpl: "⥅",
+      rarrsim: "⥴",
+      Rarrtl: "⤖",
+      rarrtl: "↣",
+      rarrw: "↝",
+      rAtail: "⤜",
+      ratail: "⤚",
+      ratio: "∶",
+      rationals: "ℚ",
+      RBarr: "⤐",
+      rBarr: "⤏",
+      rbarr: "⤍",
+      rbbrk: "❳",
+      rbrace: "}",
+      rbrack: "]",
+      rbrke: "⦌",
+      rbrksld: "⦎",
+      rbrkslu: "⦐",
+      Rcaron: "Ř",
+      rcaron: "ř",
+      Rcedil: "Ŗ",
+      rcedil: "ŗ",
+      rceil: "⌉",
+      rcub: "}",
+      Rcy: "Р",
+      rcy: "р",
+      rdca: "⤷",
+      rdldhar: "⥩",
+      rdquo: "”",
+      rdquor: "”",
+      rdsh: "↳",
+      Re: "ℜ",
+      real: "ℜ",
+      realine: "ℛ",
+      realpart: "ℜ",
+      reals: "ℝ",
+      rect: "▭",
+      REG: "®",
+      reg: "®",
+      ReverseElement: "∋",
+      ReverseEquilibrium: "⇋",
+      ReverseUpEquilibrium: "⥯",
+      rfisht: "⥽",
+      rfloor: "⌋",
+      Rfr: "ℜ",
+      rfr: "𝔯",
+      rHar: "⥤",
+      rhard: "⇁",
+      rharu: "⇀",
+      rharul: "⥬",
+      Rho: "Ρ",
+      rho: "ρ",
+      rhov: "ϱ",
+      RightAngleBracket: "⟩",
+      RightArrow: "→",
+      Rightarrow: "⇒",
+      rightarrow: "→",
+      RightArrowBar: "⇥",
+      RightArrowLeftArrow: "⇄",
+      rightarrowtail: "↣",
+      RightCeiling: "⌉",
+      RightDoubleBracket: "⟧",
+      RightDownTeeVector: "⥝",
+      RightDownVector: "⇂",
+      RightDownVectorBar: "⥕",
+      RightFloor: "⌋",
+      rightharpoondown: "⇁",
+      rightharpoonup: "⇀",
+      rightleftarrows: "⇄",
+      rightleftharpoons: "⇌",
+      rightrightarrows: "⇉",
+      rightsquigarrow: "↝",
+      RightTee: "⊢",
+      RightTeeArrow: "↦",
+      RightTeeVector: "⥛",
+      rightthreetimes: "⋌",
+      RightTriangle: "⊳",
+      RightTriangleBar: "⧐",
+      RightTriangleEqual: "⊵",
+      RightUpDownVector: "⥏",
+      RightUpTeeVector: "⥜",
+      RightUpVector: "↾",
+      RightUpVectorBar: "⥔",
+      RightVector: "⇀",
+      RightVectorBar: "⥓",
+      ring: "˚",
+      risingdotseq: "≓",
+      rlarr: "⇄",
+      rlhar: "⇌",
+      rlm: "‏",
+      rmoust: "⎱",
+      rmoustache: "⎱",
+      rnmid: "⫮",
+      roang: "⟭",
+      roarr: "⇾",
+      robrk: "⟧",
+      ropar: "⦆",
+      Ropf: "ℝ",
+      ropf: "𝕣",
+      roplus: "⨮",
+      rotimes: "⨵",
+      RoundImplies: "⥰",
+      rpar: ")",
+      rpargt: "⦔",
+      rppolint: "⨒",
+      rrarr: "⇉",
+      Rrightarrow: "⇛",
+      rsaquo: "›",
+      Rscr: "ℛ",
+      rscr: "𝓇",
+      Rsh: "↱",
+      rsh: "↱",
+      rsqb: "]",
+      rsquo: "’",
+      rsquor: "’",
+      rthree: "⋌",
+      rtimes: "⋊",
+      rtri: "▹",
+      rtrie: "⊵",
+      rtrif: "▸",
+      rtriltri: "⧎",
+      RuleDelayed: "⧴",
+      ruluhar: "⥨",
+      rx: "℞",
+      Sacute: "Ś",
+      sacute: "ś",
+      sbquo: "‚",
+      Sc: "⪼",
+      sc: "≻",
+      scap: "⪸",
+      Scaron: "Š",
+      scaron: "š",
+      sccue: "≽",
+      scE: "⪴",
+      sce: "⪰",
+      Scedil: "Ş",
+      scedil: "ş",
+      Scirc: "Ŝ",
+      scirc: "ŝ",
+      scnap: "⪺",
+      scnE: "⪶",
+      scnsim: "⋩",
+      scpolint: "⨓",
+      scsim: "≿",
+      Scy: "С",
+      scy: "с",
+      sdot: "⋅",
+      sdotb: "⊡",
+      sdote: "⩦",
+      searhk: "⤥",
+      seArr: "⇘",
+      searr: "↘",
+      searrow: "↘",
+      sect: "§",
+      semi: ";",
+      seswar: "⤩",
+      setminus: "∖",
+      setmn: "∖",
+      sext: "✶",
+      Sfr: "𝔖",
+      sfr: "𝔰",
+      sfrown: "⌢",
+      sharp: "♯",
+      SHCHcy: "Щ",
+      shchcy: "щ",
+      SHcy: "Ш",
+      shcy: "ш",
+      ShortDownArrow: "↓",
+      ShortLeftArrow: "←",
+      shortmid: "∣",
+      shortparallel: "∥",
+      ShortRightArrow: "→",
+      ShortUpArrow: "↑",
+      shy: "­",
+      Sigma: "Σ",
+      sigma: "σ",
+      sigmaf: "ς",
+      sigmav: "ς",
+      sim: "∼",
+      simdot: "⩪",
+      sime: "≃",
+      simeq: "≃",
+      simg: "⪞",
+      simgE: "⪠",
+      siml: "⪝",
+      simlE: "⪟",
+      simne: "≆",
+      simplus: "⨤",
+      simrarr: "⥲",
+      slarr: "←",
+      SmallCircle: "∘",
+      smallsetminus: "∖",
+      smashp: "⨳",
+      smeparsl: "⧤",
+      smid: "∣",
+      smile: "⌣",
+      smt: "⪪",
+      smte: "⪬",
+      smtes: "⪬︀",
+      SOFTcy: "Ь",
+      softcy: "ь",
+      sol: "/",
+      solb: "⧄",
+      solbar: "⌿",
+      Sopf: "𝕊",
+      sopf: "𝕤",
+      spades: "♠",
+      spadesuit: "♠",
+      spar: "∥",
+      sqcap: "⊓",
+      sqcaps: "⊓︀",
+      sqcup: "⊔",
+      sqcups: "⊔︀",
+      Sqrt: "√",
+      sqsub: "⊏",
+      sqsube: "⊑",
+      sqsubset: "⊏",
+      sqsubseteq: "⊑",
+      sqsup: "⊐",
+      sqsupe: "⊒",
+      sqsupset: "⊐",
+      sqsupseteq: "⊒",
+      squ: "□",
+      Square: "□",
+      square: "□",
+      SquareIntersection: "⊓",
+      SquareSubset: "⊏",
+      SquareSubsetEqual: "⊑",
+      SquareSuperset: "⊐",
+      SquareSupersetEqual: "⊒",
+      SquareUnion: "⊔",
+      squarf: "▪",
+      squf: "▪",
+      srarr: "→",
+      Sscr: "𝒮",
+      sscr: "𝓈",
+      ssetmn: "∖",
+      ssmile: "⌣",
+      sstarf: "⋆",
+      Star: "⋆",
+      star: "☆",
+      starf: "★",
+      straightepsilon: "ϵ",
+      straightphi: "ϕ",
+      strns: "¯",
+      Sub: "⋐",
+      sub: "⊂",
+      subdot: "⪽",
+      subE: "⫅",
+      sube: "⊆",
+      subedot: "⫃",
+      submult: "⫁",
+      subnE: "⫋",
+      subne: "⊊",
+      subplus: "⪿",
+      subrarr: "⥹",
+      Subset: "⋐",
+      subset: "⊂",
+      subseteq: "⊆",
+      subseteqq: "⫅",
+      SubsetEqual: "⊆",
+      subsetneq: "⊊",
+      subsetneqq: "⫋",
+      subsim: "⫇",
+      subsub: "⫕",
+      subsup: "⫓",
+      succ: "≻",
+      succapprox: "⪸",
+      succcurlyeq: "≽",
+      Succeeds: "≻",
+      SucceedsEqual: "⪰",
+      SucceedsSlantEqual: "≽",
+      SucceedsTilde: "≿",
+      succeq: "⪰",
+      succnapprox: "⪺",
+      succneqq: "⪶",
+      succnsim: "⋩",
+      succsim: "≿",
+      SuchThat: "∋",
+      Sum: "∑",
+      sum: "∑",
+      sung: "♪",
+      Sup: "⋑",
+      sup: "⊃",
+      sup1: "¹",
+      sup2: "²",
+      sup3: "³",
+      supdot: "⪾",
+      supdsub: "⫘",
+      supE: "⫆",
+      supe: "⊇",
+      supedot: "⫄",
+      Superset: "⊃",
+      SupersetEqual: "⊇",
+      suphsol: "⟉",
+      suphsub: "⫗",
+      suplarr: "⥻",
+      supmult: "⫂",
+      supnE: "⫌",
+      supne: "⊋",
+      supplus: "⫀",
+      Supset: "⋑",
+      supset: "⊃",
+      supseteq: "⊇",
+      supseteqq: "⫆",
+      supsetneq: "⊋",
+      supsetneqq: "⫌",
+      supsim: "⫈",
+      supsub: "⫔",
+      supsup: "⫖",
+      swarhk: "⤦",
+      swArr: "⇙",
+      swarr: "↙",
+      swarrow: "↙",
+      swnwar: "⤪",
+      szlig: "ß",
+      Tab: "	",
+      target: "⌖",
+      Tau: "Τ",
+      tau: "τ",
+      tbrk: "⎴",
+      Tcaron: "Ť",
+      tcaron: "ť",
+      Tcedil: "Ţ",
+      tcedil: "ţ",
+      Tcy: "Т",
+      tcy: "т",
+      tdot: "⃛",
+      telrec: "⌕",
+      Tfr: "𝔗",
+      tfr: "𝔱",
+      there4: "∴",
+      Therefore: "∴",
+      therefore: "∴",
+      Theta: "Θ",
+      theta: "θ",
+      thetasym: "ϑ",
+      thetav: "ϑ",
+      thickapprox: "≈",
+      thicksim: "∼",
+      ThickSpace: "  ",
+      thinsp: " ",
+      ThinSpace: " ",
+      thkap: "≈",
+      thksim: "∼",
+      THORN: "Þ",
+      thorn: "þ",
+      Tilde: "∼",
+      tilde: "˜",
+      TildeEqual: "≃",
+      TildeFullEqual: "≅",
+      TildeTilde: "≈",
+      times: "×",
+      timesb: "⊠",
+      timesbar: "⨱",
+      timesd: "⨰",
+      tint: "∭",
+      toea: "⤨",
+      top: "⊤",
+      topbot: "⌶",
+      topcir: "⫱",
+      Topf: "𝕋",
+      topf: "𝕥",
+      topfork: "⫚",
+      tosa: "⤩",
+      tprime: "‴",
+      TRADE: "™",
+      trade: "™",
+      triangle: "▵",
+      triangledown: "▿",
+      triangleleft: "◃",
+      trianglelefteq: "⊴",
+      triangleq: "≜",
+      triangleright: "▹",
+      trianglerighteq: "⊵",
+      tridot: "◬",
+      trie: "≜",
+      triminus: "⨺",
+      TripleDot: "⃛",
+      triplus: "⨹",
+      trisb: "⧍",
+      tritime: "⨻",
+      trpezium: "⏢",
+      Tscr: "𝒯",
+      tscr: "𝓉",
+      TScy: "Ц",
+      tscy: "ц",
+      TSHcy: "Ћ",
+      tshcy: "ћ",
+      Tstrok: "Ŧ",
+      tstrok: "ŧ",
+      twixt: "≬",
+      twoheadleftarrow: "↞",
+      twoheadrightarrow: "↠",
+      Uacute: "Ú",
+      uacute: "ú",
+      Uarr: "↟",
+      uArr: "⇑",
+      uarr: "↑",
+      Uarrocir: "⥉",
+      Ubrcy: "Ў",
+      ubrcy: "ў",
+      Ubreve: "Ŭ",
+      ubreve: "ŭ",
+      Ucirc: "Û",
+      ucirc: "û",
+      Ucy: "У",
+      ucy: "у",
+      udarr: "⇅",
+      Udblac: "Ű",
+      udblac: "ű",
+      udhar: "⥮",
+      ufisht: "⥾",
+      Ufr: "𝔘",
+      ufr: "𝔲",
+      Ugrave: "Ù",
+      ugrave: "ù",
+      uHar: "⥣",
+      uharl: "↿",
+      uharr: "↾",
+      uhblk: "▀",
+      ulcorn: "⌜",
+      ulcorner: "⌜",
+      ulcrop: "⌏",
+      ultri: "◸",
+      Umacr: "Ū",
+      umacr: "ū",
+      uml: "¨",
+      UnderBar: "_",
+      UnderBrace: "⏟",
+      UnderBracket: "⎵",
+      UnderParenthesis: "⏝",
+      Union: "⋃",
+      UnionPlus: "⊎",
+      Uogon: "Ų",
+      uogon: "ų",
+      Uopf: "𝕌",
+      uopf: "𝕦",
+      UpArrow: "↑",
+      Uparrow: "⇑",
+      uparrow: "↑",
+      UpArrowBar: "⤒",
+      UpArrowDownArrow: "⇅",
+      UpDownArrow: "↕",
+      Updownarrow: "⇕",
+      updownarrow: "↕",
+      UpEquilibrium: "⥮",
+      upharpoonleft: "↿",
+      upharpoonright: "↾",
+      uplus: "⊎",
+      UpperLeftArrow: "↖",
+      UpperRightArrow: "↗",
+      Upsi: "ϒ",
+      upsi: "υ",
+      upsih: "ϒ",
+      Upsilon: "Υ",
+      upsilon: "υ",
+      UpTee: "⊥",
+      UpTeeArrow: "↥",
+      upuparrows: "⇈",
+      urcorn: "⌝",
+      urcorner: "⌝",
+      urcrop: "⌎",
+      Uring: "Ů",
+      uring: "ů",
+      urtri: "◹",
+      Uscr: "𝒰",
+      uscr: "𝓊",
+      utdot: "⋰",
+      Utilde: "Ũ",
+      utilde: "ũ",
+      utri: "▵",
+      utrif: "▴",
+      uuarr: "⇈",
+      Uuml: "Ü",
+      uuml: "ü",
+      uwangle: "⦧",
+      vangrt: "⦜",
+      varepsilon: "ϵ",
+      varkappa: "ϰ",
+      varnothing: "∅",
+      varphi: "ϕ",
+      varpi: "ϖ",
+      varpropto: "∝",
+      vArr: "⇕",
+      varr: "↕",
+      varrho: "ϱ",
+      varsigma: "ς",
+      varsubsetneq: "⊊︀",
+      varsubsetneqq: "⫋︀",
+      varsupsetneq: "⊋︀",
+      varsupsetneqq: "⫌︀",
+      vartheta: "ϑ",
+      vartriangleleft: "⊲",
+      vartriangleright: "⊳",
+      Vbar: "⫫",
+      vBar: "⫨",
+      vBarv: "⫩",
+      Vcy: "В",
+      vcy: "в",
+      VDash: "⊫",
+      Vdash: "⊩",
+      vDash: "⊨",
+      vdash: "⊢",
+      Vdashl: "⫦",
+      Vee: "⋁",
+      vee: "∨",
+      veebar: "⊻",
+      veeeq: "≚",
+      vellip: "⋮",
+      Verbar: "‖",
+      verbar: "|",
+      Vert: "‖",
+      vert: "|",
+      VerticalBar: "∣",
+      VerticalLine: "|",
+      VerticalSeparator: "❘",
+      VerticalTilde: "≀",
+      VeryThinSpace: " ",
+      Vfr: "𝔙",
+      vfr: "𝔳",
+      vltri: "⊲",
+      vnsub: "⊂⃒",
+      vnsup: "⊃⃒",
+      Vopf: "𝕍",
+      vopf: "𝕧",
+      vprop: "∝",
+      vrtri: "⊳",
+      Vscr: "𝒱",
+      vscr: "𝓋",
+      vsubnE: "⫋︀",
+      vsubne: "⊊︀",
+      vsupnE: "⫌︀",
+      vsupne: "⊋︀",
+      Vvdash: "⊪",
+      vzigzag: "⦚",
+      Wcirc: "Ŵ",
+      wcirc: "ŵ",
+      wedbar: "⩟",
+      Wedge: "⋀",
+      wedge: "∧",
+      wedgeq: "≙",
+      weierp: "℘",
+      Wfr: "𝔚",
+      wfr: "𝔴",
+      Wopf: "𝕎",
+      wopf: "𝕨",
+      wp: "℘",
+      wr: "≀",
+      wreath: "≀",
+      Wscr: "𝒲",
+      wscr: "𝓌",
+      xcap: "⋂",
+      xcirc: "◯",
+      xcup: "⋃",
+      xdtri: "▽",
+      Xfr: "𝔛",
+      xfr: "𝔵",
+      xhArr: "⟺",
+      xharr: "⟷",
+      Xi: "Ξ",
+      xi: "ξ",
+      xlArr: "⟸",
+      xlarr: "⟵",
+      xmap: "⟼",
+      xnis: "⋻",
+      xodot: "⨀",
+      Xopf: "𝕏",
+      xopf: "𝕩",
+      xoplus: "⨁",
+      xotime: "⨂",
+      xrArr: "⟹",
+      xrarr: "⟶",
+      Xscr: "𝒳",
+      xscr: "𝓍",
+      xsqcup: "⨆",
+      xuplus: "⨄",
+      xutri: "△",
+      xvee: "⋁",
+      xwedge: "⋀",
+      Yacute: "Ý",
+      yacute: "ý",
+      YAcy: "Я",
+      yacy: "я",
+      Ycirc: "Ŷ",
+      ycirc: "ŷ",
+      Ycy: "Ы",
+      ycy: "ы",
+      yen: "¥",
+      Yfr: "𝔜",
+      yfr: "𝔶",
+      YIcy: "Ї",
+      yicy: "ї",
+      Yopf: "𝕐",
+      yopf: "𝕪",
+      Yscr: "𝒴",
+      yscr: "𝓎",
+      YUcy: "Ю",
+      yucy: "ю",
+      Yuml: "Ÿ",
+      yuml: "ÿ",
+      Zacute: "Ź",
+      zacute: "ź",
+      Zcaron: "Ž",
+      zcaron: "ž",
+      Zcy: "З",
+      zcy: "з",
+      Zdot: "Ż",
+      zdot: "ż",
+      zeetrf: "ℨ",
+      ZeroWidthSpace: "​",
+      Zeta: "Ζ",
+      zeta: "ζ",
+      Zfr: "ℨ",
+      zfr: "𝔷",
+      ZHcy: "Ж",
+      zhcy: "ж",
+      zigrarr: "⇝",
+      Zopf: "ℤ",
+      zopf: "𝕫",
+      Zscr: "𝒵",
+      zscr: "𝓏",
+      zwj: "‍",
+      zwnj: "‌"
+    }), t.entityMap = t.HTML_ENTITIES;
+  }(kt)), kt;
 }
-Hn.prototype = {
-  parse: function(e, t, r) {
-    var n = this.domBuilder;
-    n.startDocument(), Gn(t, t = /* @__PURE__ */ Object.create(null)), uo(e, t, r, n, this.errorHandler), n.endDocument();
+var yt = {}, or;
+function An() {
+  if (or) return yt;
+  or = 1;
+  var t = Dt(), e = Fr(), n = _t(), i = t.isHTMLEscapableRawTextElement, o = t.isHTMLMimeType, a = t.isHTMLRawTextElement, h = t.hasOwn, p = t.NAMESPACE, f = n.ParseError, m = n.DOMException, E = 0, l = 1, v = 2, O = 3, b = 4, C = 5, j = 6, R = 7;
+  function k() {
   }
-};
-var or = /&#?\w+;?/g;
-function uo(e, t, r, n, u) {
-  var i = to(n.mimeType);
-  e.indexOf(y.UNICODE_REPLACEMENT_CHARACTER) >= 0 && u.warning("Unicode replacement character detected, source encoding issues?");
-  function a(w) {
-    if (w > 65535) {
-      w -= 65536;
-      var J = 55296 + (w >> 10), pt = 56320 + (w & 1023);
-      return String.fromCharCode(J, pt);
-    } else
-      return String.fromCharCode(w);
-  }
-  function o(w) {
-    var J = w[w.length - 1] === ";" ? w : w + ";";
-    if (!i && J !== w)
-      return u.error("EntityRef: expecting ;"), w;
-    var pt = y.Reference.exec(J);
-    if (!pt || pt[0].length !== J.length)
-      return u.error("entity not matching Reference production: " + w), w;
-    var ht = J.slice(1, -1);
-    return it(r, ht) ? r[ht] : ht.charAt(0) === "#" ? a(parseInt(ht.substr(1).replace("x", "0x"))) : (u.error("entity not found:" + w), w);
-  }
-  function s(w) {
-    if (w > D) {
-      var J = e.substring(D, w).replace(or, o);
-      g && c(D), n.characters(J, 0, w - D), D = w;
+  k.prototype = {
+    parse: function(d, N, w) {
+      var y = this.domBuilder;
+      y.startDocument(), G(N, N = /* @__PURE__ */ Object.create(null)), ne(d, N, w, y, this.errorHandler), y.endDocument();
     }
-  }
-  function c(w, J) {
-    for (; w >= l && (J = p.exec(e)); )
-      f = J.index, l = f + J[0].length, g.lineNumber++;
-    g.columnNumber = w - f + 1;
-  }
-  for (var f = 0, l = 0, p = /.*(?:\r\n?|\n)|.*$/g, g = n.locator, m = [{ currentNSMap: t }], h = [], D = 0; ; ) {
-    try {
-      var O = e.indexOf("<", D);
-      if (O < 0) {
-        if (!i && h.length > 0)
-          return u.fatalError("unclosed xml tag(s): " + h.join(", "));
-        if (!e.substring(D).match(/^\s*$/)) {
-          var L = n.doc, b = L.createTextNode(e.substr(D));
-          if (L.documentElement)
-            return u.error("Extra content at the end of the document");
-          L.appendChild(b), n.currentElement = b;
-        }
-        return;
+  };
+  var $ = /&#?\w+;?/g;
+  function ne(d, N, w, y, B) {
+    var A = o(y.mimeType);
+    d.indexOf(e.UNICODE_REPLACEMENT_CHARACTER) >= 0 && B.warning("Unicode replacement character detected, source encoding issues?");
+    function M(q) {
+      if (q > 65535) {
+        q -= 65536;
+        var Z = 55296 + (q >> 10), Ae = 56320 + (q & 1023);
+        return String.fromCharCode(Z, Ae);
+      } else
+        return String.fromCharCode(q);
+    }
+    function J(q) {
+      var Z = q[q.length - 1] === ";" ? q : q + ";";
+      if (!A && Z !== q)
+        return B.error("EntityRef: expecting ;"), q;
+      var Ae = e.Reference.exec(Z);
+      if (!Ae || Ae[0].length !== Z.length)
+        return B.error("entity not matching Reference production: " + q), q;
+      var Ne = Z.slice(1, -1);
+      return h(w, Ne) ? w[Ne] : Ne.charAt(0) === "#" ? M(parseInt(Ne.substring(1).replace("x", "0x"))) : (B.error("entity not found:" + q), q);
+    }
+    function _(q) {
+      if (q > ie) {
+        var Z = d.substring(ie, q).replace($, J);
+        V && fe(ie), y.characters(Z, 0, q - ie), ie = q;
       }
-      if (O > D) {
-        var W = e.substring(D, O);
-        !i && h.length === 0 && (W = W.replace(new RegExp(y.S_OPT.source, "g"), ""), W && u.error("Unexpected content outside root element: '" + W + "'")), s(O);
-      }
-      switch (e.charAt(O + 1)) {
-        case "/":
-          var G = e.indexOf(">", O + 2), V = e.substring(O + 2, G > 0 ? G : void 0);
-          if (!V)
-            return u.fatalError("end tag name missing");
-          var je = G > 0 && y.reg("^", y.QName_group, y.S_OPT, "$").exec(V);
-          if (!je)
-            return u.fatalError('end tag name contains invalid characters: "' + V + '"');
-          if (!n.currentElement && !n.doc.documentElement)
-            return;
-          var Ue = h[h.length - 1] || n.currentElement.tagName || n.doc.documentElement.tagName || "";
-          if (Ue !== je[1]) {
-            var Pt = je[1].toLowerCase();
-            if (!i || Ue.toLowerCase() !== Pt)
-              return u.fatalError('Opening and ending tag mismatch: "' + Ue + '" != "' + V + '"');
+    }
+    var T = 0, I = 0, L = /\r\n?|\n|$/g, V = y.locator;
+    function fe(q, Z) {
+      for (; q >= I && (Z = L.exec(d)); )
+        T = I, I = Z.index + Z[0].length, V.lineNumber++;
+      V.columnNumber = q - T + 1;
+    }
+    for (var we = [{ currentNSMap: N }], ve = [], ie = 0; ; ) {
+      try {
+        var P = d.indexOf("<", ie);
+        if (P < 0) {
+          if (!A && ve.length > 0)
+            return B.fatalError("unclosed xml tag(s): " + ve.join(", "));
+          if (!d.substring(ie).match(/^\s*$/)) {
+            var $e = y.doc, Re = $e.createTextNode(d.substring(ie));
+            if ($e.documentElement)
+              return B.error("Extra content at the end of the document");
+            $e.appendChild(Re), y.currentElement = Re;
           }
-          var Lt = m.pop();
-          h.pop();
-          var Ft = Lt.localNSMap;
-          if (n.endElement(Lt.uri, Lt.localName, Ue), Ft)
-            for (var fr in Ft)
-              it(Ft, fr) && n.endPrefixMapping(fr);
-          G++;
-          break;
-        case "?":
-          g && c(O), G = so(e, O, n, u);
-          break;
-        case "!":
-          g && c(O), G = Jn(e, O, n, u, i);
-          break;
-        default:
-          g && c(O);
-          var H = new Xn(), kt = m[m.length - 1].currentNSMap, G = io(e, O, H, kt, o, u, i), pr = H.length;
-          if (H.closed || (i && qe.isHTMLVoidElement(H.tagName) ? H.closed = !0 : h.push(H.tagName)), g && pr) {
-            for (var ou = Pr(g, {}), qt = 0; qt < pr; qt++) {
-              var hr = H[qt];
-              c(hr.offset), hr.locator = Pr(g, {});
+          return;
+        }
+        if (P > ie) {
+          var pe = d.substring(ie, P);
+          !A && ve.length === 0 && (pe = pe.replace(new RegExp(e.S_OPT.source, "g"), ""), pe && B.error("Unexpected content outside root element: '" + pe + "'")), _(P);
+        }
+        switch (d.charAt(P + 1)) {
+          case "/":
+            var oe = d.indexOf(">", P + 2), Ve = d.substring(P + 2, oe > 0 ? oe : void 0);
+            if (!Ve)
+              return B.fatalError("end tag name missing");
+            var _e = oe > 0 && e.reg("^", e.QName_group, e.S_OPT, "$").exec(Ve);
+            if (!_e)
+              return B.fatalError('end tag name contains invalid characters: "' + Ve + '"');
+            if (!y.currentElement && !y.doc.documentElement)
+              return;
+            var Se = ve[ve.length - 1] || y.currentElement.tagName || y.doc.documentElement.tagName || "";
+            if (Se !== _e[1]) {
+              var Fe = _e[1].toLowerCase();
+              if (!A || Se.toLowerCase() !== Fe)
+                return B.fatalError('Opening and ending tag mismatch: "' + Se + '" != "' + Ve + '"');
             }
-            n.locator = ou, Lr(H, n, kt) && m.push(H), n.locator = g;
-          } else
-            Lr(H, n, kt) && m.push(H);
-          i && !H.closed ? G = oo(e, G, H.tagName, o, n) : G++;
-      }
-    } catch (w) {
-      if (w instanceof _r)
-        throw w;
-      if (w instanceof no)
-        throw new _r(w.name + ": " + w.message, n.locator, w);
-      u.error("element parse error: " + w), G = -1;
-    }
-    G > D ? D = G : s(Math.max(O, D) + 1);
-  }
-}
-function Pr(e, t) {
-  return t.lineNumber = e.lineNumber, t.columnNumber = e.columnNumber, t;
-}
-function io(e, t, r, n, u, i, a) {
-  function o(g, m, h) {
-    if (it(r.attributeNames, g))
-      return i.fatalError("Attribute " + g + " redefined");
-    if (!a && m.indexOf("<") >= 0)
-      return i.fatalError("Unescaped '<' not allowed in attributes values");
-    r.addValue(
-      g,
-      // @see https://www.w3.org/TR/xml/#AVNormalize
-      // since the xmldom sax parser does not "interpret" DTD the following is not implemented:
-      // - recursive replacement of (DTD) entity references
-      // - trimming and collapsing multiple spaces into a single one for attributes that are not of type CDATA
-      m.replace(/[\t\n\r]/g, " ").replace(or, u),
-      h
-    );
-  }
-  for (var s, c, f = ++t, l = He; ; ) {
-    var p = e.charAt(f);
-    switch (p) {
-      case "=":
-        if (l === ie)
-          s = e.slice(t, f), l = Ge;
-        else if (l === Ce)
-          l = Ge;
-        else
-          throw new Error("attribute equal must after attrName");
-        break;
-      case "'":
-      case '"':
-        if (l === Ge || l === ie)
-          if (l === ie && (i.warning('attribute value must after "="'), s = e.slice(t, f)), t = f + 1, f = e.indexOf(p, t), f > 0)
-            c = e.slice(t, f), o(s, c, t - 1), l = we;
-          else
-            throw new Error("attribute value no end '" + p + "' match");
-        else if (l == Te)
-          c = e.slice(t, f), o(s, c, t), i.warning('attribute "' + s + '" missed start quot(' + p + ")!!"), t = f + 1, l = we;
-        else
-          throw new Error('attribute value must after "="');
-        break;
-      case "/":
-        switch (l) {
-          case He:
-            r.setTagName(e.slice(t, f));
-          case we:
-          case ze:
-          case mt:
-            l = mt, r.closed = !0;
-          case Te:
-          case ie:
+            var He = we.pop();
+            ve.pop();
+            var Je = He.localNSMap;
+            if (y.endElement(He.uri, He.localName, Se), Je)
+              for (var Ce in Je)
+                h(Je, Ce) && y.endPrefixMapping(Ce);
+            oe++;
             break;
-          case Ce:
-            r.closed = !0;
+          // end element
+          case "?":
+            V && fe(P), oe = te(d, P, y, B);
+            break;
+          case "!":
+            V && fe(P), oe = Ie(d, P, y, B, A);
             break;
           default:
-            throw new Error("attribute invalid close char('/')");
+            V && fe(P);
+            var Q = new Me(), Ge = we[we.length - 1].currentNSMap, oe = g(d, P, Q, Ge, J, B, A), Xe = Q.length;
+            if (Q.closed || (A && t.isHTMLVoidElement(Q.tagName) ? Q.closed = !0 : ve.push(Q.tagName)), V && Xe) {
+              for (var vt = le(V, {}), Ye = 0; Ye < Xe; Ye++) {
+                var We = Q[Ye];
+                fe(We.offset), We.locator = le(V, {});
+              }
+              y.locator = vt, x(Q, y, Ge) && we.push(Q), y.locator = V;
+            } else
+              x(Q, y, Ge) && we.push(Q);
+            A && !Q.closed ? oe = F(d, oe, Q.tagName, J, y) : oe++;
         }
-        break;
-      case "":
-        return i.error("unexpected end of input"), l == He && r.setTagName(e.slice(t, f)), f;
-      case ">":
-        switch (l) {
-          case He:
-            r.setTagName(e.slice(t, f));
-          case we:
-          case ze:
-          case mt:
-            break;
-          case Te:
-          case ie:
-            c = e.slice(t, f), c.slice(-1) === "/" && (r.closed = !0, c = c.slice(0, -1));
-          case Ce:
-            l === Ce && (c = s), l == Te ? (i.warning('attribute "' + c + '" missed quot(")!'), o(s, c, t)) : (a || i.warning('attribute "' + c + '" missed value!! "' + c + '" instead!!'), o(c, c, t));
-            break;
-          case Ge:
-            if (!a)
-              return i.fatalError(`AttValue: ' or " expected`);
-        }
-        return f;
-      case "":
-        p = " ";
-      default:
-        if (p <= " ")
-          switch (l) {
-            case He:
-              r.setTagName(e.slice(t, f)), l = ze;
-              break;
-            case ie:
-              s = e.slice(t, f), l = Ce;
-              break;
-            case Te:
-              var c = e.slice(t, f);
-              i.warning('attribute "' + c + '" missed quot(")!!'), o(s, c, t);
-            case we:
-              l = ze;
-              break;
-          }
-        else
-          switch (l) {
-            case Ce:
-              a || i.warning('attribute "' + s + '" missed value!! "' + s + '" instead2!!'), o(s, s, t), t = f, l = ie;
-              break;
-            case we:
-              i.warning('attribute space is required"' + s + '"!!');
-            case ze:
-              l = ie, t = f;
-              break;
-            case Ge:
-              l = Te, t = f;
-              break;
-            case mt:
-              throw new Error("elements closed character '/' and '>' must be connected to");
-          }
-    }
-    f++;
-  }
-}
-function Lr(e, t, r) {
-  for (var n = e.tagName, u = null, l = e.length; l--; ) {
-    var i = e[l], a = i.qName, o = i.value, p = a.indexOf(":");
-    if (p > 0)
-      var s = i.prefix = a.slice(0, p), c = a.slice(p + 1), f = s === "xmlns" && c;
-    else
-      c = a, s = null, f = a === "xmlns" && "";
-    i.localName = c, f !== !1 && (u == null && (u = /* @__PURE__ */ Object.create(null), Gn(r, r = /* @__PURE__ */ Object.create(null))), r[f] = u[f] = o, i.uri = Mr.XMLNS, t.startPrefixMapping(f, o));
-  }
-  for (var l = e.length; l--; )
-    i = e[l], i.prefix && (i.prefix === "xml" && (i.uri = Mr.XML), i.prefix !== "xmlns" && (i.uri = r[i.prefix]));
-  var p = n.indexOf(":");
-  p > 0 ? (s = e.prefix = n.slice(0, p), c = e.localName = n.slice(p + 1)) : (s = null, c = e.localName = n);
-  var g = e.uri = r[s || ""];
-  if (t.startElement(g, c, n, e), e.closed) {
-    if (t.endElement(g, c, n), u)
-      for (s in u)
-        it(u, s) && t.endPrefixMapping(s);
-  } else
-    return e.currentNSMap = r, e.localNSMap = u, !0;
-}
-function oo(e, t, r, n, u) {
-  var i = eo(r);
-  if (i || ro(r)) {
-    var a = e.indexOf("</" + r + ">", t), o = e.substring(t + 1, a);
-    return i && (o = o.replace(or, n)), u.characters(o, 0, o.length), a;
-  }
-  return t + 1;
-}
-function Gn(e, t) {
-  for (var r in e)
-    it(e, r) && (t[r] = e[r]);
-}
-function zn(e, t) {
-  var r = t;
-  function n(c) {
-    return c = c || 0, e.charAt(r + c);
-  }
-  function u(c) {
-    c = c || 1, r += c;
-  }
-  function i() {
-    for (var c = 0; r < e.length; ) {
-      var f = n();
-      if (f !== " " && f !== `
-` && f !== "	" && f !== "\r")
-        return c;
-      c++, u();
-    }
-    return -1;
-  }
-  function a() {
-    return e.substring(r);
-  }
-  function o(c) {
-    return e.substring(r, r + c.length) === c;
-  }
-  function s(c) {
-    var f = y.reg("^", c), l = f.exec(a());
-    return l ? (u(l[0].length), l[0]) : null;
-  }
-  return {
-    char: n,
-    getIndex: function() {
-      return r;
-    },
-    getMatch: s,
-    getSource: function() {
-      return e;
-    },
-    skip: u,
-    skipBlanks: i,
-    substringFromIndex: a,
-    substringStartsWith: o
-  };
-}
-function ao(e, t) {
-  function r(o, s) {
-    var c = y.PI.exec(o.substringFromIndex());
-    return c ? c[1].toLowerCase() === "xml" ? s.fatalError(
-      "xml declaration is only allowed at the start of the document, but found at position " + o.getIndex()
-    ) : (o.skip(c[0].length), c[0]) : s.fatalError("processing instruction is not well-formed at position " + o.getIndex());
-  }
-  var n = e.getSource();
-  if (e.char() === "[") {
-    e.skip(1);
-    for (var u = e.getIndex(); e.getIndex() < n.length; ) {
-      if (e.skipBlanks(), e.char() === "]") {
-        var i = n.substring(u, e.getIndex());
-        return e.skip(1), i;
+      } catch (q) {
+        if (q instanceof f)
+          throw q;
+        if (q instanceof m)
+          throw new f(q.name + ": " + q.message, y.locator, q);
+        B.error("element parse error: " + q), oe = -1;
       }
-      var a = null;
-      if (e.char() === "<" && e.char(1) === "!")
-        switch (e.char(2)) {
-          case "E":
-            e.char(3) === "L" ? a = e.getMatch(y.elementdecl) : e.char(3) === "N" && (a = e.getMatch(y.EntityDecl));
-            break;
-          case "A":
-            a = e.getMatch(y.AttlistDecl);
-            break;
-          case "N":
-            a = e.getMatch(y.NotationDecl);
-            break;
-          case "-":
-            a = e.getMatch(y.Comment);
-            break;
-        }
-      else if (e.char() === "<" && e.char(1) === "?")
-        a = r(e, t);
-      else if (e.char() === "%")
-        a = e.getMatch(y.PEReference);
-      else
-        return t.fatalError("Error detected in Markup declaration");
-      if (!a)
-        return t.fatalError("Error in internal subset at position " + e.getIndex());
+      oe > ie ? ie = oe : _(Math.max(P, ie) + 1);
     }
-    return t.fatalError("doctype internal subset is not well-formed, missing ]");
   }
-}
-function Jn(e, t, r, n, u) {
-  var i = zn(e, t);
-  switch (i.char(2)) {
-    case "-":
-      var a = i.getMatch(y.Comment);
-      return a ? (r.comment(a, y.COMMENT_START.length, a.length - y.COMMENT_START.length - y.COMMENT_END.length), i.getIndex()) : n.fatalError("comment is not well-formed at position " + i.getIndex());
-    case "[":
-      var o = i.getMatch(y.CDSect);
-      return o ? !u && !r.currentElement ? n.fatalError("CDATA outside of element") : (r.startCDATA(), r.characters(o, y.CDATA_START.length, o.length - y.CDATA_START.length - y.CDATA_END.length), r.endCDATA(), i.getIndex()) : n.fatalError("Invalid CDATA starting at position " + t);
-    case "D": {
-      if (r.doc && r.doc.documentElement)
-        return n.fatalError("Doctype not allowed inside or after documentElement at position " + i.getIndex());
-      if (!i.substringStartsWith(y.DOCTYPE_DECL_START))
-        return n.fatalError("Expected " + y.DOCTYPE_DECL_START + " at position " + i.getIndex());
-      if (i.skip(y.DOCTYPE_DECL_START.length), i.skipBlanks() < 1)
-        return n.fatalError("Expected whitespace after " + y.DOCTYPE_DECL_START + " at position " + i.getIndex());
-      var s = {
-        name: void 0,
-        publicId: void 0,
-        systemId: void 0,
-        internalSubset: void 0
-      };
-      if (s.name = i.getMatch(y.Name), !s.name)
-        return n.fatalError("doctype name missing or contains unexpected characters at position " + i.getIndex());
-      if (i.skipBlanks(), i.substringStartsWith(y.PUBLIC) || i.substringStartsWith(y.SYSTEM)) {
-        var c = y.ExternalID_match.exec(i.substringFromIndex());
-        if (!c)
-          return n.fatalError("doctype external id is not well-formed at position " + i.getIndex());
-        c.groups.SystemLiteralOnly !== void 0 ? s.systemId = c.groups.SystemLiteralOnly : (s.systemId = c.groups.SystemLiteral, s.publicId = c.groups.PubidLiteral), i.skip(c[0].length);
-      }
-      return i.skipBlanks(), s.internalSubset = ao(i, n), i.skipBlanks(), i.char() !== ">" ? n.fatalError("doctype not terminated with > at position " + i.getIndex()) : (i.skip(1), r.startDTD(s.name, s.publicId, s.systemId, s.internalSubset), r.endDTD(), i.getIndex());
-    }
-    default:
-      return n.fatalError('Not well-formed XML starting with "<!" at position ' + t);
+  function le(d, N) {
+    return N.lineNumber = d.lineNumber, N.columnNumber = d.columnNumber, N;
   }
-}
-function so(e, t, r, n) {
-  var u = e.substring(t).match(y.PI);
-  if (!u)
-    return n.fatalError("Invalid processing instruction starting at position " + t);
-  if (u[1].toLowerCase() === "xml") {
-    if (t > 0)
-      return n.fatalError(
-        "processing instruction at position " + t + " is an xml declaration which is only at the start of the document"
+  function g(d, N, w, y, B, A, M) {
+    function J(fe, we, ve) {
+      if (h(w.attributeNames, fe))
+        return A.fatalError("Attribute " + fe + " redefined");
+      if (!M && we.indexOf("<") >= 0)
+        return A.fatalError("Unescaped '<' not allowed in attributes values");
+      w.addValue(
+        fe,
+        // @see https://www.w3.org/TR/xml/#AVNormalize
+        // since the xmldom sax parser does not "interpret" DTD the following is not implemented:
+        // - recursive replacement of (DTD) entity references
+        // - trimming and collapsing multiple spaces into a single one for attributes that are not of type CDATA
+        we.replace(/[\t\n\r]/g, " ").replace($, B),
+        ve
       );
-    if (!y.XMLDecl.test(e.substring(t)))
-      return n.fatalError("xml declaration is not well-formed");
-  }
-  return r.processingInstruction(u[1], u[2]), t + u[0].length;
-}
-function Xn() {
-  this.attributeNames = /* @__PURE__ */ Object.create(null);
-}
-Xn.prototype = {
-  setTagName: function(e) {
-    if (!y.QName_exact.test(e))
-      throw new Error("invalid tagName:" + e);
-    this.tagName = e;
-  },
-  addValue: function(e, t, r) {
-    if (!y.QName_exact.test(e))
-      throw new Error("invalid attribute:" + e);
-    this.attributeNames[e] = this.length, this[this.length++] = { qName: e, value: t, offset: r };
-  },
-  length: 0,
-  getLocalName: function(e) {
-    return this[e].localName;
-  },
-  getLocator: function(e) {
-    return this[e].locator;
-  },
-  getQName: function(e) {
-    return this[e].qName;
-  },
-  getURI: function(e) {
-    return this[e].uri;
-  },
-  getValue: function(e) {
-    return this[e].value;
-  }
-  //	,getIndex:function(uri, localName)){
-  //		if(localName){
-  //
-  //		}else{
-  //			var qName = uri
-  //		}
-  //	},
-  //	getValue:function(){return this.getValue(this.getIndex.apply(this,arguments))},
-  //	getType:function(uri,localName){}
-  //	getType:function(i){},
-};
-xt.XMLReader = Hn;
-xt.parseUtils = zn;
-xt.parseDoctypeCommentOrCData = Jn;
-var Ne = B, co = x, lo = Ae, Fr = Un, fo = xt, po = co.DOMImplementation, ho = Ne.hasDefaultHTMLNamespace, mo = Ne.isHTMLMimeType, Eo = Ne.isValidMimeType, Yn = Ne.MIME_TYPE, Ut = Ne.NAMESPACE, kr = lo.ParseError, go = fo.XMLReader;
-function Do(e) {
-  return e.replace(/\r[\n\u0085]/g, `
-`).replace(/[\r\u0085\u2028]/g, `
-`);
-}
-function vo(e) {
-  if (e = e || { locator: !0 }, this.assign = e.assign || Ne.assign, this.domHandler = e.domHandler || ar, this.onError = e.onError || e.errorHandler, e.errorHandler && typeof e.errorHandler != "function")
-    throw new TypeError("errorHandler object is no longer supported, switch to onError!");
-  e.errorHandler && e.errorHandler("warning", "The `errorHandler` option has been deprecated, use `onError` instead!", this), this.normalizeLineEndings = e.normalizeLineEndings || Do, this.locator = !!e.locator, this.xmlns = this.assign(/* @__PURE__ */ Object.create(null), e.xmlns);
-}
-vo.prototype.parseFromString = function(e, t) {
-  if (!Eo(t))
-    throw new TypeError('DOMParser.parseFromString: the provided mimeType "' + t + '" is not valid.');
-  var r = this.assign(/* @__PURE__ */ Object.create(null), this.xmlns), n = Fr.XML_ENTITIES, u = r[""] || null;
-  ho(t) ? (n = Fr.HTML_ENTITIES, u = Ut.HTML) : t === Yn.XML_SVG_IMAGE && (u = Ut.SVG), r[""] = u, r.xml = r.xml || Ut.XML;
-  var i = new this.domHandler({
-    mimeType: t,
-    defaultNamespace: u,
-    onError: this.onError
-  }), a = this.locator ? {} : void 0;
-  this.locator && i.setDocumentLocator(a);
-  var o = new go();
-  o.errorHandler = i, o.domBuilder = i;
-  var s = !Ne.isHTMLMimeType(t);
-  return s && typeof e != "string" && o.errorHandler.fatalError("source is not a string"), o.parse(this.normalizeLineEndings(String(e)), r, n), i.doc.documentElement || o.errorHandler.fatalError("missing root element"), i.doc;
-};
-function ar(e) {
-  var t = e || {};
-  this.mimeType = t.mimeType || Yn.XML_APPLICATION, this.defaultNamespace = t.defaultNamespace || null, this.cdata = !1, this.currentElement = void 0, this.doc = void 0, this.locator = void 0, this.onError = t.onError;
-}
-function Se(e, t) {
-  t.lineNumber = e.lineNumber, t.columnNumber = e.columnNumber;
-}
-ar.prototype = {
-  /**
-   * Either creates an XML or an HTML document and stores it under `this.doc`.
-   * If it is an XML document, `this.defaultNamespace` is used to create it,
-   * and it will not contain any `childNodes`.
-   * If it is an HTML document, it will be created without any `childNodes`.
-   *
-   * @see http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html
-   */
-  startDocument: function() {
-    var e = new po();
-    this.doc = mo(this.mimeType) ? e.createHTMLDocument(!1) : e.createDocument(this.defaultNamespace, "");
-  },
-  startElement: function(e, t, r, n) {
-    var u = this.doc, i = u.createElementNS(e, r || t), a = n.length;
-    Et(this, i), this.currentElement = i, this.locator && Se(this.locator, i);
-    for (var o = 0; o < a; o++) {
-      var e = n.getURI(o), s = n.getValue(o), r = n.getQName(o), c = u.createAttributeNS(e, r);
-      this.locator && Se(n.getLocator(o), c), c.value = c.nodeValue = s, i.setAttributeNode(c);
     }
-  },
-  endElement: function(e, t, r) {
-    this.currentElement = this.currentElement.parentNode;
-  },
-  startPrefixMapping: function(e, t) {
-  },
-  endPrefixMapping: function(e) {
-  },
-  processingInstruction: function(e, t) {
-    var r = this.doc.createProcessingInstruction(e, t);
-    this.locator && Se(this.locator, r), Et(this, r);
-  },
-  ignorableWhitespace: function(e, t, r) {
-  },
-  characters: function(e, t, r) {
-    if (e = qr.apply(this, arguments), e) {
-      if (this.cdata)
-        var n = this.doc.createCDATASection(e);
-      else
-        var n = this.doc.createTextNode(e);
-      this.currentElement ? this.currentElement.appendChild(n) : /^\s*$/.test(e) && this.doc.appendChild(n), this.locator && Se(this.locator, n);
-    }
-  },
-  skippedEntity: function(e) {
-  },
-  endDocument: function() {
-    this.doc.normalize();
-  },
-  /**
-   * Stores the locator to be able to set the `columnNumber` and `lineNumber`
-   * on the created DOM nodes.
-   *
-   * @param {Locator} locator
-   */
-  setDocumentLocator: function(e) {
-    e && (e.lineNumber = 0), this.locator = e;
-  },
-  //LexicalHandler
-  comment: function(e, t, r) {
-    e = qr.apply(this, arguments);
-    var n = this.doc.createComment(e);
-    this.locator && Se(this.locator, n), Et(this, n);
-  },
-  startCDATA: function() {
-    this.cdata = !0;
-  },
-  endCDATA: function() {
-    this.cdata = !1;
-  },
-  startDTD: function(e, t, r, n) {
-    var u = this.doc.implementation;
-    if (u && u.createDocumentType) {
-      var i = u.createDocumentType(e, t, r, n);
-      this.locator && Se(this.locator, i), Et(this, i), this.doc.doctype = i;
-    }
-  },
-  reportError: function(e, t) {
-    if (typeof this.onError == "function")
-      try {
-        this.onError(e, t, this);
-      } catch (r) {
-        throw new kr("Reporting " + e + ' "' + t + '" caused ' + r, this.locator);
+    for (var _, T, I = ++N, L = E; ; ) {
+      var V = d.charAt(I);
+      switch (V) {
+        case "=":
+          if (L === l)
+            _ = d.slice(N, I), L = O;
+          else if (L === v)
+            L = O;
+          else
+            throw new Error("attribute equal must after attrName");
+          break;
+        case "'":
+        case '"':
+          if (L === O || L === l)
+            if (L === l && (A.warning('attribute value must after "="'), _ = d.slice(N, I)), N = I + 1, I = d.indexOf(V, N), I > 0)
+              T = d.slice(N, I), J(_, T, N - 1), L = C;
+            else
+              throw new Error("attribute value no end '" + V + "' match");
+          else if (L == b)
+            T = d.slice(N, I), J(_, T, N), A.warning('attribute "' + _ + '" missed start quot(' + V + ")!!"), N = I + 1, L = C;
+          else
+            throw new Error('attribute value must after "="');
+          break;
+        case "/":
+          switch (L) {
+            case E:
+              w.setTagName(d.slice(N, I));
+            case C:
+            case j:
+            case R:
+              L = R, w.closed = !0;
+            case b:
+            case l:
+              break;
+            case v:
+              w.closed = !0;
+              break;
+            //case S_EQ:
+            default:
+              throw new Error("attribute invalid close char('/')");
+          }
+          break;
+        case "":
+          return A.error("unexpected end of input"), L == E && w.setTagName(d.slice(N, I)), I;
+        case ">":
+          switch (L) {
+            case E:
+              w.setTagName(d.slice(N, I));
+            case C:
+            case j:
+            case R:
+              break;
+            //normal
+            case b:
+            //Compatible state
+            case l:
+              T = d.slice(N, I), T.slice(-1) === "/" && (w.closed = !0, T = T.slice(0, -1));
+            case v:
+              L === v && (T = _), L == b ? (A.warning('attribute "' + T + '" missed quot(")!'), J(_, T, N)) : (M || A.warning('attribute "' + T + '" missed value!! "' + T + '" instead!!'), J(T, T, N));
+              break;
+            case O:
+              if (!M)
+                return A.fatalError(`AttValue: ' or " expected`);
+          }
+          return I;
+        /*xml space '\x20' | #x9 | #xD | #xA; */
+        case "":
+          V = " ";
+        default:
+          if (V <= " ")
+            switch (L) {
+              case E:
+                w.setTagName(d.slice(N, I)), L = j;
+                break;
+              case l:
+                _ = d.slice(N, I), L = v;
+                break;
+              case b:
+                var T = d.slice(N, I);
+                A.warning('attribute "' + T + '" missed quot(")!!'), J(_, T, N);
+              case C:
+                L = j;
+                break;
+            }
+          else
+            switch (L) {
+              //case S_TAG:void();break;
+              //case S_ATTR:void();break;
+              //case S_ATTR_NOQUOT_VALUE:void();break;
+              case v:
+                M || A.warning('attribute "' + _ + '" missed value!! "' + _ + '" instead2!!'), J(_, _, N), N = I, L = l;
+                break;
+              case C:
+                A.warning('attribute space is required"' + _ + '"!!');
+              case j:
+                L = l, N = I;
+                break;
+              case O:
+                L = b, N = I;
+                break;
+              case R:
+                throw new Error("elements closed character '/' and '>' must be connected to");
+            }
       }
-    else
-      console.error("[xmldom " + e + "]	" + t, Ao(this.locator));
-  },
-  /**
-   * @see http://www.saxproject.org/apidoc/org/xml/sax/ErrorHandler.html
-   */
-  warning: function(e) {
-    this.reportError("warning", e);
-  },
-  error: function(e) {
-    this.reportError("error", e);
-  },
-  /**
-   * This function reports a fatal error and throws a ParseError.
-   *
-   * @param {string} message
-   * - The message to be used for reporting and throwing the error.
-   * @returns {never}
-   * This function always throws an error and never returns a value.
-   * @throws {ParseError}
-   * Always throws a ParseError with the provided message.
-   */
-  fatalError: function(e) {
-    throw this.reportError("fatalError", e), new kr(e, this.locator);
+      I++;
+    }
   }
-};
-function Ao(e) {
-  if (e)
-    return `
-@#[line:` + e.lineNumber + ",col:" + e.columnNumber + "]";
-}
-function qr(e, t, r) {
-  return typeof e == "string" ? e.substr(t, r) : e.length >= t + r || t ? new java.lang.String(e, t, r) + "" : e;
-}
-"endDTD,startEntity,endEntity,attributeDecl,elementDecl,externalEntityDecl,internalEntityDecl,resolveEntity,getExternalSubset,notationDecl,unparsedEntityDecl".replace(
-  /\w+/g,
-  function(e) {
-    ar.prototype[e] = function() {
-      return null;
+  function x(d, N, w) {
+    for (var y = d.tagName, B = null, L = d.length; L--; ) {
+      var A = d[L], M = A.qName, J = A.value, V = M.indexOf(":");
+      if (V > 0)
+        var _ = A.prefix = M.slice(0, V), T = M.slice(V + 1), I = _ === "xmlns" && T;
+      else
+        T = M, _ = null, I = M === "xmlns" && "";
+      A.localName = T, I !== !1 && (B == null && (B = /* @__PURE__ */ Object.create(null), G(w, w = /* @__PURE__ */ Object.create(null))), w[I] = B[I] = J, A.uri = p.XMLNS, N.startPrefixMapping(I, J));
+    }
+    for (var L = d.length; L--; )
+      A = d[L], A.prefix && (A.prefix === "xml" && (A.uri = p.XML), A.prefix !== "xmlns" && (A.uri = w[A.prefix]));
+    var V = y.indexOf(":");
+    V > 0 ? (_ = d.prefix = y.slice(0, V), T = d.localName = y.slice(V + 1)) : (_ = null, T = d.localName = y);
+    var fe = d.uri = w[_ || ""];
+    if (N.startElement(fe, T, y, d), d.closed) {
+      if (N.endElement(fe, T, y), B)
+        for (_ in B)
+          h(B, _) && N.endPrefixMapping(_);
+    } else
+      return d.currentNSMap = w, d.localNSMap = B, !0;
+  }
+  function F(d, N, w, y, B) {
+    var A = i(w);
+    if (A || a(w)) {
+      var M = d.indexOf("</" + w + ">", N), J = d.substring(N + 1, M);
+      return A && (J = J.replace($, y)), B.characters(J, 0, J.length), M;
+    }
+    return N + 1;
+  }
+  function G(d, N) {
+    for (var w in d)
+      h(d, w) && (N[w] = d[w]);
+  }
+  function K(d, N) {
+    var w = N;
+    function y(I) {
+      return I = I || 0, d.charAt(w + I);
+    }
+    function B(I) {
+      I = I || 1, w += I;
+    }
+    function A() {
+      for (var I = 0; w < d.length; ) {
+        var L = y();
+        if (L !== " " && L !== `
+` && L !== "	" && L !== "\r")
+          return I;
+        I++, B();
+      }
+      return -1;
+    }
+    function M() {
+      return d.substring(w);
+    }
+    function J(I) {
+      return d.substring(w, w + I.length) === I;
+    }
+    function _(I) {
+      return d.substring(w, w + I.length).toUpperCase() === I.toUpperCase();
+    }
+    function T(I) {
+      var L = e.reg("^", I), V = L.exec(M());
+      return V ? (B(V[0].length), V[0]) : null;
+    }
+    return {
+      char: y,
+      getIndex: function() {
+        return w;
+      },
+      getMatch: T,
+      getSource: function() {
+        return d;
+      },
+      skip: B,
+      skipBlanks: A,
+      substringFromIndex: M,
+      substringStartsWith: J,
+      substringStartsWithCaseInsensitive: _
     };
   }
-);
-function Et(e, t) {
-  e.currentElement ? e.currentElement.appendChild(t) : e.doc.appendChild(t);
-}
-var $e = B;
-$e.assign;
-$e.hasDefaultHTMLNamespace;
-$e.isHTMLMimeType;
-$e.isValidMimeType;
-$e.MIME_TYPE;
-$e.NAMESPACE;
-const Gt = "USJ";
-var be = {}, No = () => {
-  const e = "\\ud800-\\udfff", a = "\\u0300-\\u036f" + "\\ufe20-\\ufe2f" + "\\u20d0-\\u20ff" + "\\u1ab0-\\u1aff" + "\\u1dc0-\\u1dff", o = "\\ufe0e\\ufe0f", s = "\\uD83D\\uDC69\\uD83C\\uDFFB\\u200D\\uD83C\\uDF93", c = `[${e}]`, f = `[${a}]`, l = "\\ud83c[\\udffb-\\udfff]", p = `(?:${f}|${l})`, g = `[^${e}]`, m = "(?:\\uD83C[\\uDDE6-\\uDDFF]){2}", h = "[\\ud800-\\udbff][\\udc00-\\udfff]", D = "\\u200d", O = "(?:\\ud83c\\udff4\\udb40\\udc67\\udb40\\udc62\\udb40(?:\\udc65|\\udc73|\\udc77)\\udb40(?:\\udc6e|\\udc63|\\udc6c)\\udb40(?:\\udc67|\\udc74|\\udc73)\\udb40\\udc7f)", L = `[${s}]`, b = `${p}?`, W = `[${o}]?`, V = `(?:${D}(?:${[g, m, h].join("|")})${W + b})*`, je = W + b + V, Pt = `(?:${[`${g}${f}?`, f, m, h, c, L].join("|")})`;
-  return new RegExp(`${O}|${l}(?=${l})|${Pt + je}`, "g");
-}, bo = vr && vr.__importDefault || function(e) {
-  return e && e.__esModule ? e : { default: e };
-};
-Object.defineProperty(be, "__esModule", { value: !0 });
-var Mt = bo(No);
-function zt(e) {
-  if (typeof e != "string")
-    throw new Error("A string is expected as input");
-  return e.match(Mt.default()) || [];
-}
-var yo = be.toArray = zt;
-function sr(e) {
-  if (typeof e != "string")
-    throw new Error("Input must be a string");
-  var t = e.match(Mt.default());
-  return t === null ? 0 : t.length;
-}
-var Co = be.length = sr;
-function Kn(e, t, r) {
-  if (t === void 0 && (t = 0), typeof e != "string")
-    throw new Error("Input must be a string");
-  (typeof t != "number" || t < 0) && (t = 0), typeof r == "number" && r < 0 && (r = 0);
-  var n = e.match(Mt.default());
-  return n ? n.slice(t, r).join("") : "";
-}
-var To = be.substring = Kn;
-function wo(e, t, r) {
-  if (t === void 0 && (t = 0), typeof e != "string")
-    throw new Error("Input must be a string");
-  var n = sr(e);
-  if (typeof t != "number" && (t = parseInt(t, 10)), t >= n)
-    return "";
-  t < 0 && (t += n);
-  var u;
-  typeof r > "u" ? u = n : (typeof r != "number" && (r = parseInt(r, 10)), u = r >= 0 ? r + t : t);
-  var i = e.match(Mt.default());
-  return i ? i.slice(t, u).join("") : "";
-}
-var So = be.substr = wo;
-function Oo(e, t, r, n) {
-  if (t === void 0 && (t = 16), r === void 0 && (r = "#"), n === void 0 && (n = "right"), typeof e != "string" || typeof t != "number")
-    throw new Error("Invalid arguments specified");
-  if (["left", "right"].indexOf(n) === -1)
-    throw new Error("Pad position should be either left or right");
-  typeof r != "string" && (r = String(r));
-  var u = sr(e);
-  if (u > t)
-    return Kn(e, 0, t);
-  if (u < t) {
-    var i = r.repeat(t - u);
-    return n === "left" ? i + e : e + i;
-  }
-  return e;
-}
-var Wn = be.limit = Oo;
-function Io(e, t, r) {
-  if (r === void 0 && (r = 0), typeof e != "string")
-    throw new Error("Input must be a string");
-  if (e === "")
-    return t === "" ? 0 : -1;
-  r = Number(r), r = isNaN(r) ? 0 : r, t = String(t);
-  var n = zt(e);
-  if (r >= n.length)
-    return t === "" ? n.length : -1;
-  if (t === "")
-    return r;
-  var u = zt(t), i = !1, a;
-  for (a = r; a < n.length; a += 1) {
-    for (var o = 0; o < u.length && u[o] === n[a + o]; )
-      o += 1;
-    if (o === u.length && u[o - 1] === n[a + o - 1]) {
-      i = !0;
-      break;
+  function ee(d, N) {
+    function w(J, _) {
+      var T = e.PI.exec(J.substringFromIndex());
+      return T ? T[1].toLowerCase() === "xml" ? _.fatalError(
+        "xml declaration is only allowed at the start of the document, but found at position " + J.getIndex()
+      ) : (J.skip(T[0].length), T[0]) : _.fatalError("processing instruction is not well-formed at position " + J.getIndex());
+    }
+    var y = d.getSource();
+    if (d.char() === "[") {
+      d.skip(1);
+      for (var B = d.getIndex(); d.getIndex() < y.length; ) {
+        if (d.skipBlanks(), d.char() === "]") {
+          var A = y.substring(B, d.getIndex());
+          return d.skip(1), A;
+        }
+        var M = null;
+        if (d.char() === "<" && d.char(1) === "!")
+          switch (d.char(2)) {
+            case "E":
+              d.char(3) === "L" ? M = d.getMatch(e.elementdecl) : d.char(3) === "N" && (M = d.getMatch(e.EntityDecl));
+              break;
+            case "A":
+              M = d.getMatch(e.AttlistDecl);
+              break;
+            case "N":
+              M = d.getMatch(e.NotationDecl);
+              break;
+            case "-":
+              M = d.getMatch(e.Comment);
+              break;
+          }
+        else if (d.char() === "<" && d.char(1) === "?")
+          M = w(d, N);
+        else if (d.char() === "%")
+          M = d.getMatch(e.PEReference);
+        else
+          return N.fatalError("Error detected in Markup declaration");
+        if (!M)
+          return N.fatalError("Error in internal subset at position " + d.getIndex());
+      }
+      return N.fatalError("doctype internal subset is not well-formed, missing ]");
     }
   }
-  return i ? a : -1;
-}
-var Ro = be.indexOf = Io;
-function Qn(e) {
-  return e ? Array.isArray(e) ? e : [e] : [];
-}
-function gt(e, t) {
-  if (!(t > P(e) || t < -P(e)))
-    return _t(e, t, 1);
-}
-function Re(e, t) {
-  return t < 0 || t > P(e) - 1 ? "" : _t(e, t, 1);
-}
-function ts(e, t) {
-  if (!(t < 0 || t > P(e) - 1))
-    return _t(e, t, 1).codePointAt(0);
-}
-function Bo(e, t, r = P(e)) {
-  const n = Po(e, t);
-  return !(n === -1 || n + P(t) !== r);
-}
-function xo(e, t, r) {
-  if (t < 0) return -1;
-  if (r) {
-    if (Re(e, t) === "}" && Re(e, t - 1) === "\\") return t;
-    const i = ot(e, "\\}", t);
-    return i >= 0 ? i + 1 : i;
+  function Ie(d, N, w, y, B) {
+    var A = K(d, N);
+    switch (B ? A.char(2).toUpperCase() : A.char(2)) {
+      case "-":
+        var M = A.getMatch(e.Comment);
+        return M ? (w.comment(M, e.COMMENT_START.length, M.length - e.COMMENT_START.length - e.COMMENT_END.length), A.getIndex()) : y.fatalError("comment is not well-formed at position " + A.getIndex());
+      case "[":
+        var J = A.getMatch(e.CDSect);
+        return J ? !B && !w.currentElement ? y.fatalError("CDATA outside of element") : (w.startCDATA(), w.characters(J, e.CDATA_START.length, J.length - e.CDATA_START.length - e.CDATA_END.length), w.endCDATA(), A.getIndex()) : y.fatalError("Invalid CDATA starting at position " + N);
+      case "D": {
+        if (w.doc && w.doc.documentElement)
+          return y.fatalError("Doctype not allowed inside or after documentElement at position " + A.getIndex());
+        if (B ? !A.substringStartsWithCaseInsensitive(e.DOCTYPE_DECL_START) : !A.substringStartsWith(e.DOCTYPE_DECL_START))
+          return y.fatalError("Expected " + e.DOCTYPE_DECL_START + " at position " + A.getIndex());
+        if (A.skip(e.DOCTYPE_DECL_START.length), A.skipBlanks() < 1)
+          return y.fatalError("Expected whitespace after " + e.DOCTYPE_DECL_START + " at position " + A.getIndex());
+        var _ = {
+          name: void 0,
+          publicId: void 0,
+          systemId: void 0,
+          internalSubset: void 0
+        };
+        if (_.name = A.getMatch(e.Name), !_.name)
+          return y.fatalError("doctype name missing or contains unexpected characters at position " + A.getIndex());
+        if (B && _.name.toLowerCase() !== "html" && y.warning("Unexpected DOCTYPE in HTML document at position " + A.getIndex()), A.skipBlanks(), A.substringStartsWith(e.PUBLIC) || A.substringStartsWith(e.SYSTEM)) {
+          var T = e.ExternalID_match.exec(A.substringFromIndex());
+          if (!T)
+            return y.fatalError("doctype external id is not well-formed at position " + A.getIndex());
+          T.groups.SystemLiteralOnly !== void 0 ? _.systemId = T.groups.SystemLiteralOnly : (_.systemId = T.groups.SystemLiteral, _.publicId = T.groups.PubidLiteral), A.skip(T[0].length);
+        } else if (B && A.substringStartsWithCaseInsensitive(e.SYSTEM)) {
+          if (A.skip(e.SYSTEM.length), A.skipBlanks() < 1)
+            return y.fatalError("Expected whitespace after " + e.SYSTEM + " at position " + A.getIndex());
+          if (_.systemId = A.getMatch(e.ABOUT_LEGACY_COMPAT_SystemLiteral), !_.systemId)
+            return y.fatalError(
+              "Expected " + e.ABOUT_LEGACY_COMPAT + " in single or double quotes after " + e.SYSTEM + " at position " + A.getIndex()
+            );
+        }
+        return B && _.systemId && !e.ABOUT_LEGACY_COMPAT_SystemLiteral.test(_.systemId) && y.warning("Unexpected doctype.systemId in HTML document at position " + A.getIndex()), B || (A.skipBlanks(), _.internalSubset = ee(A, y)), A.skipBlanks(), A.char() !== ">" ? y.fatalError("doctype not terminated with > at position " + A.getIndex()) : (A.skip(1), w.startDTD(_.name, _.publicId, _.systemId, _.internalSubset), w.endDTD(), A.getIndex());
+      }
+      default:
+        return y.fatalError('Not well-formed XML starting with "<!" at position ' + N);
+    }
   }
-  let n = t;
-  const u = P(e);
-  for (; n < u && (n = ot(e, "}", n), !(n === -1 || Re(e, n - 1) !== "\\")); )
-    n += 1;
-  return n >= u ? -1 : n;
-}
-function Mo(e, t) {
-  const r = [];
-  let n = 0, u = 0;
-  function i(o, s, c) {
-    const f = de(e, u, s), l = r.length > 0 && ae(r[r.length - 1]) ? `${r.pop()}${f}` : f;
-    ae(o) ? r.push(`${l}${o}`) : (l && r.push(l), r.push(o)), u = s + c;
+  function te(d, N, w, y) {
+    var B = d.substring(N).match(e.PI);
+    if (!B)
+      return y.fatalError("Invalid processing instruction starting at position " + N);
+    if (B[1].toLowerCase() === "xml") {
+      if (N > 0)
+        return y.fatalError(
+          "processing instruction at position " + N + " is an xml declaration which is only at the start of the document"
+        );
+      if (!e.XMLDecl.test(d.substring(N)))
+        return y.fatalError("xml declaration is not well-formed");
+    }
+    return w.processingInstruction(B[1], B[2]), N + B[0].length;
   }
-  const a = P(e);
-  for (; n < a; ) {
-    switch (Re(e, n)) {
+  function Me() {
+    this.attributeNames = /* @__PURE__ */ Object.create(null);
+  }
+  return Me.prototype = {
+    setTagName: function(d) {
+      if (!e.QName_exact.test(d))
+        throw new Error("invalid tagName:" + d);
+      this.tagName = d;
+    },
+    addValue: function(d, N, w) {
+      if (!e.QName_exact.test(d))
+        throw new Error("invalid attribute:" + d);
+      this.attributeNames[d] = this.length, this[this.length++] = { qName: d, value: N, offset: w };
+    },
+    length: 0,
+    getLocalName: function(d) {
+      return this[d].localName;
+    },
+    getLocator: function(d) {
+      return this[d].locator;
+    },
+    getQName: function(d) {
+      return this[d].qName;
+    },
+    getURI: function(d) {
+      return this[d].uri;
+    },
+    getValue: function(d) {
+      return this[d].value;
+    }
+    //	,getIndex:function(uri, localName)){
+    //		if(localName){
+    //
+    //		}else{
+    //			var qName = uri
+    //		}
+    //	},
+    //	getValue:function(){return this.getValue(this.getIndex.apply(this,arguments))},
+    //	getType:function(uri,localName){}
+    //	getType:function(i){},
+  }, yt.XMLReader = k, yt.parseUtils = K, yt.parseDoctypeCommentOrCData = Ie, yt;
+}
+var ar;
+function Nn() {
+  if (ar) return rt;
+  ar = 1;
+  var t = Dt(), e = kr(), n = _t(), i = vn(), o = An(), a = e.DOMImplementation, h = t.hasDefaultHTMLNamespace, p = t.isHTMLMimeType, f = t.isValidMimeType, m = t.MIME_TYPE, E = t.NAMESPACE, l = n.ParseError, v = o.XMLReader;
+  function O(g) {
+    return g.replace(/\r[\n\u0085]/g, `
+`).replace(/[\r\u0085\u2028\u2029]/g, `
+`);
+  }
+  function b(g) {
+    if (g = g || {}, g.locator === void 0 && (g.locator = !0), this.assign = g.assign || t.assign, this.domHandler = g.domHandler || C, this.onError = g.onError || g.errorHandler, g.errorHandler && typeof g.errorHandler != "function")
+      throw new TypeError("errorHandler object is no longer supported, switch to onError!");
+    g.errorHandler && g.errorHandler("warning", "The `errorHandler` option has been deprecated, use `onError` instead!", this), this.normalizeLineEndings = g.normalizeLineEndings || O, this.locator = !!g.locator, this.xmlns = this.assign(/* @__PURE__ */ Object.create(null), g.xmlns);
+  }
+  b.prototype.parseFromString = function(g, x) {
+    if (!f(x))
+      throw new TypeError('DOMParser.parseFromString: the provided mimeType "' + x + '" is not valid.');
+    var F = this.assign(/* @__PURE__ */ Object.create(null), this.xmlns), G = i.XML_ENTITIES, K = F[""] || null;
+    h(x) ? (G = i.HTML_ENTITIES, K = E.HTML) : x === m.XML_SVG_IMAGE && (K = E.SVG), F[""] = K, F.xml = F.xml || E.XML;
+    var ee = new this.domHandler({
+      mimeType: x,
+      defaultNamespace: K,
+      onError: this.onError
+    }), Ie = this.locator ? {} : void 0;
+    this.locator && ee.setDocumentLocator(Ie);
+    var te = new v();
+    te.errorHandler = ee, te.domBuilder = ee;
+    var Me = !t.isHTMLMimeType(x);
+    return Me && typeof g != "string" && te.errorHandler.fatalError("source is not a string"), te.parse(this.normalizeLineEndings(String(g)), F, G), ee.doc.documentElement || te.errorHandler.fatalError("missing root element"), ee.doc;
+  };
+  function C(g) {
+    var x = g || {};
+    this.mimeType = x.mimeType || m.XML_APPLICATION, this.defaultNamespace = x.defaultNamespace || null, this.cdata = !1, this.currentElement = void 0, this.doc = void 0, this.locator = void 0, this.onError = x.onError;
+  }
+  function j(g, x) {
+    x.lineNumber = g.lineNumber, x.columnNumber = g.columnNumber;
+  }
+  C.prototype = {
+    /**
+     * Either creates an XML or an HTML document and stores it under `this.doc`.
+     * If it is an XML document, `this.defaultNamespace` is used to create it,
+     * and it will not contain any `childNodes`.
+     * If it is an HTML document, it will be created without any `childNodes`.
+     *
+     * @see http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html
+     */
+    startDocument: function() {
+      var g = new a();
+      this.doc = p(this.mimeType) ? g.createHTMLDocument(!1) : g.createDocument(this.defaultNamespace, "");
+    },
+    startElement: function(g, x, F, G) {
+      var K = this.doc, ee = K.createElementNS(g, F || x), Ie = G.length;
+      $(this, ee), this.currentElement = ee, this.locator && j(this.locator, ee);
+      for (var te = 0; te < Ie; te++) {
+        var g = G.getURI(te), Me = G.getValue(te), F = G.getQName(te), d = K.createAttributeNS(g, F);
+        this.locator && j(G.getLocator(te), d), d.value = d.nodeValue = Me, ee.setAttributeNode(d);
+      }
+    },
+    endElement: function(g, x, F) {
+      this.currentElement = this.currentElement.parentNode;
+    },
+    startPrefixMapping: function(g, x) {
+    },
+    endPrefixMapping: function(g) {
+    },
+    processingInstruction: function(g, x) {
+      var F = this.doc.createProcessingInstruction(g, x);
+      this.locator && j(this.locator, F), $(this, F);
+    },
+    ignorableWhitespace: function(g, x, F) {
+    },
+    characters: function(g, x, F) {
+      if (g = k.apply(this, arguments), g) {
+        if (this.cdata)
+          var G = this.doc.createCDATASection(g);
+        else
+          var G = this.doc.createTextNode(g);
+        this.currentElement ? this.currentElement.appendChild(G) : /^\s*$/.test(g) && this.doc.appendChild(G), this.locator && j(this.locator, G);
+      }
+    },
+    skippedEntity: function(g) {
+    },
+    endDocument: function() {
+      this.doc.normalize();
+    },
+    /**
+     * Stores the locator to be able to set the `columnNumber` and `lineNumber`
+     * on the created DOM nodes.
+     *
+     * @param {Locator} locator
+     */
+    setDocumentLocator: function(g) {
+      g && (g.lineNumber = 0), this.locator = g;
+    },
+    //LexicalHandler
+    comment: function(g, x, F) {
+      g = k.apply(this, arguments);
+      var G = this.doc.createComment(g);
+      this.locator && j(this.locator, G), $(this, G);
+    },
+    startCDATA: function() {
+      this.cdata = !0;
+    },
+    endCDATA: function() {
+      this.cdata = !1;
+    },
+    startDTD: function(g, x, F, G) {
+      var K = this.doc.implementation;
+      if (K && K.createDocumentType) {
+        var ee = K.createDocumentType(g, x, F, G);
+        this.locator && j(this.locator, ee), $(this, ee), this.doc.doctype = ee;
+      }
+    },
+    reportError: function(g, x) {
+      if (typeof this.onError == "function")
+        try {
+          this.onError(g, x, this);
+        } catch (F) {
+          throw new l("Reporting " + g + ' "' + x + '" caused ' + F, this.locator);
+        }
+      else
+        console.error("[xmldom " + g + "]	" + x, R(this.locator));
+    },
+    /**
+     * @see http://www.saxproject.org/apidoc/org/xml/sax/ErrorHandler.html
+     */
+    warning: function(g) {
+      this.reportError("warning", g);
+    },
+    error: function(g) {
+      this.reportError("error", g);
+    },
+    /**
+     * This function reports a fatal error and throws a ParseError.
+     *
+     * @param {string} message
+     * - The message to be used for reporting and throwing the error.
+     * @returns {never}
+     * This function always throws an error and never returns a value.
+     * @throws {ParseError}
+     * Always throws a ParseError with the provided message.
+     */
+    fatalError: function(g) {
+      throw this.reportError("fatalError", g), new l(g, this.locator);
+    }
+  };
+  function R(g) {
+    if (g)
+      return `
+@#[line:` + g.lineNumber + ",col:" + g.columnNumber + "]";
+  }
+  function k(g, x, F) {
+    return typeof g == "string" ? g.substr(x, F) : g.length >= x + F || x ? new java.lang.String(g, x, F) + "" : g;
+  }
+  "endDTD,startEntity,endEntity,attributeDecl,elementDecl,externalEntityDecl,internalEntityDecl,resolveEntity,getExternalSubset,notationDecl,unparsedEntityDecl".replace(
+    /\w+/g,
+    function(g) {
+      C.prototype[g] = function() {
+        return null;
+      };
+    }
+  );
+  function $(g, x) {
+    g.currentElement ? g.currentElement.appendChild(x) : g.doc.appendChild(x);
+  }
+  function ne(g) {
+    if (g === "error") throw "onErrorStopParsing";
+  }
+  function le() {
+    throw "onWarningStopParsing";
+  }
+  return rt.__DOMHandler = C, rt.DOMParser = b, rt.normalizeLineEndings = O, rt.onErrorStopParsing = ne, rt.onWarningStopParsing = le, rt;
+}
+var sr;
+function bn() {
+  if (sr) return H;
+  sr = 1;
+  var t = Dt();
+  H.assign = t.assign, H.hasDefaultHTMLNamespace = t.hasDefaultHTMLNamespace, H.isHTMLMimeType = t.isHTMLMimeType, H.isValidMimeType = t.isValidMimeType, H.MIME_TYPE = t.MIME_TYPE, H.NAMESPACE = t.NAMESPACE;
+  var e = _t();
+  H.DOMException = e.DOMException, H.DOMExceptionName = e.DOMExceptionName, H.ExceptionCode = e.ExceptionCode, H.ParseError = e.ParseError;
+  var n = kr();
+  H.Attr = n.Attr, H.CDATASection = n.CDATASection, H.CharacterData = n.CharacterData, H.Comment = n.Comment, H.Document = n.Document, H.DocumentFragment = n.DocumentFragment, H.DocumentType = n.DocumentType, H.DOMImplementation = n.DOMImplementation, H.Element = n.Element, H.Entity = n.Entity, H.EntityReference = n.EntityReference, H.LiveNodeList = n.LiveNodeList, H.NamedNodeMap = n.NamedNodeMap, H.Node = n.Node, H.NodeList = n.NodeList, H.Notation = n.Notation, H.ProcessingInstruction = n.ProcessingInstruction, H.Text = n.Text, H.XMLSerializer = n.XMLSerializer;
+  var i = Nn();
+  return H.DOMParser = i.DOMParser, H.normalizeLineEndings = i.normalizeLineEndings, H.onErrorStopParsing = i.onErrorStopParsing, H.onWarningStopParsing = i.onWarningStopParsing, H;
+}
+bn();
+const Ut = "USJ";
+var xe = {}, qt, cr;
+function Cn() {
+  return cr || (cr = 1, qt = () => {
+    const t = "\\ud800-\\udfff", h = "\\u0300-\\u036f" + "\\ufe20-\\ufe2f" + "\\u20d0-\\u20ff" + "\\u1ab0-\\u1aff" + "\\u1dc0-\\u1dff", p = "\\ufe0e\\ufe0f", f = "\\uD83D\\uDC69\\uD83C\\uDFFB\\u200D\\uD83C\\uDF93", m = `[${t}]`, E = `[${h}]`, l = "\\ud83c[\\udffb-\\udfff]", v = `(?:${E}|${l})`, O = `[^${t}]`, b = "(?:\\uD83C[\\uDDE6-\\uDDFF]){2}", C = "[\\ud800-\\udbff][\\udc00-\\udfff]", j = "\\u200d", R = "(?:\\ud83c\\udff4\\udb40\\udc67\\udb40\\udc62\\udb40(?:\\udc65|\\udc73|\\udc77)\\udb40(?:\\udc6e|\\udc63|\\udc6c)\\udb40(?:\\udc67|\\udc74|\\udc73)\\udb40\\udc7f)", k = `[${f}]`, $ = `${v}?`, ne = `[${p}]?`, le = `(?:${j}(?:${[O, b, C].join("|")})${ne + $})*`, g = ne + $ + le, F = `(?:${[`${O}${E}?`, E, b, C, m, k].join("|")})`;
+    return new RegExp(`${R}|${l}(?=${l})|${F + g}`, "g");
+  }), qt;
+}
+var lr;
+function yn() {
+  if (lr) return xe;
+  lr = 1;
+  var t = xe && xe.__importDefault || function(f) {
+    return f && f.__esModule ? f : { default: f };
+  };
+  Object.defineProperty(xe, "__esModule", { value: !0 });
+  var e = t(Cn());
+  function n(f) {
+    if (typeof f != "string")
+      throw new Error("A string is expected as input");
+    return f.match(e.default()) || [];
+  }
+  xe.toArray = n;
+  function i(f) {
+    if (typeof f != "string")
+      throw new Error("Input must be a string");
+    var m = f.match(e.default());
+    return m === null ? 0 : m.length;
+  }
+  xe.length = i;
+  function o(f, m, E) {
+    if (m === void 0 && (m = 0), typeof f != "string")
+      throw new Error("Input must be a string");
+    (typeof m != "number" || m < 0) && (m = 0), typeof E == "number" && E < 0 && (E = 0);
+    var l = f.match(e.default());
+    return l ? l.slice(m, E).join("") : "";
+  }
+  xe.substring = o;
+  function a(f, m, E) {
+    if (m === void 0 && (m = 0), typeof f != "string")
+      throw new Error("Input must be a string");
+    var l = i(f);
+    if (typeof m != "number" && (m = parseInt(m, 10)), m >= l)
+      return "";
+    m < 0 && (m += l);
+    var v;
+    typeof E > "u" ? v = l : (typeof E != "number" && (E = parseInt(E, 10)), v = E >= 0 ? E + m : m);
+    var O = f.match(e.default());
+    return O ? O.slice(m, v).join("") : "";
+  }
+  xe.substr = a;
+  function h(f, m, E, l) {
+    if (m === void 0 && (m = 16), E === void 0 && (E = "#"), l === void 0 && (l = "right"), typeof f != "string" || typeof m != "number")
+      throw new Error("Invalid arguments specified");
+    if (["left", "right"].indexOf(l) === -1)
+      throw new Error("Pad position should be either left or right");
+    typeof E != "string" && (E = String(E));
+    var v = i(f);
+    if (v > m)
+      return o(f, 0, m);
+    if (v < m) {
+      var O = E.repeat(m - v);
+      return l === "left" ? O + f : f + O;
+    }
+    return f;
+  }
+  xe.limit = h;
+  function p(f, m, E) {
+    if (E === void 0 && (E = 0), typeof f != "string")
+      throw new Error("Input must be a string");
+    if (f === "")
+      return m === "" ? 0 : -1;
+    E = Number(E), E = isNaN(E) ? 0 : E, m = String(m);
+    var l = n(f);
+    if (E >= l.length)
+      return m === "" ? l.length : -1;
+    if (m === "")
+      return E;
+    var v = n(m), O = !1, b;
+    for (b = E; b < l.length; b += 1) {
+      for (var C = 0; C < v.length && v[C] === l[b + C]; )
+        C += 1;
+      if (C === v.length && v[C - 1] === l[b + C - 1]) {
+        O = !0;
+        break;
+      }
+    }
+    return O ? b : -1;
+  }
+  return xe.indexOf = p, xe;
+}
+var ot = yn();
+function qr(t) {
+  return t ? Array.isArray(t) ? t : [t] : [];
+}
+function xt(t, e) {
+  if (!(e > ce(t) || e < -ce(t)))
+    return Pt(t, e, 1);
+}
+function Et(t, e) {
+  return e < 0 || e > ce(t) - 1 ? "" : Pt(t, e, 1);
+}
+function Zu(t, e) {
+  if (!(e < 0 || e > ce(t) - 1))
+    return Pt(t, e, 1).codePointAt(0);
+}
+function Tn(t, e, n = ce(t)) {
+  const i = In(t, e);
+  return !(i === -1 || i + ce(e) !== n);
+}
+function wn(t, e, n) {
+  if (e < 0) return -1;
+  if (n) {
+    if (Et(t, e) === "}" && Et(t, e - 1) === "\\") return e;
+    const a = St(t, "\\}", e);
+    return a >= 0 ? a + 1 : a;
+  }
+  let i = e;
+  const o = ce(t);
+  for (; i < o && (i = St(t, "}", i), !(i === -1 || Et(t, i - 1) !== "\\")); )
+    i += 1;
+  return i >= o ? -1 : i;
+}
+function Sn(t, e) {
+  const n = [];
+  let i = 0, o = 0;
+  function a(p, f, m) {
+    const E = ut(t, o, f), l = n.length > 0 && Be(n[n.length - 1]) ? `${n.pop()}${E}` : E;
+    Be(p) ? n.push(`${l}${p}`) : (l && n.push(l), n.push(p)), o = f + m;
+  }
+  const h = ce(t);
+  for (; i < h; ) {
+    switch (Et(t, i)) {
       case "{":
-        if (Re(e, n - 1) !== "\\") {
-          const o = xo(e, n, !1);
-          if (o >= 0) {
-            const s = de(e, n + 1, o), c = s in t ? (
+        if (Et(t, i - 1) !== "\\") {
+          const p = wn(t, i, !1);
+          if (p >= 0) {
+            const f = ut(t, i + 1, p), m = f in e ? (
               // Just checked that the key is in the object
               // eslint-disable-next-line no-type-assertion/no-type-assertion
-              t[s]
-            ) : s;
-            i(c, n, o + 1 - n), n = o, u = o + 1;
+              e[f]
+            ) : f;
+            a(m, i, p + 1 - i), i = p, o = p + 1;
           }
         } else
-          i("{", n - 1, 2);
+          a("{", i - 1, 2);
         break;
       case "}":
-        Re(e, n - 1) !== "\\" || i("}", n - 1, 2);
+        Et(t, i - 1) !== "\\" || a("}", i - 1, 2);
         break;
     }
-    n += 1;
+    i += 1;
   }
-  if (u < a) {
-    const o = de(e, u);
-    r.push(
-      r.length > 0 && ae(r[r.length - 1]) ? `${r.pop()}${o}` : o
+  if (o < h) {
+    const p = ut(t, o);
+    n.push(
+      n.length > 0 && Be(n[n.length - 1]) ? `${n.pop()}${p}` : p
     );
   }
-  return r;
+  return n;
 }
-function rs(e, t) {
-  return Mo(e, t).map((r) => `${r}`).join("");
+function ei(t, e) {
+  return Sn(t, e).map((n) => `${n}`).join("");
 }
-function _o(e, t, r = 0) {
-  const n = de(e, r);
-  return ot(n, t) !== -1;
+function On(t, e, n = 0) {
+  const i = ut(t, n);
+  return St(i, e) !== -1;
 }
-function ot(e, t, r = 0) {
-  return Ro(e, t, r);
+function St(t, e, n = 0) {
+  return ot.indexOf(t, e, n);
 }
-function Po(e, t, r) {
-  let n = r === void 0 ? P(e) : r;
-  n < 0 ? n = 0 : n >= P(e) && (n = P(e) - 1);
-  for (let u = n; u >= 0; u--)
-    if (_t(e, u, P(t)) === t)
-      return u;
+function In(t, e, n) {
+  let i = n === void 0 ? ce(t) : n;
+  i < 0 ? i = 0 : i >= ce(t) && (i = ce(t) - 1);
+  for (let o = i; o >= 0; o--)
+    if (Pt(t, o, ce(e)) === e)
+      return o;
   return -1;
 }
-function P(e) {
-  return Co(e);
+function ce(t) {
+  return ot.length(t);
 }
-function ns(e, t) {
-  const r = t.toUpperCase();
-  return r === "NONE" ? e : e.normalize(r);
+function ti(t, e) {
+  const n = e.toUpperCase();
+  return n === "NONE" ? t : t.normalize(n);
 }
-function us(e, t, r) {
-  return e.localeCompare(t, "en", r);
+function ri(t, e, n) {
+  return t.localeCompare(e, "en", n);
 }
-function is(e, t, r = " ") {
-  return t <= P(e) ? e : Wn(e, t, r, "right");
+function ni(t, e, n = " ") {
+  return e <= ce(t) ? t : ot.limit(t, e, n, "right");
 }
-function os(e, t, r = " ") {
-  return t <= P(e) ? e : Wn(e, t, r, "left");
+function ui(t, e, n = " ") {
+  return e <= ce(t) ? t : ot.limit(t, e, n, "left");
 }
-function $r(e, t) {
-  return t > e ? e : t < -e ? 0 : t < 0 ? t + e : t;
+function fr(t, e) {
+  return e > t ? t : e < -t ? 0 : e < 0 ? e + t : e;
 }
-function jr(e, t, r) {
-  const n = P(e);
-  if (t > n || r && (t > r && !(t >= 0 && t < n && r < 0 && r > -n) || r < -n))
+function pr(t, e, n) {
+  const i = ce(t);
+  if (e > i || n && (e > n && !(e >= 0 && e < i && n < 0 && n > -i) || n < -i))
     return "";
-  const u = $r(n, t), i = r ? $r(n, r) : void 0;
-  return de(e, u, i);
+  const o = fr(i, e), a = n ? fr(i, n) : void 0;
+  return ut(t, o, a);
 }
-function Ur(e, t, r) {
-  const n = [];
-  if (r !== void 0 && r <= 0)
-    return [e];
-  if (t === "") return Lo(e).slice(0, r);
-  let u = t;
-  (typeof t == "string" || t instanceof RegExp && !_o(t.flags, "g")) && (u = new RegExp(t, "g"));
-  const i = e.match(u);
-  let a = 0;
-  if (!i) return [e];
-  for (let o = 0; o < (r ? r - 1 : i.length); o++) {
-    const s = ot(e, i[o], a), c = P(i[o]);
-    if (n.push(de(e, a, s)), a = s + c, r !== void 0 && n.length === r)
+function hr(t, e, n) {
+  const i = [];
+  if (n !== void 0 && n <= 0)
+    return [t];
+  if (e === "") return xn(t).slice(0, n);
+  let o = e;
+  (typeof e == "string" || e instanceof RegExp && !On(e.flags, "g")) && (o = new RegExp(e, "g"));
+  const a = t.match(o);
+  let h = 0;
+  if (!a) return [t];
+  for (let p = 0; p < (n ? n - 1 : a.length); p++) {
+    const f = St(t, a[p], h), m = ce(a[p]);
+    if (i.push(ut(t, h, f)), h = f + m, n !== void 0 && i.length === n)
       break;
   }
-  return n.push(de(e, a)), n;
+  return i.push(ut(t, h)), i;
 }
-function Zn(e, t, r = 0) {
-  return ot(e, t, r) === r;
+function Ur(t, e, n = 0) {
+  return St(t, e, n) === n;
 }
-function _t(e, t = 0, r = P(e) - t) {
-  return So(e, t, r);
+function Pt(t, e = 0, n = ce(t) - e) {
+  return ot.substr(t, e, n);
 }
-function de(e, t, r = P(e)) {
-  return To(e, t, r);
+function ut(t, e, n = ce(t)) {
+  return ot.substring(t, e, n);
 }
-function Lo(e) {
-  return yo(e);
+function xn(t) {
+  return ot.toArray(t);
 }
-function as(e) {
-  return Zn(e, "%") && Bo(e, "%");
+function ii(t) {
+  return Ur(t, "%") && Tn(t, "%");
 }
-function ss(e) {
-  if (typeof e != "string")
+function oi(t) {
+  if (typeof t != "string")
     throw new TypeError("Expected a string");
-  return e.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
+  return t.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
-function cs(e) {
-  return e ? Qn(e).map(
-    (n) => Array.isArray(n) ? n.map((u) => new RegExp(u)) : new RegExp(n)
+function ai(t) {
+  return t ? qr(t).map(
+    (i) => Array.isArray(i) ? i.map((o) => new RegExp(o)) : new RegExp(i)
   ) : [];
 }
-function ls(e) {
-  return e ? Qn(e).map((n) => new RegExp(n)) : [];
+function si(t) {
+  return t ? qr(t).map((i) => new RegExp(i)) : [];
 }
-const Fo = (
+const Bn = (
   // Using unicode control characters to be very explicit about which characters we are using.
   // The first 6 characters are the control characters \f\n\r\t\v.
   // eslint-disable-next-line no-control-regex
   /^[\u000C\u000A\u000D\u0009\u000B\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\u0085]+$/
 );
-function Oe(e) {
-  return Fo.test(e);
+function mt(t) {
+  return Bn.test(t);
 }
-const Jt = ["chapter", "book", "para", "row", "sidebar", Gt], ko = "​", eu = [
+function ci(t) {
+  let e = "";
+  for (let n = 0; n < t.length; n++) {
+    const i = t[n];
+    if (i === i.toUpperCase() && i !== i.toLowerCase()) {
+      if (n > 0) {
+        const a = t[n - 1];
+        if (!(a === a.toUpperCase() && a !== a.toLowerCase()))
+          e += "-";
+        else if (n + 1 < t.length) {
+          const p = t[n + 1];
+          p === p.toLowerCase() && p !== p.toUpperCase() && (e += "-");
+        }
+      }
+      e += i.toLowerCase();
+    } else
+      e += i;
+  }
+  return e;
+}
+const jt = ["chapter", "book", "para", "row", "sidebar", Ut], Mn = "​", jr = [
   { shortName: "ERR", fullNames: ["ERROR"], chapters: -1 },
   { shortName: "GEN", fullNames: ["Genesis"], chapters: 50 },
   { shortName: "EXO", fullNames: ["Exodus"], chapters: 40 },
@@ -6763,484 +6842,477 @@ const Jt = ["chapter", "book", "para", "row", "sidebar", Gt], ko = "​", eu = [
   { shortName: "3JN", fullNames: ["3 John"], chapters: 1 },
   { shortName: "JUD", fullNames: ["Jude"], chapters: 1 },
   { shortName: "REV", fullNames: ["Revelation"], chapters: 22 }
-], qo = 1, $o = eu.length - 1, jo = 1, Uo = 1, fs = {
-  bookNum: 1,
+], Rn = 1, _n = jr.length - 1, Pn = 1, Ln = 1, li = {
+  book: "GEN",
   chapterNum: 1,
   verseNum: 1
-}, Vo = (e) => {
-  var t;
-  return ((t = eu[e]) == null ? void 0 : t.chapters) ?? -1;
-}, ps = (e, t) => ({
-  bookNum: Math.max(qo, Math.min(e.bookNum + t, $o)),
+}, Fn = (t) => {
+  var e;
+  return ((e = jr[t]) == null ? void 0 : e.chapters) ?? -1;
+}, fi = (t, e) => ({
+  book: be.bookNumberToId(
+    Math.max(
+      Rn,
+      Math.min(be.bookIdToNumber(t.book) + e, _n)
+    )
+  ),
   chapterNum: 1,
   verseNum: 1
-}), hs = (e, t) => ({
-  ...e,
+}), pi = (t, e) => ({
+  ...t,
   chapterNum: Math.min(
-    Math.max(jo, e.chapterNum + t),
-    Vo(e.bookNum)
+    Math.max(Pn, t.chapterNum + e),
+    Fn(be.bookIdToNumber(t.book))
   ),
   verseNum: 1
-}), ds = (e, t) => ({
-  ...e,
-  verseNum: Math.max(Uo, e.verseNum + t)
+}), hi = (t, e) => ({
+  ...t,
+  verseNum: Math.max(Ln, t.verseNum + e)
 });
-async function ms(e, t, r) {
-  const n = Q.bookNumberToId(e);
-  if (!Zn(Intl.getCanonicalLocales(t)[0], "zh"))
-    return r({
-      localizeKey: `LocalizedId.${n}`,
-      languagesToSearch: [t]
+async function di(t, e, n) {
+  const i = be.bookNumberToId(t);
+  if (!Ur(Intl.getCanonicalLocales(e)[0], "zh"))
+    return n({
+      localizeKey: `LocalizedId.${i}`,
+      languagesToSearch: [e]
     });
-  const u = await r({
-    localizeKey: `Book.${n}`,
-    languagesToSearch: [t]
-  }), i = Ur(u, "-");
-  return Ur(i[0], "ÿ08")[0].trim();
+  const o = await n({
+    localizeKey: `Book.${i}`,
+    languagesToSearch: [e]
+  }), a = hr(o, "-");
+  return hr(a[0], "ÿ08")[0].trim();
 }
-function Vr(e) {
-  return new Wt(e.bookNum, e.chapterNum, e.verseNum).BBBCCCVVV;
+function mi(t) {
+  return new Lr(be.bookIdToNumber(t.book), t.chapterNum, t.verseNum).BBBCCC;
 }
-function Es(e, t) {
-  return Vr(e) - Vr(t);
+function dr(t) {
+  return new Lr(be.bookIdToNumber(t.book), t.chapterNum, t.verseNum).BBBCCCVVV;
 }
-function Ho(e) {
-  return `%scrollGroup_${e}%`;
+function Ei(t, e) {
+  return dr(t) - dr(e);
 }
-function gs(e) {
-  return e.map((t) => Ho(t));
+function kn(t) {
+  return `%scrollGroup_${t}%`;
 }
-function Ds(e, t, r, n) {
-  let u;
-  switch (t ?? "id") {
+function gi(t) {
+  return t.map((e) => kn(e));
+}
+function Di(t, e, n, i) {
+  let o;
+  switch (e ?? "id") {
     case "English":
-      u = Q.bookNumberToEnglishName(e.bookNum);
+      o = be.bookIdToEnglishName(t.book);
       break;
     case "id":
-      u = Q.bookNumberToId(e.bookNum);
+      o = t.book;
       break;
     default:
-      u = t ?? "";
+      o = e ?? "";
       break;
   }
-  return `${u}${n ?? " "}${e.chapterNum}${r ?? ":"}${e.verseNum}`;
+  return `${o}${i ?? " "}${t.chapterNum}${n ?? ":"}${t.verseNum}`;
 }
-const Go = (
+const qn = (
   // Using unicode control characters to be very explicit about which characters we are using.
   // The first 6 characters are the control characters \f\n\r\t\v.
   // eslint-disable-next-line no-control-regex
   /^[\u000C\u000A\u000D\u0009\u000B\u0020\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u200B\u0085]+$/
 );
-function Hr(e) {
-  return Go.test(e);
+function mr(t) {
+  return qn.test(t);
 }
-const zo = /^[\u200d\u2003\u2002\u0020\u00a0\u202f\u2009\u200a\u3000\u200b\u200c\u2060\u200e\u200f]+$/;
-function Jo(e) {
-  return zo.test(e);
+const Un = /^[\u200d\u2003\u2002\u0020\u00a0\u202f\u2009\u200a\u3000\u200b\u200c\u2060\u200e\u200f]+$/;
+function jn(t) {
+  return Un.test(t);
 }
-function Gr(e) {
-  let t = "", r = !1, n = "\0";
-  for (let u = 0; u < e.length; u += 1) {
-    const i = e[u];
-    i.charCodeAt(0) < 32 ? (r || (t += " "), r = !0) : !r && i === ko && u + 1 < e.length && Hr(e[u + 1]) || (Hr(i) ? (r || (t += i), r = !0) : Jo(i) && n === i || (t += i, r = !1)), n = i;
+function Er(t) {
+  let e = "", n = !1, i = "\0";
+  for (let o = 0; o < t.length; o += 1) {
+    const a = t[o];
+    a.charCodeAt(0) < 32 ? (n || (e += " "), n = !0) : !n && a === Mn && o + 1 < t.length && mr(t[o + 1]) || (mr(a) ? (n || (e += a), n = !0) : jn(a) && i === a || (e += a, n = !1)), i = a;
   }
-  return t;
+  return e;
 }
-function zr(e) {
-  return !e || e.length === 0 ? !0 : e.length === 1 && (e[0] === void 0 || e[0] === "");
+function gr(t) {
+  return !t || t.length === 0 ? !0 : t.length === 1 && (t[0] === void 0 || t[0] === "");
 }
-function Jr(e, t) {
-  if (!t || !Jt.includes(t.type)) return !1;
-  if (!t.content)
+function Dr(t, e) {
+  if (!e || !jt.includes(e.type)) return !1;
+  if (!e.content)
     throw new Error(
-      `Parent ${JSON.stringify(t)} of ${JSON.stringify(e)} does not have a content array! This should not happen!`
+      `Parent ${JSON.stringify(e)} of ${JSON.stringify(t)} does not have a content array! This should not happen!`
     );
-  return e === t.content[t.content.length - 1];
+  return t === e.content[e.content.length - 1];
 }
-function tu(e, t, r, n) {
-  if (!e && !r) return !0;
-  if (!e || !r) return !1;
-  const u = ae(e), i = ae(r);
-  if (u && i) {
-    const a = Gr(e), o = Gr(r);
-    if (a !== o) {
-      if (!Oe(gt(a, -1) ?? "") && !Oe(gt(o, -1) ?? "") || !Jr(e, t) || !Jr(r, n)) return !1;
-      let s = a;
-      for (; Oe(gt(s, -1) ?? ""); ) s = jr(s, 0, -1);
-      let c = o;
-      for (; Oe(gt(c, -1) ?? ""); ) c = jr(c, 0, -1);
-      if (s !== c) return !1;
+function $r(t, e, n, i) {
+  if (!t && !n) return !0;
+  if (!t || !n) return !1;
+  const o = Be(t), a = Be(n);
+  if (o && a) {
+    const h = Er(t), p = Er(n);
+    if (h !== p) {
+      if (!mt(xt(h, -1) ?? "") && !mt(xt(p, -1) ?? "") || !Dr(t, e) || !Dr(n, i)) return !1;
+      let f = h;
+      for (; mt(xt(f, -1) ?? ""); ) f = pr(f, 0, -1);
+      let m = p;
+      for (; mt(xt(m, -1) ?? ""); ) m = pr(m, 0, -1);
+      if (f !== m) return !1;
     }
-  } else if (!u && !i) {
-    const a = e, o = r, s = Object.keys(a).filter(
+  } else if (!o && !a) {
+    const h = t, p = n, f = Object.keys(h).filter(
       (l) => l !== "content"
     );
-    if (s.length !== Object.keys(o).filter((l) => l !== "content").length || s.some((l) => !(l in o) || a[l] !== o[l])) return !1;
-    const c = zr(a.content), f = zr(o.content);
-    if (c !== f) return !1;
-    if (!c && !f) {
-      let l = a.content, p = o.content;
-      const g = l[l.length - 1];
-      Jt.includes(a.type) && ae(g) && Oe(g) && (l = l.slice(0, -1));
-      const m = p[p.length - 1];
-      if (Jt.includes(o.type) && ae(m) && Oe(m) && (p = p.slice(0, -1)), l.length !== p.length) return !1;
-      for (let h = 0; h < l.length; h += 1)
-        if (!tu(l[h], a, p[h], o))
+    if (f.length !== Object.keys(p).filter((l) => l !== "content").length || f.some((l) => !(l in p) || h[l] !== p[l])) return !1;
+    const m = gr(h.content), E = gr(p.content);
+    if (m !== E) return !1;
+    if (!m && !E) {
+      let l = h.content, v = p.content;
+      const O = l[l.length - 1];
+      jt.includes(h.type) && Be(O) && mt(O) && (l = l.slice(0, -1));
+      const b = v[v.length - 1];
+      if (jt.includes(p.type) && Be(b) && mt(b) && (v = v.slice(0, -1)), l.length !== v.length) return !1;
+      for (let C = 0; C < l.length; C += 1)
+        if (!$r(l[C], h, v[C], p))
           return !1;
     }
   } else
     return !1;
   return !0;
 }
-function vs(e, t) {
-  return tu(e, void 0, t, void 0);
+function vi(t, e) {
+  return $r(t, void 0, e, void 0);
 }
-const As = (e) => (...t) => e.map((n) => n(...t)).every((n) => n), Ns = (e) => async (...t) => {
-  const r = e.map(async (n) => n(...t));
-  return (await Promise.all(r)).every((n) => n);
-}, Dt = "chapter", vt = "verse";
-var Xo = Object.getOwnPropertyNames, Yo = Object.getOwnPropertySymbols, Ko = Object.prototype.hasOwnProperty;
-function Xr(e, t) {
-  return function(n, u, i) {
-    return e(n, u, i) && t(n, u, i);
+const Ai = (t) => (...e) => t.map((i) => i(...e)).every((i) => i), Ni = (t) => async (...e) => {
+  const n = t.map(async (i) => i(...e));
+  return (await Promise.all(n)).every((i) => i);
+}, Bt = "chapter", Mt = "verse";
+var $n = Object.getOwnPropertyNames, Vn = Object.getOwnPropertySymbols, Gn = Object.prototype.hasOwnProperty;
+function vr(t, e) {
+  return function(i, o, a) {
+    return t(i, o, a) && e(i, o, a);
   };
 }
-function At(e) {
-  return function(r, n, u) {
-    if (!r || !n || typeof r != "object" || typeof n != "object")
-      return e(r, n, u);
-    var i = u.cache, a = i.get(r), o = i.get(n);
-    if (a && o)
-      return a === n && o === r;
-    i.set(r, n), i.set(n, r);
-    var s = e(r, n, u);
-    return i.delete(r), i.delete(n), s;
+function Rt(t) {
+  return function(n, i, o) {
+    if (!n || !i || typeof n != "object" || typeof i != "object")
+      return t(n, i, o);
+    var a = o.cache, h = a.get(n), p = a.get(i);
+    if (h && p)
+      return h === i && p === n;
+    a.set(n, i), a.set(i, n);
+    var f = t(n, i, o);
+    return a.delete(n), a.delete(i), f;
   };
 }
-function Yr(e) {
-  return Xo(e).concat(Yo(e));
+function Ar(t) {
+  return $n(t).concat(Vn(t));
 }
-var Wo = Object.hasOwn || function(e, t) {
-  return Ko.call(e, t);
+var zn = Object.hasOwn || function(t, e) {
+  return Gn.call(t, e);
 };
-function ye(e, t) {
-  return e === t || !e && !t && e !== e && t !== t;
+function at(t, e) {
+  return t === e || !t && !e && t !== t && e !== e;
 }
-var Qo = "__v", Zo = "__o", ea = "_owner", Kr = Object.getOwnPropertyDescriptor, Wr = Object.keys;
-function ta(e, t, r) {
-  var n = e.length;
-  if (t.length !== n)
+var Hn = "__v", Jn = "__o", Xn = "_owner", Nr = Object.getOwnPropertyDescriptor, br = Object.keys;
+function Yn(t, e, n) {
+  var i = t.length;
+  if (e.length !== i)
     return !1;
-  for (; n-- > 0; )
-    if (!r.equals(e[n], t[n], n, n, e, t, r))
+  for (; i-- > 0; )
+    if (!n.equals(t[i], e[i], i, i, t, e, n))
       return !1;
   return !0;
 }
-function ra(e, t) {
-  return ye(e.getTime(), t.getTime());
+function Wn(t, e) {
+  return at(t.getTime(), e.getTime());
 }
-function na(e, t) {
-  return e.name === t.name && e.message === t.message && e.cause === t.cause && e.stack === t.stack;
+function Kn(t, e) {
+  return t.name === e.name && t.message === e.message && t.cause === e.cause && t.stack === e.stack;
 }
-function ua(e, t) {
-  return e === t;
+function Qn(t, e) {
+  return t === e;
 }
-function Qr(e, t, r) {
-  var n = e.size;
-  if (n !== t.size)
+function Cr(t, e, n) {
+  var i = t.size;
+  if (i !== e.size)
     return !1;
-  if (!n)
+  if (!i)
     return !0;
-  for (var u = new Array(n), i = e.entries(), a, o, s = 0; (a = i.next()) && !a.done; ) {
-    for (var c = t.entries(), f = !1, l = 0; (o = c.next()) && !o.done; ) {
-      if (u[l]) {
+  for (var o = new Array(i), a = t.entries(), h, p, f = 0; (h = a.next()) && !h.done; ) {
+    for (var m = e.entries(), E = !1, l = 0; (p = m.next()) && !p.done; ) {
+      if (o[l]) {
         l++;
         continue;
       }
-      var p = a.value, g = o.value;
-      if (r.equals(p[0], g[0], s, l, e, t, r) && r.equals(p[1], g[1], p[0], g[0], e, t, r)) {
-        f = u[l] = !0;
+      var v = h.value, O = p.value;
+      if (n.equals(v[0], O[0], f, l, t, e, n) && n.equals(v[1], O[1], v[0], O[0], t, e, n)) {
+        E = o[l] = !0;
         break;
       }
       l++;
     }
-    if (!f)
+    if (!E)
       return !1;
-    s++;
+    f++;
   }
   return !0;
 }
-var ia = ye;
-function oa(e, t, r) {
-  var n = Wr(e), u = n.length;
-  if (Wr(t).length !== u)
+var Zn = at;
+function eu(t, e, n) {
+  var i = br(t), o = i.length;
+  if (br(e).length !== o)
     return !1;
-  for (; u-- > 0; )
-    if (!ru(e, t, r, n[u]))
+  for (; o-- > 0; )
+    if (!Vr(t, e, n, i[o]))
       return !1;
   return !0;
 }
-function Je(e, t, r) {
-  var n = Yr(e), u = n.length;
-  if (Yr(t).length !== u)
+function Tt(t, e, n) {
+  var i = Ar(t), o = i.length;
+  if (Ar(e).length !== o)
     return !1;
-  for (var i, a, o; u-- > 0; )
-    if (i = n[u], !ru(e, t, r, i) || (a = Kr(e, i), o = Kr(t, i), (a || o) && (!a || !o || a.configurable !== o.configurable || a.enumerable !== o.enumerable || a.writable !== o.writable)))
+  for (var a, h, p; o-- > 0; )
+    if (a = i[o], !Vr(t, e, n, a) || (h = Nr(t, a), p = Nr(e, a), (h || p) && (!h || !p || h.configurable !== p.configurable || h.enumerable !== p.enumerable || h.writable !== p.writable)))
       return !1;
   return !0;
 }
-function aa(e, t) {
-  return ye(e.valueOf(), t.valueOf());
+function tu(t, e) {
+  return at(t.valueOf(), e.valueOf());
 }
-function sa(e, t) {
-  return e.source === t.source && e.flags === t.flags;
+function ru(t, e) {
+  return t.source === e.source && t.flags === e.flags;
 }
-function Zr(e, t, r) {
-  var n = e.size;
-  if (n !== t.size)
+function yr(t, e, n) {
+  var i = t.size;
+  if (i !== e.size)
     return !1;
-  if (!n)
+  if (!i)
     return !0;
-  for (var u = new Array(n), i = e.values(), a, o; (a = i.next()) && !a.done; ) {
-    for (var s = t.values(), c = !1, f = 0; (o = s.next()) && !o.done; ) {
-      if (!u[f] && r.equals(a.value, o.value, a.value, o.value, e, t, r)) {
-        c = u[f] = !0;
+  for (var o = new Array(i), a = t.values(), h, p; (h = a.next()) && !h.done; ) {
+    for (var f = e.values(), m = !1, E = 0; (p = f.next()) && !p.done; ) {
+      if (!o[E] && n.equals(h.value, p.value, h.value, p.value, t, e, n)) {
+        m = o[E] = !0;
         break;
       }
-      f++;
+      E++;
     }
-    if (!c)
+    if (!m)
       return !1;
   }
   return !0;
 }
-function ca(e, t) {
-  var r = e.length;
-  if (t.length !== r)
+function nu(t, e) {
+  var n = t.length;
+  if (e.length !== n)
     return !1;
-  for (; r-- > 0; )
-    if (e[r] !== t[r])
+  for (; n-- > 0; )
+    if (t[n] !== e[n])
       return !1;
   return !0;
 }
-function la(e, t) {
-  return e.hostname === t.hostname && e.pathname === t.pathname && e.protocol === t.protocol && e.port === t.port && e.hash === t.hash && e.username === t.username && e.password === t.password;
+function uu(t, e) {
+  return t.hostname === e.hostname && t.pathname === e.pathname && t.protocol === e.protocol && t.port === e.port && t.hash === e.hash && t.username === e.username && t.password === e.password;
 }
-function ru(e, t, r, n) {
-  return (n === ea || n === Zo || n === Qo) && (e.$$typeof || t.$$typeof) ? !0 : Wo(t, n) && r.equals(e[n], t[n], n, n, e, t, r);
+function Vr(t, e, n, i) {
+  return (i === Xn || i === Jn || i === Hn) && (t.$$typeof || e.$$typeof) ? !0 : zn(e, i) && n.equals(t[i], e[i], i, i, t, e, n);
 }
-var fa = "[object Arguments]", pa = "[object Boolean]", ha = "[object Date]", da = "[object Error]", ma = "[object Map]", Ea = "[object Number]", ga = "[object Object]", Da = "[object RegExp]", va = "[object Set]", Aa = "[object String]", Na = "[object URL]", ba = Array.isArray, en = typeof ArrayBuffer == "function" && ArrayBuffer.isView ? ArrayBuffer.isView : null, tn = Object.assign, ya = Object.prototype.toString.call.bind(Object.prototype.toString);
-function Ca(e) {
-  var t = e.areArraysEqual, r = e.areDatesEqual, n = e.areErrorsEqual, u = e.areFunctionsEqual, i = e.areMapsEqual, a = e.areNumbersEqual, o = e.areObjectsEqual, s = e.arePrimitiveWrappersEqual, c = e.areRegExpsEqual, f = e.areSetsEqual, l = e.areTypedArraysEqual, p = e.areUrlsEqual;
-  return function(m, h, D) {
-    if (m === h)
+var iu = "[object Arguments]", ou = "[object Boolean]", au = "[object Date]", su = "[object Error]", cu = "[object Map]", lu = "[object Number]", fu = "[object Object]", pu = "[object RegExp]", hu = "[object Set]", du = "[object String]", mu = "[object URL]", Eu = Array.isArray, Tr = typeof ArrayBuffer == "function" && ArrayBuffer.isView ? ArrayBuffer.isView : null, wr = Object.assign, gu = Object.prototype.toString.call.bind(Object.prototype.toString);
+function Du(t) {
+  var e = t.areArraysEqual, n = t.areDatesEqual, i = t.areErrorsEqual, o = t.areFunctionsEqual, a = t.areMapsEqual, h = t.areNumbersEqual, p = t.areObjectsEqual, f = t.arePrimitiveWrappersEqual, m = t.areRegExpsEqual, E = t.areSetsEqual, l = t.areTypedArraysEqual, v = t.areUrlsEqual;
+  return function(b, C, j) {
+    if (b === C)
       return !0;
-    if (m == null || h == null)
+    if (b == null || C == null)
       return !1;
-    var O = typeof m;
-    if (O !== typeof h)
+    var R = typeof b;
+    if (R !== typeof C)
       return !1;
-    if (O !== "object")
-      return O === "number" ? a(m, h, D) : O === "function" ? u(m, h, D) : !1;
-    var L = m.constructor;
-    if (L !== h.constructor)
+    if (R !== "object")
+      return R === "number" ? h(b, C, j) : R === "function" ? o(b, C, j) : !1;
+    var k = b.constructor;
+    if (k !== C.constructor)
       return !1;
-    if (L === Object)
-      return o(m, h, D);
-    if (ba(m))
-      return t(m, h, D);
-    if (en != null && en(m))
-      return l(m, h, D);
-    if (L === Date)
-      return r(m, h, D);
-    if (L === RegExp)
-      return c(m, h, D);
-    if (L === Map)
-      return i(m, h, D);
-    if (L === Set)
-      return f(m, h, D);
-    var b = ya(m);
-    return b === ha ? r(m, h, D) : b === Da ? c(m, h, D) : b === ma ? i(m, h, D) : b === va ? f(m, h, D) : b === ga ? typeof m.then != "function" && typeof h.then != "function" && o(m, h, D) : b === Na ? p(m, h, D) : b === da ? n(m, h, D) : b === fa ? o(m, h, D) : b === pa || b === Ea || b === Aa ? s(m, h, D) : !1;
+    if (k === Object)
+      return p(b, C, j);
+    if (Eu(b))
+      return e(b, C, j);
+    if (Tr != null && Tr(b))
+      return l(b, C, j);
+    if (k === Date)
+      return n(b, C, j);
+    if (k === RegExp)
+      return m(b, C, j);
+    if (k === Map)
+      return a(b, C, j);
+    if (k === Set)
+      return E(b, C, j);
+    var $ = gu(b);
+    return $ === au ? n(b, C, j) : $ === pu ? m(b, C, j) : $ === cu ? a(b, C, j) : $ === hu ? E(b, C, j) : $ === fu ? typeof b.then != "function" && typeof C.then != "function" && p(b, C, j) : $ === mu ? v(b, C, j) : $ === su ? i(b, C, j) : $ === iu ? p(b, C, j) : $ === ou || $ === lu || $ === du ? f(b, C, j) : !1;
   };
 }
-function Ta(e) {
-  var t = e.circular, r = e.createCustomConfig, n = e.strict, u = {
-    areArraysEqual: n ? Je : ta,
-    areDatesEqual: ra,
-    areErrorsEqual: na,
-    areFunctionsEqual: ua,
-    areMapsEqual: n ? Xr(Qr, Je) : Qr,
-    areNumbersEqual: ia,
-    areObjectsEqual: n ? Je : oa,
-    arePrimitiveWrappersEqual: aa,
-    areRegExpsEqual: sa,
-    areSetsEqual: n ? Xr(Zr, Je) : Zr,
-    areTypedArraysEqual: n ? Je : ca,
-    areUrlsEqual: la
+function vu(t) {
+  var e = t.circular, n = t.createCustomConfig, i = t.strict, o = {
+    areArraysEqual: i ? Tt : Yn,
+    areDatesEqual: Wn,
+    areErrorsEqual: Kn,
+    areFunctionsEqual: Qn,
+    areMapsEqual: i ? vr(Cr, Tt) : Cr,
+    areNumbersEqual: Zn,
+    areObjectsEqual: i ? Tt : eu,
+    arePrimitiveWrappersEqual: tu,
+    areRegExpsEqual: ru,
+    areSetsEqual: i ? vr(yr, Tt) : yr,
+    areTypedArraysEqual: i ? Tt : nu,
+    areUrlsEqual: uu
   };
-  if (r && (u = tn({}, u, r(u))), t) {
-    var i = At(u.areArraysEqual), a = At(u.areMapsEqual), o = At(u.areObjectsEqual), s = At(u.areSetsEqual);
-    u = tn({}, u, {
-      areArraysEqual: i,
-      areMapsEqual: a,
-      areObjectsEqual: o,
-      areSetsEqual: s
+  if (n && (o = wr({}, o, n(o))), e) {
+    var a = Rt(o.areArraysEqual), h = Rt(o.areMapsEqual), p = Rt(o.areObjectsEqual), f = Rt(o.areSetsEqual);
+    o = wr({}, o, {
+      areArraysEqual: a,
+      areMapsEqual: h,
+      areObjectsEqual: p,
+      areSetsEqual: f
     });
   }
-  return u;
+  return o;
 }
-function wa(e) {
-  return function(t, r, n, u, i, a, o) {
-    return e(t, r, o);
+function Au(t) {
+  return function(e, n, i, o, a, h, p) {
+    return t(e, n, p);
   };
 }
-function Sa(e) {
-  var t = e.circular, r = e.comparator, n = e.createState, u = e.equals, i = e.strict;
-  if (n)
-    return function(s, c) {
-      var f = n(), l = f.cache, p = l === void 0 ? t ? /* @__PURE__ */ new WeakMap() : void 0 : l, g = f.meta;
-      return r(s, c, {
-        cache: p,
-        equals: u,
-        meta: g,
-        strict: i
+function Nu(t) {
+  var e = t.circular, n = t.comparator, i = t.createState, o = t.equals, a = t.strict;
+  if (i)
+    return function(f, m) {
+      var E = i(), l = E.cache, v = l === void 0 ? e ? /* @__PURE__ */ new WeakMap() : void 0 : l, O = E.meta;
+      return n(f, m, {
+        cache: v,
+        equals: o,
+        meta: O,
+        strict: a
       });
     };
-  if (t)
-    return function(s, c) {
-      return r(s, c, {
+  if (e)
+    return function(f, m) {
+      return n(f, m, {
         cache: /* @__PURE__ */ new WeakMap(),
-        equals: u,
+        equals: o,
         meta: void 0,
-        strict: i
+        strict: a
       });
     };
-  var a = {
+  var h = {
     cache: void 0,
-    equals: u,
+    equals: o,
     meta: void 0,
-    strict: i
+    strict: a
   };
-  return function(s, c) {
-    return r(s, c, a);
+  return function(f, m) {
+    return n(f, m, h);
   };
 }
-var Oa = pe();
-pe({ strict: !0 });
-pe({ circular: !0 });
-pe({
+var bu = ze();
+ze({ strict: !0 });
+ze({ circular: !0 });
+ze({
   circular: !0,
   strict: !0
 });
-pe({
+ze({
   createInternalComparator: function() {
-    return ye;
+    return at;
   }
 });
-pe({
+ze({
   strict: !0,
   createInternalComparator: function() {
-    return ye;
+    return at;
   }
 });
-pe({
+ze({
   circular: !0,
   createInternalComparator: function() {
-    return ye;
+    return at;
   }
 });
-pe({
+ze({
   circular: !0,
   createInternalComparator: function() {
-    return ye;
+    return at;
   },
   strict: !0
 });
-function pe(e) {
-  e === void 0 && (e = {});
-  var t = e.circular, r = t === void 0 ? !1 : t, n = e.createInternalComparator, u = e.createState, i = e.strict, a = i === void 0 ? !1 : i, o = Ta(e), s = Ca(o), c = n ? n(s) : wa(s);
-  return Sa({ circular: r, comparator: s, createState: u, equals: c, strict: a });
+function ze(t) {
+  t === void 0 && (t = {});
+  var e = t.circular, n = e === void 0 ? !1 : e, i = t.createInternalComparator, o = t.createState, a = t.strict, h = a === void 0 ? !1 : a, p = vu(t), f = Du(p), m = i ? i(f) : Au(f);
+  return Nu({ circular: n, comparator: f, createState: o, equals: m, strict: h });
 }
-function Ia(e, t) {
-  return Oa(e, t);
+function Cu(t, e) {
+  return bu(t, e);
 }
-function Ra(e, t) {
-  if (typeof e != typeof t) return !1;
-  if (!e && !t) return !0;
-  if (Array.isArray(e)) {
-    const i = t, a = e;
-    return i.length === 0 ? !0 : i.every((o) => a.includes(o));
+function yu(t, e) {
+  if (typeof t != typeof e) return !1;
+  if (!t && !e) return !0;
+  if (Array.isArray(t)) {
+    const a = e, h = t;
+    return a.length === 0 ? !0 : a.every((p) => h.includes(p));
   }
-  if (typeof e != "object")
-    return Ia(e, t);
-  const r = t, n = e;
-  let u = !0;
-  return Object.keys(r).forEach((i) => {
-    u && (Object.hasOwn(n, i) && Ra(n[i], r[i]) || (u = !1));
-  }), u;
+  if (typeof t != "object")
+    return Cu(t, e);
+  const n = e, i = t;
+  let o = !0;
+  return Object.keys(n).forEach((a) => {
+    o && (Object.hasOwn(i, a) && yu(i[a], n[a]) || (o = !1));
+  }), o;
 }
-function rn(e, t, r) {
-  return JSON.stringify(e, (u, i) => {
-    let a = i;
-    return t && (a = t(u, a)), a === void 0 && (a = null), a;
-  }, r);
+function Sr(t, e, n) {
+  return JSON.stringify(t, (o, a) => {
+    let h = a;
+    return e && (h = e(o, h)), h === void 0 && (h = null), h;
+  }, n);
 }
-function Ba(e, t) {
-  function r(a) {
-    return Object.keys(a).forEach((o) => {
-      a[o] === null ? a[o] = void 0 : typeof a[o] == "object" && (a[o] = r(a[o]));
-    }), a;
+function Tu(t, e) {
+  function n(o) {
+    return Object.keys(o).forEach((a) => {
+      o[a] === null ? o[a] = void 0 : typeof o[a] == "object" && (o[a] = n(o[a]));
+    }), o;
   }
-  function n(a, o) {
-    if (o && typeof o == "object" && "book" in o && typeof o.book == "string" && "chapterNum" in o && typeof o.chapterNum == "number" && "verseNum" in o && typeof o.verseNum == "number" && Object.keys(o).every(
-      (s) => ["book", "chapterNum", "verseNum", "verse", "versificationStr"].includes(s)
-    )) {
-      const s = o.chapterNum.toString(10), c = "verse" in o && typeof o.verse == "string" ? o.verse : o.verseNum.toString(10), f = "versificationStr" in o && typeof o.versificationStr == "string" ? new oe(o.versificationStr) : void 0;
-      return new Wt(o.book, s, c, f);
-    }
-    return o;
-  }
-  function u(a, o) {
-    return n(
-      a,
-      t ? t.call(this, a, o) : o
-    );
-  }
-  const i = JSON.parse(e, u);
+  const i = JSON.parse(t, e);
   if (i !== null)
-    return typeof i == "object" ? r(i) : i;
+    return typeof i == "object" ? n(i) : i;
 }
-function bs(e) {
+function bi(t) {
   try {
-    const t = rn(e);
-    return t === rn(Ba(t));
+    const e = Sr(t);
+    return e === Sr(Tu(e));
   } catch {
     return !1;
   }
 }
-const ys = (e) => e.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
-function Cs() {
-  return typeof navigator < "u" && navigator.languages ? navigator.languages[0] : new lu().resolvedOptions().locale;
+const Ci = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;").replace(/\//g, "&#x2F;");
+function yi() {
+  return typeof navigator < "u" && navigator.languages ? navigator.languages[0] : new Wr().resolvedOptions().locale;
 }
-function Ts(e, t = 2) {
-  if (e === 0) return "0 Bytes";
-  const r = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], n = Math.floor(Math.log(e) / Math.log(1024)), u = r[n];
-  return `${new Du("en", {
+function Ti(t, e = 2) {
+  if (t === 0) return "0 Bytes";
+  const n = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], i = Math.floor(Math.log(t) / Math.log(1024)), o = n[i];
+  return `${new un("en", {
     style: "decimal",
-    maximumFractionDigits: t,
+    maximumFractionDigits: e,
     minimumFractionDigits: 0
-  }).format(e / 1024 ** n)} ${u}`;
+  }).format(t / 1024 ** i)} ${o}`;
 }
-const xa = 1e3, nu = 60, uu = nu * 60, Ma = uu * 24;
-function ws(e, t, r = /* @__PURE__ */ new Date()) {
-  const n = Math.floor((t.getTime() - r.getTime()) / xa), u = Math.round(n / Ma);
-  if (Math.abs(u) >= 1) return e.format(u, "day");
-  const i = Math.round(n / uu);
-  if (Math.abs(i) >= 1) return e.format(i, "hour");
-  const a = Math.round(n / nu);
-  return Math.abs(a) >= 1 ? e.format(a, "minute") : e.format(n, "second");
+const wu = 1e3, Gr = 60, zr = Gr * 60, Su = zr * 24;
+function wi(t, e, n = /* @__PURE__ */ new Date()) {
+  const i = Math.floor((e.getTime() - n.getTime()) / wu), o = Math.round(i / Su);
+  if (Math.abs(o) >= 1) return t.format(o, "day");
+  const a = Math.round(i / zr);
+  if (Math.abs(a) >= 1) return t.format(a, "hour");
+  const h = Math.round(i / Gr);
+  return Math.abs(h) >= 1 ? t.format(h, "minute") : t.format(i, "second");
 }
-const cr = {
+const zt = {
   projectSettingsContribution: {
     description: "The data an extension provides to inform Platform.Bible of the project settings it provides",
     anyOf: [
@@ -7476,6 +7548,13 @@ const cr = {
           description: {
             description: "localizeKey that displays in the settings dialog to describe the setting",
             $ref: "#/$defs/localizeKey"
+          },
+          isHidden: {
+            description: `Boolean that controls whether a setting should be hidden or not. If hidden
+            , the setting will not show up in the settings dialog in \`paranext-core\`, and thus
+            will not be configurable by the user unless an extension provides a way to interact with
+            the setting.`,
+            type: "boolean"
           }
         },
         required: ["label"]
@@ -7562,19 +7641,19 @@ const cr = {
     tsType: "Id"
   }
 };
-function lr(e) {
-  e && Object.values(e).forEach((t) => {
-    if (t.type) {
-      if ("tsType" in t && delete t.tsType, t.type === "any") {
-        delete t.type;
+function Ht(t) {
+  t && Object.values(t).forEach((e) => {
+    if (e.type) {
+      if ("tsType" in e && delete e.tsType, e.type === "any") {
+        delete e.type;
         return;
       }
-      t.type === "object" && lr(t.properties);
+      e.type === "object" && Ht(e.properties);
     }
   });
 }
-lr(cr);
-const _a = {
+Ht(zt);
+const Ou = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   title: "Project Settings Contribution",
   description: "The data an extension provides to inform Platform.Bible of the project settings it provides",
@@ -7589,10 +7668,10 @@ const _a = {
       }
     }
   ],
-  $defs: cr
+  $defs: zt
 };
-Object.freeze(_a);
-const Pa = {
+Object.freeze(Ou);
+const Iu = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   title: "Settings Contribution",
   description: "The data an extension provides to inform Platform.Bible of the settings it provides",
@@ -7607,10 +7686,10 @@ const Pa = {
       }
     }
   ],
-  $defs: cr
+  $defs: zt
 };
-Object.freeze(Pa);
-const iu = {
+Object.freeze(Iu);
+const Hr = {
   languageStrings: {
     description: "Map whose keys are localized string keys and whose values provide information about how to localize strings for the localized string key",
     type: "object",
@@ -7658,8 +7737,8 @@ const iu = {
     tsType: "LocalizeKey"
   }
 };
-lr(iu);
-const La = {
+Ht(Hr);
+const xu = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   title: "Localized String Data Contribution",
   description: "The data an extension provides to inform Platform.Bible of the localized strings it provides.",
@@ -7675,10 +7754,10 @@ const La = {
       }
     }
   },
-  $defs: iu
+  $defs: Hr
 };
-Object.freeze(La);
-const Fa = {
+Object.freeze(xu);
+const Bu = {
   title: "Platform.Bible menus",
   type: "object",
   properties: {
@@ -7924,51 +8003,51 @@ const Fa = {
     }
   }
 };
-Object.freeze(Fa);
-const ne = ["figure", "note", "sidebar", "table"];
-Object.freeze(ne);
-class F {
-  constructor(t) {
-    I(this, "usj");
-    I(this, "parentMapInternal");
-    this.usj = t;
+Object.freeze(Bu);
+const je = ["figure", "note", "sidebar", "table"];
+Object.freeze(je);
+class Ee {
+  constructor(e) {
+    W(this, "usj");
+    W(this, "parentMapInternal");
+    this.usj = e;
   }
   // If new variables are created to speed up queries, they should be reset here
   usjChanged() {
     this.parentMapInternal = void 0;
   }
   // #region Directly using the JSONPath package to perform JSONPath query -> USJ node
-  findSingleValue(t) {
-    const r = dr({ path: t, json: this.usj, wrap: !0 });
-    if (r === void 0 || r.length === 0) return;
-    if (!Array.isArray(r[0])) return r[0];
-    const n = dr({ path: t, json: this.usj, wrap: !1 });
-    return n.length === 1 && Array.isArray(n[0]) ? n[0] : n;
+  findSingleValue(e) {
+    const n = Wt({ path: e, json: this.usj, wrap: !0 });
+    if (n === void 0 || n.length === 0) return;
+    if (!Array.isArray(n[0])) return n[0];
+    const i = Wt({ path: e, json: this.usj, wrap: !1 });
+    return i.length === 1 && Array.isArray(i[0]) ? i[0] : i;
   }
-  findParent(t) {
-    return this.findSingleValue(`${t}^`);
+  findParent(e) {
+    return this.findSingleValue(`${e}^`);
   }
   findBookId() {
     return this.findSingleValue('$.content[?(@.type=="book" && @.marker=="id")].code');
   }
-  findChapterNode(t) {
-    const r = `$..content[?(@.type=="chapter" && @.number=="${t}")]`;
-    return this.findSingleValue(r);
+  findChapterNode(e) {
+    const n = `$..content[?(@.type=="chapter" && @.number=="${e}")]`;
+    return this.findSingleValue(n);
   }
   // #endregion
   // #region Parent Maps
-  static createParentMapInternal(t, r, n) {
-    var u;
-    n.set(t, r), t.content && n.set(t.content, t), (u = t.content) == null || u.forEach((i) => {
-      typeof i == "object" && F.createParentMapInternal(i, t, n);
+  static createParentMapInternal(e, n, i) {
+    var o;
+    i.set(e, n), e.content && i.set(e.content, e), (o = e.content) == null || o.forEach((a) => {
+      typeof a == "object" && Ee.createParentMapInternal(a, e, i);
     });
   }
   /** Viewing a Usj object as a tree, build a map to walk up the tree */
   createUsjParentMap() {
-    const t = /* @__PURE__ */ new Map();
-    return this.usj.content && t.set(this.usj.content, this.usj), this.usj.content.forEach((r) => {
-      typeof r == "object" && F.createParentMapInternal(r, this.usj, t);
-    }), t;
+    const e = /* @__PURE__ */ new Map();
+    return this.usj.content && e.set(this.usj.content, this.usj), this.usj.content.forEach((n) => {
+      typeof n == "object" && Ee.createParentMapInternal(n, this.usj, e);
+    }), e;
   }
   /** Create the parent map if it doesn't already exist and return it */
   get parentMap() {
@@ -7977,50 +8056,50 @@ class F {
   // #endregion
   // #region Working Stacks
   /** Return the working stack applicable to the given node */
-  createWorkingStack(t) {
-    const r = [], { parentMap: n } = this;
-    let u = t, i = n.get(u);
-    for (; i !== void 0; ) {
-      if (!i.content)
+  createWorkingStack(e) {
+    const n = [], { parentMap: i } = this;
+    let o = e, a = i.get(o);
+    for (; a !== void 0; ) {
+      if (!a.content)
         throw new Error("Invalid parentMap: all parents should have content");
       if (
         // Referencing tempNode and tempParent is OK in the loop since 'let' is used instead of 'var'
         // eslint-disable-next-line no-loop-func
-        !i.content.find((a, o) => {
-          if (a !== u) return !1;
-          if (!i) throw new Error('undefined "tempParent" should not be possible');
-          return r.unshift({ parent: i, index: o }), !0;
+        !a.content.find((h, p) => {
+          if (h !== o) return !1;
+          if (!a) throw new Error('undefined "tempParent" should not be possible');
+          return n.unshift({ parent: a, index: p }), !0;
         })
       )
-        throw new Error(`Unable to find correct parent node of ${JSON.stringify(u)}`);
-      if (i.type === Gt) break;
-      u = i, i = n.get(i);
+        throw new Error(`Unable to find correct parent node of ${JSON.stringify(o)}`);
+      if (a.type === Ut) break;
+      o = a, a = i.get(a);
     }
-    return r;
+    return n;
   }
-  static convertWorkingStackToJsonPath(t) {
-    let r = "$";
-    return t.forEach((n) => {
-      r = `${r}.content[${n.index}]`;
-    }), r;
+  static convertWorkingStackToJsonPath(e) {
+    let n = "$";
+    return e.forEach((i) => {
+      n = `${n}.content[${i.index}]`;
+    }), n;
   }
-  convertJsonPathToWorkingStack(t) {
-    const r = [], n = t.match(/content\[(\d+)\]/g);
-    if (!n) throw new Error(`Malformed or unexpected jsonPath: ${t}`);
-    let u = this.usj;
-    return n.forEach((i, a) => {
-      const o = /(\d+)/.exec(i);
-      if (!o) throw new Error(`Malformed or unexpected jsonPath: ${t}`);
-      const s = parseInt(o[0], 10);
-      if (r.push({ parent: u, index: s }), a + 1 < n.length) {
-        if (typeof u == "string" || !u.content)
-          throw new Error(`jsonPath points to node without children: ${JSON.stringify(u)}`);
-        const c = u.content[s];
-        if (typeof c == "string")
-          throw new Error(`jsonPath points to node without children: ${JSON.stringify(c)}`);
-        u = c;
+  convertJsonPathToWorkingStack(e) {
+    const n = [], i = e.match(/content\[(\d+)\]/g);
+    if (!i) throw new Error(`Malformed or unexpected jsonPath: ${e}`);
+    let o = this.usj;
+    return i.forEach((a, h) => {
+      const p = /(\d+)/.exec(a);
+      if (!p) throw new Error(`Malformed or unexpected jsonPath: ${e}`);
+      const f = parseInt(p[0], 10);
+      if (n.push({ parent: o, index: f }), h + 1 < i.length) {
+        if (typeof o == "string" || !o.content)
+          throw new Error(`jsonPath points to node without children: ${JSON.stringify(o)}`);
+        const m = o.content[f];
+        if (typeof m == "string")
+          throw new Error(`jsonPath points to node without children: ${JSON.stringify(m)}`);
+        o = m;
       }
-    }), r;
+    }), n;
   }
   // #endregion
   // #region Walk the node tree
@@ -8040,28 +8119,28 @@ class F {
    * The general idea here is that we are looking for the MarkerObject in Usj that is immediately
    * adjacent to whatever `node`'s next sibling is in `parent`'s `content` array.
    */
-  static findRightMostDescendantMarkerObject(t, r, n = []) {
-    if (!t.content) return { node: t, parent: r };
-    for (let u = t.content.length - 1; u >= 0; u--) {
-      const i = t.content[u];
-      if (typeof i == "object" && !n.includes(i.type))
-        return i.content ? this.findRightMostDescendantMarkerObject(i, t, n) : { node: i, parent: t };
+  static findRightMostDescendantMarkerObject(e, n, i = []) {
+    if (!e.content) return { node: e, parent: n };
+    for (let o = e.content.length - 1; o >= 0; o--) {
+      const a = e.content[o];
+      if (typeof a == "object" && !i.includes(a.type))
+        return a.content ? this.findRightMostDescendantMarkerObject(a, e, i) : { node: a, parent: e };
     }
-    return { node: t, parent: r };
+    return { node: e, parent: n };
   }
-  static findNextMatchingNodeUsingWorkingStack(t, r, n, u) {
-    var a;
-    let i = t;
-    for (; i !== void 0; ) {
-      const o = typeof i == "object" && n.includes(i.type);
-      if (!o && u(i, r)) return i;
-      if (!o && typeof i == "object" && (((a = i.content) == null ? void 0 : a.length) ?? 0) > 0)
-        r.push({ parent: i, index: 0 }), [i] = i.content;
+  static findNextMatchingNodeUsingWorkingStack(e, n, i, o) {
+    var h;
+    let a = e;
+    for (; a !== void 0; ) {
+      const p = typeof a == "object" && i.includes(a.type);
+      if (!p && o(a, n)) return a;
+      if (!p && typeof a == "object" && (((h = a.content) == null ? void 0 : h.length) ?? 0) > 0)
+        n.push({ parent: a, index: 0 }), [a] = a.content;
       else
-        for (i = void 0; r.length > 0; ) {
-          const s = r.pop();
-          if (s && s.index + 1 < s.parent.content.length) {
-            s.index += 1, r.push(s), i = s.parent.content[s.index];
+        for (a = void 0; n.length > 0; ) {
+          const f = n.pop();
+          if (f && f.index + 1 < f.parent.content.length) {
+            f.index += 1, n.push(f), a = f.parent.content[f.index];
             break;
           }
         }
@@ -8072,285 +8151,295 @@ class F {
    * criteria specified by `searchFunction` (i.e., the first node where `searchFunction` returns
    * `true`)
    */
-  findNextMatchingNode(t, r, n) {
-    const u = this.createWorkingStack(t);
-    return F.findNextMatchingNodeUsingWorkingStack(
-      t,
-      u,
-      r,
-      n
+  findNextMatchingNode(e, n, i) {
+    const o = this.createWorkingStack(e);
+    return Ee.findNextMatchingNodeUsingWorkingStack(
+      e,
+      o,
+      n,
+      i
     );
   }
   // #endregion
   // #region Node -> JSONPath
-  nodeToJsonPath(t) {
-    return F.convertWorkingStackToJsonPath(this.createWorkingStack(t));
+  nodeToJsonPath(e) {
+    return Ee.convertWorkingStackToJsonPath(this.createWorkingStack(e));
   }
   // #endregion
-  // #region USJ + node -> VerseRef + offset
+  // #region USJ + node -> SerializedVerseRef + offset
   /** Find the chapter and verse that apply to a given USJ node */
-  findVerseRefForNode(t, r, n = {
+  findVerseRefForNode(e, n, i = {
     chapterNum: void 0,
     verseNum: void 0,
     startingContentNode: void 0
   }) {
-    if (n.verseNum !== void 0 && n.chapterNum !== void 0) return n;
-    if (typeof t == "object" && t.number !== void 0) {
-      const s = Number.parseInt(t.number, 10);
-      if (t.type === Dt)
-        return n.chapterNum = s, n.verseNum = n.verseNum ?? 0, n.startingContentNode = n.startingContentNode ?? t, n;
-      t.type === vt && !n.verseNum && (n.verseNum = s, n.startingContentNode = t);
+    if (i.verseNum !== void 0 && i.chapterNum !== void 0) return i;
+    if (typeof e == "object" && e.number !== void 0) {
+      const f = Number.parseInt(e.number, 10);
+      if (e.type === Bt)
+        return i.chapterNum = f, i.verseNum = i.verseNum ?? 0, i.startingContentNode = i.startingContentNode ?? e, i;
+      e.type === Mt && !i.verseNum && (i.verseNum = f, i.startingContentNode = e);
     }
-    if (!r.content)
-      throw new Error(`"content" array not found: ${JSON.stringify(r)}`);
-    let u = 0;
-    for (let s = 0; s < r.content.length; s++)
-      if (r.content[s] === t) {
-        u = s;
+    if (!n.content)
+      throw new Error(`"content" array not found: ${JSON.stringify(n)}`);
+    let o = 0;
+    for (let f = 0; f < n.content.length; f++)
+      if (n.content[f] === e) {
+        o = f;
         break;
       }
-    let i = u - 1;
-    for (; i >= 0 && typeof r.content[i] != "object"; )
-      i -= 1;
-    if (i < 0) {
-      if (r.type === Gt)
-        return n.chapterNum === void 0 && (n.chapterNum = 1, n.verseNum = 0, n.startingContentNode = void 0), n;
-      const s = r, c = this.parentMap.get(s);
-      if (!c) throw new Error(`No parent found for ${JSON.stringify(r)}`);
-      return this.findVerseRefForNode(s, c, n);
+    let a = o - 1;
+    for (; a >= 0 && typeof n.content[a] != "object"; )
+      a -= 1;
+    if (a < 0) {
+      if (n.type === Ut)
+        return i.chapterNum === void 0 && (i.chapterNum = 1, i.verseNum = 0, i.startingContentNode = void 0), i;
+      const f = n, m = this.parentMap.get(f);
+      if (!m) throw new Error(`No parent found for ${JSON.stringify(n)}`);
+      return this.findVerseRefForNode(f, m, i);
     }
-    const a = r.content[i], o = F.findRightMostDescendantMarkerObject(
-      a,
-      r,
-      ne
+    const h = n.content[a], p = Ee.findRightMostDescendantMarkerObject(
+      h,
+      n,
+      je
     );
-    return this.findVerseRefForNode(o.node, o.parent, n);
+    return this.findVerseRefForNode(p.node, p.parent, i);
   }
-  nodeToVerseRefAndOffset(t, r, n) {
-    if (typeof r == "string" && n === void 0)
+  nodeToVerseRefAndOffset(e, n, i) {
+    if (typeof n == "string" && i === void 0)
       throw new Error('If "node" is a string, then "nodeParent" cannot be undefined');
-    let u;
-    if (n === void 0 ? u = this.parentMap.get(r) : u = Array.isArray(n) ? this.parentMap.get(n) : n, u === void 0)
-      throw new Error(`Cannot find parent for ${JSON.stringify(n)}`);
-    const i = this.findVerseRefForNode(r, u);
-    if (!i) return;
-    if (!i.chapterNum)
-      throw new Error(`Could not determine chapter number for ${JSON.stringify(r)}`);
-    const a = new Wt(
-      t,
-      i.chapterNum.toString(),
-      i.verseNum ? i.verseNum.toString() : "0"
-    );
-    let o = 0;
-    return i.startingContentNode !== void 0 && this.findNextMatchingNode(i.startingContentNode, [], (s, c) => {
-      var f, l;
-      return s === r ? !0 : c.find((p) => ne.includes(p.parent.type)) ? !1 : typeof s == "string" ? (o += s.length, !1) : s.type === Dt && s.number !== ((f = i.chapterNum) == null ? void 0 : f.toString()) || s.type === vt && s.number !== ((l = i.verseNum) == null ? void 0 : l.toString()) ? (o = 0, !0) : !1;
-    }), { verseRef: a, offset: o };
+    let o;
+    if (i === void 0 ? o = this.parentMap.get(n) : o = Array.isArray(i) ? this.parentMap.get(i) : i, o === void 0)
+      throw new Error(`Cannot find parent for ${JSON.stringify(i)}`);
+    const a = this.findVerseRefForNode(n, o);
+    if (!a) return;
+    if (!a.chapterNum)
+      throw new Error(`Could not determine chapter number for ${JSON.stringify(n)}`);
+    const h = {
+      book: e,
+      chapterNum: a.chapterNum,
+      verseNum: a.verseNum ?? 0
+    };
+    let p = 0;
+    return a.startingContentNode !== void 0 && this.findNextMatchingNode(a.startingContentNode, [], (f, m) => {
+      var E, l;
+      return f === n ? !0 : m.find((v) => je.includes(v.parent.type)) ? !1 : typeof f == "string" ? (p += f.length, !1) : f.type === Bt && f.number !== ((E = a.chapterNum) == null ? void 0 : E.toString()) || f.type === Mt && f.number !== ((l = a.verseNum) == null ? void 0 : l.toString()) ? (p = 0, !0) : !1;
+    }), { verseRef: h, offset: p };
   }
   // #endregion
-  // #region JSONPath -> VerseRef + offset
-  jsonPathToVerseRefAndOffset(t, r) {
-    const n = r ?? this.findBookId();
-    if (!n) throw new Error("Not able to determine the book ID");
-    const u = this.findSingleValue(t);
-    if (!u) throw new Error(`No result found for JSONPath query: ${t}`);
-    const i = this.findParent(t);
-    if (!i) throw new Error(`Could not determine parent for ${t}`);
-    const a = this.nodeToVerseRefAndOffset(n, u, i);
-    if (!a)
-      throw new Error(`Could not determine VerseRef that corresponds to ${t}`);
-    return a;
+  // #region JSONPath -> SerializedVerseRef + offset
+  jsonPathToVerseRefAndOffset(e, n) {
+    const i = n ?? this.findBookId();
+    if (!i) throw new Error("Not able to determine the book ID");
+    const o = this.findSingleValue(e);
+    if (!o) throw new Error(`No result found for JSONPath query: ${e}`);
+    const a = this.findParent(e);
+    if (!a) throw new Error(`Could not determine parent for ${e}`);
+    const h = this.nodeToVerseRefAndOffset(i, o, a);
+    if (!h)
+      throw new Error(
+        `Could not determine SerializedVerseRef that corresponds to ${e}`
+      );
+    return h;
   }
   // #endregion
-  // #region VerseRef + offset -> Node + JSONPath + offset
-  verseRefToUsjContentLocation(t, r = 0) {
-    if (r < 0) throw new Error("offset must be >= 0");
-    const n = this.findBookId() ?? t.book;
-    if (!n) throw new Error("Not able to determine the book ID");
-    if (n !== t.book)
-      throw new Error(`Book IDs don't match: USJ=${n}, VerseRef=${t.book}`);
-    const u = this.findChapterNode(t.chapterNum);
-    if (u === void 0)
-      throw new Error(`Could not find ${n} chapter ${t.chapterNum}`);
-    let i = !1, a = "";
-    const o = t.verse, s = this.findNextMatchingNode(
-      u,
-      ne,
-      (p, g) => p === u ? t.verseNum === 0 ? (a = F.convertWorkingStackToJsonPath(g), !0) : !1 : typeof p != "object" ? !1 : p.type === Dt ? (i = !0, !0) : p.type === vt && p.number !== void 0 && p.number === o ? (a = F.convertWorkingStackToJsonPath(g), !0) : !1
+  // #region SerializedVerseRef + offset -> Node + JSONPath + offset
+  verseRefToUsjContentLocation(e, n = 0) {
+    if (n < 0) throw new Error("offset must be >= 0");
+    const i = this.findBookId() ?? e.book;
+    if (!i) throw new Error("Not able to determine the book ID");
+    if (i !== e.book)
+      throw new Error(`Book IDs don't match: USJ=${i}, SerializedVerseRef=${e.book}`);
+    const o = this.findChapterNode(e.chapterNum);
+    if (o === void 0)
+      throw new Error(`Could not find ${i} chapter ${e.chapterNum}`);
+    let a = !1, h = "";
+    const p = e.verse ?? e.verseNum.toString(), f = this.findNextMatchingNode(
+      o,
+      je,
+      (v, O) => v === o ? e.verseNum === 0 ? (h = Ee.convertWorkingStackToJsonPath(O), !0) : !1 : typeof v != "object" ? !1 : v.type === Bt ? (a = !0, !0) : v.type === Mt && v.number !== void 0 && v.number === p ? (h = Ee.convertWorkingStackToJsonPath(O), !0) : !1
     );
-    if (i || s === void 0 || typeof s == "string")
-      throw new Error(`Verse ${o} not found in ${n} ${t.chapterNum}`);
-    if (r === 0) return { node: s, offset: 0, jsonPath: a };
-    let c = 0, f = 0, l;
+    if (a || f === void 0 || typeof f == "string")
+      throw new Error(`Verse ${p} not found in ${i} ${e.chapterNum}`);
+    if (n === 0) return { node: f, offset: 0, jsonPath: h };
+    let m = 0, E = 0, l;
     return this.findNextMatchingNode(
-      s,
-      ne,
-      (p, g) => {
-        if (p === s) return !1;
-        if (typeof p == "string") {
-          if (c += p.length, c > r)
-            return a = F.convertWorkingStackToJsonPath(g), f = r - c + p.length, l = p, !0;
-        } else if (p.type === Dt || p.type === vt) return !0;
+      f,
+      je,
+      (v, O) => {
+        if (v === f) return !1;
+        if (typeof v == "string") {
+          if (m += v.length, m > n)
+            return h = Ee.convertWorkingStackToJsonPath(O), E = n - m + v.length, l = v, !0;
+        } else if (v.type === Bt || v.type === Mt) return !0;
         return !1;
       }
-    ), { node: l ?? s, offset: f, jsonPath: a };
+    ), { node: l ?? f, offset: E, jsonPath: h };
   }
   // #endregion
   // #region Search for text from a node + JSONPath + offset
-  findNextLocationOfMatchingText(t, r, n = 1e3) {
-    let u = "", i = 0, a = 0, o = 0;
-    if (F.findNextMatchingNodeUsingWorkingStack(
-      t.node,
-      this.convertJsonPathToWorkingStack(t.jsonPath),
-      ne,
+  findNextLocationOfMatchingText(e, n, i = 1e3) {
+    let o = "", a = 0, h = 0, p = 0;
+    if (Ee.findNextMatchingNodeUsingWorkingStack(
+      e.node,
+      this.convertJsonPathToWorkingStack(e.jsonPath),
+      je,
       (l) => {
         if (typeof l != "string") return !1;
-        i += l.length, u = `${u}${l}`;
-        const p = u.indexOf(r);
-        return p < 0 ? (a += u.length, u.length > r.length && (u = u.substring(u.length - r.length)), a -= u.length, i > n) : (o = a + p, !0);
+        a += l.length, o = `${o}${l}`;
+        const v = o.indexOf(n);
+        return v < 0 ? (h += o.length, o.length > n.length && (o = o.substring(o.length - n.length)), h -= o.length, a > i) : (p = h + v, !0);
       }
-    ), o <= 0) return;
-    i = 0;
-    let s = 0, c = [];
-    const f = F.findNextMatchingNodeUsingWorkingStack(
-      t.node,
-      this.convertJsonPathToWorkingStack(t.jsonPath),
-      ne,
-      (l, p) => typeof l != "string" || (i += l.length, i < o + 1) ? !1 : (s = o - i + l.length, c = p, !0)
+    ), p <= 0) return;
+    a = 0;
+    let f = 0, m = [];
+    const E = Ee.findNextMatchingNodeUsingWorkingStack(
+      e.node,
+      this.convertJsonPathToWorkingStack(e.jsonPath),
+      je,
+      (l, v) => typeof l != "string" || (a += l.length, a < p + 1) ? !1 : (f = p - a + l.length, m = v, !0)
     );
-    if (!f) throw new Error("Internal error: inconsistent search results");
+    if (!E) throw new Error("Internal error: inconsistent search results");
     return {
-      node: f,
-      offset: s,
-      jsonPath: F.convertWorkingStackToJsonPath(c)
+      node: E,
+      offset: f,
+      jsonPath: Ee.convertWorkingStackToJsonPath(m)
     };
   }
   // #endregion
   // #region Extract text from a node + JSONPath + offset
-  extractText(t, r) {
-    let n = "", u = t.offset, i = 0;
-    return F.findNextMatchingNodeUsingWorkingStack(
-      t.node,
-      this.convertJsonPathToWorkingStack(t.jsonPath),
-      ne,
-      (a) => {
-        if (typeof a != "string") return !1;
-        if (u >= a.length)
-          return u -= a.length, !1;
-        let o = a;
-        if (u > 0 && (o = o.substring(u), u = 0), i + o.length < r)
-          return i += o.length, n = `${n}${o}`, !1;
-        const s = r - i;
-        return n = `${n}${o.substring(0, s - 1)}`, !0;
+  extractText(e, n) {
+    let i = "", o = e.offset, a = 0;
+    return Ee.findNextMatchingNodeUsingWorkingStack(
+      e.node,
+      this.convertJsonPathToWorkingStack(e.jsonPath),
+      je,
+      (h) => {
+        if (typeof h != "string") return !1;
+        if (o >= h.length)
+          return o -= h.length, !1;
+        let p = h;
+        if (o > 0 && (p = p.substring(o), o = 0), a + p.length < n)
+          return a += p.length, i = `${i}${p}`, !1;
+        const f = n - a;
+        return i = `${i}${p.substring(0, f - 1)}`, !0;
       }
-    ), n;
+    ), i;
   }
-  extractTextBetweenPoints(t, r, n = 100) {
-    let u = "";
-    return F.findNextMatchingNodeUsingWorkingStack(
-      t.node,
-      this.convertJsonPathToWorkingStack(t.jsonPath),
-      ne,
-      (i, a) => i === r.node && (typeof i == "object" || r.jsonPath === F.convertWorkingStackToJsonPath(a)) ? !0 : typeof i != "string" ? !1 : (u = `${u}${i}`, u.length > n && (u = u.substring(0, n)), u.length >= n)
-    ), u;
+  extractTextBetweenPoints(e, n, i = 100) {
+    let o = "";
+    return Ee.findNextMatchingNodeUsingWorkingStack(
+      e.node,
+      this.convertJsonPathToWorkingStack(e.jsonPath),
+      je,
+      (a, h) => a === n.node && (typeof a == "object" || n.jsonPath === Ee.convertWorkingStackToJsonPath(h)) ? !0 : typeof a != "string" ? !1 : (o = `${o}${a}`, o.length > i && (o = o.substring(0, i)), o.length >= i)
+    ), o;
   }
   // #endregion
   // #region Edit this USJ data
-  static removeContentNodesFromArray(t, r) {
-    let n = 0;
-    for (let u = t.length - 1; u >= 0; u--) {
-      const i = t[u];
-      r(i) ? (t.splice(u, 1), n += 1) : typeof i != "string" && i.content && (n += this.removeContentNodesFromArray(i.content, r));
+  static removeContentNodesFromArray(e, n) {
+    let i = 0;
+    for (let o = e.length - 1; o >= 0; o--) {
+      const a = e[o];
+      n(a) ? (e.splice(o, 1), i += 1) : typeof a != "string" && a.content && (i += this.removeContentNodesFromArray(a.content, n));
     }
-    return n;
+    return i;
   }
-  removeContentNodes(t) {
-    const r = F.removeContentNodesFromArray(this.usj.content, t);
-    return this.usjChanged(), r;
+  removeContentNodes(e) {
+    const n = Ee.removeContentNodesFromArray(this.usj.content, e);
+    return this.usjChanged(), n;
   }
   // #endregion
 }
 export {
-  ja as AsyncVariable,
-  Dt as CHAPTER_TYPE,
-  Ua as Collator,
-  lu as DateTimeFormat,
-  mu as DocumentCombiner,
-  qo as FIRST_SCR_BOOK_NUM,
-  jo as FIRST_SCR_CHAPTER_NUM,
-  Uo as FIRST_SCR_VERSE_NUM,
-  $o as LAST_SCR_BOOK_NUM,
-  gu as Mutex,
-  Ka as MutexMap,
-  Wa as NonValidatingDocumentCombiner,
-  Du as NumberFormat,
-  fu as PlatformEventEmitter,
-  Qa as PromiseChainingMap,
-  Za as UnsubscriberAsyncList,
-  F as UsjReaderWriter,
-  vt as VERSE_TYPE,
-  Ns as aggregateUnsubscriberAsyncs,
-  As as aggregateUnsubscribers,
-  vs as areUsjContentsEqualExceptWhitespace,
-  gt as at,
-  Re as charAt,
-  ts as codePointAt,
-  Es as compareScrRefs,
-  Ya as createSyncProxyForAsyncObject,
-  Ha as debounce,
-  Ye as deepClone,
-  Ia as deepEqual,
-  fs as defaultScrRef,
-  Ba as deserialize,
-  Bo as endsWith,
-  Qn as ensureArray,
-  ss as escapeStringRegexp,
-  Ts as formatBytes,
-  rs as formatReplacementString,
-  Mo as formatReplacementStringToArray,
-  Ds as formatScrRef,
-  ws as formatTimeSpan,
-  Xa as getAllObjectFunctionNames,
-  Vo as getChaptersForBook,
-  Cs as getCurrentLocale,
-  za as getErrorMessage,
-  Ho as getLocalizeKeyForScrollGroupId,
-  gs as getLocalizeKeysForScrollGroupIds,
-  ms as getLocalizedIdFromBookNumber,
-  Ga as groupBy,
-  ys as htmlEncode,
-  _o as includes,
-  ot as indexOf,
-  as as isLocalizeKey,
-  bs as isSerializable,
-  ae as isString,
-  Ra as isSubset,
-  Oe as isWhiteSpace,
-  Po as lastIndexOf,
-  La as localizedStringsDocumentSchema,
-  Fa as menuDocumentSchema,
-  Va as newGuid,
-  ns as normalize,
-  Gr as normalizeScriptureSpaces,
-  ps as offsetBook,
-  hs as offsetChapter,
-  ds as offsetVerse,
-  us as ordinalCompare,
-  is as padEnd,
-  os as padStart,
-  _a as projectSettingsDocumentSchema,
-  Vr as scrRefToBBBCCCVVV,
-  rn as serialize,
-  Pa as settingsDocumentSchema,
-  jr as slice,
-  Ur as split,
-  Zn as startsWith,
-  P as stringLength,
-  de as substring,
-  Lo as toArray,
-  ls as transformAndEnsureRegExpArray,
-  cs as transformAndEnsureRegExpRegExpArray,
-  du as wait,
-  Ja as waitForDuration
+  Pu as AsyncVariable,
+  Bt as CHAPTER_TYPE,
+  Lu as Collator,
+  Wr as DateTimeFormat,
+  tn as DocumentCombiner,
+  zu as EventRollingTimeCounter,
+  Rn as FIRST_SCR_BOOK_NUM,
+  Pn as FIRST_SCR_CHAPTER_NUM,
+  Ln as FIRST_SCR_VERSE_NUM,
+  _n as LAST_SCR_BOOK_NUM,
+  nn as Mutex,
+  Hu as MutexMap,
+  Ju as NonValidatingDocumentCombiner,
+  un as NumberFormat,
+  It as PLATFORM_ERROR_VERSION,
+  Kr as PlatformEventEmitter,
+  Xu as PromiseChainingMap,
+  Yu as UnsubscriberAsyncList,
+  Ee as UsjReaderWriter,
+  Mt as VERSE_TYPE,
+  Ni as aggregateUnsubscriberAsyncs,
+  Ai as aggregateUnsubscribers,
+  vi as areUsjContentsEqualExceptWhitespace,
+  xt as at,
+  Et as charAt,
+  Zu as codePointAt,
+  Ei as compareScrRefs,
+  $u as createSyncProxyForAsyncObject,
+  ku as debounce,
+  wt as deepClone,
+  Cu as deepEqual,
+  li as defaultScrRef,
+  Tu as deserialize,
+  Tn as endsWith,
+  qr as ensureArray,
+  oi as escapeStringRegexp,
+  Ti as formatBytes,
+  ei as formatReplacementString,
+  Sn as formatReplacementStringToArray,
+  Di as formatScrRef,
+  wi as formatTimeSpan,
+  ju as getAllObjectFunctionNames,
+  Fn as getChaptersForBook,
+  yi as getCurrentLocale,
+  Or as getErrorMessage,
+  kn as getLocalizeKeyForScrollGroupId,
+  gi as getLocalizeKeysForScrollGroupIds,
+  di as getLocalizedIdFromBookNumber,
+  qu as groupBy,
+  Ci as htmlEncode,
+  On as includes,
+  St as indexOf,
+  Vu as isErrorMessageAboutParatextBlockingInternetAccess,
+  Gu as isErrorMessageAboutRegistryAuthFailure,
+  ii as isLocalizeKey,
+  Ku as isPlatformError,
+  bi as isSerializable,
+  Be as isString,
+  yu as isSubset,
+  mt as isWhiteSpace,
+  In as lastIndexOf,
+  xu as localizedStringsDocumentSchema,
+  Bu as menuDocumentSchema,
+  Fu as newGuid,
+  Wu as newPlatformError,
+  ti as normalize,
+  Er as normalizeScriptureSpaces,
+  fi as offsetBook,
+  pi as offsetChapter,
+  hi as offsetVerse,
+  ri as ordinalCompare,
+  ni as padEnd,
+  ui as padStart,
+  Ou as projectSettingsDocumentSchema,
+  mi as scrRefToBBBCCC,
+  dr as scrRefToBBBCCCVVV,
+  Sr as serialize,
+  Iu as settingsDocumentSchema,
+  pr as slice,
+  hr as split,
+  Ur as startsWith,
+  ce as stringLength,
+  ut as substring,
+  xn as toArray,
+  ci as toKebabCase,
+  si as transformAndEnsureRegExpArray,
+  ai as transformAndEnsureRegExpRegExpArray,
+  en as wait,
+  Uu as waitForDuration
 };
 //# sourceMappingURL=index.js.map
