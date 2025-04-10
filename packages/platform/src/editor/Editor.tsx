@@ -253,10 +253,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     <LexicalComposer initialConfig={editorConfig}>
       <EditablePlugin isEditable={!isReadonly} />
       <div className="editor-container">
-        <div
-          className="editor-toolbar-container"
-          style={{ display: isReadonly ? "none" : "block" }}
-        >
+        <div className={"editor-toolbar-container" + (isReadonly ? "-readonly" : "-editable")}>
           <ToolbarPlugin ref={toolbarEndRef} />
         </div>
         <div className="editor-inner">
