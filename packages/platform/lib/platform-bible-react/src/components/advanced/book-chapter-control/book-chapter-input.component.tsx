@@ -8,14 +8,23 @@ export type BookChapterInputProps = {
   handleOnClick: MouseEventHandler<HTMLInputElement>;
   handleSubmit: () => void;
   onFocus?: FocusEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   value: string;
   placeholder: string;
+  className?: string;
 };
 
 // Shadcn Input sets type to "button"- HAVE to prop spread before setting type
-const BookChapterInput = forwardRef<HTMLInputElement, BookChapterInputProps>(
+export const BookChapterInput = forwardRef<HTMLInputElement, BookChapterInputProps>(
   (
-    { handleSearch, handleKeyDown, handleOnClick, handleSubmit, ...props }: BookChapterInputProps,
+    {
+      handleSearch,
+      handleKeyDown,
+      handleOnClick,
+      handleSubmit,
+      className,
+      ...props
+    }: BookChapterInputProps,
     ref,
   ) => {
     return (
@@ -24,14 +33,15 @@ const BookChapterInput = forwardRef<HTMLInputElement, BookChapterInputProps>(
           {...props}
           type="text"
           className={cn(
-            "tw-box-border tw-w-[200px] tw-gap-2.5 tw-rounded-lg tw-border tw-border-solid tw-bg-background tw-py-2 tw-pe-9 tw-ps-4 tw-font-medium tw-shadow-none tw-outline-none",
+            "tw-box-border tw-w-[200px] tw-gap-2.5 tw-rounded-lg tw-border tw-border-solid tw-bg-background tw-py-2 tw-pe-2 tw-ps-4 tw-font-medium tw-shadow-none tw-outline-none",
+            className,
           )}
           onChange={(event) => handleSearch(event.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSubmit();
-            }
-            handleKeyDown(e);
+              e.preventDefault();
+            } else handleKeyDown(e);
           }}
           onClick={handleOnClick}
           ref={ref}

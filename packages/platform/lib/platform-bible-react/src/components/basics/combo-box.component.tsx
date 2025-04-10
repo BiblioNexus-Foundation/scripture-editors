@@ -68,7 +68,7 @@ function getOptionLabelDefault(option: ComboBoxOption): string {
  * Thanks to Shadcn for heavy inspiration and documentation
  * https://ui.shadcn.com/docs/components/combobox
  */
-function ComboBox<T extends ComboBoxOption = ComboBoxOption>({
+export function ComboBox<T extends ComboBoxOption = ComboBoxOption>({
   id,
   options = [],
   className,
@@ -104,7 +104,7 @@ function ComboBox<T extends ComboBoxOption = ComboBoxOption>({
         >
           <div className="tw-flex tw-flex-1 tw-items-center tw-overflow-hidden">
             {icon && <div className="tw-pe-2">{icon}</div>}
-            <span className="tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap">
+            <span className={cn("tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap")}>
               {value ? getOptionLabel(value) : buttonPlaceholder}
             </span>
           </div>

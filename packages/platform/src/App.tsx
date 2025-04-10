@@ -1,7 +1,6 @@
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
-import { Canon, SerializedVerseRef } from "@sillsdev/scripture";
+import { SerializedVerseRef } from "@sillsdev/scripture";
 import { BookChapterControl } from "platform-bible-react";
-import { ScriptureReference as BCReference } from "platform-bible-utils";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
 import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
@@ -26,11 +25,7 @@ type Annotations = {
 };
 
 const defaultUsj = usxStringToUsj('<usx version="3.1" />');
-const defaultScrRef: SerializedVerseRef = {
-  book: "PSA",
-  chapterNum: 1,
-  verseNum: 1,
-};
+const defaultScrRef: SerializedVerseRef = { book: "PSA", chapterNum: 1, verseNum: 1 };
 const nodeOptions: UsjNodeOptions = {
   [immutableNoteCallerNodeName]: { onClick: () => console.log("note node clicked") },
 };
@@ -113,23 +108,6 @@ export default function App() {
     marginalRef.current?.setUsj(usj);
   }, []);
 
-  const bcScrRef = useMemo<BCReference>(
-    () => ({
-      bookNum: Canon.bookIdToNumber(scrRef.book),
-      chapterNum: scrRef.chapterNum,
-      verseNum: scrRef.verseNum,
-    }),
-    [scrRef],
-  );
-
-  const handleBcScrRefChange = useCallback((bcScrRef: BCReference) => {
-    setScrRef({
-      book: Canon.bookNumberToId(bcScrRef.bookNum),
-      chapterNum: bcScrRef.chapterNum,
-      verseNum: bcScrRef.verseNum,
-    });
-  }, []);
-
   const handleTypeChange = useCallback((type: string) => setAnnotationType(type), []);
 
   const handleCursorClick = useCallback((addition: number) => {
@@ -179,7 +157,7 @@ export default function App() {
   return (
     <>
       <div className="controls">
-        <BookChapterControl scrRef={bcScrRef} handleSubmit={handleBcScrRefChange} />
+        <BookChapterControl scrRef={scrRef} handleSubmit={setScrRef} />
         <span>
           <div>Cursor Location</div>
           <div>
