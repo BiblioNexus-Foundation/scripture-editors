@@ -5,7 +5,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
 import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactDOM from "react-dom";
 import { isImmutableChapterElement } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
@@ -113,7 +113,7 @@ function isEditorInput(
 
 export default function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
-  const isReadonly = !editor.isEditable();
+  const [isReadonly, setIsReadonly] = useState(() => !editor.isEditable());
   const targetRef = useRef<HTMLElement>();
   const editorInputClassNameRef = useRef<string>();
   const closeMenuFnRef = useRef<() => void>();
@@ -157,7 +157,7 @@ export default function ContextMenuPlugin(): JSX.Element {
   );
 
   useEffect(() => {
-    editorInputClassNameRef.current = editor.getRootElement()?.className || "";
+    editorInputClassNameRef.current = editor.getRootElement()?.className ?? "";
   }, [editor]);
 
   useEffect(() => {
@@ -171,6 +171,14 @@ export default function ContextMenuPlugin(): JSX.Element {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, []);
+
+  useEffect(
+    () =>
+      editor.registerEditableListener((editable) => {
+        setIsReadonly(!editable);
+      }),
+    [editor],
+  );
 
   return (
     <LexicalContextMenuPlugin
