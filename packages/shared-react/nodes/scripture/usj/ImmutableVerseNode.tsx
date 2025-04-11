@@ -14,11 +14,7 @@ import {
   isHTMLElement,
 } from "lexical";
 import { JSX } from "react";
-import {
-  UnknownAttributes,
-  VERSE_CLASS_NAME,
-  ZWSP,
-} from "shared/nodes/scripture/usj/node-constants";
+import { UnknownAttributes, VERSE_CLASS_NAME } from "shared/nodes/scripture/usj/node-constants";
 import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
 
 export const VERSE_MARKER = "v";
@@ -213,7 +209,7 @@ export class ImmutableVerseNode extends DecoratorNode<JSX.Element> {
       <span>
         {this.getShowMarker()
           ? getVisibleOpenMarkerText(this.getMarker(), this.getNumber())
-          : this.getNumber() + ZWSP}
+          : this.getNumber()}
       </span>
     );
   }

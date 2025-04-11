@@ -48,7 +48,6 @@ import {
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
-  isSerializedChapterNode,
 } from "shared/nodes/scripture/usj/ChapterNode";
 import {
   CHAR_VERSION,
@@ -60,7 +59,6 @@ import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
-  isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -88,9 +86,11 @@ import {
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
+  isSomeSerializedChapterNode,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import {
+  isSerializedParaNode,
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
@@ -115,7 +115,10 @@ import {
   IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { CallerData } from "shared-react/nodes/scripture/usj/node-react.utils";
+import {
+  CallerData,
+  isSomeSerializedVerseNode,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
   UsjNodeOptions,
@@ -668,29 +671,25 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
 }
 
 /**
- * Insert implied paras around any other set of nodes that contain a text element at the root.
+ * Insert implied paras around any other set of nodes that contain a text or verse element at the root.
  * @param nodes - Serialized nodes.
  * @returns nodes with any needed implied paras inserted.
  */
 function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
-  const isBookNodeFound = bookNodeIndex >= 0;
-  const chapterNodeIndex = nodes.findIndex(
-    (node) => isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node),
+  const validRootNodeIndex = nodes.findIndex(
+    (node) =>
+      isSerializedBookNode(node) || isSomeSerializedChapterNode(node) || isSerializedParaNode(node),
   );
-  const isChapterNodeFound = chapterNodeIndex >= 0;
-  if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {
-    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, bookNodeIndex));
-    const bookNode = nodes[bookNodeIndex];
-    const nodesAfter = insertImpliedParasRecurse(nodes.slice(bookNodeIndex + 1));
-    return [...nodesBefore, bookNode, ...nodesAfter];
-  } else if (isChapterNodeFound) {
-    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, chapterNodeIndex));
-    const chapterNode = nodes[chapterNodeIndex];
-    const nodesAfter = insertImpliedParasRecurse(nodes.slice(chapterNodeIndex + 1));
-    return [...nodesBefore, chapterNode, ...nodesAfter];
-  } else if (nodes.some((node) => "text" in node && "mode" in node)) {
-    // If there are any text nodes as a child of this root, enclose in an implied para node.
+  const isValidRootNodeFound = validRootNodeIndex >= 0;
+  if (isValidRootNodeFound) {
+    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, validRootNodeIndex));
+    const validRootNode = nodes[validRootNodeIndex];
+    const nodesAfter = insertImpliedParasRecurse(nodes.slice(validRootNodeIndex + 1));
+    return [...nodesBefore, validRootNode, ...nodesAfter];
+  } else if (
+    nodes.some((node) => ("text" in node && "mode" in node) || isSomeSerializedVerseNode(node))
+  ) {
+    // If there are any text or verse nodes as a child of this root, enclose in an implied para node.
     return [createImpliedPara(nodes)];
   }
   return nodes;

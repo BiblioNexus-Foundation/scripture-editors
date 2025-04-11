@@ -70,7 +70,9 @@ function useArrowKeys(editor: LexicalEditor) {
 
       // Check if directions are different
       const inputDiv = paragraphElement.parentElement;
-      if (!inputDiv || paragraphElement.dir === inputDiv.dir) return false;
+      const paragraphDir = paragraphElement.dir || "ltr";
+      const inputDir = (inputDiv?.dir ?? "") || "ltr";
+      if (!inputDiv || paragraphDir === inputDir) return false;
 
       // Move in the opposite direction
       const isBackward =

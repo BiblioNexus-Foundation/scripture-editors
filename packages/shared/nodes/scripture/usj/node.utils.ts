@@ -13,9 +13,19 @@ import {
 import { NBSP, NUMBERED_MARKER_PLACEHOLDER, UnknownAttributes } from "./node-constants";
 import { $isUnknownNode, UnknownNode } from "../../features/UnknownNode";
 import { $isBookNode, BookNode } from "./BookNode";
-import { $isChapterNode, ChapterNode } from "./ChapterNode";
+import {
+  $isChapterNode,
+  ChapterNode,
+  isSerializedChapterNode,
+  SerializedChapterNode,
+} from "./ChapterNode";
 import { $isCharNode, CharNode, isSerializedCharNode } from "./CharNode";
-import { $isImmutableChapterNode, ImmutableChapterNode } from "./ImmutableChapterNode";
+import {
+  $isImmutableChapterNode,
+  ImmutableChapterNode,
+  isSerializedImmutableChapterNode,
+  SerializedImmutableChapterNode,
+} from "./ImmutableChapterNode";
 import { $isMilestoneNode, MilestoneNode } from "./MilestoneNode";
 import { $isNoteNode, NoteNode } from "./NoteNode";
 import { $isParaNode, ParaNode } from "./ParaNode";
@@ -92,6 +102,17 @@ export function extractNonNumberedMarkers(markers: string[] | readonly string[])
  */
 export function $isSomeChapterNode(node: LexicalNode | null | undefined): node is SomeChapterNode {
   return $isChapterNode(node) || $isImmutableChapterNode(node);
+}
+
+/**
+ * Checks if the given node is a SerializedChapterNode or SerializedImmutableChapterNode.
+ * @param node - The serialized node to check.
+ * @returns `true` if the node is a SerializedChapterNode or SerializedImmutableChapterNode, `false` otherwise.
+ */
+export function isSomeSerializedChapterNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedChapterNode | SerializedImmutableChapterNode {
+  return isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node);
 }
 
 /**
