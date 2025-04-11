@@ -779,6 +779,82 @@ export const editorStateGen1v1Editable = {
   },
 } as unknown as SerializedEditorState;
 
+export const usxGen1v1ImpliedParaEmpty = `
+<usx version="3.1">
+  <book style="id" code="GEN" />
+  <chapter style="c" number="1" sid="GEN 1" />
+    <verse style="v" number="1" sid="GEN 1:1" /><verse eid="GEN 1:1" />
+    <verse style="v" number="2" sid="GEN 1:2" /><verse eid="GEN 1:2" />
+    <verse style="v" number="15" sid="GEN 1:15" /><verse eid="GEN 1:15" />
+  <chapter eid="GEN 1" />
+</usx>
+`;
+
+export const usjGen1v1ImpliedParaEmpty: Usj = {
+  type: "USJ",
+  version: "3.1",
+  content: [
+    { type: "book", marker: "id", code: "GEN" },
+    { type: "chapter", marker: "c", number: "1", sid: "GEN 1" },
+    { type: "verse", marker: "v", number: "1", sid: "GEN 1:1" },
+    { type: "verse", marker: "v", number: "2", sid: "GEN 1:2" },
+    { type: "verse", marker: "v", number: "15", sid: "GEN 1:15" },
+  ],
+};
+
+export const editorStateGen1v1ImpliedParaEmpty = {
+  root: {
+    type: "root",
+    direction: null,
+    format: "",
+    indent: 0,
+    version: 1,
+    children: [
+      {
+        type: "book",
+        code: "GEN",
+        marker: "id",
+        direction: null,
+        format: "",
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: "text",
+            text: "",
+            detail: 0,
+            format: 0,
+            mode: "normal",
+            style: "",
+            version: 1,
+          },
+        ],
+      },
+      {
+        type: "immutable-chapter",
+        marker: "c",
+        number: "1",
+        sid: "GEN 1",
+        version: 1,
+      },
+      {
+        type: "implied-para",
+        direction: null,
+        format: "",
+        indent: 0,
+        textFormat: 0,
+        textStyle: "",
+        version: 1,
+        children: [
+          { type: "immutable-verse", marker: "v", number: "1", sid: "GEN 1:1", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "2", sid: "GEN 1:2", version: 1 },
+          { type: "immutable-verse", marker: "v", number: "15", sid: "GEN 1:15", version: 1 },
+        ],
+      },
+    ],
+  },
+} as unknown as SerializedEditorState;
+
 export const usxGen1v1ImpliedPara = `
 <usx version="3.1">
   <book style="id" code="GEN" />

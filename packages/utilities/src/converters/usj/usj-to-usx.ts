@@ -71,9 +71,11 @@ function convertUsjRecurse(
     chapterEid = markerContent.sid;
 
   // Append to parent.
-  if (eidElement && !isLastItem) parentElement.appendChild(eidElement);
+  const isVerseInImpliedPara =
+    parentElement.nodeName === USX_TYPE && eidElement?.tagName === "verse";
+  if (eidElement && (!isLastItem || isVerseInImpliedPara)) parentElement.appendChild(eidElement);
   parentElement.appendChild(element);
-  if (eidElement && isLastItem) parentElement.appendChild(eidElement);
+  if (eidElement && isLastItem && !isVerseInImpliedPara) parentElement.appendChild(eidElement);
 
   // Allow for final chapter and verse end elements at the end of an implied para.
   if (isLastItem && parentElement.nodeName === USX_TYPE) {

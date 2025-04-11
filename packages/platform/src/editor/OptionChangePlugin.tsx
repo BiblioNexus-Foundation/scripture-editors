@@ -22,7 +22,7 @@ export default function OptionChangePlugin({
     if (editedUsjRef.current && !deepEqual(editedUsjRef.current, usj)) {
       setUsj(editedUsjRef.current);
     }
-  }, [hasSpacing, isFormattedFont, markerMode, nodeOptions, setUsj, usj]);
+  }, [editedUsjRef, hasSpacing, isFormattedFont, markerMode, nodeOptions, setUsj, usj]);
 
   return null;
 }

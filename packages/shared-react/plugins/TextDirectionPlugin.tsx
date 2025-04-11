@@ -23,19 +23,19 @@ export default function TextDirectionPlugin({
 }
 
 function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
-  function updateTextDirection() {
-    const rootElement = editor.getRootElement();
-    if (!rootElement || textDirection === "auto") return;
-
-    rootElement.dir = textDirection;
-    const placeholderClassName = editor._config.theme.placeholder;
-    const placeholderElement = document.getElementsByClassName(
-      placeholderClassName,
-    )[0] as HTMLElement;
-    if (placeholderElement) placeholderElement.dir = textDirection;
-  }
-
   useEffect(() => {
+    function updateTextDirection() {
+      const rootElement = editor.getRootElement();
+      if (!rootElement || textDirection === "auto") return;
+
+      rootElement.dir = textDirection;
+      const placeholderClassName = editor._config.theme.placeholder;
+      const placeholderElement = document.getElementsByClassName(
+        placeholderClassName,
+      )[0] as HTMLElement;
+      if (placeholderElement) placeholderElement.dir = textDirection;
+    }
+
     updateTextDirection();
     return editor.registerUpdateListener(({ dirtyElements }) => {
       if (dirtyElements.size > 0) updateTextDirection();
@@ -70,7 +70,9 @@ function useArrowKeys(editor: LexicalEditor) {
 
       // Check if directions are different
       const inputDiv = paragraphElement.parentElement;
-      if (!inputDiv || paragraphElement.dir === inputDiv.dir) return false;
+      const paragraphDir = paragraphElement.dir || "ltr";
+      const inputDir = (inputDiv?.dir ?? "") || "ltr";
+      if (!inputDiv || paragraphDir === inputDir) return false;
 
       // Move in the opposite direction
       const isBackward =
