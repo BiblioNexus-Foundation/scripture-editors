@@ -11,20 +11,34 @@ import { useEffect } from "react";
 import { getNodeElementTagName } from "shared/nodes/scripture/usj/node.utils";
 import { TextDirection } from "./text-direction.model";
 
-function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
-  useEffect(() => {
-    return editor.registerUpdateListener(({ dirtyElements }) => {
-      if (dirtyElements.size > 0) {
-        const rootElement = editor.getRootElement();
-        if (!rootElement || textDirection === "auto") return;
+export default function TextDirectionPlugin({
+  textDirection,
+}: {
+  textDirection: TextDirection;
+}): null {
+  const [editor] = useLexicalComposerContext();
+  useTextDirection(editor, textDirection);
+  useArrowKeys(editor);
+  return null;
+}
 
-        rootElement.dir = textDirection;
-        const placeholderClassName = editor._config.theme.placeholder;
-        const placeholderElement = document.getElementsByClassName(
-          placeholderClassName,
-        )[0] as HTMLElement;
-        if (placeholderElement) placeholderElement.dir = textDirection;
-      }
+function useTextDirection(editor: LexicalEditor, textDirection: TextDirection) {
+  function updateTextDirection() {
+    const rootElement = editor.getRootElement();
+    if (!rootElement || textDirection === "auto") return;
+
+    rootElement.dir = textDirection;
+    const placeholderClassName = editor._config.theme.placeholder;
+    const placeholderElement = document.getElementsByClassName(
+      placeholderClassName,
+    )[0] as HTMLElement;
+    if (placeholderElement) placeholderElement.dir = textDirection;
+  }
+
+  useEffect(() => {
+    updateTextDirection();
+    return editor.registerUpdateListener(({ dirtyElements }) => {
+      if (dirtyElements.size > 0) updateTextDirection();
     });
   }, [editor, textDirection]);
 }
@@ -70,15 +84,4 @@ function useArrowKeys(editor: LexicalEditor) {
 
     return editor.registerCommand(KEY_DOWN_COMMAND, $handleKeyDown, COMMAND_PRIORITY_HIGH);
   }, [editor]);
-}
-
-export default function TextDirectionPlugin({
-  textDirection,
-}: {
-  textDirection: TextDirection;
-}): null {
-  const [editor] = useLexicalComposerContext();
-  useTextDirection(editor, textDirection);
-  useArrowKeys(editor);
-  return null;
 }

@@ -42,14 +42,15 @@ import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
-import { TextDirection } from "shared-react/plugins/text-direction.model";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
 import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
-import { getViewClassList, getViewOptions, ViewOptions } from "./adaptors/view-options.utils";
+import { getViewClassList, getViewOptions } from "./adaptors/view-options.utils";
+import { EditorOptions } from "./editor.model";
 import editorTheme from "./editor.theme";
+import OptionChangePlugin from "./OptionChangePlugin";
 import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 
@@ -91,29 +92,6 @@ export type EditorRef = {
   toolbarEndRef: React.RefObject<HTMLElement> | null;
 };
 
-/** Options to configure the editor. */
-export type EditorOptions = {
-  /** Is the editor readonly or editable. */
-  isReadonly?: boolean;
-  /** Is the editor enabled for spell checking. */
-  hasSpellCheck?: boolean;
-  /** Text direction: "ltr" | "rtl" | "auto". */
-  textDirection?: TextDirection;
-  /** Key to trigger the marker menu. Defaults to '\'. */
-  markerMenuTrigger?: string;
-  /**
-   * View options - EXPERIMENTAL. Defaults to the formatted view mode which is currently the only
-   * functional option.
-   */
-  view?: ViewOptions;
-  /** Options for each editor node:
-   * @param nodes.ImmutableNoteCallerNode.noteCallers - Possible note callers to use when caller is
-   *   '+'. Defaults to Latin lower case letters.
-   * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
-   */
-  nodes?: UsjNodeOptions;
-};
-
 export type EditorProps<TLogger extends LoggerBasic> = {
   /** Initial Scripture data in USJ format. */
   defaultUsj?: Usj;
@@ -148,6 +126,8 @@ const editorConfig: Mutable<InitialConfigType> = {
 };
 
 const defaultViewOptions = getViewOptions();
+const defaultNodeOptions: UsjNodeOptions = {};
+const defaultOptions: EditorOptions = {};
 
 function Placeholder(): JSX.Element {
   return <div className="editor-placeholder">Enter some Scripture...</div>;
@@ -193,8 +173,8 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     textDirection = "ltr",
     markerMenuTrigger = "\\",
     view: viewOptions = defaultViewOptions,
-    nodes: nodeOptions = {},
-  } = options ?? {};
+    nodes: nodeOptions = defaultNodeOptions,
+  } = options ?? defaultOptions;
 
   editorConfig.editable = !isReadonly;
   editorUsjAdaptor.initialize(logger);
@@ -281,6 +261,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
               }
             />
           )}
+          <OptionChangePlugin
+            options={{ view: viewOptions, nodes: nodeOptions }}
+            editedUsjRef={editedUsjRef}
+            usj={usj}
+            setUsj={setUsj}
+          />
           <UpdateStatePlugin
             scripture={usj}
             nodeOptions={nodeOptions}
