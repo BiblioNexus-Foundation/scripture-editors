@@ -11,6 +11,7 @@ export {
   getViewOptions,
   viewOptionsToMode,
 } from "./editor/adaptors/view-options.utils";
-export type { EditorOptions, EditorRef } from "./editor/Editor";
+export type { EditorRef } from "./editor/Editor";
+export type { EditorOptions } from "./editor/editor.model";
 export type { ViewMode } from "./editor/adaptors/view-mode.model";
 export type { Comments } from "./marginal/comments/commenting";

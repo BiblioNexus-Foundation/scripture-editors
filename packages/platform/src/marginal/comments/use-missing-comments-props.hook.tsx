@@ -54,10 +54,9 @@ export default function useMissingCommentsProps<TLogger extends LoggerBasic>(
   commentStoreRef: React.MutableRefObject<CommentStore | undefined>,
 ) {
   useEffect(() => {
-    if (!editorProps.options) editorProps.options = {};
-    if (!editorProps.options.nodes) editorProps.options.nodes = {};
-    if (!editorProps.options.nodes[typedMarkNodeName])
-      editorProps.options.nodes[typedMarkNodeName] = {};
+    editorProps.options ??= {};
+    editorProps.options.nodes ??= {};
+    editorProps.options.nodes[typedMarkNodeName] ??= {};
     editorProps.options.nodes[typedMarkNodeName].addMissingComments = (usjCommentIds: string[]) => {
       addMissingComments(usjCommentIds, commentStoreRef);
     };

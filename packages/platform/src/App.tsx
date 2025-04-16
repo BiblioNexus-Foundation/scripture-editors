@@ -9,8 +9,12 @@ import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/Im
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import AnnotationTypeSelect from "./AnnotationTypeSelect";
-import { getViewOptions, DEFAULT_VIEW_MODE } from "./editor/adaptors/view-options.utils";
-import { EditorOptions } from "./editor/Editor";
+import {
+  getViewOptions,
+  DEFAULT_VIEW_MODE,
+  ViewOptions,
+} from "./editor/adaptors/view-options.utils";
+import { EditorOptions } from "./editor/editor.model";
 import { Comments } from "./marginal/comments/commenting";
 import Marginal, { MarginalRef } from "./marginal/Marginal";
 import TextDirectionDropDown from "./TextDirectionDropDown";
@@ -71,24 +75,9 @@ const defaultAnnotations: Annotations = {
   },
 };
 
-function getOptions(
-  isReadonly: boolean,
-  hasSpellCheck: boolean,
-  textDirection: TextDirection,
-  viewMode: string | undefined,
-): EditorOptions {
-  return {
-    isReadonly,
-    hasSpellCheck,
-    textDirection,
-    view: getViewOptions(viewMode),
-    nodes: nodeOptions,
-  };
-}
-
 export default function App() {
   const marginalRef = useRef<MarginalRef | null>(null);
-  const [definedOptions, setDefinedOptions] = useState(false);
+  const [isOptionsDefined, setIsOptionsDefined] = useState(false);
   const [isReadonly, setIsReadonly] = useState(false);
   const [hasSpellCheck, setHasSpellCheck] = useState(false);
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
@@ -97,10 +86,17 @@ export default function App() {
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");
 
+  const viewOptions = useMemo<ViewOptions | undefined>(() => getViewOptions(viewMode), [viewMode]);
+
   const options = useMemo<EditorOptions | undefined>(
-    () =>
-      definedOptions ? getOptions(isReadonly, hasSpellCheck, textDirection, viewMode) : undefined,
-    [definedOptions, isReadonly, hasSpellCheck, textDirection, viewMode],
+    () => ({
+      isReadonly,
+      hasSpellCheck,
+      textDirection,
+      view: viewOptions,
+      nodes: nodeOptions,
+    }),
+    [isReadonly, hasSpellCheck, textDirection, viewOptions],
   );
 
   const handleUsjChange = useCallback((usj: Usj, comments: Comments | undefined) => {
@@ -143,7 +139,7 @@ export default function App() {
     [annotationType, annotations],
   );
 
-  const toggleDefineOptions = useCallback(() => setDefinedOptions((value) => !value), []);
+  const toggleIsOptionsDefined = useCallback(() => setIsOptionsDefined((value) => !value), []);
 
   // Simulate USJ updating after the editor is loaded.
   useEffect(() => {
@@ -195,11 +191,11 @@ export default function App() {
             </button>
           </div>
         </span>
-        <button onClick={toggleDefineOptions}>
-          {definedOptions ? "Undefine" : "Define"} Options
+        <button onClick={toggleIsOptionsDefined}>
+          {isOptionsDefined ? "Undefine" : "Define"} Options
         </button>
       </div>
-      {definedOptions && (
+      {isOptionsDefined && (
         <div className="defined-options">
           <div className="checkbox">
             <input
@@ -231,7 +227,7 @@ export default function App() {
         onSelectionChange={(selection) => console.log({ selection })}
         onCommentChange={(comments) => console.log({ comments })}
         onUsjChange={handleUsjChange}
-        options={options}
+        options={isOptionsDefined ? options : undefined}
         logger={console}
       />
     </>
