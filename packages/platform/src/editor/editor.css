@@ -20,7 +20,7 @@
 }
 
 .editor-toolbar-container-editable {
-  display: block;
+  display: inline;
 }
 
 .editor-inner {
