@@ -4,11 +4,11 @@ declare module "rich-text" {
   export const type: Type;
 
   export interface StringMap {
-    [key: string]: any;
+    [key: string]: string | StringMap;
   }
 
   export interface DeltaOperation {
-    insert?: any;
+    insert?: string | StringMap;
     delete?: number;
     retain?: number;
     attributes?: StringMap;
