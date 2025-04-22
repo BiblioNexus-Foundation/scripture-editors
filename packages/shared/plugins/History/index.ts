@@ -397,6 +397,7 @@ export function registerHistory(
         },
         currentEntry: currentHistoryEntry,
       },
+      mutatedNodes: null,
     });
   };
 

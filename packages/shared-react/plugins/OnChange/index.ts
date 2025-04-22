@@ -17,6 +17,7 @@ export const registerOnChange = (editor: LexicalEditor, onChange: UpdateListener
       prevEditorState,
       normalizedNodes,
       tags,
+      mutatedNodes: null,
     });
   };
 
