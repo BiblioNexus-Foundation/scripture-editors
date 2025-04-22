@@ -21,12 +21,14 @@ import {
   editorStateGen1v1,
   editorStateGen1v1Editable,
   editorStateGen1v1ImpliedPara,
+  editorStateGen1v1ImpliedParaEmpty,
   editorStateGen1v1Nonstandard,
   editorStateMarks,
   editorStateWithUnknownItems,
   usjEmpty,
   usjGen1v1,
   usjGen1v1ImpliedPara,
+  usjGen1v1ImpliedParaEmpty,
   usjGen1v1Nonstandard,
   usjMarks,
   usjWithUnknownItems,
@@ -52,6 +54,14 @@ describe("Editor USJ Adaptor", () => {
     const usj = editorUsjAdaptor.deserializeEditorState(editorState);
 
     expect(usj).toEqual(usjGen1v1);
+  });
+
+  it("should convert to USJ from Lexical editor state JSON with an empty implied para", () => {
+    const editorState = editor.parseEditorState(editorStateGen1v1ImpliedParaEmpty);
+
+    const usj = editorUsjAdaptor.deserializeEditorState(editorState);
+
+    expect(usj).toEqual(usjGen1v1ImpliedParaEmpty);
   });
 
   it("should convert to USJ from Lexical editor state JSON with implied para", () => {

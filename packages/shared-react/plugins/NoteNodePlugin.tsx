@@ -51,15 +51,16 @@ export default function NoteNodePlugin<TLogger extends LoggerBasic>({
  */
 function useNodeOptions(nodeOptions: UsjNodeOptions, logger?: LoggerBasic) {
   const previousNoteCallersRef = useRef<string[]>();
+  const nodeOptionsNoteCallers = nodeOptions[immutableNoteCallerNodeName]?.noteCallers;
 
   useEffect(() => {
-    let noteCallers = nodeOptions[immutableNoteCallerNodeName]?.noteCallers;
+    let noteCallers = nodeOptionsNoteCallers;
     if (!noteCallers || noteCallers.length <= 0) noteCallers = defaultNoteCallers;
     if (previousNoteCallersRef.current !== noteCallers) {
       previousNoteCallersRef.current = noteCallers;
       updateCounterStyleSymbols("note-callers", noteCallers, logger);
     }
-  }, [nodeOptions[immutableNoteCallerNodeName]?.noteCallers]);
+  }, [logger, nodeOptionsNoteCallers]);
 }
 
 /**
@@ -252,7 +253,7 @@ function updateCounterStyleSymbols(
           return;
         }
       }
-    } catch (e) {
+    } catch {
       // Skip cross-origin stylesheets that can't be accessed
       continue;
     }

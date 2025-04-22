@@ -2,7 +2,9 @@ import { act } from "@testing-library/react";
 import {
   $createPoint,
   $createRangeSelection,
+  $createTextNode,
   $getSelection,
+  $insertNodes,
   $isRangeSelection,
   $setSelection,
   CreateEditorArgs,
@@ -11,7 +13,6 @@ import {
   LexicalEditor,
   LexicalNode,
   LexicalNodeReplacement,
-  TextNode,
   createEditor,
 } from "lexical";
 import scriptureUsjNodes from "./scripture/usj";
@@ -59,27 +60,27 @@ export function createBasicTestEnvironment(
  * @param editor - The LexicalEditor instance where the selection will be set.
  * @param $createNoteNodeToInsert - A callback function to create the NoteNode to insert at the
  *   selection.
- * @param startNode - The starting TextNode of the selection.
+ * @param startNode - The starting LexicalNode of the selection.
  * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
  *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
+ * @param endNode - The ending LexicalNode of the selection. Defaults to the startNode.
  * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
  *   startOffset.
  * @param tag - Optional tag for the update.
  */
 export function updateSelection(
   editor: LexicalEditor,
-  startNode: TextNode,
+  startNode: LexicalNode,
   startOffset?: number,
-  endNode?: TextNode,
+  endNode?: LexicalNode,
   endOffset?: number,
   tag?: string | string[],
 ) {
   editor.update(
     () => {
-      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-      if (endOffset === undefined) endOffset = startOffset;
-      if (!endNode) endNode = startNode;
+      startOffset ??= startNode.getTextContentSize();
+      endOffset ??= startOffset;
+      endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
       rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
       rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
@@ -92,22 +93,22 @@ export function updateSelection(
 /**
  * Checks the selection range in the LexicalEditor is at the specified location.
  *
- * @param startNode - The starting TextNode of the expected selection.
+ * @param startNode - The starting LexicalNode of the expected selection.
  * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
  *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the expected selection. Defaults to the startNode.
+ * @param endNode - The ending LexicalNode of the expected selection. Defaults to the startNode.
  * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
  *   end of the endNode's text content.
  */
 export function $expectSelectionToBe(
-  startNode: TextNode,
+  startNode: LexicalNode,
   startOffset?: number,
-  endNode?: TextNode,
+  endNode?: LexicalNode,
   endOffset?: number,
 ) {
-  if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-  if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-  if (!endNode) endNode = startNode;
+  startOffset ??= startNode.getTextContentSize();
+  endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
+  endNode ??= startNode;
 
   const selection = $getSelection();
   if (!$isRangeSelection(selection)) fail("Selection is not a range selection");
@@ -129,30 +130,63 @@ export function $expectSelectionToBe(
  * Press the enter key at the selection range in the LexicalEditor.
  *
  * @param editor - The LexicalEditor instance where the selection will be set.
- * @param startNode - The starting TextNode of the selection.
+ * @param startNode - The starting LexicalNode of the selection.
  * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
  *   end of the startNode's text content.
- * @param endNode - The ending TextNode of the selection. Defaults to the startNode.
+ * @param endNode - The ending LexicalNode of the selection. Defaults to the startNode.
  * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
  *   end of the endNode's text content.
  */
 export async function pressEnterAtSelection(
   editor: LexicalEditor,
-  startNode: TextNode,
+  startNode: LexicalNode,
   startOffset?: number,
-  endNode?: TextNode,
+  endNode?: LexicalNode,
   endOffset?: number,
 ) {
   await act(async () => {
     editor.update(() => {
-      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-      if (!endNode) endNode = startNode;
+      startOffset ??= startNode.getTextContentSize();
+      endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
+      endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
       rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
       rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
       $setSelection(rangeSelection);
+      editor.dispatchCommand(KEY_ENTER_COMMAND, null);
     });
-    editor.dispatchCommand(KEY_ENTER_COMMAND, null);
+  });
+}
+
+/**
+ * Type text before the selection range in the LexicalEditor.
+ *
+ * @param editor - The LexicalEditor instance where the selection will be set.
+ * @param startNode - The starting LexicalNode of the selection.
+ * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
+ *   end of the startNode's text content.
+ * @param endNode - The ending LexicalNode of the selection. Defaults to the startNode.
+ * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
+ *   end of the endNode's text content.
+ */
+export async function typeTextBeforeSelection(
+  editor: LexicalEditor,
+  text: string,
+  startNode: LexicalNode,
+  startOffset?: number,
+  endNode?: LexicalNode,
+  endOffset?: number,
+) {
+  await act(async () => {
+    editor.update(() => {
+      startOffset ??= startNode.getTextContentSize();
+      endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
+      endNode ??= startNode;
+      const rangeSelection = $createRangeSelection();
+      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
+      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
+      $setSelection(rangeSelection);
+      $insertNodes([$createTextNode(text)]);
+    });
   });
 }

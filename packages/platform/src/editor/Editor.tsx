@@ -42,6 +42,7 @@ import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
+import { TextNodePlugin } from "shared-react/plugins/TextNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
@@ -287,6 +288,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
           <ParaNodePlugin />
           <TextDirectionPlugin textDirection={textDirection} />
+          <TextNodePlugin />
           {children}
         </div>
       </div>

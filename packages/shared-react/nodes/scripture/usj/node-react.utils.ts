@@ -1,4 +1,11 @@
-import { $getNodeByKey, $isElementNode, $isTextNode, LexicalEditor, LexicalNode } from "lexical";
+import {
+  $getNodeByKey,
+  $isElementNode,
+  $isTextNode,
+  LexicalEditor,
+  LexicalNode,
+  SerializedLexicalNode,
+} from "lexical";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import {
   $isNodeWithMarker,
@@ -7,9 +14,19 @@ import {
   NodesWithMarker,
 } from "shared/nodes/scripture/usj/node.utils";
 import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $isVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import {
+  $isVerseNode,
+  isSerializedVerseNode,
+  SerializedVerseNode,
+  VerseNode,
+} from "shared/nodes/scripture/usj/VerseNode";
 import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
-import { $isImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
+import {
+  $isImmutableVerseNode,
+  ImmutableVerseNode,
+  isSerializedImmutableVerseNode,
+  SerializedImmutableVerseNode,
+} from "./ImmutableVerseNode";
 
 /** Caller count is in an object so it can be manipulated by passing the object. */
 export type CallerData = {
@@ -48,6 +65,17 @@ export function $findImmutableNoteCallerNodes(nodes: LexicalNode[]): ImmutableNo
  */
 export function $isSomeVerseNode(node: LexicalNode | null | undefined): node is SomeVerseNode {
   return $isVerseNode(node) || $isImmutableVerseNode(node);
+}
+
+/**
+ * Checks if the given node is a SerializedVerseNode or SerializedImmutableVerseNode.
+ * @param node - The serialized node to check.
+ * @returns `true` if the node is a SerializedVerseNode or SerializedImmutableVerseNode, `false` otherwise.
+ */
+export function isSomeSerializedVerseNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedVerseNode | SerializedImmutableVerseNode {
+  return isSerializedVerseNode(node) || isSerializedImmutableVerseNode(node);
 }
 
 /**
