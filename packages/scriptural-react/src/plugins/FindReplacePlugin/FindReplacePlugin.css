@@ -1,0 +1,180 @@
+.find-replace-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 300px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.find-replace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f8f8;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.find-replace-title {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.find-replace-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.find-replace-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #666;
+}
+
+.find-replace-controls {
+  padding: 12px;
+}
+
+.find-replace-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.find-replace-row:last-child {
+  margin-bottom: 0;
+}
+
+.find-replace-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.find-replace-input:focus {
+  border-color: #4d90fe;
+  outline: none;
+}
+
+.find-replace-results {
+  font-size: 12px;
+  color: #666;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.find-replace-nav-button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  margin: 0 2px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.find-replace-nav-button:hover:not(:disabled) {
+  background-color: #e9e9e9;
+}
+
+.find-replace-nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.find-replace-button {
+  padding: 6px 12px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.find-replace-button:hover:not(:disabled) {
+  background-color: #e9e9e9;
+}
+
+.find-replace-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* For dark theme support */
+@media (prefers-color-scheme: dark) {
+  .find-replace-container {
+    background-color: #222;
+    border-color: #444;
+  }
+
+  .find-replace-header {
+    border-bottom-color: #333;
+    background-color: #1c1c1c;
+  }
+
+  .find-replace-title {
+    color: #e0e0e0;
+  }
+
+  .find-replace-close {
+    color: #888;
+  }
+
+  .find-replace-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #bbb;
+  }
+
+  .find-replace-input {
+    background-color: #333;
+    border-color: #555;
+    color: #e0e0e0;
+  }
+
+  .find-replace-input:focus {
+    border-color: #7fa9fe;
+  }
+
+  .find-replace-results {
+    color: #aaa;
+  }
+
+  .find-replace-nav-button,
+  .find-replace-button {
+    background-color: #333;
+    border-color: #555;
+    color: #e0e0e0;
+  }
+
+  .find-replace-nav-button:hover:not(:disabled),
+  .find-replace-button:hover:not(:disabled) {
+    background-color: #444;
+  }
+}

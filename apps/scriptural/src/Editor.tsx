@@ -74,7 +74,7 @@ export function Editor({
   }, [scriptureReferenceHandler, referenceHandlerSource]);
 
   return (
-    <div className="editor-wrapper prose">
+    <div className="editor-wrapper prose relative">
       <ScripturalEditorComposer
         initialConfig={initialConfig}
         scriptureReferenceHandler={scriptureReferenceHandler}
