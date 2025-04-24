@@ -26,7 +26,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         node_version: [20]
-        pnpm_version: [9]
+        pnpm_version: [10]
 
     steps:
       - name: Check out Git repository
