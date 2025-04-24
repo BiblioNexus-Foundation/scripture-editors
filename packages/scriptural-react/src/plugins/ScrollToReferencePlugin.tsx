@@ -48,10 +48,14 @@ function scrollToReference(
   scrollBehavior: ScrollBehavior = "auto",
   scrollOffset: number = 100,
 ): void {
-  // First try to find the verse element
-  let targetElement = findReferenceElement(editorElement, "v", reference.verse?.toString());
+  // First try to find the verse within the current chapter context
+  let targetElement = findVerseInChapterContext(
+    editorElement,
+    reference.chapter?.toString() || "1",
+    reference.verse?.toString() || "1",
+  );
 
-  // If verse not found, try to find the chapter element
+  // If verse not found in chapter context, try to find just the chapter element
   if (!targetElement) {
     targetElement = findReferenceElement(editorElement, "c", reference.chapter?.toString());
   }
@@ -76,6 +80,70 @@ function scrollToReference(
       highlightElement(targetElement);
     }
   }
+}
+
+/**
+ * Finds a verse element within the context of a specific chapter
+ */
+function findVerseInChapterContext(
+  container: HTMLElement,
+  chapter: string,
+  verse: string,
+): HTMLElement | null {
+  if (!chapter || !verse) return null;
+
+  // Method 1: Find verses that have chapter context in their attributes
+  // Some implementations might include chapter data in verse elements
+  const verseWithChapterContext = container.querySelector(
+    `[data-marker="v"][data-number="${verse}"][data-chapter="${chapter}"]`,
+  );
+
+  if (verseWithChapterContext) {
+    return verseWithChapterContext as HTMLElement;
+  }
+
+  // Method 2: Find the chapter element first, then look for verses within that chapter
+  const chapterElement = findReferenceElement(container, "c", chapter);
+  if (chapterElement) {
+    // Find the next chapter (if any)
+    const nextChapter = Array.from(container.querySelectorAll('[data-marker="c"]')).find((el) => {
+      const chapterNum = el.getAttribute("data-number");
+      return chapterNum && parseInt(chapterNum) > parseInt(chapter);
+    });
+
+    // Get all verse elements
+    const allVerseElements = Array.from(container.querySelectorAll('[data-marker="v"]'));
+
+    // Find verse elements that are after the current chapter and before the next chapter (if any)
+    for (const verseEl of allVerseElements) {
+      // Check if this verse has the right number
+      if (verseEl.getAttribute("data-number") === verse) {
+        // Check if this verse is positioned after the chapter element
+        if (isElementAfter(verseEl, chapterElement)) {
+          // If there's a next chapter, make sure this verse is before it
+          if (!nextChapter || isElementBefore(verseEl, nextChapter)) {
+            return verseEl as HTMLElement;
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Checks if element A is positioned after element B in the document
+ */
+function isElementAfter(a: Element, b: Element): boolean {
+  return !!(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING);
+}
+
+/**
+ * Checks if element A is positioned before element B in the document
+ */
+function isElementBefore(a: Element, b: Element): boolean {
+  return !!(b.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_PRECEDING);
 }
 
 /**
