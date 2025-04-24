@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ScriptureReferenceHandler, ReferenceChangeEvent } from "@scriptural/react";
 import { ScriptureReference } from "@scriptural/react/internal-packages/shared-react/plugins/ScriptureReferencePlugin";
 import { Button } from "../components/ui/button";
