@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useFindReplace } from "@scriptural/react";
 import { X, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { VscReplace } from "react-icons/vsc";
