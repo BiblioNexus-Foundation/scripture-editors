@@ -5,7 +5,8 @@ import { $getSelection } from "lexical";
 import { $isScriptureElementNode } from "shared/nodes/scripture/generic";
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
 import { useScripturalComposerContext } from "../../context";
-import { ScriptureElementNode } from "shared/nodes/scripture/generic/ScriptureElementNode";
+import { InlineNode } from "shared/nodes/scripture/generic/InlineNode";
+import { BlockNode } from "shared/nodes/scripture/generic/BlockNode";
 
 export function MarkerWatcherPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -13,7 +14,7 @@ export function MarkerWatcherPlugin() {
 
   useEffect(() => {
     editor.registerUpdateListener(({ editorState }) => {
-      if (!editor.hasNodes([ScriptureElementNode])) {
+      if (!editor.hasNodes([InlineNode, BlockNode])) {
         throw new Error("MarkerWatcherPlugin: ScriptureElementNode is not registered on editor!");
       }
       editorState.read(() => {

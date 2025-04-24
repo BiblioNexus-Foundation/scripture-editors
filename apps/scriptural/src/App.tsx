@@ -7,6 +7,7 @@ import { useResponsive } from "./utils/useResponsive";
 import { UsjDocument } from "@scriptural/react/internal-packages/shared/converters/usj/core/usj";
 import { EditorState } from "lexical";
 import { useMemo } from "react";
+import { AppReferenceHandler } from "./utils/AppReferenceHandler";
 
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
@@ -23,16 +24,35 @@ const STORAGE_KEYS = {
 function App() {
   const isVertical = useResponsive(600);
   const editorState = useMemo(() => getInitialEditorState(), []);
+
+  // Create a shared reference handler that will sync between the two editors
+  const referenceHandler = useMemo(
+    () =>
+      new AppReferenceHandler({
+        book: "TIT",
+        chapter: 1,
+        verse: 1,
+      }),
+    [],
+  );
+
   return (
     <div className="flex flex-col max-h-screen">
-      <AppBar />
+      <AppBar referenceHandler={referenceHandler} />
       <PanelGroup
         className="workspace flex-grow"
         autoSaveId="example"
         direction={isVertical ? "vertical" : "horizontal"}
       >
         <Panel defaultSize={50}>
-          <Editor usj={usj as UsjDocument} editable={false} bookCode={"TIT"} />
+          <Editor
+            usj={usj as UsjDocument}
+            editable={false}
+            bookCode={"TIT"}
+            scriptureReferenceHandler={referenceHandler}
+            referenceHandlerSource="left-panel"
+            enableScrollToReference={true}
+          />
         </Panel>
         <PanelResizeHandle className="resizable-handle" />
         <Panel defaultSize={50}>
@@ -41,6 +61,9 @@ function App() {
             initialState={editorState}
             editable={true}
             bookCode={"TIT"}
+            scriptureReferenceHandler={referenceHandler}
+            referenceHandlerSource="right-panel"
+            enableScrollToReference={true}
             onSave={(newUsj: UsjDocument) => {
               const cachedUsj: CachedData<UsjDocument> = {
                 timestamp: Date.now(),

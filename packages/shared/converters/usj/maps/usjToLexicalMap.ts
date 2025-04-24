@@ -292,6 +292,13 @@ export const createUsjMap: () => UsjMapCreator = () => {
       char: ({ nodeProps, convertedContent, metadata }) => {
         if ("marker" in nodeProps && nodeProps.marker === "w") {
           const textNode = convertedContent?.[0] as SerializedTextNode | undefined;
+          if (!textNode) {
+            return createSerializedInlineNode({
+              children: [],
+              attributes: convertNodePropsToAttributes(nodeProps),
+            });
+          }
+
           const metadataRelativePath = metadata.relativePath;
           if (metadataRelativePath) {
             const { currentOutput, initialNode } = metadata;
@@ -336,11 +343,11 @@ export const createUsjMap: () => UsjMapCreator = () => {
                 ? doesLastCharRequireSpaceAfter(lastOutputNode.text)
                 : true);
 
-            if (shouldAddSpaceBefore && textNode) {
+            if (shouldAddSpaceBefore) {
               textNode.text = WHITESPACE_CHAR + textNode.text;
             }
 
-            if (currentOutput && textNode) {
+            if (currentOutput) {
               //get the latest output node
               const latestOutputNode = currentOutput[currentOutput.length - 1];
               if ($isSerializedTextNode(latestOutputNode)) {

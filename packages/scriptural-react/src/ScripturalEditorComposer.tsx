@@ -10,12 +10,14 @@ import { scriptureNodes } from "shared/nodes/scripture/generic";
 import {
   ScripturalEditorProvider,
   ScripturalInitialConfigType,
+  ScriptureReferenceHandler,
 } from "./context/ScripturalEditorContext";
 import { useScripturalComposerContext } from "./context/ScripturalEditorContext";
 
 type ScripturalComposerProps = {
   initialConfig: ScripturalInitialConfigType;
   children: React.ReactNode;
+  scriptureReferenceHandler?: ScriptureReferenceHandler;
 };
 
 function ScripturalComposerContent({ children }: { children: React.ReactNode }) {
@@ -38,7 +40,7 @@ function ScripturalComposerContent({ children }: { children: React.ReactNode }) 
         {children}
         <ScriptureReferencePlugin
           onChangeReference={(reference) => {
-            setScriptureReference(reference);
+            setScriptureReference(reference, "editor_content");
           }}
           book={scripturalInitialConfig.bookCode}
           verseDepth={2}
@@ -55,9 +57,19 @@ function ScripturalComposerContent({ children }: { children: React.ReactNode }) 
   );
 }
 
-export default function ScripturalComposer({ initialConfig, children }: ScripturalComposerProps) {
+export default function ScripturalComposer({
+  initialConfig,
+  children,
+  scriptureReferenceHandler,
+}: ScripturalComposerProps) {
+  // Merge the reference handler into the initial config if provided
+  const mergedConfig = {
+    ...initialConfig,
+    scriptureReferenceHandler,
+  };
+
   return (
-    <ScripturalEditorProvider initialConfig={initialConfig}>
+    <ScripturalEditorProvider initialConfig={mergedConfig}>
       <ScripturalComposerContent children={children} />
     </ScripturalEditorProvider>
   );

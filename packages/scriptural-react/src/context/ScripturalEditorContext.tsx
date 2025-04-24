@@ -18,16 +18,118 @@ export type EditorSettings = {
   [key: string]: unknown;
 };
 
+/**
+ * Source tags that identify what triggered a reference change
+ */
+export type ReferenceChangeSource =
+  | "user_navigation" // User clicked a reference navigation control
+  | "editor_content" // Content changes in the editor triggered the update
+  | "external_app" // External application set the reference
+  | "initial_load" // Initial reference set during load
+  | "sync" // Reference synced from another component
+  | string; // Allow for custom source tags
+
+/**
+ * Information about a reference change event
+ */
+export interface ReferenceChangeEvent {
+  reference: ScriptureReference | null;
+  source: ReferenceChangeSource;
+  metadata?: Record<string, unknown>; // Optional additional data about the change
+}
+
 export interface ScripturalEditorContextType {
   initialLexicalState: null | string | EditorState | ((editor: LexicalEditor) => void);
   scripturalInitialConfig: ScripturalInitialConfigType;
   selectedMarker: string | undefined;
   setSelectedMarker: (marker: string | undefined) => void;
   scriptureReference: ScriptureReference | null;
-  setScriptureReference: (ref: ScriptureReference | null) => void;
+  setScriptureReference: (
+    ref: ScriptureReference | null,
+    source?: ReferenceChangeSource,
+    metadata?: Record<string, unknown>,
+  ) => void;
   editorRef: React.RefObject<HTMLDivElement>;
   getSettings: <T>(key: string) => T | undefined;
   updateSettings: (key: string, value: unknown) => void;
+}
+
+/**
+ * Interface for scripture reference handlers
+ * Both internal and external handlers implement this interface
+ */
+export interface ScriptureReferenceHandler {
+  /**
+   * Get the current reference
+   */
+  getReference: () => ScriptureReference | null;
+
+  /**
+   * Update the reference
+   * @param ref New reference
+   * @param source Tag identifying what triggered the change
+   * @param metadata Optional additional data about the change
+   */
+  setReference: (
+    ref: ScriptureReference | null,
+    source?: ReferenceChangeSource,
+    metadata?: Record<string, unknown>,
+  ) => void;
+
+  /**
+   * Subscribe to reference changes
+   * @param callback Function to call when reference changes
+   * @returns Unsubscribe function
+   */
+  subscribe: (callback: (event: ReferenceChangeEvent) => void) => () => void;
+}
+
+/**
+ * Default implementation of ScriptureReferenceHandler
+ * Used internally when no external handler is provided
+ */
+class DefaultReferenceHandler implements ScriptureReferenceHandler {
+  private reference: ScriptureReference | null;
+  private subscribers: ((event: ReferenceChangeEvent) => void)[] = [];
+
+  constructor(initialReference: ScriptureReference | null) {
+    this.reference = initialReference;
+  }
+
+  getReference(): ScriptureReference | null {
+    return this.reference;
+  }
+
+  setReference(
+    ref: ScriptureReference | null,
+    source: ReferenceChangeSource = "user_navigation",
+    metadata?: Record<string, unknown>,
+  ): void {
+    this.reference = ref;
+    this.notifySubscribers({
+      reference: ref,
+      source,
+      metadata,
+    });
+  }
+
+  subscribe(callback: (event: ReferenceChangeEvent) => void): () => void {
+    this.subscribers.push(callback);
+    // Immediately notify with current value
+    callback({
+      reference: this.reference,
+      source: "initial_load",
+    });
+
+    // Return unsubscribe function
+    return () => {
+      this.subscribers = this.subscribers.filter((cb) => cb !== callback);
+    };
+  }
+
+  private notifySubscribers(event: ReferenceChangeEvent): void {
+    this.subscribers.forEach((callback) => callback(event));
+  }
 }
 
 export type ScripturalInitialConfigType = {
@@ -39,6 +141,8 @@ export type ScripturalInitialConfigType = {
   theme?: EditorThemeClasses;
   nodes?: LexicalNode[];
   initialSettings?: EditorSettings;
+  scriptureReferenceHandler?: ScriptureReferenceHandler;
+  initialScriptureReference?: ScriptureReference | null;
 };
 
 const ScripturalEditorContext = createContext<ScripturalEditorContextType | undefined>(undefined);
@@ -57,11 +161,51 @@ export function ScripturalEditorProvider({
     string | EditorState | ((editor: LexicalEditor) => void)
   >(initialConfig.initialLexicalState ?? "");
   const [selectedMarker, setSelectedMarker] = useState<string>();
-  const [scriptureReference, setScriptureReference] = useState<ScriptureReference | null>({
+
+  // Default reference if no initial reference provided
+  const defaultReference: ScriptureReference = {
     book: initialConfig.bookCode,
     chapter: 1,
     verse: 1,
-  });
+  };
+
+  // Create reference handler instance (internal or external)
+  const referenceHandlerRef = useRef<ScriptureReferenceHandler>(
+    initialConfig.scriptureReferenceHandler ||
+      new DefaultReferenceHandler(initialConfig.initialScriptureReference ?? defaultReference),
+  );
+
+  // React state that reflects the current reference
+  const [currentReference, setCurrentReference] = useState<ScriptureReference | null>(
+    referenceHandlerRef.current.getReference(),
+  );
+
+  // Set up subscription to reference handler
+  useEffect(() => {
+    // If the handler changes (unlikely after initial setup), update the ref
+    if (initialConfig.scriptureReferenceHandler) {
+      referenceHandlerRef.current = initialConfig.scriptureReferenceHandler;
+    }
+
+    // Subscribe to reference changes from the handler
+    const unsubscribe = referenceHandlerRef.current.subscribe((event) => {
+      setCurrentReference(event.reference);
+    });
+
+    return unsubscribe;
+  }, [initialConfig.scriptureReferenceHandler]);
+
+  // Function to update reference through the handler
+  const setScriptureReference = useCallback(
+    (
+      ref: ScriptureReference | null,
+      source: ReferenceChangeSource = "user_navigation",
+      metadata?: Record<string, unknown>,
+    ): void => {
+      referenceHandlerRef.current.setReference(ref, source, metadata);
+    },
+    [],
+  );
 
   const [settings, setSettings] = useState<EditorSettings>(initialConfig.initialSettings ?? {});
 
@@ -150,7 +294,7 @@ export function ScripturalEditorProvider({
         scripturalInitialConfig: initialConfig,
         selectedMarker,
         setSelectedMarker,
-        scriptureReference,
+        scriptureReference: currentReference,
         setScriptureReference,
         editorRef,
         getSettings,
