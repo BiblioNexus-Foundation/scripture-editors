@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useScripturalComposerContext } from "../context/ScripturalEditorContext";
 import { ScriptureReference } from "shared-react/plugins/ScriptureReferencePlugin";
 
@@ -19,7 +18,6 @@ export function ScrollToReferencePlugin({
   /** Offset from the top of the viewport (in pixels) */
   scrollOffset?: number;
 }) {
-  const [editor] = useLexicalComposerContext();
   const { scriptureReference, editorRef } = useScripturalComposerContext();
 
   useEffect(() => {
