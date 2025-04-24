@@ -12,6 +12,7 @@ export const VERSE_CLASS_NAME = "verse";
 export const INVALID_CLASS_NAME = "invalid";
 export const TEXT_SPACING_CLASS_NAME = "text-spacing";
 export const FORMATTED_FONT_CLASS_NAME = "formatted-font";
+export const MARKER_MODE_CLASS_NAME_PREFIX = "marker-";
 
 export const EXTERNAL_USJ_MUTATION_TAG = "external-usj-mutation";
 export const SELECTION_CHANGE_TAG = "selection-change";

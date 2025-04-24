@@ -158,15 +158,22 @@ function createVerseMarker(node: SerializedImmutableVerseNode | SerializedVerseN
   });
 }
 
-function createCharMarker(node: SerializedCharNode): MarkerObject {
+function createCharMarker(
+  node: SerializedCharNode,
+  content: MarkerContent[] | undefined,
+): MarkerObject {
   const { type, marker, unknownAttributes } = node;
-  let { text } = node;
-  if (text.startsWith(NBSP)) text = text.slice(1);
+  // Remove NBSP at the start of the child text nodes.
+  content?.forEach((c, i) => {
+    if (typeof c === "string" && c.startsWith(NBSP)) {
+      content[i] = c.slice(1);
+    }
+  });
   return removeUndefinedProperties({
     type,
     marker,
     ...unknownAttributes,
-    content: [text],
+    content,
   });
 }
 
@@ -328,6 +335,7 @@ export function recurseNodes(
   nodes.forEach((node, index) => {
     const serializedBookNode = node as SerializedBookNode;
     const serializedChapterNode = node as SerializedChapterNode;
+    const serializedCharNode = node as SerializedCharNode;
     const serializedParaNode = node as SerializedParaNode;
     const serializedNoteNode = node as SerializedNoteNode;
     const serializedTextNode = node as SerializedTextNode;
@@ -352,7 +360,9 @@ export function recurseNodes(
         markers.push(createVerseMarker(node as SerializedImmutableVerseNode | SerializedVerseNode));
         break;
       case CharNode.getType():
-        markers.push(createCharMarker(node as SerializedCharNode));
+        markers.push(
+          createCharMarker(serializedCharNode, recurseNodes(serializedCharNode.children)),
+        );
         break;
       case ParaNode.getType():
         markers.push(
@@ -376,7 +386,7 @@ export function recurseNodes(
         childMarkers = recurseNodes(serializedMarkNode.children);
         if (childMarkers) {
           const commentIDs = serializedMarkNode.typedIDs[COMMENT_MARK_TYPE];
-          if (commentIDs && commentIDs.length >= 0) {
+          if (commentIDs) {
             replaceMarkWithMilestones(childMarkers, commentIDs, pids, nodes[index + 1], markers);
             pids = commentIDs;
           } else {
@@ -386,7 +396,7 @@ export function recurseNodes(
               if (typeof firstChild === "string") combineTextContentOrAdd(markers, firstChild);
               else markers.push(firstChild);
             }
-            if (childMarkers) markers.push(...childMarkers);
+            if (childMarkers.length > 0) markers.push(...childMarkers);
           }
         }
         break;

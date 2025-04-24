@@ -13,6 +13,7 @@ import {
   SerializedLexicalNode,
   SerializedLineBreakNode,
   SerializedTextNode,
+  TextModeType,
   TextNode,
 } from "lexical";
 import { EditorAdaptor } from "shared/adaptors/editor-adaptor.model";
@@ -75,6 +76,8 @@ import {
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
+  isSerializedTextNode,
+  removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import {
   SerializedVerseNode,
@@ -154,7 +157,7 @@ export function serializeEditorState(
 ): SerializedEditorState {
   if (viewOptions) _viewOptions = viewOptions;
   // use default view mode
-  else _viewOptions = getViewOptions(undefined);
+  else _viewOptions = getViewOptions();
   /** empty para node for an 'empty' editor */
   const emptyParaNode: SerializedParaNode = createPara({
     type: ParaNode.getType(),
@@ -220,7 +223,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: BookNode.getType(),
     marker: marker as BookMarker,
     code: code ?? ("" as BookCode),
@@ -230,7 +233,7 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
     format: "",
     indent: 0,
     version: BOOK_VERSION,
-  };
+  });
 }
 
 function createChapter(
@@ -245,7 +248,7 @@ function createChapter(
   if (_viewOptions?.markerMode === "visible") showMarker = true;
 
   return _viewOptions?.markerMode === "editable"
-    ? {
+    ? removeUndefinedProperties({
         type: ChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -258,8 +261,8 @@ function createChapter(
         format: "",
         indent: 0,
         version: CHAPTER_VERSION,
-      }
-    : {
+      })
+    : removeUndefinedProperties({
         type: ImmutableChapterNode.getType(),
         marker: marker as ChapterMarker,
         number: number ?? "",
@@ -269,7 +272,7 @@ function createChapter(
         pubnumber,
         unknownAttributes,
         version: IMMUTABLE_CHAPTER_VERSION,
-      };
+      });
 }
 
 function createVerse(
@@ -288,7 +291,7 @@ function createVerse(
   else if (_viewOptions?.markerMode === "visible") showMarker = true;
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type,
     text,
     marker: marker as VerseMarker,
@@ -299,30 +302,35 @@ function createVerse(
     showMarker,
     unknownAttributes,
     version,
-  };
+  });
 }
 
-function createChar(markerObject: MarkerObject): SerializedCharNode {
+function createChar(
+  markerObject: MarkerObject,
+  childNodes: SerializedLexicalNode[] = [],
+): SerializedCharNode {
   const { marker } = markerObject;
   if (!CharNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected char marker '${marker}'!`);
   }
-  let text = getTextContent(markerObject.content);
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
-    text = text + NBSP; //TODO need to handle space before punctuation
+    childNodes.forEach((node) => {
+      if (isSerializedTextNode(node)) node.text = NBSP + node.text;
+    });
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: CharNode.getType(),
     marker,
-    text,
     unknownAttributes,
-    detail: 0,
-    format: 0,
-    mode: "normal",
-    style: "",
+    children: [...childNodes],
+    direction: null,
+    format: "",
+    indent: 0,
+    textFormat: 0,
+    textStyle: "",
     version: CHAR_VERSION,
-  };
+  });
 }
 
 function createImpliedPara(children: SerializedLexicalNode[]): SerializedImpliedParaNode {
@@ -352,7 +360,7 @@ function createPara(
   children.push(...childNodes);
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: ParaNode.getType(),
     marker,
     unknownAttributes,
@@ -363,7 +371,7 @@ function createPara(
     textFormat: 0,
     textStyle: "",
     version: PARA_VERSION,
-  };
+  });
 }
 
 function createNoteCaller(
@@ -372,20 +380,16 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (
-    _nodeOptions &&
-    _nodeOptions[immutableNoteCallerNodeName] &&
-    _nodeOptions[immutableNoteCallerNodeName].onClick
-  )
+  if (_nodeOptions?.[immutableNoteCallerNodeName]?.onClick)
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
-  return {
+  return removeUndefinedProperties({
     type: ImmutableNoteCallerNode.getType(),
     caller,
     previewText,
     onClick,
     version: IMMUTABLE_NOTE_CALLER_VERSION,
-  };
+  });
 }
 
 function createNote(
@@ -400,14 +404,6 @@ function createNote(
     callerNode = createText(getEditableCallerText(caller));
   } else {
     callerNode = createNoteCaller(caller, childNodes);
-    /*
-    childNodes.forEach((node) => {
-      if (isSerializedCharNode(node)) {
-        node.mode = "token";
-        node.style = "display: none";
-      }
-    });
-    */
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
@@ -422,7 +418,7 @@ function createNote(
   children.push(callerNode, ...childNodes);
   if (closingMarkerNode) children.push(closingMarkerNode);
 
-  return {
+  return removeUndefinedProperties({
     type: NoteNode.getType(),
     marker: marker as NoteMarker,
     caller,
@@ -433,7 +429,7 @@ function createNote(
     format: "",
     indent: 0,
     version: NOTE_VERSION,
-  };
+  });
 }
 
 function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
@@ -443,14 +439,14 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
-  return {
+  return removeUndefinedProperties({
     type: MilestoneNode.getType(),
     marker: marker as MilestoneMarker,
     sid,
     eid,
     unknownAttributes,
     version: MILESTONE_VERSION,
-  };
+  });
 }
 
 function createMark(children: SerializedLexicalNode[], ids: string[] = []): SerializedMarkNode {
@@ -473,7 +469,7 @@ function createUnknown(
   const tag = markerObject.type;
   const unknownAttributes = getUnknownAttributes(markerObject);
   const children: SerializedLexicalNode[] = [...childNodes];
-  return {
+  return removeUndefinedProperties({
     type: UnknownNode.getType(),
     tag,
     marker,
@@ -483,7 +479,7 @@ function createUnknown(
     format: "",
     indent: 0,
     version: UNKNOWN_VERSION,
-  };
+  });
 }
 
 function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
@@ -500,13 +496,13 @@ function createMarker(marker: string, isOpening = true): SerializedMarkerNode {
   };
 }
 
-function createText(text: string): SerializedTextNode {
+function createText(text: string, mode: TextModeType = "normal"): SerializedTextNode {
   return {
     type: TextNode.getType(),
     text,
     detail: 0,
     format: 0,
-    mode: "normal",
+    mode,
     style: "",
     version: 1,
   };
@@ -603,7 +599,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           break;
         case CharNode.getType():
           addOpeningMarker(markerContent.marker, nodes);
-          nodes.push(createChar(markerContent));
+          nodes.push(createChar(markerContent, recurseNodes(markerContent.content)));
           addClosingMarker(markerContent.marker, nodes);
           break;
         case ParaNode.getType():

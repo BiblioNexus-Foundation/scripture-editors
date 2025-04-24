@@ -41,6 +41,7 @@ export type SerializedNoteNode = Spread<
 
 export const NOTE_VERSION = 1;
 
+export const noteNodeName = "NoteNode";
 export class NoteNode extends ElementNode {
   __marker: NoteMarker;
   __caller: string;
@@ -198,8 +199,6 @@ function $convertNoteElement(element: HTMLElement): DOMConversionOutput {
   const node = $createNoteNode(marker, caller);
   return { node };
 }
-
-export const noteNodeName = Symbol.for(NoteNode.name);
 
 export function $createNoteNode(
   marker: NoteMarker,

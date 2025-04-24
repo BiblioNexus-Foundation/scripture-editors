@@ -49,12 +49,7 @@ import {
   CHAPTER_MARKER,
   ChapterMarker,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import {
-  CHAR_VERSION,
-  CharNode,
-  isSerializedCharNode,
-  SerializedCharNode,
-} from "shared/nodes/scripture/usj/CharNode";
+import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
 import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
@@ -86,6 +81,7 @@ import {
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
+  isSerializedTextNode,
   isSomeSerializedChapterNode,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
@@ -325,25 +321,30 @@ function createVerse(
   });
 }
 
-function createChar(markerObject: MarkerObject): SerializedCharNode {
+function createChar(
+  markerObject: MarkerObject,
+  childNodes: SerializedLexicalNode[] = [],
+): SerializedCharNode {
   const { marker } = markerObject;
   if (!CharNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected char marker '${marker}'!`);
   }
-  let text = getTextContent(markerObject.content);
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
-    text = NBSP + text;
+    childNodes.forEach((node) => {
+      if (isSerializedTextNode(node)) node.text = NBSP + node.text;
+    });
   const unknownAttributes = getUnknownAttributes(markerObject);
 
   return removeUndefinedProperties({
     type: CharNode.getType(),
     marker,
-    text,
     unknownAttributes,
-    detail: 0,
-    format: 0,
-    mode: "normal",
-    style: "",
+    children: [...childNodes],
+    direction: null,
+    format: "",
+    indent: 0,
+    textFormat: 0,
+    textStyle: "",
     version: CHAR_VERSION,
   });
 }
@@ -419,12 +420,6 @@ function createNote(
     callerNode = createText(getEditableCallerText(caller));
   } else {
     callerNode = createNoteCaller(caller, childNodes);
-    childNodes.forEach((node) => {
-      if (isSerializedCharNode(node)) {
-        node.mode = "token";
-        node.style = "display: none";
-      }
-    });
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
@@ -642,7 +637,7 @@ function recurseNodes(markers: MarkerContent[] | undefined): SerializedLexicalNo
           break;
         case CharNode.getType():
           addOpeningMarker(markerContent.marker, nodes);
-          nodes.push(createChar(markerContent));
+          nodes.push(createChar(markerContent, recurseNodes(markerContent.content)));
           addClosingMarker(markerContent.marker, nodes);
           break;
         case ParaNode.getType():

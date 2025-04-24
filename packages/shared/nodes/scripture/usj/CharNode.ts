@@ -5,14 +5,13 @@ import {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
-  EditorConfig,
+  ElementNode,
   LexicalEditor,
   LexicalNode,
   NodeKey,
+  SerializedElementNode,
   SerializedLexicalNode,
-  SerializedTextNode,
   Spread,
-  TextNode,
   isHTMLElement,
 } from "lexical";
 import { UnknownAttributes } from "./node-constants";
@@ -125,22 +124,17 @@ export type SerializedCharNode = Spread<
     marker: CharMarker;
     unknownAttributes?: UnknownAttributes;
   },
-  SerializedTextNode
+  SerializedElementNode
 >;
 
 type CharMarker = string;
 
-export class CharNode extends TextNode {
+export class CharNode extends ElementNode {
   __marker: CharMarker;
   __unknownAttributes?: UnknownAttributes;
 
-  constructor(
-    marker: CharMarker,
-    text: string,
-    unknownAttributes?: UnknownAttributes,
-    key?: NodeKey,
-  ) {
-    super(text, key);
+  constructor(marker: CharMarker, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
+    super(key);
     this.__marker = marker;
     this.__unknownAttributes = unknownAttributes;
   }
@@ -150,13 +144,13 @@ export class CharNode extends TextNode {
   }
 
   static clone(node: CharNode): CharNode {
-    const { __marker, __text, __unknownAttributes, __key } = node;
-    return new CharNode(__marker, __text, __unknownAttributes, __key);
+    const { __marker, __unknownAttributes, __key } = node;
+    return new CharNode(__marker, __unknownAttributes, __key);
   }
 
   static importJSON(serializedNode: SerializedCharNode): CharNode {
-    const { marker, text, unknownAttributes } = serializedNode;
-    return $createCharNode(marker, text, unknownAttributes).updateFromJSON(serializedNode);
+    const { marker, unknownAttributes } = serializedNode;
+    return $createCharNode(marker, unknownAttributes).updateFromJSON(serializedNode);
   }
 
   static importDOM(): DOMConversionMap | null {
@@ -211,11 +205,17 @@ export class CharNode extends TextNode {
     return self.__unknownAttributes;
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
-    const dom = super.createDOM(config);
+  createDOM(): HTMLElement {
+    const dom = document.createElement("span");
     dom.setAttribute("data-marker", this.__marker);
     dom.classList.add(this.__type, `usfm_${this.__marker}`);
     return dom;
+  }
+
+  updateDOM(): boolean {
+    // Returning false tells Lexical that this node does not need its
+    // DOM element replacing with a new copy from createDOM.
+    return false;
   }
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
@@ -238,25 +238,28 @@ export class CharNode extends TextNode {
     };
   }
 
-  isTextEntity(): true {
+  // Mutation
+
+  canBeEmpty(): false {
+    return false;
+  }
+
+  isInline(): true {
     return true;
   }
 }
 
 function $convertCharElement(element: HTMLElement): DOMConversionOutput {
   const marker = (element.getAttribute("data-marker") as CharMarker) ?? "f";
-  const text = element.textContent ?? "";
-  const node = $createCharNode(marker, text);
-  node.setStyle(element.getAttribute("style") ?? "");
+  const node = $createCharNode(marker);
   return { node };
 }
 
 export function $createCharNode(
   marker: CharMarker,
-  text: string,
   unknownAttributes?: UnknownAttributes,
 ): CharNode {
-  return $applyNodeReplacement(new CharNode(marker, text, unknownAttributes));
+  return $applyNodeReplacement(new CharNode(marker, unknownAttributes));
 }
 
 function isCharElement(node: HTMLElement | null | undefined): boolean {

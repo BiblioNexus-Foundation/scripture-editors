@@ -12,12 +12,14 @@ import {
   KEY_DOWN_COMMAND,
   LexicalEditor,
   NodeMutation,
+  TextNode,
 } from "lexical";
 import { useEffect, useRef } from "react";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import {
+  $findFirstAncestorNoteNode,
   getNodeElementTagName,
   getNoteCallerPreviewText,
 } from "shared/nodes/scripture/usj/node.utils";
@@ -81,6 +83,7 @@ function useNoteNode(editor: LexicalEditor) {
     return mergeRegister(
       // Update NoteNodeCaller preview text when NoteNode children text is changed.
       editor.registerNodeTransform(CharNode, $noteCharNodeTransform),
+      editor.registerNodeTransform(TextNode, $noteTextNodeTransform),
 
       // Re-generate all note callers when a note is removed.
       editor.registerMutationListener(
@@ -115,7 +118,21 @@ function $noteCharNodeTransform(node: CharNode): void {
   if (!$isCharNode(node) || !$isNoteNode(parent) || !noteCaller) return;
 
   const previewText = getNoteCallerPreviewText(children);
-  noteCaller.setPreviewText(previewText);
+  if (noteCaller.getPreviewText() !== previewText) noteCaller.setPreviewText(previewText);
+}
+
+/**
+ * Changes in NoteNode children text are updated in the NoteNodeCaller preview text.
+ * @param node - TextNode thats needs its preview text updated.
+ */
+function $noteTextNodeTransform(node: TextNode): void {
+  const noteNode = $findFirstAncestorNoteNode(node);
+  const children = noteNode?.getChildren();
+  const noteCaller = children?.find((child) => $isImmutableNoteCallerNode(child));
+  if (!$isTextNode(node) || !$isNoteNode(noteNode) || !noteCaller || !children) return;
+
+  const previewText = getNoteCallerPreviewText(children);
+  if (noteCaller.getPreviewText() !== previewText) noteCaller.setPreviewText(previewText);
 }
 
 /**

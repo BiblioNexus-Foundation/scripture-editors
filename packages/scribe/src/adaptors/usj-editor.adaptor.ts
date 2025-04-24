@@ -48,19 +48,12 @@ import {
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
-  isSerializedChapterNode,
 } from "shared/nodes/scripture/usj/ChapterNode";
-import {
-  CHAR_VERSION,
-  CharNode,
-  isSerializedCharNode,
-  SerializedCharNode,
-} from "shared/nodes/scripture/usj/CharNode";
+import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
 import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
-  isSerializedImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import {
   IMPLIED_PARA_VERSION,
@@ -88,9 +81,12 @@ import {
   getPreviewTextFromSerializedNodes,
   getUnknownAttributes,
   getVisibleOpenMarkerText,
+  isSerializedTextNode,
+  isSomeSerializedChapterNode,
   removeUndefinedProperties,
 } from "shared/nodes/scripture/usj/node.utils";
 import {
+  isSerializedParaNode,
   PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
@@ -115,7 +111,10 @@ import {
   IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
 } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { CallerData } from "shared-react/nodes/scripture/usj/node-react.utils";
+import {
+  CallerData,
+  isSomeSerializedVerseNode,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 import {
   AddMissingComments,
   UsjNodeOptions,
@@ -169,7 +168,7 @@ export function serializeEditorState(
 ): SerializedEditorState {
   if (viewOptions) _viewOptions = viewOptions;
   // use default view mode
-  else _viewOptions = getViewOptions(undefined);
+  else _viewOptions = getViewOptions();
   /** empty para node for an 'empty' editor */
   const emptyParaNode: SerializedParaNode = createPara({
     type: ParaNode.getType(),
@@ -322,25 +321,30 @@ function createVerse(
   });
 }
 
-function createChar(markerObject: MarkerObject): SerializedCharNode {
+function createChar(
+  markerObject: MarkerObject,
+  childNodes: SerializedLexicalNode[] = [],
+): SerializedCharNode {
   const { marker } = markerObject;
   if (!CharNode.isValidMarker(marker)) {
     _logger?.warn(`Unexpected char marker '${marker}'!`);
   }
-  let text = getTextContent(markerObject.content);
   if (_viewOptions?.markerMode === "visible" || _viewOptions?.markerMode === "editable")
-    text = NBSP + text;
+    childNodes.forEach((node) => {
+      if (isSerializedTextNode(node)) node.text = NBSP + node.text;
+    });
   const unknownAttributes = getUnknownAttributes(markerObject);
 
   return removeUndefinedProperties({
     type: CharNode.getType(),
     marker,
-    text,
     unknownAttributes,
-    detail: 0,
-    format: 0,
-    mode: "normal",
-    style: "",
+    children: [...childNodes],
+    direction: null,
+    format: "",
+    indent: 0,
+    textFormat: 0,
+    textStyle: "",
     version: CHAR_VERSION,
   });
 }
@@ -392,11 +396,7 @@ function createNoteCaller(
 ): SerializedImmutableNoteCallerNode {
   const previewText = getPreviewTextFromSerializedNodes(childNodes);
   let onClick: OnClick = () => undefined;
-  if (
-    _nodeOptions &&
-    _nodeOptions[immutableNoteCallerNodeName] &&
-    _nodeOptions[immutableNoteCallerNodeName].onClick
-  )
+  if (_nodeOptions?.[immutableNoteCallerNodeName]?.onClick)
     onClick = _nodeOptions[immutableNoteCallerNodeName].onClick;
 
   return removeUndefinedProperties({
@@ -420,12 +420,6 @@ function createNote(
     callerNode = createText(getEditableCallerText(caller));
   } else {
     callerNode = createNoteCaller(caller, childNodes);
-    childNodes.forEach((node) => {
-      if (isSerializedCharNode(node)) {
-        node.mode = "token";
-        node.style = "display: none";
-      }
-    });
   }
   const unknownAttributes = getUnknownAttributes(markerObject);
 
@@ -643,7 +637,7 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
           break;
         case CharNode.getType():
           addOpeningMarker(markerContent.marker, nodes);
-          nodes.push(createChar(markerContent));
+          nodes.push(createChar(markerContent, recurseNodes(markerContent.content)));
           addClosingMarker(markerContent.marker, nodes);
           break;
         case ParaNode.getType():
@@ -672,29 +666,25 @@ export function recurseNodes(markers: MarkerContent[] | undefined): SerializedLe
 }
 
 /**
- * Insert implied paras around any other set of nodes that contain a text element at the root.
+ * Insert implied paras around any other set of nodes that contain a text or verse element at the root.
  * @param nodes - Serialized nodes.
  * @returns nodes with any needed implied paras inserted.
  */
 function insertImpliedParasRecurse(nodes: SerializedLexicalNode[]): SerializedLexicalNode[] {
-  const bookNodeIndex = nodes.findIndex((node) => isSerializedBookNode(node));
-  const isBookNodeFound = bookNodeIndex >= 0;
-  const chapterNodeIndex = nodes.findIndex(
-    (node) => isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node),
+  const validRootNodeIndex = nodes.findIndex(
+    (node) =>
+      isSerializedBookNode(node) || isSomeSerializedChapterNode(node) || isSerializedParaNode(node),
   );
-  const isChapterNodeFound = chapterNodeIndex >= 0;
-  if (isBookNodeFound && (!isChapterNodeFound || bookNodeIndex < chapterNodeIndex)) {
-    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, bookNodeIndex));
-    const bookNode = nodes[bookNodeIndex];
-    const nodesAfter = insertImpliedParasRecurse(nodes.slice(bookNodeIndex + 1));
-    return [...nodesBefore, bookNode, ...nodesAfter];
-  } else if (isChapterNodeFound) {
-    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, chapterNodeIndex));
-    const chapterNode = nodes[chapterNodeIndex];
-    const nodesAfter = insertImpliedParasRecurse(nodes.slice(chapterNodeIndex + 1));
-    return [...nodesBefore, chapterNode, ...nodesAfter];
-  } else if (nodes.some((node) => "text" in node && "mode" in node)) {
-    // If there are any text nodes as a child of this root, enclose in an implied para node.
+  const isValidRootNodeFound = validRootNodeIndex >= 0;
+  if (isValidRootNodeFound) {
+    const nodesBefore = insertImpliedParasRecurse(nodes.slice(0, validRootNodeIndex));
+    const validRootNode = nodes[validRootNodeIndex];
+    const nodesAfter = insertImpliedParasRecurse(nodes.slice(validRootNodeIndex + 1));
+    return [...nodesBefore, validRootNode, ...nodesAfter];
+  } else if (
+    nodes.some((node) => ("text" in node && "mode" in node) || isSomeSerializedVerseNode(node))
+  ) {
+    // If there are any text or verse nodes as a child of this root, enclose in an implied para node.
     return [createImpliedPara(nodes)];
   }
   return nodes;

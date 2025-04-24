@@ -1,9 +1,11 @@
 import { MarkerContent } from "@biblionexus-foundation/scripture-utilities";
 import {
+  $createTextNode,
   $getSelection,
   $isElementNode,
   $isRangeSelection,
   $isTextNode,
+  EditorUpdateOptions,
   LexicalEditor,
   LexicalNode,
   RangeSelection,
@@ -18,6 +20,12 @@ import { ParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { MarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
 import { Marker } from "shared/utils/usfm/usfmTypes";
 import { createLexicalUsjNode } from "shared/utils/usj/contentToLexicalNode";
+import { GENERATOR_NOTE_CALLER } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  $isSomeVerseNode,
+  $removeLeadingSpace,
+  $addTrailingSpace,
+} from "shared-react/nodes/scripture/usj/node-react.utils";
 import { ViewOptions } from "./view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
@@ -69,13 +77,13 @@ const markerActions: {
       const content: MarkerContent = {
         type: "note",
         marker: "f",
-        caller: "+",
+        caller: GENERATOR_NOTE_CALLER,
         content: [
-          { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum} `] },
+          { type: "char", marker: "fr", content: [`${chapterNum}:${verseNum}`] },
           {
             type: "char",
             marker: "ft",
-            content: [currentEditor.noteText ?? " "],
+            content: [currentEditor.noteText ?? "-"],
           },
         ],
       };
@@ -88,13 +96,13 @@ const markerActions: {
       const content: MarkerContent = {
         type: "note",
         marker: "x",
-        caller: "+",
+        caller: GENERATOR_NOTE_CALLER,
         content: [
-          { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum} `] },
+          { type: "char", marker: "xo", content: [`${chapterNum}:${verseNum}`] },
           {
             type: "char",
             marker: "xt",
-            content: [currentEditor.noteText ?? " "],
+            content: [currentEditor.noteText ?? "-"],
           },
         ],
       };
@@ -108,6 +116,8 @@ export function getUsjMarkerAction(
   marker: string,
   _markerData?: Marker,
   viewOptions?: ViewOptions,
+  /** Included for tests, e.g. `{ discrete: true }` */
+  editorUpdateOptions?: EditorUpdateOptions,
 ): MarkerAction {
   const markerAction = getMarkerAction(marker);
   const action = (currentEditor: {
@@ -118,13 +128,11 @@ export function getUsjMarkerAction(
     noteText?: string;
   }) => {
     currentEditor.editor.update(() => {
-      const content = currentEditor.autoNumbering
-        ? markerAction?.action?.(currentEditor)
-        : markerAction?.action?.(currentEditor);
+      const content = markerAction?.action?.(currentEditor);
       if (!content) return;
 
       const serializedLexicalNode = createLexicalUsjNode(content, usjEditorAdaptor, viewOptions);
-      const usjNode = $createNodeFromSerializedNode(serializedLexicalNode);
+      const nodeToInsert = $createNodeFromSerializedNode(serializedLexicalNode);
 
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -133,24 +141,28 @@ export function getUsjMarkerAction(
           $wrapTextSelectionInInlineNode(selection, () =>
             $createNodeFromSerializedNode(serializedLexicalNode),
           );
-        } else if ($isElementNode(usjNode) && !usjNode.isInline()) {
+        } else if ($isElementNode(nodeToInsert) && !nodeToInsert.isInline()) {
           // If the selection is empty, insert a new paragraph and replace it with the USJ node
           const paragraph = selection.insertParagraph();
           if (paragraph) {
             // Transfer the content of the paragraph to the USJ node
             const paragraphContent = paragraph.getChildren();
-            usjNode.append(...paragraphContent);
-            paragraph.replace(usjNode);
-            usjNode.selectStart();
+            nodeToInsert.append(...paragraphContent);
+            paragraph.replace(nodeToInsert);
+            nodeToInsert.selectStart();
           }
         } else {
-          selection.insertNodes([usjNode]);
+          selection.insertNodes([nodeToInsert]);
+          $moveVerseFollowingSpaceToPreviousNode(nodeToInsert);
+          const nextNode = nodeToInsert.getNextSibling();
+          if (nextNode) nextNode.selectStart();
+          else nodeToInsert.selectStart();
         }
       } else {
-        // Insert the USJ node directly
-        selection?.insertNodes([usjNode]);
+        // Insert the node directly
+        selection?.insertNodes([nodeToInsert]);
       }
-    });
+    }, editorUpdateOptions);
   };
   return { action, label: markerAction?.label };
 }
@@ -181,7 +193,7 @@ function getMarkerAction(marker: string): {
           const content: MarkerContent = {
             type: CharNode.getType(),
             marker,
-            content: [" "],
+            content: ["-"],
           };
           return [content];
         },
@@ -207,7 +219,7 @@ function $wrapTextSelectionInInlineNode(
     }
 
     // Get the target node to wrap
-    const targetNode = getTargetNode(
+    const targetNode = $getTargetNode(
       node,
       index === 0,
       index === nodes.length - 1,
@@ -227,13 +239,11 @@ function $wrapTextSelectionInInlineNode(
     }
 
     // Wrap the target node
-    wrapNode(targetNode, currentWrapper);
+    $wrapNode(targetNode, currentWrapper);
   });
 
   // Update selection
-  if ($isTextNode(currentWrapper)) {
-    currentWrapper.selectEnd();
-  }
+  if ($isTextNode(currentWrapper) || $isElementNode(currentWrapper)) currentWrapper.selectEnd();
 }
 
 // #region Helper functions for $wrapTextSelectionInInlineNode
@@ -249,7 +259,7 @@ function getSelectionOffsets(selection: RangeSelection): [number, number] {
   return selection.isBackward() ? [focusOffset, anchorOffset] : [anchorOffset, focusOffset];
 }
 
-function getTargetNode(
+function $getTargetNode(
   node: LexicalNode,
   isFirst: boolean,
   isLast: boolean,
@@ -283,27 +293,53 @@ function handleTextNode(
   const start = isFirst ? startOffset : 0;
   const end = isLast ? endOffset : textLength;
 
-  if (start === 0 && end === 0) {
-    return;
-  }
+  if (start === 0 && end === 0) return;
 
   const splitNodes = node.splitText(start, end);
 
-  if (splitNodes.length === 1) {
-    return splitNodes[0];
-  }
+  if (splitNodes.length === 1) return splitNodes[0];
 
-  return splitNodes.length === 3 || isFirst || end === textLength ? splitNodes[1] : splitNodes[0];
+  return splitNodes.length === 3 || end === textLength ? splitNodes[1] : splitNodes[0];
 }
 
-function wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
+function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
   if ($isTextNode(wrapper)) {
-    wrapper.setTextContent(node.getTextContent());
+    const text = $moveLeadingSpaceToPreviousNode(node, wrapper);
+    wrapper.setTextContent(text);
     node.remove();
   } else if ($isElementNode(wrapper)) {
-    wrapper.clear();
+    const wrapperChildrenCount = wrapper.getChildrenSize();
     wrapper.append(node);
+    for (let i = 0; i < wrapperChildrenCount; i++) wrapper.getFirstChild()?.remove();
+    $moveLeadingSpaceToPreviousNode(node, wrapper);
   }
+}
+
+function $moveLeadingSpaceToPreviousNode(node: LexicalNode, wrapper: LexicalNode): string {
+  let text = node.getTextContent();
+  if ($isTextNode(node) && wrapper.isInline() && text.startsWith(" ")) {
+    text = text.trimStart();
+    node.setTextContent(text);
+    const previousNode = wrapper.getPreviousSibling();
+    $addTrailingSpace(previousNode);
+    if (!$isTextNode(previousNode)) wrapper.insertBefore($createTextNode(" "));
+  }
+  return text;
 }
 
 // #endregion
+
+/**
+ * Moves the leading space of a node following a verse node to the previous node.
+ *
+ * This function checks if the previous node ends in a space and adds one if needed. It then checks
+ * if the following node starts with a space and removes it.
+ *
+ * @param node - The node to check for leading space.
+ */
+function $moveVerseFollowingSpaceToPreviousNode(node: LexicalNode) {
+  if (!$isSomeVerseNode(node)) return;
+
+  $addTrailingSpace(node.getPreviousSibling());
+  $removeLeadingSpace(node.getNextSibling());
+}

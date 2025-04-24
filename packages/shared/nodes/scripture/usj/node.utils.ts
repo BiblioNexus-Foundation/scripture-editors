@@ -8,6 +8,8 @@ import {
   LexicalEditor,
   LexicalNode,
   SerializedLexicalNode,
+  SerializedTextNode,
+  TextNode,
 } from "lexical";
 // Must be imported before `CharNode` to prevent a circular dependency.
 import { NBSP, NUMBERED_MARKER_PLACEHOLDER, UnknownAttributes } from "./node-constants";
@@ -159,6 +161,34 @@ export function $findThisChapter(node: LexicalNode | null | undefined) {
 }
 
 /**
+ * Traverses up the node tree from startNode to find the first ancestor NoteNode.
+ * @param startNode - The node to start the upward search from.
+ * @returns The first ancestor NoteNode found, or `undefined` if none exists before the root.
+ */
+export function $findFirstAncestorNoteNode(startNode: LexicalNode): NoteNode | undefined {
+  let currentNode: LexicalNode | null = startNode;
+
+  while (currentNode !== null) {
+    if ($isNoteNode(currentNode)) return currentNode;
+    currentNode = currentNode.getParent();
+  }
+
+  // Reached the root without finding a NoteNode
+  return undefined;
+}
+
+/**
+ * Checks if the given node is a SerializedTextNode.
+ * @param node - The node to check.
+ * @returns `true` if the node is a SerializedTextNode, `false` otherwise.
+ */
+export function isSerializedTextNode(
+  node: SerializedLexicalNode | null | undefined,
+): node is SerializedTextNode {
+  return node?.type === TextNode.getType();
+}
+
+/**
  * Remove the given node and all the nodes after.
  * @param nodes - Nodes to prune.
  * @param pruneNode - Node to prune and all nodes after.
@@ -239,14 +269,36 @@ export function getVisibleOpenMarkerText(marker: string, content: string | undef
 }
 
 /**
- * Gets the preview text for a serialized note caller.
- * @param childNodes - Child nodes of the NoteNode.
- * @returns the preview text.
+ * Recursively extracts text content from a serialized Lexical node and its descendants.
+ * @param node - The serialized node to process.
+ * @returns The concatenated text content.
+ */
+function extractTextFromNode(node: SerializedLexicalNode): string {
+  if (isSerializedTextNode(node)) return node.text;
+
+  if (isSerializedCharNode(node)) {
+    // If it's an ElementNode, process its children recursively and join their text
+    // We join with '' here because spacing is usually handled by spaces within TextNodes
+    // or potentially by joining results from the top-level nodes with spaces later.
+    return node.children.map((child) => extractTextFromNode(child)).join("");
+  }
+
+  // Ignore other node types (e.g., LineBreakNode, custom nodes without text/children)
+  return "";
+}
+
+/**
+ * Gets the preview text from an array of serialized Lexical nodes,
+ * handling nested elements like the modified CharNode.
+ * @param childNodes - Child nodes (e.g., from a NoteNode or ParagraphNode).
+ * @returns The preview text.
  */
 export function getPreviewTextFromSerializedNodes(childNodes: SerializedLexicalNode[]): string {
   const previewText = childNodes
-    .reduce((text, node) => text + (isSerializedCharNode(node) ? ` ${node.text}` : ""), "")
+    .map((node) => extractTextFromNode(node))
+    .join(" ")
     .trim();
+
   return previewText;
 }
 

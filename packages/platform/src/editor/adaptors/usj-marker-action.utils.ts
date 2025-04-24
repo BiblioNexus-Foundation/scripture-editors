@@ -229,9 +229,7 @@ function $wrapTextSelectionInInlineNode(
   });
 
   // Update selection
-  if ($isTextNode(currentWrapper)) {
-    currentWrapper.selectEnd();
-  }
+  if ($isTextNode(currentWrapper) || $isElementNode(currentWrapper)) currentWrapper.selectEnd();
 }
 
 // #region Helper functions for $wrapTextSelectionInInlineNode
@@ -292,20 +290,27 @@ function handleTextNode(
 
 function $wrapNode(node: LexicalNode, wrapper: LexicalNode): void {
   if ($isTextNode(wrapper)) {
-    let text = node.getTextContent();
-    // Inline nodes can't start with a space.
-    if ($isTextNode(node) && wrapper.isInline() && text.startsWith(" ")) {
-      text = text.trimStart();
-      const previousNode = wrapper.getPreviousSibling();
-      $addTrailingSpace(previousNode);
-      if (!$isTextNode(previousNode)) wrapper.insertBefore($createTextNode(" "));
-    }
+    const text = $moveLeadingSpaceToPreviousNode(node, wrapper);
     wrapper.setTextContent(text);
     node.remove();
   } else if ($isElementNode(wrapper)) {
-    wrapper.clear();
+    const wrapperChildrenCount = wrapper.getChildrenSize();
     wrapper.append(node);
+    for (let i = 0; i < wrapperChildrenCount; i++) wrapper.getFirstChild()?.remove();
+    $moveLeadingSpaceToPreviousNode(node, wrapper);
   }
+}
+
+function $moveLeadingSpaceToPreviousNode(node: LexicalNode, wrapper: LexicalNode): string {
+  let text = node.getTextContent();
+  if ($isTextNode(node) && wrapper.isInline() && text.startsWith(" ")) {
+    text = text.trimStart();
+    node.setTextContent(text);
+    const previousNode = wrapper.getPreviousSibling();
+    $addTrailingSpace(previousNode);
+    if (!$isTextNode(previousNode)) wrapper.insertBefore($createTextNode(" "));
+  }
+  return text;
 }
 
 // #endregion
