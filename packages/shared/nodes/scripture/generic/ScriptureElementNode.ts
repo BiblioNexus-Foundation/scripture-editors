@@ -33,6 +33,10 @@ export class ScriptureElementNode extends ElementNode {
     this.__tag = tag;
   }
 
+  static getType(): string {
+    return "usfmelement";
+  }
+
   getAttributes(): Attributes {
     return this.getLatest().__attributes;
   }

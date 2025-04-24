@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 import {
   ScripturalEditorComposer,
@@ -8,6 +8,8 @@ import {
   DEFAULT_SCRIPTURAL_BASE_SETTINGS,
   useBaseSettings,
   ScripturalInitialConfigType,
+  ScriptureReferenceHandler,
+  ScrollToReferencePlugin,
 } from "@scriptural/react";
 import "@scriptural/react/styles/scriptural-editor.css";
 import "@scriptural/react/styles/nodes-menu.css";
@@ -17,6 +19,7 @@ import { CustomToolbar } from "./CustomToolbar";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { UsjDocument } from "@scriptural/react/internal-packages/shared/converters/usj/core/usj";
 import { EditorState, LexicalEditor } from "lexical";
+import { AppReferenceHandler } from "./utils/AppReferenceHandler";
 
 function onError(error: any) {
   console.error(error);
@@ -30,6 +33,9 @@ export function Editor({
   children,
   onSave,
   onHistoryChange,
+  scriptureReferenceHandler,
+  referenceHandlerSource,
+  enableScrollToReference = true,
 }: {
   usj?: UsjDocument;
   initialState?: null | string | EditorState | ((editor: LexicalEditor) => void);
@@ -38,6 +44,9 @@ export function Editor({
   children?: React.ReactNode;
   onSave?: (newUsj: UsjDocument) => void;
   onHistoryChange?: Parameters<typeof HistoryPlugin>[0]["onChange"];
+  scriptureReferenceHandler?: ScriptureReferenceHandler;
+  referenceHandlerSource?: string;
+  enableScrollToReference?: boolean;
 }) {
   const initialConfig = useMemo<ScripturalInitialConfigType>(() => {
     return {
@@ -53,10 +62,28 @@ export function Editor({
     };
   }, [usj, editable, onSave, bookCode]);
 
+  // Set the source identifier on the reference handler if both are provided
+  useEffect(() => {
+    if (
+      scriptureReferenceHandler &&
+      referenceHandlerSource &&
+      scriptureReferenceHandler instanceof AppReferenceHandler
+    ) {
+      scriptureReferenceHandler.setSource(referenceHandlerSource);
+    }
+  }, [scriptureReferenceHandler, referenceHandlerSource]);
+
   return (
     <div className="editor-wrapper prose">
-      <ScripturalEditorComposer initialConfig={initialConfig}>
-        <EditorPlugins onSave={onSave} onHistoryChange={onHistoryChange} />
+      <ScripturalEditorComposer
+        initialConfig={initialConfig}
+        scriptureReferenceHandler={scriptureReferenceHandler}
+      >
+        <EditorPlugins
+          onSave={onSave}
+          onHistoryChange={onHistoryChange}
+          enableScrollToReference={enableScrollToReference}
+        />
         {children}
       </ScripturalEditorComposer>
     </div>
@@ -66,13 +93,16 @@ export function Editor({
 function EditorPlugins({
   onSave,
   onHistoryChange,
+  enableScrollToReference,
 }: {
   onSave?: (newUsj: UsjDocument) => void;
   onHistoryChange?: Parameters<typeof HistoryPlugin>[0]["onChange"];
+  enableScrollToReference?: boolean;
 }) {
   const { enhancedCursorPosition, contextMenuTriggerKey } = useBaseSettings();
   const [editor] = useLexicalComposerContext();
   const editable = useMemo(() => editor.isEditable(), [editor]);
+
   return (
     <>
       <CustomToolbar onSave={onSave} />
@@ -87,6 +117,11 @@ function EditorPlugins({
           <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
           <HistoryPlugin onChange={onHistoryChange} />
         </>
+      )}
+
+      {/* Add scroll to reference support */}
+      {enableScrollToReference && (
+        <ScrollToReferencePlugin scrollBehavior="smooth" scrollOffset={80} />
       )}
     </>
   );

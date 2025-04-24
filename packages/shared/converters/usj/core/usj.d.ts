@@ -7,6 +7,8 @@ export type UsjDocument = {
   content: Exclude<UsjNode, UsjDocument>[];
 };
 
+export type SingleCharString = string;
+
 export type UsjStructuralNode = UsjBook | UsjChapter | UsjPara | UsjTable | UsjSidebar | UsjBreak;
 export type UsjInlineNode = UsjChar | UsjVerse | UsjMilestone | UsjFigure | UsjNote | UsjRef;
 export type UsjNode = UsjDocument | UsjStructuralNode | UsjInlineNode;
