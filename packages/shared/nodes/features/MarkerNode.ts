@@ -16,19 +16,17 @@ export const MARKER_VERSION = 1;
 
 export type SerializedMarkerNode = Spread<
   {
-    marker: MarkerMarker;
+    marker: string;
     isOpening?: boolean;
   },
   SerializedTextNode
 >;
 
-type MarkerMarker = string;
-
 export class MarkerNode extends TextNode {
-  __marker: MarkerMarker;
+  __marker: string;
   __isOpening: boolean;
 
-  constructor(marker: MarkerMarker, isOpening = true, key?: NodeKey) {
+  constructor(marker: string, isOpening = true, key?: NodeKey) {
     const text = isOpening ? openingMarkerText(marker) : closingMarkerText(marker);
     super(text, key);
     this.__marker = marker;
@@ -48,7 +46,7 @@ export class MarkerNode extends TextNode {
     return $createMarkerNode(marker, isOpening).updateFromJSON(serializedNode);
   }
 
-  setMarker(marker: MarkerMarker): this {
+  setMarker(marker: string): this {
     if (this.__marker === marker) return this;
 
     const self = this.getWritable();
@@ -56,7 +54,7 @@ export class MarkerNode extends TextNode {
     return self;
   }
 
-  getMarker(): MarkerMarker {
+  getMarker(): string {
     const self = this.getLatest();
     return self.__marker;
   }
@@ -93,7 +91,7 @@ export class MarkerNode extends TextNode {
   }
 }
 
-export function $createMarkerNode(marker: MarkerMarker, isOpening?: boolean): MarkerNode {
+export function $createMarkerNode(marker: string, isOpening?: boolean): MarkerNode {
   return $applyNodeReplacement(new MarkerNode(marker, isOpening));
 }
 

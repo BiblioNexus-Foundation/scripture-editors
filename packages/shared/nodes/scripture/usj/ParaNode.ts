@@ -16,14 +16,7 @@ import {
   Spread,
   isHTMLElement,
 } from "lexical";
-import { UnknownAttributes } from "./node-constants";
-import {
-  extractNonNumberedMarkers,
-  extractNumberedMarkers,
-  isValidNumberedMarker,
-} from "./node.utils";
-
-export const PARA_MARKER_DEFAULT = "p";
+import { PARA_MARKER_DEFAULT, UnknownAttributes } from "./node-constants";
 
 /** @see https://docs.usfm.bible/usfm/3.1/para/index.html */
 const VALID_PARA_MARKERS = [
@@ -154,31 +147,22 @@ const VALID_PARA_MARKERS = [
   "pb",
 ] as const;
 
-const VALID_PARA_MARKERS_NUMBERED = extractNumberedMarkers(VALID_PARA_MARKERS);
-const VALID_PARA_MARKERS_NON_NUMBERED = [
-  ...extractNonNumberedMarkers(VALID_PARA_MARKERS),
-  // Include the numbered styles, i.e. not ending in a number since pi (= pi1) is valid.
-  ...VALID_PARA_MARKERS_NUMBERED,
-] as const;
-
 export const PARA_VERSION = 1;
 
 export type SerializedParaNode = Spread<
   {
-    marker: ParaMarker;
+    marker: string;
     unknownAttributes?: UnknownAttributes;
   },
   SerializedParagraphNode
 >;
 
-type ParaMarker = string;
-
 export class ParaNode extends ParagraphNode {
-  __marker: ParaMarker;
+  __marker: string;
   __unknownAttributes?: UnknownAttributes;
 
   constructor(
-    marker: ParaMarker = PARA_MARKER_DEFAULT,
+    marker: string = PARA_MARKER_DEFAULT,
     unknownAttributes?: UnknownAttributes,
     key?: NodeKey,
   ) {
@@ -212,12 +196,12 @@ export class ParaNode extends ParagraphNode {
 
   static isValidMarker(marker: string | undefined): boolean {
     return (
-      (marker && VALID_PARA_MARKERS_NON_NUMBERED.includes(marker)) ||
-      isValidNumberedMarker(marker, VALID_PARA_MARKERS_NUMBERED)
+      marker !== undefined &&
+      VALID_PARA_MARKERS.includes(marker as (typeof VALID_PARA_MARKERS)[number])
     );
   }
 
-  setMarker(marker: ParaMarker): this {
+  setMarker(marker: string): this {
     if (this.__marker === marker) return this;
 
     const self = this.getWritable();
@@ -225,7 +209,7 @@ export class ParaNode extends ParagraphNode {
     return self;
   }
 
-  getMarker(): ParaMarker {
+  getMarker(): string {
     const self = this.getLatest();
     return self.__marker;
   }
@@ -297,10 +281,7 @@ function $convertParaElement(element: HTMLElement): DOMConversionOutput {
   return { node };
 }
 
-export function $createParaNode(
-  marker?: ParaMarker,
-  unknownAttributes?: UnknownAttributes,
-): ParaNode {
+export function $createParaNode(marker?: string, unknownAttributes?: UnknownAttributes): ParaNode {
   return $applyNodeReplacement(new ParaNode(marker, unknownAttributes));
 }
 

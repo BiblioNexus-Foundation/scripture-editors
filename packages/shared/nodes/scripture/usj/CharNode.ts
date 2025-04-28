@@ -15,11 +15,6 @@ import {
   isHTMLElement,
 } from "lexical";
 import { UnknownAttributes } from "./node-constants";
-import {
-  extractNonNumberedMarkers,
-  extractNumberedMarkers,
-  isValidNumberedMarker,
-} from "./node.utils";
 
 /** @see https://docs.usfm.bible/usfm/3.1/char/notes/footnote/index.html */
 const VALID_CHAR_FOOTNOTE_MARKERS = [
@@ -110,30 +105,21 @@ const VALID_CHAR_MARKERS = [
   ...VALID_CHAR_CROSS_REFERENCE_MARKERS,
 ] as const;
 
-const VALID_CHAR_MARKERS_NUMBERED = extractNumberedMarkers(VALID_CHAR_MARKERS);
-const VALID_CHAR_MARKERS_NON_NUMBERED = [
-  ...extractNonNumberedMarkers(VALID_CHAR_MARKERS),
-  // Include the numbered markers, i.e. not ending in a number since pi (= pi1) is valid.
-  ...VALID_CHAR_MARKERS_NUMBERED,
-] as const;
-
 export const CHAR_VERSION = 1;
 
 export type SerializedCharNode = Spread<
   {
-    marker: CharMarker;
+    marker: string;
     unknownAttributes?: UnknownAttributes;
   },
   SerializedElementNode
 >;
 
-type CharMarker = string;
-
 export class CharNode extends ElementNode {
-  __marker: CharMarker;
+  __marker: string;
   __unknownAttributes?: UnknownAttributes;
 
-  constructor(marker: CharMarker, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
+  constructor(marker: string, unknownAttributes?: UnknownAttributes, key?: NodeKey) {
     super(key);
     this.__marker = marker;
     this.__unknownAttributes = unknownAttributes;
@@ -167,21 +153,18 @@ export class CharNode extends ElementNode {
   }
 
   static isValidMarker(marker: string | undefined): boolean {
-    return (
-      (marker && VALID_CHAR_MARKERS_NON_NUMBERED.includes(marker)) ||
-      isValidNumberedMarker(marker, VALID_CHAR_MARKERS_NUMBERED)
-    );
+    return marker !== undefined && VALID_CHAR_MARKERS.includes(marker);
   }
 
   static isValidFootnoteMarker(marker: string | undefined): boolean {
-    return !!marker && VALID_CHAR_FOOTNOTE_MARKERS.includes(marker);
+    return marker !== undefined && VALID_CHAR_FOOTNOTE_MARKERS.includes(marker);
   }
 
   static isValidCrossReferenceMarker(marker: string | undefined): boolean {
-    return !!marker && VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
+    return marker !== undefined && VALID_CHAR_CROSS_REFERENCE_MARKERS.includes(marker);
   }
 
-  setMarker(marker: CharMarker): this {
+  setMarker(marker: string): this {
     if (this.__marker === marker) return this;
 
     const self = this.getWritable();
@@ -189,7 +172,7 @@ export class CharNode extends ElementNode {
     return self;
   }
 
-  getMarker(): CharMarker {
+  getMarker(): string {
     const self = this.getLatest();
     return self.__marker;
   }
@@ -250,15 +233,12 @@ export class CharNode extends ElementNode {
 }
 
 function $convertCharElement(element: HTMLElement): DOMConversionOutput {
-  const marker = (element.getAttribute("data-marker") as CharMarker) ?? "f";
+  const marker = element.getAttribute("data-marker") ?? "f";
   const node = $createCharNode(marker);
   return { node };
 }
 
-export function $createCharNode(
-  marker: CharMarker,
-  unknownAttributes?: UnknownAttributes,
-): CharNode {
+export function $createCharNode(marker: string, unknownAttributes?: UnknownAttributes): CharNode {
   return $applyNodeReplacement(new CharNode(marker, unknownAttributes));
 }
 

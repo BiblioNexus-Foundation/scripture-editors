@@ -2,7 +2,7 @@
 
 export type UnknownAttributes = { [name: string]: string | undefined };
 
-export const NUMBERED_MARKER_PLACEHOLDER = "#";
+export const PARA_MARKER_DEFAULT = "p";
 
 export const NBSP = "\u00A0";
 export const ZWSP = "\u200B";
