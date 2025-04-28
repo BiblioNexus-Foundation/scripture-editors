@@ -17,6 +17,7 @@ import {
 } from "../nodes/scripture/usj/ImmutableVerseNode";
 import { $isSomeVerseNode } from "../nodes/scripture/usj/node-react.utils";
 import { TextNodePlugin } from "./TextNodePlugin";
+import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
 
 let secondVerseNode: ImmutableVerseNode;
 
@@ -95,6 +96,27 @@ describe("TextNodePlugin", () => {
       if (!$isTextNode(textNode)) fail("Expected a TextNode");
       expect(textNode.getTextContent()).toBe("a");
       $expectSelectionToBe(textNode, 1);
+    });
+  });
+
+  it("should not add a space inside a char node", async () => {
+    let charNode: LexicalNode | null;
+    function $initialEditorState() {
+      charNode = $createCharNode("wj").append($createTextNode("a"));
+      $getRoot().append(
+        $createImmutableChapterNode("1"),
+        $createParaNode().append($createImmutableVerseNode("1"), charNode),
+      );
+    }
+    const { editor } = await testEnvironment($initialEditorState);
+
+    editor.getEditorState().read(() => {
+      const para = $getRoot().getChildren()[1];
+      if (!$isParaNode(para)) fail("Expected a ParaNode");
+      expect(para.getChildren()).toHaveLength(2);
+      const charNode = para.getChildAtIndex(1);
+      if (!$isCharNode(charNode)) fail("Expected a CharNode");
+      expect(charNode.getTextContent()).toBe("a");
     });
   });
 });

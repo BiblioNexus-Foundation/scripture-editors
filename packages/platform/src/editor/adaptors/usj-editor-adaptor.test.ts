@@ -85,9 +85,7 @@ describe("USJ Editor Adaptor", () => {
     expect(serializedEditorState).toEqual(editorStateGen1v1ImpliedPara);
   });
 
-  // TODO: Fix char not being able to contain other content and re-enable this test
-  // https://github.com/BiblioNexus-Foundation/scripture-editors/issues/223
-  xit("should convert from USJ with nonstandard features to Lexical editor state JSON", () => {
+  it("should convert from USJ with nonstandard features to Lexical editor state JSON", () => {
     const serializedEditorState = serializeEditorState(usjGen1v1Nonstandard);
 
     expect(serializedEditorState).toEqual(editorStateGen1v1Nonstandard);

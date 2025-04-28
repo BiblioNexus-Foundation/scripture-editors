@@ -4,7 +4,7 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
-import { $getRoot, $createTextNode, LexicalEditor, TextNode } from "lexical";
+import { $getRoot, $createTextNode, LexicalEditor, TextNode, $isTextNode } from "lexical";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
@@ -50,7 +50,7 @@ describe("NoteNodePlugin", () => {
         expect(getPreviewText(firstNoteNode)).toBe("1:1  First footnote text");
       });
 
-      await updateNoteNodeText(editor, firstNoteNode, 1, "1:1a ");
+      await updateNoteNodeText(editor, firstNoteNode, 1, 0, "1:1a ");
 
       editor.getEditorState().read(() => {
         expect(getPreviewText(firstNoteNode)).toBe("1:1a  First footnote text");
@@ -63,8 +63,8 @@ function $createFootnoteNode(caller: string, reference: string, text: string) {
   const footnoteNode = $createNoteNode("f", GENERATOR_NOTE_CALLER);
   footnoteNode.append(
     $createImmutableNoteCallerNode(caller, `${reference} ${text}`),
-    $createCharNode("fr", reference),
-    $createCharNode("ft", text),
+    $createCharNode("fr").append($createTextNode(reference)),
+    $createCharNode("ft").append($createTextNode(text)),
   );
   return footnoteNode;
 }
@@ -140,20 +140,27 @@ async function testEnvironment(
  *
  * @param editor - The LexicalEditor instance where the NoteNode is located.
  * @param noteNode - The NoteNode instance containing the CharNode to update.
- * @param childIndex - The index of the CharNode within the NoteNode's children.
+ * @param charNodeIndex - The index of the CharNode within the NoteNode's children.
+ * @param textNodeIndex - The index of the TextNode within the CharNode's children.
  * @param text - The new text content to set on the CharNode.
  * @returns A promise that resolves once the text content has been updated.
  */
 async function updateNoteNodeText(
   editor: LexicalEditor,
   noteNode: NoteNode,
-  childIndex: number,
+  charNodeIndex: number,
+  textNodeIndex: number,
   text: string,
 ) {
   await act(async () => {
     editor.update(() => {
-      const noteNodeChild = noteNode.getChildAtIndex(childIndex);
-      if ($isCharNode(noteNodeChild)) noteNodeChild.setTextContent(text);
+      const noteNodeChild = noteNode.getChildAtIndex(charNodeIndex);
+      if ($isCharNode(noteNodeChild)) {
+        const charNodeChild = noteNodeChild.getChildAtIndex(textNodeIndex);
+        if ($isTextNode(charNodeChild)) {
+          charNodeChild.setTextContent(text);
+        }
+      }
     });
   });
 }

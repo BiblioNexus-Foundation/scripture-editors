@@ -1,6 +1,7 @@
 import {
   TEXT_SPACING_CLASS_NAME,
   FORMATTED_FONT_CLASS_NAME,
+  MARKER_MODE_CLASS_NAME_PREFIX,
 } from "shared/nodes/scripture/usj/node-constants";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
@@ -78,7 +79,11 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
  */
 export function getViewClassList(viewOptions: ViewOptions | undefined) {
   const classList: string[] = [];
-  if (viewOptions?.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
-  if (viewOptions?.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
+  const _viewOptions = viewOptions ?? getViewOptions();
+  if (_viewOptions) {
+    classList.push(`${MARKER_MODE_CLASS_NAME_PREFIX}${_viewOptions.markerMode}`);
+    if (_viewOptions.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
+    if (_viewOptions.isFormattedFont) classList.push(FORMATTED_FONT_CLASS_NAME);
+  }
   return classList;
 }

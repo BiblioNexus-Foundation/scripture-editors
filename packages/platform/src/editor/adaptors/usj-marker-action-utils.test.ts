@@ -24,6 +24,15 @@ const reference = { book: "GEN", chapterNum: 1, verseNum: 1 };
 
 let secondVerseTextNode: TextNode;
 
+function $defaultInitialEditorState() {
+  secondVerseTextNode = $createTextNode("second verse text ");
+  $getRoot().append(
+    $createImmutableChapterNode("1"),
+    $createParaNode().append($createImmutableVerseNode("1"), $createTextNode("first verse text ")),
+    $createParaNode().append($createImmutableVerseNode("2"), secondVerseTextNode),
+  );
+}
+
 describe("USJ Marker Action Utils", () => {
   it("should load default initialEditorState and set selection (sanity check)", async () => {
     const { editor } = createBasicTestEnvironment(nodes, $defaultInitialEditorState);
@@ -151,7 +160,9 @@ describe("USJ Marker Action Utils", () => {
         if (!$isCharNode(insertedNode)) fail("Inserted node is not a char");
         expect(insertedNode.getMarker()).toBe("wj");
         expect(insertedNode.getTextContent()).toBe("-");
-        $expectSelectionToBe(insertedNode, 0);
+        const charTextNode = insertedNode.getChildAtIndex(0);
+        if (!$isTextNode(charTextNode)) fail("Inserted char node does not have a text node");
+        $expectSelectionToBe(charTextNode, 0);
       });
     });
   });
@@ -173,7 +184,9 @@ describe("USJ Marker Action Utils", () => {
         const tailTextNode = insertedNode.getNextSibling();
         if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
         expect(tailTextNode.getTextContent()).toBe(" text ");
-        $expectSelectionToBe(insertedNode);
+        const charTextNode = insertedNode.getChildAtIndex(0);
+        if (!$isTextNode(charTextNode)) fail("Inserted char node does not have a text node");
+        $expectSelectionToBe(charTextNode);
       });
     });
 
@@ -193,21 +206,10 @@ describe("USJ Marker Action Utils", () => {
         const tailTextNode = insertedNode.getNextSibling();
         if (!$isTextNode(tailTextNode)) fail("Tail node is not text");
         expect(tailTextNode.getTextContent()).toBe(" text ");
-        $expectSelectionToBe(insertedNode);
+        const charTextNode = insertedNode.getChildAtIndex(0);
+        if (!$isTextNode(charTextNode)) fail("Inserted char node does not have a text node");
+        $expectSelectionToBe(charTextNode);
       });
     });
   });
 });
-
-function $defaultInitialEditorState() {
-  const firstVerseNode = $createImmutableVerseNode("1");
-  const firstVerseTextNode = $createTextNode("first verse text ");
-  const secondVerseNode = $createImmutableVerseNode("2");
-  secondVerseTextNode = $createTextNode("second verse text ");
-
-  $getRoot().append(
-    $createImmutableChapterNode("1"),
-    $createParaNode().append(firstVerseNode, firstVerseTextNode),
-    $createParaNode().append(secondVerseNode, secondVerseTextNode),
-  );
-}
