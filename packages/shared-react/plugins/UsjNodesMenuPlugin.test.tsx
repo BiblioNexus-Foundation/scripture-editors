@@ -16,6 +16,11 @@ import {
 } from "lexical";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import {
+  $createImpliedParaNode,
+  $isImpliedParaNode,
+  ImpliedParaNode,
+} from "shared/nodes/scripture/usj/ImpliedParaNode";
 import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
@@ -23,6 +28,7 @@ import {
   $createImmutableVerseNode,
   ImmutableVerseNode,
 } from "../nodes/scripture/usj/ImmutableVerseNode";
+import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
 import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
 
 let firstVerseNode: ImmutableVerseNode;
@@ -129,6 +135,48 @@ describe("UsjNodesMenuPlugin", () => {
         expect(ch2SecondVerseNode.getNumber()).toBe("2");
       });
     });
+
+    it("should get 'p' marker from implied para to enable menu there", async () => {
+      let impliedPara: ImpliedParaNode;
+      function $initialEditorState() {
+        impliedPara = $createImpliedParaNode();
+        $getRoot().append($createImmutableChapterNode("1"), impliedPara);
+      }
+      const { editor } = await testEnvironment($initialEditorState);
+
+      editor.getEditorState().read(() => {
+        if (!$isImpliedParaNode(impliedPara)) fail("impliedPara is not an implied para node");
+        if (!$isReactNodeWithMarker(impliedPara))
+          fail("impliedPara is not a React node with marker");
+        expect(impliedPara.getMarker()).toBe("p");
+      });
+    });
+
+    it("should insert a verse when the paragraph is implied", async () => {
+      function $initialEditorState() {
+        firstVerseNode = $createImmutableVerseNode("1");
+        firstVerseTextNode = $createTextNode("first verse text ");
+        secondVerseNode = $createImmutableVerseNode("2");
+        secondVerseTextNode = $createTextNode("second verse text ");
+        $getRoot().append(
+          $createImmutableChapterNode("1"),
+          $createImpliedParaNode().append(
+            firstVerseNode,
+            firstVerseTextNode,
+            secondVerseNode,
+            secondVerseTextNode,
+          ),
+        );
+      }
+      const { editor } = await testEnvironment($initialEditorState);
+
+      await insertVerseNodeAtSelection(editor, "2", firstVerseTextNode);
+
+      editor.getEditorState().read(() => {
+        expect(firstVerseNode.getNumber()).toBe("1");
+        expect(secondVerseNode.getNumber()).toBe("3");
+      });
+    });
   });
 });
 
@@ -233,9 +281,9 @@ async function insertVerseNodeAtSelection(
 ) {
   await act(async () => {
     editor.update(() => {
-      if (startOffset === undefined) startOffset = startNode.getTextContentSize();
-      if (endOffset === undefined) endOffset = endNode ? endNode.getTextContentSize() : startOffset;
-      if (!endNode) endNode = startNode;
+      startOffset ??= startNode.getTextContentSize();
+      endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
+      endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
       rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
       rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
