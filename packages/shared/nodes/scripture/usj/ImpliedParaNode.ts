@@ -8,6 +8,7 @@ import {
   SerializedLexicalNode,
   SerializedParagraphNode,
 } from "lexical";
+import { PARA_MARKER_DEFAULT } from "./ParaNode";
 
 export const IMPLIED_PARA_VERSION = 1;
 
@@ -24,6 +25,10 @@ export class ImpliedParaNode extends ParagraphNode {
 
   static importJSON(serializedNode: SerializedImpliedParaNode): ImpliedParaNode {
     return $createImpliedParaNode().updateFromJSON(serializedNode);
+  }
+
+  getMarker(): string {
+    return PARA_MARKER_DEFAULT;
   }
 
   createDOM(): HTMLElement {

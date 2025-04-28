@@ -28,6 +28,7 @@ import {
   isSerializedImmutableChapterNode,
   SerializedImmutableChapterNode,
 } from "./ImmutableChapterNode";
+import { $isImpliedParaNode, ImpliedParaNode } from "./ImpliedParaNode";
 import { $isMilestoneNode, MilestoneNode } from "./MilestoneNode";
 import { $isNoteNode, NoteNode } from "./NoteNode";
 import { $isParaNode, ParaNode } from "./ParaNode";
@@ -38,6 +39,7 @@ export type NodesWithMarker =
   | ChapterNode
   | CharNode
   | ImmutableChapterNode
+  | ImpliedParaNode
   | MilestoneNode
   | ParaNode
   | NoteNode
@@ -382,6 +384,7 @@ export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is
     $isChapterNode(node) ||
     $isCharNode(node) ||
     $isImmutableChapterNode(node) ||
+    $isImpliedParaNode(node) ||
     $isMilestoneNode(node) ||
     $isParaNode(node) ||
     $isNoteNode(node) ||
