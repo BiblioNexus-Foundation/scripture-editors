@@ -8,6 +8,8 @@ import {
   immutableNoteCallerNodeName,
   SerializedImmutableNoteCallerNode,
 } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { UNFORMATTED_VIEW_MODE } from "shared-react/views/view-mode.model";
+import { getViewOptions } from "shared-react/views/view-options.utils";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
@@ -32,8 +34,6 @@ import {
   usjWithUnknownItems,
 } from "../../../../utilities/src/converters/usj/converter-test.data";
 import { serializeEditorState, reset, initialize } from "./usj-editor.adaptor";
-import { UNFORMATTED_VIEW_MODE } from "./view-mode.model";
-import { getViewOptions } from "./view-options.utils";
 
 /**
  * Remove the `onClick` function because it can't be compared since it's anonymous.

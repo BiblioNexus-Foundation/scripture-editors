@@ -1,19 +1,17 @@
 import { JSX } from "react";
+import { viewModeToViewNames, ViewMode } from "shared-react/views/view-mode.model";
 import DropDown, { DropDownItem } from "./editor/toolbar/DropDown";
-import { viewModeToViewNames, ViewNameKey } from "./editor/adaptors/view-mode.model";
 
 function viewModeToClassName(viewMode: string): string {
   return viewMode in viewModeToViewNames ? viewMode : "";
 }
 
 function viewModeLabel(viewMode: string): string {
-  return viewMode in viewModeToViewNames
-    ? viewModeToViewNames[viewMode as ViewNameKey]
-    : "select...";
+  return viewMode in viewModeToViewNames ? viewModeToViewNames[viewMode as ViewMode] : "select...";
 }
 
-function dropDownActiveClass(active: boolean): string {
-  return active ? "active dropdown-item-active" : "";
+function dropDownActiveClass(isActive: boolean): string {
+  return isActive ? "active dropdown-item-active" : "";
 }
 
 export default function ViewModeDropDown({
@@ -33,14 +31,14 @@ export default function ViewModeDropDown({
       buttonLabel={viewModeLabel(viewMode)}
       buttonAriaLabel="Selection options for view mode"
     >
-      {Object.keys(viewModeToViewNames).map((item) => (
+      {Object.keys(viewModeToViewNames).map((itemViewMode) => (
         <DropDownItem
-          key={item}
-          className={"item view-mode " + dropDownActiveClass(viewMode === item)}
-          onClick={() => handleSelect(item)}
+          key={itemViewMode}
+          className={"item view-mode " + dropDownActiveClass(viewMode === itemViewMode)}
+          onClick={() => handleSelect(itemViewMode)}
         >
-          <i className={"icon view-mode " + viewModeToClassName(item)} />
-          {viewModeToViewNames[item as ViewNameKey]}
+          <i className={"icon view-mode " + viewModeToClassName(itemViewMode)} />
+          {viewModeToViewNames[itemViewMode as ViewMode]}
         </DropDownItem>
       ))}
     </DropDown>

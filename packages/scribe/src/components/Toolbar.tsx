@@ -1,13 +1,13 @@
-import Button from "./Button";
-import useModal from "../hooks/useModal";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useState, useRef, useEffect } from "react";
 import { REDO_COMMAND, UNDO_COMMAND } from "lexical";
-import "./Toolbar.css";
-import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
-import { InsertDialog } from "./Input/TextInput";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import { ViewOptions } from "../adaptors/view-options.utils";
+import { ViewOptions } from "shared-react/views/view-options.utils";
+import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
+import useModal from "../hooks/useModal";
+import Button from "./Button";
+import { InsertDialog } from "./Input/TextInput";
+import "./Toolbar.css";
 
 export const Toolbar = ({
   scrRef,

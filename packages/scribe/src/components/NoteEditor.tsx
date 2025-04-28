@@ -13,9 +13,9 @@ import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/Immuta
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
+import { ViewOptions } from "shared-react/views/view-options.utils";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
-import { ViewOptions } from "../adaptors/view-options.utils";
 import editorTheme from "../themes/editor-theme";
 
 type NoteEditorProps = {

@@ -26,7 +26,7 @@ import {
   $removeLeadingSpace,
   $addTrailingSpace,
 } from "shared-react/nodes/scripture/usj/node-react.utils";
-import { ViewOptions } from "./view-options.utils";
+import { ViewOptions } from "shared-react/views/view-options.utils";
 import usjEditorAdaptor from "./usj-editor.adaptor";
 
 const markerActions: {

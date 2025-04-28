@@ -4,7 +4,7 @@ import {
   MARKER_MODE_CLASS_NAME_PREFIX,
 } from "shared/nodes/scripture/usj/node-constants";
 import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
 import { ViewMode, FORMATTED_VIEW_MODE, UNFORMATTED_VIEW_MODE } from "./view-mode.model";
 
 export type ViewOptions = {
@@ -16,7 +16,31 @@ export type ViewOptions = {
   isFormattedFont: boolean;
 };
 
-export const DEFAULT_VIEW_MODE = FORMATTED_VIEW_MODE;
+let defaultViewMode: ViewMode;
+let defaultViewOptions: ViewOptions | undefined;
+
+/**
+ * Sets the default view mode and options.
+ * @param viewMode - View mode of the editor.
+ */
+export function setDefaultView(viewMode: ViewMode) {
+  defaultViewMode = viewMode;
+  defaultViewOptions = getViewOptions(viewMode);
+}
+
+setDefaultView(FORMATTED_VIEW_MODE);
+
+/**
+ * Gets the default view mode.
+ * @returns the default view mode.
+ */
+export const getDefaultViewMode = () => defaultViewMode;
+
+/**
+ * Gets the default view options.
+ * @returns the default view options.
+ */
+export const getDefaultViewOptions = () => defaultViewOptions;
 
 /**
  * Get view option properties based on the view mode.
@@ -26,7 +50,7 @@ export const DEFAULT_VIEW_MODE = FORMATTED_VIEW_MODE;
  */
 export function getViewOptions(viewMode?: string | undefined): ViewOptions | undefined {
   let viewOptions: ViewOptions | undefined;
-  switch (viewMode ?? DEFAULT_VIEW_MODE) {
+  switch (viewMode ?? defaultViewMode) {
     case FORMATTED_VIEW_MODE:
       viewOptions = {
         markerMode: "hidden",
@@ -52,7 +76,7 @@ export function getViewOptions(viewMode?: string | undefined): ViewOptions | und
  * @param viewOptions - View options of the editor.
  * @returns the view mode if the view is defined, `undefined` otherwise.
  */
-export function viewOptionsToMode(viewOptions: ViewOptions | undefined): ViewMode | undefined {
+export function getViewMode(viewOptions: ViewOptions | undefined): ViewMode | undefined {
   if (!viewOptions) return undefined;
 
   const { markerMode, hasSpacing, isFormattedFont } = viewOptions;
@@ -79,7 +103,7 @@ export function getVerseNodeClass(viewOptions: ViewOptions | undefined) {
  */
 export function getViewClassList(viewOptions: ViewOptions | undefined) {
   const classList: string[] = [];
-  const _viewOptions = viewOptions ?? getViewOptions();
+  const _viewOptions = viewOptions ?? defaultViewOptions;
   if (_viewOptions) {
     classList.push(`${MARKER_MODE_CLASS_NAME_PREFIX}${_viewOptions.markerMode}`);
     if (_viewOptions.hasSpacing) classList.push(TEXT_SPACING_CLASS_NAME);
