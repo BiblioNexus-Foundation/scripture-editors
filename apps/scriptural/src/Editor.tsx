@@ -10,6 +10,7 @@ import {
   ScripturalInitialConfigType,
   ScriptureReferenceHandler,
   ScrollToReferencePlugin,
+  MarkersMenuProvider,
 } from "@scriptural/react";
 import "@scriptural/react/styles/scriptural-editor.css";
 import "@scriptural/react/styles/nodes-menu.css";
@@ -105,24 +106,26 @@ function EditorPlugins({
 
   return (
     <>
-      <CustomToolbar onSave={onSave} />
-      {editable && (
-        <>
-          {enhancedCursorPosition && (
-            <CursorHandlerPlugin
-              updateTags={["history-merge", "skip-toggle-nodes"]}
-              canContainPlaceHolder={(node) => node.getType() !== "graft"}
-            />
-          )}
-          <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
-          <HistoryPlugin onChange={onHistoryChange} />
-        </>
-      )}
+      <MarkersMenuProvider>
+        <CustomToolbar onSave={onSave} />
+        {editable && (
+          <>
+            {enhancedCursorPosition && (
+              <CursorHandlerPlugin
+                updateTags={["history-merge", "skip-toggle-nodes"]}
+                canContainPlaceHolder={(node) => node.getType() !== "graft"}
+              />
+            )}
 
-      {/* Add scroll to reference support */}
-      {enableScrollToReference && (
-        <ScrollToReferencePlugin scrollBehavior="smooth" scrollOffset={80} />
-      )}
+            <ScripturalNodesMenuPlugin trigger={contextMenuTriggerKey} />
+            <HistoryPlugin onChange={onHistoryChange} />
+          </>
+        )}
+
+        {enableScrollToReference && (
+          <ScrollToReferencePlugin scrollBehavior="smooth" scrollOffset={80} />
+        )}
+      </MarkersMenuProvider>
     </>
   );
 }

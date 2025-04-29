@@ -14,10 +14,11 @@ import { serializedLexicalToUsjNode } from "shared/converters/usj";
 
 export function ToolbarContainer({
   children,
+  className,
   ...props
 }: { children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="toolbar noprint" {...props}>
+    <div className={"toolbar noprint " + className} {...props}>
       {children}
     </div>
   );
@@ -41,10 +42,11 @@ export default function ToolbarButton({
 
 export function ToolbarSection({
   children,
+  className,
   ...props
 }: { children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="toolbar-section" {...props}>
+    <div className={"toolbar-section " + (className ? className : "")} {...props}>
       {children}
     </div>
   );

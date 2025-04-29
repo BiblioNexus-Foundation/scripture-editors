@@ -6,6 +6,36 @@ import { NodeSelectionMenu } from "./NodeSelectionMenu";
 import { OptionItem } from "./Menu";
 import { $isCursorAtEdgeofBlock } from "shared/plugins/CursorHandler/core/utils";
 
+// Define a type for key combinations
+export type TriggerKeyCombo = {
+  key: string;
+  ctrl?: boolean;
+  alt?: boolean;
+  shift?: boolean;
+  meta?: boolean;
+};
+
+// Parse string trigger into key combination object
+function parseTrigger(trigger: string): TriggerKeyCombo {
+  if (trigger.includes("+")) {
+    const parts = trigger.split("+").map((part) => part.trim());
+    const keyCombo: TriggerKeyCombo = { key: parts[parts.length - 1] };
+
+    for (let i = 0; i < parts.length - 1; i++) {
+      const modifier = parts[i].toLowerCase();
+      if (modifier === "ctrl") keyCombo.ctrl = true;
+      if (modifier === "alt") keyCombo.alt = true;
+      if (modifier === "shift") keyCombo.shift = true;
+      if (modifier === "meta" || modifier === "cmd") keyCombo.meta = true;
+    }
+
+    return keyCombo;
+  }
+
+  // Simple single key trigger
+  return { key: trigger };
+}
+
 export const NodesMenu = memo(function NodesMenu({
   trigger,
   items,
@@ -15,18 +45,26 @@ export const NodesMenu = memo(function NodesMenu({
 }) {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
+  const triggerKeyCombo = parseTrigger(trigger);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
         setIsOpen(false);
         editor.focus();
-      } else if (e.key === trigger && !isOpen) {
+      } else if (
+        e.key.toLowerCase() === triggerKeyCombo.key.toLowerCase() &&
+        (!triggerKeyCombo.ctrl || e.ctrlKey) &&
+        (!triggerKeyCombo.alt || e.altKey) &&
+        (!triggerKeyCombo.shift || e.shiftKey) &&
+        (!triggerKeyCombo.meta || e.metaKey) &&
+        !isOpen
+      ) {
         e.preventDefault();
         setIsOpen(true);
       }
     },
-    [editor, trigger, isOpen],
+    [editor, triggerKeyCombo, isOpen],
   );
 
   useEffect(() => {
@@ -88,12 +126,28 @@ export const NodesMenu = memo(function NodesMenu({
     });
   }, [editor]);
 
+  const handleSelectOption = useCallback(
+    (option: OptionItem) => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          selection.insertText("\n");
+          option.action(editor);
+        }
+      });
+      setIsOpen(false);
+      editor.focus();
+    },
+    [editor],
+  );
+
   return (
     items && (
       <FloatingBoxAtCursor isOpen={isOpen}>
         {({ placement }) => (
           <NodeSelectionMenu
             options={items}
+            onSelectOption={handleSelectOption}
             onClose={() => setIsOpen(false)}
             inverse={placement === "top-start"}
           />

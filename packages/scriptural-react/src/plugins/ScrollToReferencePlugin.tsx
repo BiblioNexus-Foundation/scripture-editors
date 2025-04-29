@@ -46,7 +46,7 @@ function scrollToReference(
   reference: ScriptureReference,
   editorElement: HTMLElement,
   scrollBehavior: ScrollBehavior = "auto",
-  scrollOffset: number = 100,
+  scrollOffset = 100,
 ): void {
   // First try to find the verse within the current chapter context
   let targetElement = findVerseInChapterContext(
