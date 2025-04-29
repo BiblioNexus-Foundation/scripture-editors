@@ -75,15 +75,6 @@ export function isValidNumberedMarker(
 }
 
 /**
- * Checks if the given node is a ChapterNode or ImmutableChapterNode.
- * @param node - The node to check.
- * @returns `true` if the node is a ChapterNode or ImmutableChapterNode, `false` otherwise.
- */
-export function $isSomeChapterNode(node: LexicalNode | null | undefined): node is SomeChapterNode {
-  return $isChapterNode(node) || $isImmutableChapterNode(node);
-}
-
-/**
  * Checks if the given node is a SerializedChapterNode or SerializedImmutableChapterNode.
  * @param node - The serialized node to check.
  * @returns `true` if the node is a SerializedChapterNode or SerializedImmutableChapterNode, `false` otherwise.
@@ -92,6 +83,15 @@ export function isSomeSerializedChapterNode(
   node: SerializedLexicalNode | null | undefined,
 ): node is SerializedChapterNode | SerializedImmutableChapterNode {
   return isSerializedChapterNode(node) || isSerializedImmutableChapterNode(node);
+}
+
+/**
+ * Checks if the given node is a ChapterNode or ImmutableChapterNode.
+ * @param node - The node to check.
+ * @returns `true` if the node is a ChapterNode or ImmutableChapterNode, `false` otherwise.
+ */
+export function $isSomeChapterNode(node: LexicalNode | null | undefined): node is SomeChapterNode {
+  return $isChapterNode(node) || $isImmutableChapterNode(node);
 }
 
 /**
@@ -152,6 +152,70 @@ export function $findFirstAncestorNoteNode(startNode: LexicalNode): NoteNode | u
 
   // Reached the root without finding a NoteNode
   return undefined;
+}
+
+/**
+ * Checks if the node has a `getMarker` method. Excludes React nodes - consider using
+ * `$isReactNodeWithMarker` instead.
+ * @param node - LexicalNode to check.
+ * @returns `true` if the node has a `getMarker` method, `false` otherwise.
+ */
+export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is NodesWithMarker {
+  return (
+    $isBookNode(node) ||
+    $isChapterNode(node) ||
+    $isCharNode(node) ||
+    $isImmutableChapterNode(node) ||
+    $isImpliedParaNode(node) ||
+    $isMilestoneNode(node) ||
+    $isParaNode(node) ||
+    $isNoteNode(node) ||
+    $isVerseNode(node) ||
+    $isUnknownNode(node)
+    // ImmutableUnmatchedNode & MarkerNode also have the `getMarker` method but they left out for
+    // now until we know we need them.
+  );
+}
+
+/**
+ * Get the next node in the document tree.
+ * @param node - The current node to get the next node from.
+ * @returns The next node or null if there is no next node.
+ */
+export function $getNextNode(node: LexicalNode): LexicalNode | null {
+  if ($isElementNode(node)) return node.getFirstChild();
+  return node.getNextSibling() ?? node.getParent()?.getNextSibling() ?? null;
+}
+
+/**
+ * Get the previous node in the document tree.
+ * @param node - The current node to get the previous node from.
+ * @returns The previous node or null if there is no previous node.
+ */
+export function $getPreviousNode(node: LexicalNode): LexicalNode | null {
+  if ($isElementNode(node)) return node.getLastChild();
+  return node.getPreviousSibling() ?? node.getParent()?.getPreviousSibling() ?? null;
+}
+
+/**
+ * Find a common ancestor of a and b and return the common ancestor,
+ * or undefined if there is no common ancestor between the two nodes.
+ *
+ * This function is compatible with the deprecated `LexicalNode.getCommonAncestor` function but
+ * uses the new (as of Lexical v0.26.0) NodeCaret APIs.
+ *
+ * @param a A LexicalNode
+ * @param b A LexicalNode
+ * @returns The common ancestor between the two nodes or undefined if they have no common ancestor
+ */
+export function $getCommonAncestorCompatible(
+  a: LexicalNode,
+  b: LexicalNode,
+): LexicalNode | undefined {
+  const a1 = $isElementNode(a) ? a : a.getParent();
+  const b1 = $isElementNode(b) ? b : b.getParent();
+  const result = a1 && b1 ? $getCommonAncestor(a1, b1) : undefined;
+  return result ? result.commonAncestor : undefined;
 }
 
 /**
@@ -345,50 +409,6 @@ export function removeUndefinedProperties<T>(obj: T): T {
   return Object.fromEntries(
     Object.entries(obj as Partial<T>).filter(([, value]) => value !== undefined),
   ) as T;
-}
-
-/**
- * Checks if the node has a `getMarker` method. Excludes React nodes - consider using
- * `$isReactNodeWithMarker` instead.
- * @param node - LexicalNode to check.
- * @returns `true` if the node has a `getMarker` method, `false` otherwise.
- */
-export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is NodesWithMarker {
-  return (
-    $isBookNode(node) ||
-    $isChapterNode(node) ||
-    $isCharNode(node) ||
-    $isImmutableChapterNode(node) ||
-    $isImpliedParaNode(node) ||
-    $isMilestoneNode(node) ||
-    $isParaNode(node) ||
-    $isNoteNode(node) ||
-    $isVerseNode(node) ||
-    $isUnknownNode(node)
-    // ImmutableUnmatchedNode & MarkerNode also have the `getMarker` method but they left out for
-    // now until we know we need them.
-  );
-}
-
-/**
- * Find a common ancestor of a and b and return the common ancestor,
- * or undefined if there is no common ancestor between the two nodes.
- *
- * This function is compatible with the deprecated `LexicalNode.getCommonAncestor` function but
- * uses the new (as of Lexical v0.26.0) NodeCaret APIs.
- *
- * @param a A LexicalNode
- * @param b A LexicalNode
- * @returns The common ancestor between the two nodes or undefined if they have no common ancestor
- */
-export function $getCommonAncestorCompatible(
-  a: LexicalNode,
-  b: LexicalNode,
-): LexicalNode | undefined {
-  const a1 = $isElementNode(a) ? a : a.getParent();
-  const b1 = $isElementNode(b) ? b : b.getParent();
-  const result = a1 && b1 ? $getCommonAncestor(a1, b1) : undefined;
-  return result ? result.commonAncestor : undefined;
 }
 
 /**

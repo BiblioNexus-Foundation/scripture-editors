@@ -5,9 +5,11 @@ import {
   $createTextNode,
   $getSelection,
   $insertNodes,
+  $isElementNode,
   $isRangeSelection,
   $setSelection,
   CreateEditorArgs,
+  KEY_DOWN_COMMAND,
   KEY_ENTER_COMMAND,
   Klass,
   LexicalEditor,
@@ -24,6 +26,7 @@ export type TestEnv = {
 
 /**
  * Create basic Lexical test environment.
+ *
  * @param nodes - Array of nodes for the test environment.
  * @param $initialEditorState - Optional function to set the initial editor state.
  * @returns a test environment.
@@ -82,8 +85,16 @@ export function updateSelection(
       endOffset ??= startOffset;
       endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
+      rangeSelection.anchor = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      rangeSelection.focus = $createPoint(
+        endNode.getKey(),
+        endOffset,
+        $isElementNode(endNode) ? "element" : "text",
+      );
       $setSelection(rangeSelection);
     },
     { discrete: true, tag },
@@ -117,12 +128,12 @@ export function $expectSelectionToBe(
   expect(selectionStart).toEqual({
     key: startNode.getKey(),
     offset: startOffset,
-    type: "text",
+    type: $isElementNode(startNode) ? "element" : "text",
   });
   expect(selectionEnd).toEqual({
     key: endNode.getKey(),
     offset: endOffset,
-    type: "text",
+    type: $isElementNode(endNode) ? "element" : "text",
   });
 }
 
@@ -155,6 +166,21 @@ export async function pressEnterAtSelection(
       $setSelection(rangeSelection);
       editor.dispatchCommand(KEY_ENTER_COMMAND, null);
     });
+  });
+}
+
+/**
+ * Simulates pressing an arrow key by dispatching the KEY_DOWN_COMMAND.
+ *
+ * @param editor - The Lexical editor instance.
+ * @param key - The key name (e.g., "ArrowRight", "ArrowLeft").
+ */
+export async function pressArrowKey(editor: LexicalEditor, key: string): Promise<void> {
+  await act(async () => {
+    editor.dispatchCommand(
+      KEY_DOWN_COMMAND,
+      new KeyboardEvent("keydown", { key: key, bubbles: true, cancelable: true }),
+    );
   });
 }
 

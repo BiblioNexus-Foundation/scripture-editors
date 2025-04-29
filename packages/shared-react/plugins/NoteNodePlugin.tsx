@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $findMatchingParent, mergeRegister } from "@lexical/utils";
+import { mergeRegister } from "@lexical/utils";
 import {
   $createRangeSelection,
   $getNodeByKey,
@@ -7,9 +7,7 @@ import {
   $isRangeSelection,
   $isTextNode,
   $setSelection,
-  COMMAND_PRIORITY_HIGH,
   EditorState,
-  KEY_DOWN_COMMAND,
   LexicalEditor,
   NodeMutation,
   TextNode,
@@ -20,7 +18,6 @@ import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import {
   $findFirstAncestorNoteNode,
-  getNodeElementTagName,
   getNoteCallerPreviewText,
 } from "shared/nodes/scripture/usj/node.utils";
 import {
@@ -32,7 +29,7 @@ import {
 } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 
-export default function NoteNodePlugin<TLogger extends LoggerBasic>({
+export function NoteNodePlugin<TLogger extends LoggerBasic>({
   nodeOptions,
   logger,
 }: {
@@ -42,7 +39,6 @@ export default function NoteNodePlugin<TLogger extends LoggerBasic>({
   const [editor] = useLexicalComposerContext();
   useNodeOptions(nodeOptions, logger);
   useNoteNode(editor);
-  useArrowKeys(editor);
   return null;
 }
 
@@ -191,61 +187,6 @@ function $handleDoubleClick(event: MouseEvent) {
     newSelection.focus.set(focusNode.getKey(), focus.offset, "text");
     $setSelection(newSelection);
   }
-}
-
-/**
- * When moving forward with arrow keys, if a note node is next, move to the following node.
- * @param editor - The LexicalEditor instance used to access the DOM.
- */
-function useArrowKeys(editor: LexicalEditor) {
-  useEffect(() => {
-    const $handleKeyDown = (event: KeyboardEvent): boolean => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return false;
-
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return false;
-
-      const anchorNode = selection.anchor.getNode();
-      const isAtEnd = selection.anchor.offset === anchorNode.getTextContent().length;
-
-      // Find the closest paragraph element to get the text direction
-      const paragraphNode = $findMatchingParent(
-        anchorNode,
-        (node) => getNodeElementTagName(node, editor) === "p",
-      );
-      if (!paragraphNode) return false;
-
-      const paragraphElement = editor.getElementByKey(paragraphNode.getKey());
-      if (!paragraphElement) return false;
-
-      const inputDiv = paragraphElement.parentElement;
-      if (!inputDiv) return false;
-
-      // If moving forward from the end of a text node and a note follows
-      if (
-        isAtEnd &&
-        ((inputDiv.dir === "ltr" && event.key === "ArrowRight") ||
-          (inputDiv.dir === "rtl" && event.key === "ArrowLeft"))
-      ) {
-        const nextSibling = anchorNode.getNextSibling();
-        if ($isNoteNode(nextSibling)) {
-          // Find the next text node after the NoteNode
-          const nodeAfterNote = nextSibling.getNextSibling();
-          if (nodeAfterNote) {
-            // Move to the start of the next text node
-            selection.anchor.set(nodeAfterNote.getKey(), 0, "text");
-            selection.focus.set(nodeAfterNote.getKey(), 0, "text");
-            event.preventDefault();
-            return true;
-          }
-        }
-      }
-
-      return false;
-    };
-
-    return editor.registerCommand(KEY_DOWN_COMMAND, $handleKeyDown, COMMAND_PRIORITY_HIGH);
-  }, [editor]);
 }
 
 function updateCounterStyleSymbols(
