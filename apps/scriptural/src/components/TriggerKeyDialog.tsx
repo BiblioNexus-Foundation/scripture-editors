@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { HiOutlineKey, HiOutlineInformationCircle } from "react-icons/hi";
-import { MdKeyboard, MdClose } from "react-icons/md";
+import { MdKeyboard } from "react-icons/md";
 import { Keyboard, KeySquare, Headphones, Check, X } from "lucide-react";
 
 interface TriggerKeyDialogProps {

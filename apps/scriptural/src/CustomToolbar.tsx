@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 
 import {
-  EnhancedCursorToggleButton,
   FormatButton,
   MarkerInfo,
   RedoButton,
@@ -17,7 +16,6 @@ import {
 } from "@scriptural/react";
 
 import { ImPilcrow } from "react-icons/im";
-import { RiInputCursorMove } from "react-icons/ri";
 import {
   MdOutlineUndo,
   MdOutlineRedo,
