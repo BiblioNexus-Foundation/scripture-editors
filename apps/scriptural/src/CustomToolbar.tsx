@@ -12,7 +12,6 @@ import {
   ViewButton,
   FindReplacePlugin,
   useFindReplace,
-  ScripturalNodesMenuPlugin,
 } from "@scriptural/react";
 
 import { ImPilcrow } from "react-icons/im";
