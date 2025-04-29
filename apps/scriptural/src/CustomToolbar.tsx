@@ -92,9 +92,6 @@ export function CustomToolbar({ onSave }: { onSave: any }) {
 
   return (
     <>
-      {/* Register the ScripturalNodesMenuPlugin with the current trigger */}
-      <ScripturalNodesMenuPlugin trigger={triggerKeyCombo} />
-
       {/* Trigger key dialog */}
       <TriggerKeyDialog
         isOpen={isDialogOpen}
