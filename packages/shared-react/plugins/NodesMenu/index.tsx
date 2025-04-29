@@ -126,28 +126,12 @@ export const NodesMenu = memo(function NodesMenu({
     });
   }, [editor]);
 
-  const handleSelectOption = useCallback(
-    (option: OptionItem) => {
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          selection.insertText("\n");
-          option.action(editor);
-        }
-      });
-      setIsOpen(false);
-      editor.focus();
-    },
-    [editor],
-  );
-
   return (
     items && (
       <FloatingBoxAtCursor isOpen={isOpen}>
         {({ placement }) => (
           <NodeSelectionMenu
             options={items}
-            onSelectOption={handleSelectOption}
             onClose={() => setIsOpen(false)}
             inverse={placement === "top-start"}
           />
