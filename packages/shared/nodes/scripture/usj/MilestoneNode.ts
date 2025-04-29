@@ -42,11 +42,9 @@ const VALID_MILESTONE_MARKERS = [
 
 export const MILESTONE_VERSION = 1;
 
-export type MilestoneMarker = (typeof VALID_MILESTONE_MARKERS)[number];
-
 export type SerializedMilestoneNode = Spread<
   {
-    marker: MilestoneMarker;
+    marker: string;
     sid?: string;
     eid?: string;
     unknownAttributes?: UnknownAttributes;
@@ -55,13 +53,13 @@ export type SerializedMilestoneNode = Spread<
 >;
 
 export class MilestoneNode extends DecoratorNode<void> {
-  __marker: MilestoneMarker;
+  __marker: string;
   __sid?: string;
   __eid?: string;
   __unknownAttributes?: UnknownAttributes;
 
   constructor(
-    marker: MilestoneMarker,
+    marker: string,
     sid?: string,
     eid?: string,
     unknownAttributes?: UnknownAttributes,
@@ -90,12 +88,13 @@ export class MilestoneNode extends DecoratorNode<void> {
 
   static isValidMarker(marker: string | undefined): boolean {
     return (
-      !!marker &&
-      (VALID_MILESTONE_MARKERS.includes(marker as MilestoneMarker) || marker.startsWith("z"))
+      marker !== undefined &&
+      (VALID_MILESTONE_MARKERS.includes(marker as (typeof VALID_MILESTONE_MARKERS)[number]) ||
+        marker.startsWith("z"))
     );
   }
 
-  setMarker(marker: MilestoneMarker): this {
+  setMarker(marker: string): this {
     if (this.__marker === marker) return this;
 
     const self = this.getWritable();
@@ -103,7 +102,7 @@ export class MilestoneNode extends DecoratorNode<void> {
     return self;
   }
 
-  getMarker(): MilestoneMarker {
+  getMarker(): string {
     const self = this.getLatest();
     return self.__marker;
   }
@@ -179,7 +178,7 @@ export function isMilestoneCommentMarker(marker: string) {
 }
 
 export function $createMilestoneNode(
-  marker: MilestoneMarker,
+  marker: string,
   sid?: string,
   eid?: string,
   unknownAttributes?: UnknownAttributes,

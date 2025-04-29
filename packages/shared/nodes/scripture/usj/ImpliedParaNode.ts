@@ -8,7 +8,7 @@ import {
   SerializedLexicalNode,
   SerializedParagraphNode,
 } from "lexical";
-import { PARA_MARKER_DEFAULT } from "./ParaNode";
+import { PARA_MARKER_DEFAULT } from "./node-constants";
 
 export const IMPLIED_PARA_VERSION = 1;
 

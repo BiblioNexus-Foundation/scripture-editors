@@ -3,8 +3,6 @@ import { $getRoot, NodeKey, $getNodeByKey } from "lexical";
 import { $createImmutableChapterNode } from "./ImmutableChapterNode";
 import { $createParaNode } from "./ParaNode";
 import {
-  extractNonNumberedMarkers,
-  extractNumberedMarkers,
   getNextVerse,
   getUnknownAttributes,
   isValidNumberedMarker,
@@ -31,26 +29,6 @@ describe("Editor Node Utilities", () => {
 
     it("should not identify a non-numbered marker", async () => {
       expect(isValidNumberedMarker("pi", ["pi"])).toBe(false);
-    });
-  });
-
-  describe("extractNumberedMarkers()", () => {
-    it("should not throw", async () => {
-      expect(() => extractNumberedMarkers([undefined as unknown as string])).not.toThrow();
-    });
-
-    it("should extract numbered markers", async () => {
-      expect(extractNumberedMarkers(["p", "pi#"])).toEqual(["pi"]);
-    });
-  });
-
-  describe("extractNonNumberedMarkers()", () => {
-    it("should not throw", async () => {
-      expect(() => extractNonNumberedMarkers([undefined as unknown as string])).not.toThrow();
-    });
-
-    it("should extract non-numbered markers", async () => {
-      expect(extractNonNumberedMarkers(["p", "pi#"])).toEqual(["p"]);
     });
   });
 

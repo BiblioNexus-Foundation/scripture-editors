@@ -11,8 +11,6 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
-// Must be imported before `CharNode` to prevent a circular dependency.
-import { NBSP, NUMBERED_MARKER_PLACEHOLDER, UnknownAttributes } from "./node-constants";
 import { $isUnknownNode, UnknownNode } from "../../features/UnknownNode";
 import { $isBookNode, BookNode } from "./BookNode";
 import {
@@ -31,6 +29,7 @@ import {
 import { $isImpliedParaNode, ImpliedParaNode } from "./ImpliedParaNode";
 import { $isMilestoneNode, MilestoneNode } from "./MilestoneNode";
 import { $isNoteNode, NoteNode } from "./NoteNode";
+import { NBSP, UnknownAttributes } from "./node-constants";
 import { $isParaNode, ParaNode } from "./ParaNode";
 import { $isVerseNode, VerseNode } from "./VerseNode";
 
@@ -73,30 +72,6 @@ export function isValidNumberedMarker(
   // Ends with a number.
   const maybeNumber = marker.slice(numberedMarker.length);
   return ONLY_DIGITS_TEST.test(maybeNumber);
-}
-
-/**
- * Extracts a list of numbered markers with the '#' removed.
- * @param markers - List of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
- * @returns list of numbered markers (non-numbered are filtered out) with the '#' removed,
- *   e.g. ['pi'].
- */
-export function extractNumberedMarkers(markers: string[] | readonly string[]): string[] {
-  return (
-    markers
-      .filter((marker) => !!marker && marker.endsWith(NUMBERED_MARKER_PLACEHOLDER))
-      // remove placeholder
-      .map((marker) => marker.slice(0, -1))
-  );
-}
-
-/**
- * Extracts a list of non-numbered markers.
- * @param markers - List of markers containing placeholder numbered markers, e.g. ['p', 'pi#'].
- * @returns list of non-numbered markers (numbered are filtered out), e.g. ['p'].
- */
-export function extractNonNumberedMarkers(markers: string[] | readonly string[]): string[] {
-  return markers.filter((marker) => !marker?.endsWith(NUMBERED_MARKER_PLACEHOLDER));
 }
 
 /**

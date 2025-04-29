@@ -63,19 +63,13 @@ import {
 import {
   MILESTONE_VERSION,
   MilestoneNode,
-  MilestoneMarker,
   SerializedMilestoneNode,
   STARTING_MS_COMMENT_MARKER,
   ENDING_MS_COMMENT_MARKER,
   isMilestoneCommentMarker,
 } from "shared/nodes/scripture/usj/MilestoneNode";
-import {
-  NOTE_VERSION,
-  NoteNode,
-  NoteMarker,
-  SerializedNoteNode,
-} from "shared/nodes/scripture/usj/NoteNode";
-import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+import { NOTE_VERSION, NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { NBSP, PARA_MARKER_DEFAULT } from "shared/nodes/scripture/usj/node-constants";
 import {
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
@@ -87,7 +81,6 @@ import {
 } from "shared/nodes/scripture/usj/node.utils";
 import {
   isSerializedParaNode,
-  PARA_MARKER_DEFAULT,
   PARA_VERSION,
   ParaNode,
   SerializedParaNode,
@@ -436,7 +429,7 @@ function createNote(
 
   return removeUndefinedProperties({
     type: NoteNode.getType(),
-    marker: marker as NoteMarker,
+    marker,
     caller,
     category,
     unknownAttributes,
@@ -457,7 +450,7 @@ function createMilestone(markerObject: MarkerObject): SerializedMilestoneNode {
 
   return removeUndefinedProperties({
     type: MilestoneNode.getType(),
-    marker: marker as MilestoneMarker,
+    marker,
     sid,
     eid,
     unknownAttributes,

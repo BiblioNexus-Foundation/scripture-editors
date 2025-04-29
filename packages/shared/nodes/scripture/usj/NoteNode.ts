@@ -27,11 +27,9 @@ const VALID_NOTE_MARKERS = [
   "ex",
 ] as const;
 
-export type NoteMarker = (typeof VALID_NOTE_MARKERS)[number];
-
 export type SerializedNoteNode = Spread<
   {
-    marker: NoteMarker;
+    marker: string;
     caller: string;
     category?: string;
     unknownAttributes?: UnknownAttributes;
@@ -43,13 +41,13 @@ export const NOTE_VERSION = 1;
 
 export const noteNodeName = "NoteNode";
 export class NoteNode extends ElementNode {
-  __marker: NoteMarker;
+  __marker: string;
   __caller: string;
   __category?: string;
   __unknownAttributes?: UnknownAttributes;
 
   constructor(
-    marker: NoteMarker,
+    marker: string,
     caller: string,
     category?: string,
     unknownAttributes?: UnknownAttributes,
@@ -92,10 +90,13 @@ export class NoteNode extends ElementNode {
   }
 
   static isValidMarker(marker: string | undefined): boolean {
-    return !!marker && VALID_NOTE_MARKERS.includes(marker as NoteMarker);
+    return (
+      marker !== undefined &&
+      VALID_NOTE_MARKERS.includes(marker as (typeof VALID_NOTE_MARKERS)[number])
+    );
   }
 
-  setMarker(marker: NoteMarker): this {
+  setMarker(marker: string): this {
     if (this.__marker === marker) return this;
 
     const self = this.getWritable();
@@ -103,7 +104,7 @@ export class NoteNode extends ElementNode {
     return self;
   }
 
-  getMarker(): NoteMarker {
+  getMarker(): string {
     const self = this.getLatest();
     return self.__marker;
   }
@@ -194,14 +195,14 @@ export class NoteNode extends ElementNode {
 }
 
 function $convertNoteElement(element: HTMLElement): DOMConversionOutput {
-  const marker = (element.getAttribute("data-marker") as NoteMarker) ?? "f";
+  const marker = element.getAttribute("data-marker") ?? "f";
   const caller = element.getAttribute("data-caller") ?? "";
   const node = $createNoteNode(marker, caller);
   return { node };
 }
 
 export function $createNoteNode(
-  marker: NoteMarker,
+  marker: string,
   caller: string,
   category?: string,
   unknownAttributes?: UnknownAttributes,
