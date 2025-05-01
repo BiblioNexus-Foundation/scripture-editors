@@ -18,6 +18,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import {
@@ -33,12 +34,12 @@ import {
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { ArrowNavigationPlugin } from "shared-react/plugins/ArrowNavigationPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
@@ -282,6 +283,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             ignoreHistoryMergeTagChange
           />
           <AnnotationPlugin ref={annotationRef} logger={logger} />
+          <ArrowNavigationPlugin />
           <ClipboardPlugin />
           <CommandMenuPlugin logger={logger} />
           <ContextMenuPlugin />

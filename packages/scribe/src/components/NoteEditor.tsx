@@ -11,7 +11,7 @@ import { useCallback, useEffect } from "react";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";

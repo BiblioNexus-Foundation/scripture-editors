@@ -22,7 +22,7 @@ import {
   ImmutableVerseNode,
 } from "../nodes/scripture/usj/ImmutableVerseNode";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
-import NoteNodePlugin from "./NoteNodePlugin";
+import { NoteNodePlugin } from "./NoteNodePlugin";
 
 let firstVerseTextNode: TextNode;
 let firstNoteNode: NoteNode;

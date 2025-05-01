@@ -15,7 +15,7 @@ import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVe
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
-import NoteNodePlugin from "shared-react/plugins/NoteNodePlugin";
+import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import { getViewClassList, ViewOptions } from "../adaptors/view-options.utils";
