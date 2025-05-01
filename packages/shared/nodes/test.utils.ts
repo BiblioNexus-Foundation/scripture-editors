@@ -161,8 +161,16 @@ export async function pressEnterAtSelection(
       endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
       endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
+      rangeSelection.anchor = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      rangeSelection.focus = $createPoint(
+        endNode.getKey(),
+        endOffset,
+        $isElementNode(endNode) ? "element" : "text",
+      );
       $setSelection(rangeSelection);
       editor.dispatchCommand(KEY_ENTER_COMMAND, null);
     });
@@ -170,12 +178,12 @@ export async function pressEnterAtSelection(
 }
 
 /**
- * Simulates pressing an arrow key by dispatching the KEY_DOWN_COMMAND.
+ * Simulates pressing a key by dispatching the KEY_DOWN_COMMAND.
  *
  * @param editor - The Lexical editor instance.
  * @param key - The key name (e.g., "ArrowRight", "ArrowLeft").
  */
-export async function pressArrowKey(editor: LexicalEditor, key: string): Promise<void> {
+export async function pressKey(editor: LexicalEditor, key: string): Promise<void> {
   await act(async () => {
     editor.dispatchCommand(
       KEY_DOWN_COMMAND,
@@ -209,8 +217,16 @@ export async function typeTextBeforeSelection(
       endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
       endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text");
-      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text");
+      rangeSelection.anchor = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      rangeSelection.focus = $createPoint(
+        endNode.getKey(),
+        endOffset,
+        $isElementNode(endNode) ? "element" : "text",
+      );
       $setSelection(rangeSelection);
       $insertNodes([$createTextNode(text)]);
     });
