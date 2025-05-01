@@ -10,7 +10,7 @@ import { $createCharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $createNoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $expectSelectionToBe, pressArrowKey, updateSelection } from "shared/nodes/test.utils";
+import { $expectSelectionToBe, pressKey, updateSelection } from "shared/nodes/test.utils";
 import {
   $createImmutableNoteCallerNode,
   ImmutableNoteCallerNode,
@@ -76,7 +76,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, textNodeBeforeChapter);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(paraNodeAfterChapter, 0);
@@ -87,7 +87,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, verseParaNode, 0);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(firstVerseTextNode, 0);
@@ -98,7 +98,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, firstVerseTextNode);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(secondVerseTextNodeBeforeNote, 0);
@@ -109,7 +109,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, secondVerseTextNodeAfterNote);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(note2TextNode);
@@ -120,7 +120,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, thirdVerseTextNode);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(verseParaNode, 10);
@@ -133,7 +133,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, textNodeAfterChapter, 0);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(paraNodeBeforeChapter, 1);
@@ -144,7 +144,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, firstVerseTextNode, 0);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(verseParaNode, 0);
@@ -155,7 +155,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, secondVerseTextNodeBeforeNote, 0);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(firstVerseTextNode);
@@ -166,7 +166,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, thirdVerseTextNode, 0);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(secondVerseTextNodeAfterNote);
@@ -177,7 +177,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment();
         updateSelection(editor, verseParaNode, 10);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(thirdVerseTextNode);
@@ -192,7 +192,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, textNodeBeforeChapter);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(paraNodeAfterChapter, 0);
@@ -203,7 +203,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, firstVerseTextNode);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(secondVerseTextNodeBeforeNote, 0);
@@ -214,7 +214,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, secondVerseTextNodeAfterNote);
 
-        await pressArrowKey(editor, "ArrowLeft");
+        await pressKey(editor, "ArrowLeft");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(note2TextNode);
@@ -227,7 +227,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, textNodeAfterChapter, 0);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(paraNodeBeforeChapter, 1);
@@ -238,7 +238,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, secondVerseTextNodeBeforeNote, 0);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(firstVerseTextNode);
@@ -249,7 +249,7 @@ describe("ArrowNavigationPlugin", () => {
         const { editor } = await testEnvironment(undefined, "rtl");
         updateSelection(editor, thirdVerseTextNode, 0);
 
-        await pressArrowKey(editor, "ArrowRight");
+        await pressKey(editor, "ArrowRight");
 
         editor.getEditorState().read(() => {
           $expectSelectionToBe(secondVerseTextNodeAfterNote);
