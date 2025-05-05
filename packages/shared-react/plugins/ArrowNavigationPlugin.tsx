@@ -1,3 +1,7 @@
+import {
+  $isImmutableVerseNode,
+  ImmutableVerseNode,
+} from "../nodes/scripture/usj/ImmutableVerseNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
@@ -5,7 +9,6 @@ import {
   COMMAND_PRIORITY_HIGH,
   KEY_DOWN_COMMAND,
   LexicalEditor,
-  LexicalNode,
   RangeSelection,
 } from "lexical";
 import { useEffect } from "react";
@@ -13,14 +16,16 @@ import {
   $isImmutableChapterNode,
   ImmutableChapterNode,
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
-  $isImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { $isImpliedParaNode } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import { $getNextNode, $getPreviousNode } from "shared/nodes/scripture/usj/node.utils";
+import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 
+/**
+ * This plugin handles arrow key navigation in the editor, specifically for moving between chapter
+ * and verse nodes. It ensures that when the user presses the arrow keys, the selection moves to the
+ * next or previous chapter or verse node, depending on the direction of the arrow key pressed.
+ */
 export function ArrowNavigationPlugin(): null {
   const [editor] = useLexicalComposerContext();
   useArrowKeys(editor);
@@ -28,8 +33,8 @@ export function ArrowNavigationPlugin(): null {
 }
 
 /**
- * When moving with arrow keys, if a chapter or verse node is next, move to the following node.
- * Also handles navigation around adjacent verse/note nodes.
+ * When moving with arrow keys, it handles navigation around adjacent verse and note nodes.
+ * It also handles not moving if a chapter node is the only thing at the beginning.
  * @param editor - The LexicalEditor instance used to access the DOM.
  */
 function useArrowKeys(editor: LexicalEditor) {
@@ -44,30 +49,21 @@ function useArrowKeys(editor: LexicalEditor) {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return false;
 
       const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return false;
+      if (!$isRangeSelection(selection) || !selection.isCollapsed()) return false;
 
       const inputDiv = editor.getRootElement();
       if (!inputDiv) return false;
 
-      const anchorNode = selection.anchor.getNode();
       const direction = inputDiv.dir || "ltr";
-      const isMovingForward = checkIsMovingForward(direction, event.key);
-      const isMovingBackward = checkIsMovingBackward(direction, event.key);
-
       let isHandled = false;
-
-      if (isMovingForward && $canMoveForward(anchorNode, selection)) {
-        isHandled = $handleForwardNavigation(anchorNode);
-      } else if (isMovingBackward && $canMoveBackward(anchorNode, selection)) {
-        isHandled = $handleBackwardNavigation(anchorNode);
+      if (isMovingForward(direction, event.key)) {
+        isHandled = $handleForwardNavigation(selection);
+      } else if (isMovingBackward(direction, event.key)) {
+        isHandled = $handleBackwardNavigation(selection);
       }
 
-      if (isHandled) {
-        event.preventDefault();
-        return true;
-      }
-
-      return false;
+      if (isHandled) event.preventDefault();
+      return isHandled;
     };
 
     return editor.registerCommand(KEY_DOWN_COMMAND, $handleKeyDown, COMMAND_PRIORITY_HIGH);
@@ -76,58 +72,53 @@ function useArrowKeys(editor: LexicalEditor) {
 
 // --- Helper functions for direction checking ---
 
-function checkIsMovingForward(direction: string, key: string): boolean {
+function isMovingForward(direction: string, key: string): boolean {
   return (
     (direction === "ltr" && key === "ArrowRight") || (direction === "rtl" && key === "ArrowLeft")
   );
 }
 
-function checkIsMovingBackward(direction: string, key: string): boolean {
+function isMovingBackward(direction: string, key: string): boolean {
   return (
     (direction === "ltr" && key === "ArrowLeft") || (direction === "rtl" && key === "ArrowRight")
   );
 }
 
-// Helper to check if the cursor can move forward from the current position
-function $canMoveForward(anchorNode: LexicalNode, selection: RangeSelection): boolean {
-  const isParaNode = $isParaNode(anchorNode);
-  const isAtNodeEnd = selection.anchor.offset === anchorNode.getTextContentSize();
-  return isParaNode || isAtNodeEnd;
-}
-
-// Helper to check if the cursor can move backward from the current position
-function $canMoveBackward(anchorNode: LexicalNode, selection: RangeSelection): boolean {
-  const isParaNode = $isParaNode(anchorNode);
-  const isAtNodeStart = selection.anchor.offset === 0;
-  return isParaNode || isAtNodeStart;
-}
-
 // Helper to handle forward arrow key navigation logic
-function $handleForwardNavigation(anchorNode: LexicalNode): boolean {
-  const nextNode = $getNextNode(anchorNode);
-  if ($isImmutableChapterNode(nextNode) || $isImmutableVerseNode(nextNode)) {
-    const nodeAfterNext = nextNode.getNextSibling();
-    // If a verse is immediately followed by a note, select the end of the note
-    if ($isNoteNode(nodeAfterNext)) nodeAfterNext.selectEnd();
-    else nextNode.selectEnd();
-    return true;
+function $handleForwardNavigation(selection: RangeSelection): boolean {
+  const nextNode = $getNextNode(selection);
+  if (!$isImmutableChapterNode(nextNode) && !$isImmutableVerseNode(nextNode)) return false;
+
+  const anchorNode = selection.anchor.getNode();
+  if ($isParaNode(anchorNode) || $isImpliedParaNode(anchorNode)) {
+    const isSelectionAtParaEnd = selection.anchor.offset === anchorNode.getChildrenSize();
+    if (isSelectionAtParaEnd) return false;
+  } else {
+    const isSelectionAtNodeEnd = selection.anchor.offset === anchorNode.getTextContentSize();
+    if (!isSelectionAtNodeEnd) return false;
   }
-  return false;
+
+  const nodeAfterChapterOrVerse = nextNode.getNextSibling();
+  if (!$isNoteNode(nodeAfterChapterOrVerse)) return false;
+
+  const nodeAfterNote = nodeAfterChapterOrVerse.getNextSibling();
+  if (nodeAfterNote) nodeAfterNote.selectStart();
+  else nodeAfterChapterOrVerse.selectEnd();
+  return true;
 }
 
 // Helper to handle backward arrow key navigation logic
-function $handleBackwardNavigation(anchorNode: LexicalNode): boolean {
-  const prevNode = $getPreviousNode(anchorNode);
-  if ($isImmutableChapterNode(prevNode) || $isImmutableVerseNode(prevNode)) {
-    prevNode.selectStart();
-    return true;
-  } else if ($isNoteNode(prevNode)) {
-    const nodeBeforePrevious = prevNode.getPreviousSibling();
-    // If a note is immediately preceded by a verse, select the start of the verse
-    if ($isImmutableVerseNode(nodeBeforePrevious)) {
-      nodeBeforePrevious.selectStart();
-      return true;
-    }
-  }
-  return false;
+function $handleBackwardNavigation(selection: RangeSelection): boolean {
+  const prevNode = $getPreviousNode(selection);
+  // If a chapter node is the only thing at the beginning then don't move.
+  if ($isImmutableChapterNode(prevNode) && !prevNode.getPreviousSibling()) return true;
+
+  if (!$isNoteNode(prevNode)) return false;
+
+  const isSelectionAtNodeStart = selection.anchor.offset === 0;
+  const nodeBeforeNote = prevNode.getPreviousSibling();
+  if (!$isImmutableVerseNode(nodeBeforeNote) || !isSelectionAtNodeStart) return false;
+
+  nodeBeforeNote.selectStart();
+  return true;
 }

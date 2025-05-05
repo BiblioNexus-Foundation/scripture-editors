@@ -7,6 +7,7 @@ import {
   BaseSelection,
   LexicalEditor,
   LexicalNode,
+  RangeSelection,
   SerializedLexicalNode,
   SerializedTextNode,
   TextNode,
@@ -179,22 +180,34 @@ export function $isNodeWithMarker(node: LexicalNode | null | undefined): node is
 
 /**
  * Get the next node in the document tree.
- * @param node - The current node to get the next node from.
+ * @param selection - The current selection to get the next node from.
  * @returns The next node or null if there is no next node.
  */
-export function $getNextNode(node: LexicalNode): LexicalNode | null {
-  if ($isElementNode(node)) return node.getFirstChild();
-  return node.getNextSibling() ?? node.getParent()?.getNextSibling() ?? null;
+export function $getNextNode(selection: RangeSelection): LexicalNode | null {
+  if (selection.anchor.type === "element") {
+    const anchorNode = selection.anchor.getNode();
+    const offset = selection.anchor.offset;
+    if (offset < anchorNode.getChildrenSize()) return anchorNode.getChildAtIndex(offset);
+  }
+
+  const anchorNode = selection.anchor.getNode();
+  return anchorNode.getNextSibling() ?? anchorNode.getParent()?.getNextSibling() ?? null;
 }
 
 /**
  * Get the previous node in the document tree.
- * @param node - The current node to get the previous node from.
+ * @param selection - The current selection to get the previous node from.
  * @returns The previous node or null if there is no previous node.
  */
-export function $getPreviousNode(node: LexicalNode): LexicalNode | null {
-  if ($isElementNode(node)) return node.getLastChild();
-  return node.getPreviousSibling() ?? node.getParent()?.getPreviousSibling() ?? null;
+export function $getPreviousNode(selection: RangeSelection): LexicalNode | null {
+  const offset = selection.anchor.offset;
+  if (selection.anchor.type === "element" && offset > 0) {
+    const anchorNode = selection.anchor.getNode();
+    return anchorNode.getChildAtIndex(offset - 1);
+  }
+
+  const anchorNode = selection.anchor.getNode();
+  return anchorNode.getPreviousSibling() ?? anchorNode.getParent()?.getPreviousSibling() ?? null;
 }
 
 /**

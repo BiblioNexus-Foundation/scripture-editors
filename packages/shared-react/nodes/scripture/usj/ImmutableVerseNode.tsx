@@ -232,6 +232,12 @@ export class ImmutableVerseNode extends DecoratorNode<JSX.Element> {
       version: IMMUTABLE_VERSE_VERSION,
     };
   }
+
+  // Mutation
+
+  isKeyboardSelectable(): false {
+    return false;
+  }
 }
 
 function $convertImmutableVerseElement(element: HTMLElement): DOMConversionOutput {
