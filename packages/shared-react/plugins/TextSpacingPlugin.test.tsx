@@ -16,12 +16,12 @@ import {
   $createImmutableVerseNode,
 } from "../nodes/scripture/usj/ImmutableVerseNode";
 import { $isSomeVerseNode } from "../nodes/scripture/usj/node-react.utils";
-import { TextNodePlugin } from "./TextNodePlugin";
+import { TextSpacingPlugin } from "./TextSpacingPlugin";
 import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
 
 let secondVerseNode: ImmutableVerseNode;
 
-describe("TextNodePlugin", () => {
+describe("TextSpacingPlugin", () => {
   it("should load default initialEditorState (sanity check)", async () => {
     const { editor } = await testEnvironment();
 
@@ -156,7 +156,7 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
           placeholder={null}
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <TextNodePlugin />
+        <TextSpacingPlugin />
       </LexicalComposer>
     );
   }

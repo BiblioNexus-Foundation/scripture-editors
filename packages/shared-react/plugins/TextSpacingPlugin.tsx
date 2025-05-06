@@ -7,7 +7,7 @@ import { $isUnknownNode } from "shared/nodes/features/UnknownNode";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
 
-export function TextNodePlugin() {
+export function TextSpacingPlugin() {
   const [editor] = useLexicalComposerContext();
   useTextNode(editor);
   return null;
