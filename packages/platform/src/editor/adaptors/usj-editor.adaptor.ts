@@ -112,7 +112,11 @@ import {
   AddMissingComments,
   UsjNodeOptions,
 } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { ViewOptions, getVerseNodeClass, getViewOptions } from "./view-options.utils";
+import {
+  ViewOptions,
+  getVerseNodeClass,
+  getViewOptions,
+} from "shared-react/views/view-options.utils";
 
 interface UsjEditorAdaptor extends EditorAdaptor {
   initialize: typeof initialize;

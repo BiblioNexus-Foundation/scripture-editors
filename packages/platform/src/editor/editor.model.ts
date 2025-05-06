@@ -1,6 +1,6 @@
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
-import { ViewOptions } from "./adaptors/view-options.utils";
+import { ViewOptions } from "shared-react/views/view-options.utils";
 
 /** Options to configure the editor. */
 export type EditorOptions = {

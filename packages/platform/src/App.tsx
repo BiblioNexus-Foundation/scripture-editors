@@ -8,12 +8,12 @@ import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
-import AnnotationTypeSelect from "./AnnotationTypeSelect";
 import {
+  getDefaultViewMode,
   getViewOptions,
-  DEFAULT_VIEW_MODE,
   ViewOptions,
-} from "./editor/adaptors/view-options.utils";
+} from "shared-react/views/view-options.utils";
+import AnnotationTypeSelect from "./AnnotationTypeSelect";
 import { EditorOptions } from "./editor/editor.model";
 import { Comments } from "./marginal/comments/commenting";
 import Marginal, { MarginalRef } from "./marginal/Marginal";
@@ -81,7 +81,7 @@ export default function App() {
   const [isReadonly, setIsReadonly] = useState(false);
   const [hasSpellCheck, setHasSpellCheck] = useState(false);
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
-  const [viewMode, setViewMode] = useState(DEFAULT_VIEW_MODE);
+  const [viewMode, setViewMode] = useState(getDefaultViewMode);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");

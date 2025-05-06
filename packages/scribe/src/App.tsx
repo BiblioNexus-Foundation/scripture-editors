@@ -1,14 +1,13 @@
 import { Usj, USJ_TYPE, USJ_VERSION } from "@biblionexus-foundation/scripture-utilities";
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
-import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
-import Editor, { EditorRef } from "./components/Editor";
-import { getViewOptions } from "./adaptors/view-options.utils";
-import { formattedViewMode as defaultViewMode } from "./plugins/view-mode.model";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { getViewOptions, getDefaultViewMode } from "shared-react/views/view-options.utils";
 // import { Usj2Usfm } from "./hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";
+import Editor, { EditorRef } from "./components/Editor";
+import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
 
 const defaultUsj: Usj = {
   type: USJ_TYPE,
@@ -36,7 +35,7 @@ function App() {
     return () => clearTimeout(timeoutId);
   }, [usj]);
 
-  const [viewMode] = useState(defaultViewMode);
+  const [viewMode] = useState(getDefaultViewMode);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
   const onChange = async (usj: Usj) => {
     console.log(usj);
