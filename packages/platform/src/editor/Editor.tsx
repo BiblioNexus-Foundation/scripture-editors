@@ -1,3 +1,12 @@
+import OptionChangePlugin from "./OptionChangePlugin";
+import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
+import TreeViewPlugin from "./TreeViewPlugin";
+import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
+import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
+import { EditorOptions } from "./editor.model";
+import editorTheme from "./editor.theme";
+import ToolbarPlugin from "./toolbar/ToolbarPlugin";
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { InitialConfigType, LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -7,8 +16,8 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { SerializedVerseRef } from "@sillsdev/scripture";
-import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import { deepEqual } from "fast-equals";
+import { $setSelection, EditorState, LexicalEditor } from "lexical";
 import React, {
   JSX,
   PropsWithChildren,
@@ -18,13 +27,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { LoggerBasic } from "shared/adaptors/logger-basic.model";
-import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import {
-  blackListedChangeTags,
-  SELECTION_CHANGE_TAG,
-} from "shared/nodes/scripture/usj/node-constants";
 import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
 import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
 import {
@@ -47,14 +49,13 @@ import { TextSpacingPlugin } from "shared-react/plugins/TextSpacingPlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
-import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
-import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
-import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
-import { EditorOptions } from "./editor.model";
-import editorTheme from "./editor.theme";
-import OptionChangePlugin from "./OptionChangePlugin";
-import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
-import ToolbarPlugin from "./toolbar/ToolbarPlugin";
+import { LoggerBasic } from "shared/adaptors/logger-basic.model";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import {
+  blackListedChangeTags,
+  SELECTION_CHANGE_TAG,
+} from "shared/nodes/scripture/usj/node-constants";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -176,6 +177,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     markerMenuTrigger = "\\",
     view: viewOptions = defaultViewOptions,
     nodes: nodeOptions = defaultNodeOptions,
+    debug = false,
   } = options ?? defaultOptions;
 
   editorConfig.editable = !isReadonly;
@@ -293,6 +295,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <TextSpacingPlugin />
           {children}
         </div>
+        {debug && <TreeViewPlugin />}
       </div>
     </LexicalComposer>
   );

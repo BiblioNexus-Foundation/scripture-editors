@@ -24,6 +24,7 @@ body {
   justify-content: space-between;
   margin-bottom: 20px;
   color: black;
+  font-size: 13.3333px;
 }
 
 .controls > .pr-twp.tw-flex {
@@ -45,7 +46,7 @@ body {
 .controls button.active:hover {
   background-color: #bbb;
 }
-.controls input {
+.controls input[type="text"] {
   width: 150px;
 }
 
@@ -53,6 +54,10 @@ body {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+}
+
+.debug {
+  display: flex;
 }
 
 div.checkbox {
@@ -71,7 +76,7 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
-.defined-options label {
+label {
   cursor: pointer;
   color: black;
   font-size: 13.3333px;

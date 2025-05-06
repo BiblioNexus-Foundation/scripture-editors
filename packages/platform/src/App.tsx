@@ -1,9 +1,14 @@
+import AnnotationTypeSelect from "./AnnotationTypeSelect";
+import "./App.css";
+import { EditorOptions } from "./editor/editor.model";
+import { Comments } from "./marginal/comments/commenting";
+import Marginal, { MarginalRef } from "./marginal/Marginal";
+import TextDirectionDropDown from "./TextDirectionDropDown";
+import ViewModeDropDown from "./ViewModeDropDown";
 import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedVerseRef } from "@sillsdev/scripture";
 import { BookChapterControl } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
-import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
@@ -13,13 +18,8 @@ import {
   getViewOptions,
   ViewOptions,
 } from "shared-react/views/view-options.utils";
-import AnnotationTypeSelect from "./AnnotationTypeSelect";
-import { EditorOptions } from "./editor/editor.model";
-import { Comments } from "./marginal/comments/commenting";
-import Marginal, { MarginalRef } from "./marginal/Marginal";
-import TextDirectionDropDown from "./TextDirectionDropDown";
-import ViewModeDropDown from "./ViewModeDropDown";
-import "./App.css";
+import { WEB_PSA_USX as usx } from "shared/data/WEB-PSA.usx";
+import { WEB_PSA_COMMENTS as comments } from "shared/data/WEB_PSA.comments";
 
 type Annotations = {
   [buttonId: string]: {
@@ -82,6 +82,7 @@ export default function App() {
   const [hasSpellCheck, setHasSpellCheck] = useState(false);
   const [textDirection, setTextDirection] = useState<TextDirection>("ltr");
   const [viewMode, setViewMode] = useState(getDefaultViewMode);
+  const [debug, setDebug] = useState(true);
   const [scrRef, setScrRef] = useState(defaultScrRef);
   const [annotations, setAnnotations] = useState(defaultAnnotations);
   const [annotationType, setAnnotationType] = useState("spelling");
@@ -95,8 +96,9 @@ export default function App() {
       textDirection,
       view: viewOptions,
       nodes: nodeOptions,
+      debug,
     }),
-    [isReadonly, hasSpellCheck, textDirection, viewOptions],
+    [isReadonly, hasSpellCheck, textDirection, viewOptions, debug],
   );
 
   const handleUsjChange = useCallback((usj: Usj, comments: Comments | undefined) => {
@@ -191,6 +193,17 @@ export default function App() {
             </button>
           </div>
         </span>
+        <div className="debug">
+          <div className="checkbox">
+            <input
+              type="checkbox"
+              id="debugCheckBox"
+              checked={debug}
+              onChange={(e) => setDebug(e.target.checked)}
+            />
+            <label htmlFor="debugCheckBox">Debug</label>
+          </div>
+        </div>
         <button onClick={toggleIsOptionsDefined}>
           {isOptionsDefined ? "Undefine" : "Define"} Options
         </button>
@@ -227,7 +240,7 @@ export default function App() {
         onSelectionChange={(selection) => console.log({ selection })}
         onCommentChange={(comments) => console.log({ comments })}
         onUsjChange={handleUsjChange}
-        options={isOptionsDefined ? options : undefined}
+        options={isOptionsDefined ? options : { debug }}
         logger={console}
       />
     </>
