@@ -1,3 +1,10 @@
+import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
+import {
+  $isImmutableVerseNode,
+  ImmutableVerseNode,
+  isSerializedImmutableVerseNode,
+  SerializedImmutableVerseNode,
+} from "./ImmutableVerseNode";
 import {
   $getNodeByKey,
   $isElementNode,
@@ -7,6 +14,7 @@ import {
   SerializedLexicalNode,
 } from "lexical";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
 import {
   $isNodeWithMarker,
   $isSomeChapterNode,
@@ -20,13 +28,6 @@ import {
   SerializedVerseNode,
   VerseNode,
 } from "shared/nodes/scripture/usj/VerseNode";
-import { $isImmutableNoteCallerNode, ImmutableNoteCallerNode } from "./ImmutableNoteCallerNode";
-import {
-  $isImmutableVerseNode,
-  ImmutableVerseNode,
-  isSerializedImmutableVerseNode,
-  SerializedImmutableVerseNode,
-} from "./ImmutableVerseNode";
 
 /** Caller count is in an object so it can be manipulated by passing the object. */
 export type CallerData = {
@@ -229,7 +230,7 @@ export function $isReactNodeWithMarker(
 export function $addTrailingSpace(node: LexicalNode | null | undefined) {
   if ($isTextNode(node)) {
     const text = node.getTextContent();
-    if (!text.endsWith(" ")) node.setTextContent(`${text} `);
+    if (!text.endsWith(" ") && !text.endsWith(NBSP)) node.setTextContent(`${text} `);
   }
 }
 

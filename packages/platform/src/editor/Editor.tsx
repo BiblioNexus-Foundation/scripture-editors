@@ -43,7 +43,7 @@ import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
-import { TextNodePlugin } from "shared-react/plugins/TextNodePlugin";
+import { TextSpacingPlugin } from "shared-react/plugins/TextSpacingPlugin";
 import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
@@ -287,10 +287,10 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <ClipboardPlugin />
           <CommandMenuPlugin logger={logger} />
           <ContextMenuPlugin />
-          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
+          <NoteNodePlugin nodeOptions={nodeOptions} viewOptions={viewOptions} logger={logger} />
           <ParaNodePlugin />
           <TextDirectionPlugin textDirection={textDirection} />
-          <TextNodePlugin />
+          <TextSpacingPlugin />
           {children}
         </div>
       </div>
