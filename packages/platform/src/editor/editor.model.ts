@@ -23,4 +23,6 @@ export type EditorOptions = {
    * @param nodes.ImmutableNoteCallerNode.onClick - Click handler method.
    */
   nodes?: UsjNodeOptions;
+  /** EXPERIMENTAL: Is the editor being debugged using the TreeView */
+  debug?: boolean;
 };
