@@ -147,7 +147,7 @@ const Editor = forwardRef(function Editor(
         viewOptions={viewOptions}
       />
       <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
-      <NoteNodePlugin nodeOptions={nodeOptions} />
+      <NoteNodePlugin nodeOptions={nodeOptions} viewOptions={viewOptions} />
       <HistoryPlugin />
       <AutoFocusPlugin />
       <ContextMenuPlugin />

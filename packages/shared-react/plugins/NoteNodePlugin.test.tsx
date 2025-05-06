@@ -1,15 +1,3 @@
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { render, act } from "@testing-library/react";
-import { $getRoot, $createTextNode, LexicalEditor, TextNode, $isTextNode } from "lexical";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import {
   $createImmutableNoteCallerNode,
   defaultNoteCallers,
@@ -22,7 +10,28 @@ import {
   ImmutableVerseNode,
 } from "../nodes/scripture/usj/ImmutableVerseNode";
 import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
+import { ViewOptions } from "../views/view-options.utils";
 import { NoteNodePlugin } from "./NoteNodePlugin";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { render, act } from "@testing-library/react";
+import {
+  $getRoot,
+  $createTextNode,
+  LexicalEditor,
+  TextNode,
+  $isTextNode,
+  $getNodeByKey,
+} from "lexical";
+import scriptureUsjNodes from "shared/nodes/scripture/usj";
+import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
+import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+import { $createNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
 
 let firstVerseTextNode: TextNode;
 let firstNoteNode: NoteNode;
@@ -54,6 +63,59 @@ describe("NoteNodePlugin", () => {
 
       editor.getEditorState().read(() => {
         expect(getPreviewText(firstNoteNode)).toBe("1:1a  First footnote text");
+      });
+    });
+  });
+
+  describe("Deleted Note Caller", () => {
+    it("should remove NoteNode without caller when markerMode is not 'editable'", async () => {
+      let noteNodeWithoutCallerKey: string | undefined;
+      const $initialEditorState = () => {
+        const noteNodeWithoutCaller = $createNoteNode("f", GENERATOR_NOTE_CALLER);
+        // Add some other nodes, but not an ImmutableNoteCallerNode
+        noteNodeWithoutCaller.append(
+          $createCharNode("fr").append($createTextNode("1:1a ")),
+          $createCharNode("ft").append($createTextNode("Some text")),
+        );
+        noteNodeWithoutCallerKey = noteNodeWithoutCaller.getKey();
+        $getRoot().append($createParaNode().append(noteNodeWithoutCaller));
+      };
+      const { editor } = await testEnvironment(
+        undefined,
+        // viewOptions (`markerMode` is not 'editable')
+        { markerMode: "visible", hasSpacing: true, isFormattedFont: true }, // Explicitly non-editable
+        $initialEditorState,
+      );
+
+      editor.getEditorState().read(() => {
+        // Node should be removed
+        expect($getNodeByKey(noteNodeWithoutCallerKey as string)).toBeNull();
+      });
+    });
+
+    it("should not remove NoteNode without caller when markerMode is 'editable'", async () => {
+      let noteNodeKey: string;
+      const $initialEditorState = () => {
+        const noteNode = $createNoteNode("f", GENERATOR_NOTE_CALLER);
+        noteNode.append(
+          $createTextNode(NBSP + "a "),
+          $createCharNode("fr").append($createTextNode("1:1a ")),
+          $createCharNode("ft").append($createTextNode("Some text")),
+        );
+        noteNodeKey = noteNode.getKey();
+        $getRoot().append($createParaNode().append(noteNode));
+      };
+      const { editor } = await testEnvironment(
+        undefined,
+        { markerMode: "editable", hasSpacing: false, isFormattedFont: false },
+        $initialEditorState,
+      );
+
+      editor.getEditorState().read(() => {
+        const noteNode = $getNodeByKey(noteNodeKey);
+        // Node should not be removed
+        expect(noteNode).not.toBeNull();
+        expect(noteNode?.isAttached()).toBe(true);
       });
     });
   });
@@ -93,6 +155,7 @@ async function testEnvironment(
   nodeOptions: UsjNodeOptions = {
     [immutableNoteCallerNodeName]: { noteCallers: defaultNoteCallers },
   },
+  viewOptions: ViewOptions = { markerMode: "hidden", hasSpacing: true, isFormattedFont: true },
   $initialEditorState: () => void = $defaultInitialEditorState,
 ) {
   let editor: LexicalEditor;
@@ -121,7 +184,7 @@ async function testEnvironment(
           placeholder={null}
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <NoteNodePlugin nodeOptions={nodeOptions} logger={console} />
+        <NoteNodePlugin nodeOptions={nodeOptions} viewOptions={viewOptions} logger={console} />
       </LexicalComposer>
     );
   }

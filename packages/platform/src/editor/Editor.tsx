@@ -287,7 +287,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           <ClipboardPlugin />
           <CommandMenuPlugin logger={logger} />
           <ContextMenuPlugin />
-          <NoteNodePlugin nodeOptions={nodeOptions} logger={logger} />
+          <NoteNodePlugin nodeOptions={nodeOptions} viewOptions={viewOptions} logger={logger} />
           <ParaNodePlugin />
           <TextDirectionPlugin textDirection={textDirection} />
           <TextSpacingPlugin />

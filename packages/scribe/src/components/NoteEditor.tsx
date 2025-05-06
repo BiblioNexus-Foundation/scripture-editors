@@ -81,7 +81,7 @@ export const NoteEditor = ({
           // logger={logger}
         />
         <OnChangePlugin onChange={handleChange} ignoreSelectionChange={true} />
-        <NoteNodePlugin nodeOptions={nodeOptions} />
+        <NoteNodePlugin nodeOptions={nodeOptions} viewOptions={viewOptions} />
         <HistoryPlugin />
         <AutoFocusPlugin />
         {/* <TreeViewPlugin /> */}

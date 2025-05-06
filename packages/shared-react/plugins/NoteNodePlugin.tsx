@@ -1,3 +1,12 @@
+import {
+  $isImmutableNoteCallerNode,
+  defaultNoteCallers,
+  GENERATOR_NOTE_CALLER,
+  ImmutableNoteCallerNode,
+  immutableNoteCallerNodeName,
+} from "../nodes/scripture/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
+import { ViewOptions } from "../views/view-options.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
@@ -20,25 +29,27 @@ import {
   $findFirstAncestorNoteNode,
   getNoteCallerPreviewText,
 } from "shared/nodes/scripture/usj/node.utils";
-import {
-  $isImmutableNoteCallerNode,
-  defaultNoteCallers,
-  GENERATOR_NOTE_CALLER,
-  ImmutableNoteCallerNode,
-  immutableNoteCallerNodeName,
-} from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
 
+/**
+ * This plugin is responsible for handling NoteNode and NoteNodeCaller interactions. It also
+ * updates the counter style symbols for note callers when the node options change.
+ * @param nodeOptions - Node options that includes the list of potential node callers.
+ * @param viewOptions - View options that includes the list of potential node callers.
+ * @param logger - Logger to use, if any.
+ * @returns
+ */
 export function NoteNodePlugin<TLogger extends LoggerBasic>({
   nodeOptions,
+  viewOptions,
   logger,
 }: {
   nodeOptions: UsjNodeOptions;
+  viewOptions: ViewOptions | undefined;
   logger?: TLogger;
 }): null {
   const [editor] = useLexicalComposerContext();
   useNodeOptions(nodeOptions, logger);
-  useNoteNode(editor);
+  useNoteNode(editor, viewOptions);
   return null;
 }
 
@@ -64,8 +75,9 @@ function useNodeOptions(nodeOptions: UsjNodeOptions, logger?: LoggerBasic) {
 /**
  * This hook is responsible for handling NoteNode and NoteNodeCaller interactions.
  * @param editor - The LexicalEditor instance used to access the DOM.
+ * @param viewOptions - View options that includes the list of potential node callers.
  */
-function useNoteNode(editor: LexicalEditor) {
+function useNoteNode(editor: LexicalEditor, viewOptions: ViewOptions | undefined) {
   useEffect(() => {
     if (!editor.hasNodes([CharNode, NoteNode, ImmutableNoteCallerNode])) {
       throw new Error(
@@ -77,6 +89,9 @@ function useNoteNode(editor: LexicalEditor) {
       editor.update(() => $handleDoubleClick(event));
 
     return mergeRegister(
+      // Remove NoteNode if it doesn't contain a caller node.
+      editor.registerNodeTransform(NoteNode, (node) => $noteNodeTransform(node, viewOptions)),
+
       // Update NoteNodeCaller preview text when NoteNode children text is changed.
       editor.registerNodeTransform(CharNode, $noteCharNodeTransform),
       editor.registerNodeTransform(TextNode, $noteTextNodeTransform),
@@ -100,7 +115,18 @@ function useNoteNode(editor: LexicalEditor) {
         },
       ),
     );
-  }, [editor]);
+  }, [editor, viewOptions]);
+}
+
+/**
+ * Removes a NoteNode if it does not contain an ImmutableNoteCallerNode child when `markerMode` is
+ * not 'editable'. This can happen during certain editing operations or data inconsistencies.
+ * @param node - The NoteNode to check.
+ * @param viewOptions - The view options that includes the marker mode.
+ */
+function $noteNodeTransform(node: NoteNode, viewOptions: ViewOptions | undefined): void {
+  const hasNoteCaller = node.getChildren().some((child) => $isImmutableNoteCallerNode(child));
+  if (!hasNoteCaller && viewOptions?.markerMode !== "editable") node.remove();
 }
 
 /**

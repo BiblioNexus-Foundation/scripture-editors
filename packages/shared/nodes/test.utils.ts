@@ -193,19 +193,87 @@ export async function pressKey(editor: LexicalEditor, key: string): Promise<void
 }
 
 /**
- * Type text before the selection range in the LexicalEditor.
+ * Type text after the selection point in the LexicalEditor.
+ *
+ * @param editor - The LexicalEditor instance where the selection will be set.
+ * @param node - The LexicalNode after which the selection will start.
+ * @param startOffset - The offset within the startNode (after `node`) where the selection begins.
+ *   Defaults to the end of the startNode's text content.
+ */
+export async function typeTextAfterNode(
+  editor: LexicalEditor,
+  text: string,
+  node: LexicalNode,
+  startOffset?: number,
+) {
+  await act(async () => {
+    editor.update(() => {
+      const startNode = node.getNextSibling() ?? node;
+      startOffset ??= startNode.getTextContentSize();
+      const rangeSelection = $createRangeSelection();
+      rangeSelection.anchor = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      rangeSelection.focus = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      $setSelection(rangeSelection);
+      $insertNodes([$createTextNode(text)]);
+    });
+  });
+}
+
+/**
+ * Type text at the selection point in the LexicalEditor.
  *
  * @param editor - The LexicalEditor instance where the selection will be set.
  * @param startNode - The starting LexicalNode of the selection.
  * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
  *   end of the startNode's text content.
- * @param endNode - The ending LexicalNode of the selection. Defaults to the startNode.
- * @param endOffset - The offset within the endNode where the selection ends. Defaults to the
- *   end of the endNode's text content.
  */
-export async function typeTextBeforeSelection(
+export async function typeTextAtSelection(
   editor: LexicalEditor,
   text: string,
+  startNode: LexicalNode,
+  startOffset?: number,
+) {
+  await act(async () => {
+    editor.update(() => {
+      startOffset ??= startNode.getTextContentSize();
+      const rangeSelection = $createRangeSelection();
+      rangeSelection.anchor = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      rangeSelection.focus = $createPoint(
+        startNode.getKey(),
+        startOffset,
+        $isElementNode(startNode) ? "element" : "text",
+      );
+      $setSelection(rangeSelection);
+      $insertNodes([$createTextNode(text)]);
+    });
+  });
+}
+
+/**
+ * Deletes text within the specified selection range in the LexicalEditor.
+ *
+ * @param editor - The LexicalEditor instance where the deletion will occur.
+ * @param startNode - The starting LexicalNode of the selection to delete.
+ * @param startOffset - The offset within the startNode where the selection begins. Defaults to the
+ *   end of the startNode's text content.
+ * @param endNode - The ending LexicalNode of the selection to delete. Defaults to the startNode.
+ * @param endOffset - The offset within the endNode where the deletion ends. Defaults to the
+ *   end of the endNode's text content.
+ */
+export async function deleteTextAtSelection(
+  editor: LexicalEditor,
   startNode: LexicalNode,
   startOffset?: number,
   endNode?: LexicalNode,
@@ -217,18 +285,10 @@ export async function typeTextBeforeSelection(
       endOffset ??= endNode ? endNode.getTextContentSize() : startOffset;
       endNode ??= startNode;
       const rangeSelection = $createRangeSelection();
-      rangeSelection.anchor = $createPoint(
-        startNode.getKey(),
-        startOffset,
-        $isElementNode(startNode) ? "element" : "text",
-      );
-      rangeSelection.focus = $createPoint(
-        endNode.getKey(),
-        endOffset,
-        $isElementNode(endNode) ? "element" : "text",
-      );
+      rangeSelection.anchor = $createPoint(startNode.getKey(), startOffset, "text"); // Assume text for deletion
+      rangeSelection.focus = $createPoint(endNode.getKey(), endOffset, "text"); // Assume text for deletion
       $setSelection(rangeSelection);
-      $insertNodes([$createTextNode(text)]);
+      rangeSelection.removeText();
     });
   });
 }

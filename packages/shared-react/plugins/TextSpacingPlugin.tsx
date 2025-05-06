@@ -1,53 +1,71 @@
-import { wasNodeCreated } from "../nodes/scripture/usj/node-react.utils";
+import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
+import {
+  $addTrailingSpace,
+  $isSomeVerseNode,
+  SomeVerseNode,
+  wasNodeCreated,
+} from "../nodes/scripture/usj/node-react.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { LexicalEditor, TextNode } from "lexical";
+import { $createTextNode, $isTextNode, LexicalEditor, TextNode } from "lexical";
 import { useEffect } from "react";
 import { $isUnknownNode } from "shared/nodes/features/UnknownNode";
 import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
 import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
 
+/** This plugin ensures that there is a space following a text node including before verse nodes. */
 export function TextSpacingPlugin() {
   const [editor] = useLexicalComposerContext();
-  useTextNode(editor);
+  useTextSpacing(editor);
   return null;
 }
 
 /**
  * This hook is responsible for handling a trailing space on a TextNode, and moving text nodes
- * that are created inside an UnknownNode.
+ * that are created inside an UnknownNode. It also ensures verses are properly spaced.
  * @param editor - The LexicalEditor instance used to access the DOM.
  */
-function useTextNode(editor: LexicalEditor) {
+function useTextSpacing(editor: LexicalEditor) {
   useEffect(() => {
-    if (!editor.hasNodes([CharNode, NoteNode, TextNode])) {
-      throw new Error("TextNodePlugin: CharNode, NoteNode or TextNode not registered on editor!");
+    if (!editor.hasNodes([CharNode, ImmutableVerseNode, NoteNode, TextNode, VerseNode])) {
+      throw new Error(
+        "TextSpacingPlugin: CharNode, ImmutableVerseNode, NoteNode, TextNode or VerseNode not registered on editor!",
+      );
     }
 
     return mergeRegister(
       editor.registerNodeTransform(TextNode, $textNodeTrailingSpaceTransform),
       editor.registerNodeTransform(TextNode, (node) => $textNodeInUnknownTransform(node, editor)),
+      editor.registerNodeTransform(VerseNode, $verseNodeTransform),
+      editor.registerNodeTransform(ImmutableVerseNode, $verseNodeTransform),
     );
   }, [editor]);
 }
 
 /**
- * Adds a space to the end of a TextNode if it doesn't precede a note or isn't inside a char node.
- * It also doesn't add a space if the text node is not editable.
+ * Adds a space to the end of a TextNode if it doesn't precede a note or isn't inside a CharNode or
+ * UnknownNode. It doesn't add a space if the text node is not editable. It removes a TextNode with
+ * only a space if it is not followed by a verse node.
  * @param node - TextNode that might need updating.
  */
 function $textNodeTrailingSpaceTransform(node: TextNode): void {
-  const textContent = node.getTextContent();
+  if (!node.isAttached()) return;
+
+  const text = node.getTextContent();
+  const nextSibling = node.getNextSibling();
+  const parent = node.getParent();
   if (
     node.getMode() !== "normal" ||
-    $isNoteNode(node.getNextSibling()) ||
-    (textContent.endsWith(" ") && textContent.length > 1) ||
-    $isCharNode(node.getParent())
+    (text.endsWith(" ") && text.length > 1) ||
+    $isNoteNode(nextSibling) ||
+    $isCharNode(parent) ||
+    $isUnknownNode(parent)
   )
     return;
 
-  if (!textContent.endsWith(" ") && textContent.length >= 1) node.setTextContent(textContent + " ");
-  else node.setTextContent("");
+  if (text === " " && !$isSomeVerseNode(nextSibling)) node.setTextContent("");
+  else $addTrailingSpace(node);
 }
 
 /**
@@ -57,9 +75,18 @@ function $textNodeTrailingSpaceTransform(node: TextNode): void {
  */
 function $textNodeInUnknownTransform(node: TextNode, editor: LexicalEditor): void {
   const unknownNode = node.getParent();
-  if (!$isUnknownNode(unknownNode)) return;
+  if (!$isUnknownNode(unknownNode) || !node.isAttached()) return;
 
   // If a text node is created inside an UnknownNode (e.g., by typing), move it after the
   // UnknownNode.
   if (wasNodeCreated(editor, node.getKey())) unknownNode.insertAfter(node);
+}
+
+/** Transform for a verse node (handles non-TextNode predecessors) */
+function $verseNodeTransform(node: SomeVerseNode): void {
+  if (!node.isAttached()) return;
+
+  const previousSibling = node.getPreviousSibling();
+  if (previousSibling && !$isTextNode(previousSibling) && !$isUnknownNode(previousSibling))
+    node.insertBefore($createTextNode(" "));
 }
