@@ -172,8 +172,8 @@ async function testEnvironment(
           editorState: $initialEditorState,
           namespace: "TestEditor",
           nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
-          onError: () => {
-            throw Error();
+          onError: (error) => {
+            throw error;
           },
           theme: {},
         }}

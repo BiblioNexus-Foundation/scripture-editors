@@ -110,6 +110,12 @@ export class ImmutableUnmatchedNode extends DecoratorNode<void> {
       version: IMMUTABLE_UNMATCHED_VERSION,
     };
   }
+
+  // Mutation
+
+  isKeyboardSelectable(): false {
+    return false;
+  }
 }
 
 function $convertImmutableUnmatchedElement(element: HTMLElement): DOMConversionOutput {

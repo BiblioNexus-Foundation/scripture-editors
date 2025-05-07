@@ -1,3 +1,6 @@
+import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
+import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
+import ParaNodePlugin from "./ParaNodePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -12,9 +15,6 @@ import {
 } from "shared/nodes/scripture/usj/ImmutableChapterNode";
 import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { pressEnterAtSelection } from "shared/nodes/test.utils";
-import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
-import ParaNodePlugin from "./ParaNodePlugin";
 
 let firstVerseTextNode: TextNode;
 
@@ -27,8 +27,9 @@ describe("ParaNodePlugin", () => {
       const children = root.getChildren();
       expect(root.getTextContent()).toBe("first verse text \n\nsecond verse text ");
       expect(children.length).toBe(3);
-      if (!$isImmutableChapterNode(children[0])) fail("First item is not an ImmutableChapterNode");
-      if (!$isParaNode(children[1])) fail("First child after chapter is not a ParaNode");
+      if (!$isImmutableChapterNode(children[0]))
+        throw new Error("First item is not an ImmutableChapterNode");
+      if (!$isParaNode(children[1])) throw new Error("First child after chapter is not a ParaNode");
       expect(children[1].getChildrenSize()).toBe(1);
     });
   });
@@ -43,10 +44,10 @@ describe("ParaNodePlugin", () => {
       const children = root.getChildren();
       expect(children.length).toBe(4);
       const firstPara = children[1];
-      if (!$isParaNode(firstPara)) fail("First child after chapter is not a ParaNode");
+      if (!$isParaNode(firstPara)) throw new Error("First child after chapter is not a ParaNode");
       expect(firstPara.getTextContent()).toBe("first ");
       const secondPara = children[2];
-      if (!$isParaNode(secondPara)) fail("Second child after chapter is not a ParaNode");
+      if (!$isParaNode(secondPara)) throw new Error("Second child after chapter is not a ParaNode");
       expect(secondPara.getTextContent()).toBe("verse text ");
     });
   });
@@ -61,10 +62,10 @@ describe("ParaNodePlugin", () => {
       const children = root.getChildren();
       expect(children.length).toBe(4);
       const firstPara = children[1];
-      if (!$isParaNode(firstPara)) fail("First child after chapter is not a ParaNode");
+      if (!$isParaNode(firstPara)) throw new Error("First child after chapter is not a ParaNode");
       expect(firstPara.getTextContent()).toBe("first");
       const secondPara = children[2];
-      if (!$isParaNode(secondPara)) fail("Second child after chapter is not a ParaNode");
+      if (!$isParaNode(secondPara)) throw new Error("Second child after chapter is not a ParaNode");
       expect(secondPara.getTextContent()).toBe("verse text ");
     });
   });
@@ -97,8 +98,8 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
           editorState: $initialEditorState,
           namespace: "TestEditor",
           nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
-          onError: () => {
-            throw Error();
+          onError: (error) => {
+            throw error;
           },
           theme: {},
         }}

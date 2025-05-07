@@ -171,6 +171,12 @@ export class MilestoneNode extends DecoratorNode<void> {
       version: MILESTONE_VERSION,
     };
   }
+
+  // Mutation
+
+  isKeyboardSelectable(): false {
+    return false;
+  }
 }
 
 export function isMilestoneCommentMarker(marker: string) {

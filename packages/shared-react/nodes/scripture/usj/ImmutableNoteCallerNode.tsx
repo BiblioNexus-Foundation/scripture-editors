@@ -146,6 +146,12 @@ export class ImmutableNoteCallerNode extends DecoratorNode<ReactNode> {
       version: IMMUTABLE_NOTE_CALLER_VERSION,
     };
   }
+
+  // Mutation
+
+  isKeyboardSelectable(): false {
+    return false;
+  }
 }
 
 function $convertNoteCallerElement(element: HTMLElement): DOMConversionOutput {

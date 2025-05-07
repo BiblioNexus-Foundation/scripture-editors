@@ -1,3 +1,10 @@
+import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
+import {
+  $createImmutableVerseNode,
+  ImmutableVerseNode,
+} from "../nodes/scripture/usj/ImmutableVerseNode";
+import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
+import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -23,13 +30,6 @@ import {
 } from "shared/nodes/scripture/usj/ImpliedParaNode";
 import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $createImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
-import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
 
 let firstVerseNode: ImmutableVerseNode;
 let firstVerseTextNode: TextNode;
@@ -145,9 +145,10 @@ describe("UsjNodesMenuPlugin", () => {
       const { editor } = await testEnvironment($initialEditorState);
 
       editor.getEditorState().read(() => {
-        if (!$isImpliedParaNode(impliedPara)) fail("impliedPara is not an implied para node");
+        if (!$isImpliedParaNode(impliedPara))
+          throw new Error("impliedPara is not an implied para node");
         if (!$isReactNodeWithMarker(impliedPara))
-          fail("impliedPara is not a React node with marker");
+          throw new Error("impliedPara is not a React node with marker");
         expect(impliedPara.getMarker()).toBe("p");
       });
     });
@@ -229,8 +230,8 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
           editorState: $initialEditorState,
           namespace: "TestEditor",
           nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
-          onError: () => {
-            throw Error();
+          onError: (error) => {
+            throw error;
           },
           theme: {},
         }}

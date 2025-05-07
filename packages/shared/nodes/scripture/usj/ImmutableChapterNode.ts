@@ -250,6 +250,10 @@ export class ImmutableChapterNode extends DecoratorNode<void> {
   isInline(): false {
     return false;
   }
+
+  isKeyboardSelectable(): false {
+    return false;
+  }
 }
 
 function $convertImmutableChapterElement(element: HTMLElement): DOMConversionOutput {
