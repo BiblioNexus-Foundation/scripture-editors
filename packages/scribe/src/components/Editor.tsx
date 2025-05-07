@@ -17,8 +17,8 @@ import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVe
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
+import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import { getViewClassList, ViewOptions } from "shared-react/views/view-options.utils";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
@@ -140,7 +140,7 @@ const Editor = forwardRef(function Editor(
           autoNumbering={autoNumbering}
         />
       )}
-      <UpdateStatePlugin
+      <LoadStatePlugin
         scripture={loadedUsj}
         nodeOptions={nodeOptions}
         editorAdaptor={usjEditorAdaptor}

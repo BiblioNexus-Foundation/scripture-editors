@@ -11,8 +11,8 @@ import { useCallback, useEffect } from "react";
 import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import { ViewOptions } from "shared-react/views/view-options.utils";
 import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
 import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
@@ -73,7 +73,7 @@ export const NoteEditor = ({
           placeholder={<div>Enter some text...</div>}
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <UpdateStatePlugin
+        <LoadStatePlugin
           scripture={usj}
           nodeOptions={nodeOptions}
           editorAdaptor={usjNoteEditorAdapter}

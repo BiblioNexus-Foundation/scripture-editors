@@ -14,7 +14,7 @@ import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-const
  * @param props.logger - Logger instance.
  * @returns null, i.e. no DOM elements.
  */
-export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
+export function LoadStatePlugin<TLogger extends LoggerBasic>({
   scripture,
   nodeOptions,
   editorAdaptor,
@@ -36,13 +36,25 @@ export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
   useEffect(() => {
     editorAdaptor.reset?.();
     const serializedEditorState = editorAdaptor.serializeEditorState(scripture, viewOptions);
-    const editorState = editor.parseEditorState(serializedEditorState);
-    // Execute after the current render cycle.
-    const timeoutId = setTimeout(() => {
-      editor.setEditorState(editorState, { tag: EXTERNAL_USJ_MUTATION_TAG });
-      editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
-    }, 0);
-    return () => clearTimeout(timeoutId);
+    if (serializedEditorState == null) {
+      logger?.warn(
+        "LoadStatePlugin: serializedEditorState was null or undefined. Skipping editor update.",
+      );
+      return;
+    }
+
+    try {
+      const editorState = editor.parseEditorState(serializedEditorState);
+      editor.update(
+        () => {
+          editor.setEditorState(editorState);
+          editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
+        },
+        { tag: EXTERNAL_USJ_MUTATION_TAG },
+      );
+    } catch {
+      logger?.error("LoadStatePlugin: error parsing or setting editor state.");
+    }
   }, [editor, scripture, viewOptions, editorAdaptor]);
 
   return null;

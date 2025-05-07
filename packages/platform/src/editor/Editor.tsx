@@ -41,12 +41,12 @@ import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import EditablePlugin from "shared-react/plugins/EditablePlugin";
+import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
 import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
 import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
 import { TextSpacingPlugin } from "shared-react/plugins/TextSpacingPlugin";
-import UpdateStatePlugin from "shared-react/plugins/UpdateStatePlugin";
 import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
@@ -271,7 +271,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             usj={usj}
             setUsj={setUsj}
           />
-          <UpdateStatePlugin
+          <LoadStatePlugin
             scripture={usj}
             nodeOptions={nodeOptions}
             editorAdaptor={usjEditorAdaptor}
