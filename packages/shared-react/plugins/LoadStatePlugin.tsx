@@ -14,7 +14,7 @@ import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-const
  * @param props.logger - Logger instance.
  * @returns null, i.e. no DOM elements.
  */
-export default function UpdateStatePlugin<TLogger extends LoggerBasic>({
+export function LoadStatePlugin<TLogger extends LoggerBasic>({
   scripture,
   nodeOptions,
   editorAdaptor,
