@@ -1,7 +1,7 @@
 /**
  * Convert Scripture from USJ to USX.
  * Adapted to TypeScript from this file:
- * @see https://github.com/usfm-bible/tcdocs/blob/main/python/lib/usfmtc/usjproc.py
+ * @see https://github.com/usfm-bible/usfmtc/blob/0afa385a1f282b286cc6bff7bbc953ae788aa10c/src/usfmtc/usjproc.py
  */
 
 import { DOMImplementation, Document, Element, Text } from "@xmldom/xmldom";
@@ -11,26 +11,23 @@ import { USX_TYPE, USX_VERSION } from "./usx.model";
 let chapterEid: string | undefined;
 let verseEid: string | undefined;
 
-function createVerseEndElement(usxDoc: Document, verseEid: string): Element {
-  const eidElement = usxDoc.createElement("verse");
-  eidElement.setAttribute("eid", verseEid);
-  return eidElement;
-}
-
-function createChapterEndElement(usxDoc: Document, chapterEid: string): Element {
-  const eidElement = usxDoc.createElement("chapter");
-  eidElement.setAttribute("eid", chapterEid);
-  return eidElement;
-}
-
-function setAttributes(element: Element, markerContent: MarkerObject) {
-  if (markerContent.type === "unmatched") element.setAttribute("marker", markerContent.marker);
-  else element.setAttribute("style", markerContent.marker);
-  for (const [key, value] of Object.entries(markerContent)) {
-    if (value && !["type", "marker", "content"].includes(key)) {
-      element.setAttribute(key, value as string);
-    }
+export function usjToUsxString(usj: Usj): string {
+  const usxDoc = new DOMImplementation().createDocument("", USX_TYPE);
+  if (usxDoc.documentElement) {
+    usxDoc.documentElement.setAttribute("version", USX_VERSION);
+    usjToUsxDom(usj, usxDoc);
   }
+  return usxDoc.toString();
+}
+
+export function usjToUsxDom(usj: Usj, usxDoc: Document): Element | undefined {
+  if (!usxDoc.documentElement) return undefined;
+
+  for (const [index, markerContent] of usj.content.entries()) {
+    const isLastItem = index === usj.content.length - 1;
+    convertUsjRecurse(markerContent, usxDoc.documentElement, usxDoc, isLastItem);
+  }
+  return usxDoc.documentElement ?? undefined;
 }
 
 function convertUsjRecurse(
@@ -86,21 +83,24 @@ function convertUsjRecurse(
   }
 }
 
-export function usjToUsxDom(usj: Usj, usxDoc: Document): Element | undefined {
-  if (!usxDoc.documentElement) return undefined;
-
-  for (const [index, markerContent] of usj.content.entries()) {
-    const isLastItem = index === usj.content.length - 1;
-    convertUsjRecurse(markerContent, usxDoc.documentElement, usxDoc, isLastItem);
+function setAttributes(element: Element, markerContent: MarkerObject) {
+  if (markerContent.type === "unmatched") element.setAttribute("marker", markerContent.marker);
+  else element.setAttribute("style", markerContent.marker);
+  for (const [key, value] of Object.entries(markerContent)) {
+    if (value && !["type", "marker", "content"].includes(key)) {
+      element.setAttribute(key, value as string);
+    }
   }
-  return usxDoc.documentElement ?? undefined;
 }
 
-export function usjToUsxString(usj: Usj): string {
-  const usxDoc = new DOMImplementation().createDocument("", USX_TYPE);
-  if (usxDoc.documentElement) {
-    usxDoc.documentElement.setAttribute("version", USX_VERSION);
-    usjToUsxDom(usj, usxDoc);
-  }
-  return usxDoc.toString();
+function createVerseEndElement(usxDoc: Document, verseEid: string): Element {
+  const eidElement = usxDoc.createElement("verse");
+  eidElement.setAttribute("eid", verseEid);
+  return eidElement;
+}
+
+function createChapterEndElement(usxDoc: Document, chapterEid: string): Element {
+  const eidElement = usxDoc.createElement("chapter");
+  eidElement.setAttribute("eid", chapterEid);
+  return eidElement;
 }
