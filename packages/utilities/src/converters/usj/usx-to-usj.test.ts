@@ -35,9 +35,7 @@ describe("USX to USJ Converter", () => {
     expect(usj).toEqual(usjGen1v1ImpliedPara);
   });
 
-  // TODO: Fix whitespace problems and re-enable this test
-  // https://github.com/BiblioNexus-Foundation/scripture-editors/issues/224
-  xit("should convert from USX to USJ with special whitespace", () => {
+  it("should convert from USX to USJ with special whitespace", () => {
     const usj = usxStringToUsj(usxGen1v1Whitespace);
     expect(usj).toEqual(usjGen1v1Whitespace);
   });
