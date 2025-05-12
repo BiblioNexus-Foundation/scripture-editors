@@ -1,9 +1,7 @@
 /**
  * Convert Scripture from USX to USJ.
  * Adapted to TypeScript from this file:
- * @see https://github.com/mvh-solutions/nice-usfm-json/blob/main/javascript/lib/usx-to-usj.js
- * And kept updated with changes from this file:
- * @see https://github.com/usfm-bible/tcdocs/blob/main/python/scripts/usx2usj.py
+ * @see https://github.com/usfm-bible/usfmtc/blob/0afa385a1f282b286cc6bff7bbc953ae788aa10c/src/usfmtc/usjproc.py
  */
 
 import { DOMParser, Element } from "@xmldom/xmldom";
@@ -13,7 +11,22 @@ import { USX_TYPE } from "./usx.model";
 type Action = "append" | "merge" | "ignore";
 type Attribs = { [name: string]: string };
 
-function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
+export function usxStringToUsj(usxString: string): Usj {
+  const parser = new DOMParser();
+  const inputUsxDom = parser.parseFromString(usxString, "text/xml");
+  return usxDomToUsj(inputUsxDom.documentElement);
+}
+
+export function usxDomToUsj(inputUsxDom: Element | null): Usj {
+  const [outputJson] = inputUsxDom
+    ? convertUsxRecurse(inputUsxDom)
+    : [{ content: [] as MarkerContent[] } as Usj];
+  outputJson.type = USJ_TYPE;
+  outputJson.version = USJ_VERSION;
+  return outputJson;
+}
+
+function convertUsxRecurse<T extends Usj | MarkerObject = Usj>(
   inputUsxElement: Element,
 ): [outputJson: T, action: Action] {
   const attribs: Attribs = {};
@@ -24,8 +37,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
 
   if (["row", "cell"].includes(type)) type = "table:" + type;
   if (inputUsxElement.attributes) {
-    for (let i = 0; i < inputUsxElement.attributes.length; i++) {
-      const attrib = inputUsxElement.attributes[i];
+    for (const attrib of Array.from(inputUsxElement.attributes)) {
       attribs[attrib.name] = attrib.value;
     }
   }
@@ -36,6 +48,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
   }
   // dropping because presence of vid in para elements is not consistent in USX
   if (attribs.vid) delete attribs.vid;
+  // Not dropping `attribs.closed` for backwards compatibility.
   // dropping because it is nonstandard derived metadata that could get out of date
   if (attribs.status) delete attribs.status;
 
@@ -65,7 +78,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
       continue;
     }
     // ChildNodes are Elements.
-    const [childDict, whatToDo] = usxDomToUsjRecurse<MarkerObject>(child as Element);
+    const [childDict, whatToDo] = convertUsxRecurse<MarkerObject>(child as Element);
 
     switch (whatToDo) {
       case "append":
@@ -80,6 +93,7 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
         break;
     }
 
+    // Handle tail text
     if (
       child.nextSibling &&
       child.nextSibling.nodeType === child.nextSibling.TEXT_NODE &&
@@ -90,6 +104,8 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
     }
   }
 
+  // For backward compatibility, not deleting content for type: chapter, verse, optbreak, ms OR
+  // marker: va, ca, b.
   if (outObj.content.length === 0 && outObj.type !== USX_TYPE) {
     delete outObj.content;
   }
@@ -99,19 +115,4 @@ function usxDomToUsjRecurse<T extends Usj | MarkerObject = Usj>(
   }
 
   return [outObj, action];
-}
-
-export function usxDomToUsj(inputUsxDom: Element | null): Usj {
-  const [outputJson] = inputUsxDom
-    ? usxDomToUsjRecurse(inputUsxDom)
-    : [{ content: [] as MarkerContent[] } as Usj];
-  outputJson.type = USJ_TYPE;
-  outputJson.version = USJ_VERSION;
-  return outputJson;
-}
-
-export function usxStringToUsj(usxString: string): Usj {
-  const parser = new DOMParser();
-  const inputUsxDom = parser.parseFromString(usxString, "text/xml");
-  return usxDomToUsj(inputUsxDom.documentElement);
 }
