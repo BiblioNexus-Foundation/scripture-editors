@@ -114,6 +114,25 @@ export default function App() {
 }
 ```
 
+## Features
+
+- USJ editor with USX support
+- Read-only and edit mode
+- History - undo & redo
+- Cut, copy, paste, paste as plain text - context menu and keyboard shortcuts
+- Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
+- Insert markers - type '\\' (backslash - configurable to another key) for a marker menu. If text is selected first the marker will apply to the selection if possible, e.g. use '\\wj' to "red-letter" selected text.
+- Add comments to selected text, reply in comment threads, delete comments and threads.
+  - To enable comments use the `<Marginal />` editor component (comments appear in the margin).
+  - To use the editor without comments use the `<Editorial />` component.
+- Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
+- Get and set the cursor location or selection range.
+- Specify `textDirection` as `"ltr"`, `"rtl"`, or `"auto"` (`"auto"` is unlikely to be useful for minority languages).
+- BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
+- Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
+- Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
+- Node options - callback for when a `<note>` link is clicked
+
 ## Styling
 
 This npm package does not include styling so you need to style the editor component to suit your application. A good place to start is to copy the **CSS** from this repo:
@@ -135,24 +154,11 @@ If using the **commenting features** in the `<Marginal />` component:
 - [/packages/platform/src/marginal/comments/comment-editor.theme.css](/packages/platform/src/marginal/comments/comment-editor.theme.css)
 - [/packages/platform/src/marginal/comments/CommentPlugin.css](/packages/platform/src/marginal/comments/CommentPlugin.css)
 
-## Features
+### Annotation Styles
 
-- USJ editor with USX support
-- Read-only and edit mode
-- History - undo & redo
-- Cut, copy, paste, paste as plain text - context menu and keyboard shortcuts
-- Format block type - change `<para>` markers. The current implementation is a proof-of-concept and doesn't have all the markers available yet.
-- Insert markers - type '\\' (backslash - configurable to another key) for a marker menu. If text is selected first the marker will apply to the selection if possible, e.g. use '\\wj' to "red-letter" selected text.
-- Add comments to selected text, reply in comment threads, delete comments and threads.
-  - To enable comments use the `<Marginal />` editor component (comments appear in the margin).
-  - To use the editor without comments use the `<Editorial />` component.
-- Add and remove different types of annotations. Style the different annotations types with CSS, e.g. style a spelling annotation with a red squiggly underline.
-- Get and set the cursor location or selection range.
-- Specify `textDirection` as `"ltr"`, `"rtl"`, or `"auto"` (`"auto"` is unlikely to be useful for minority languages).
-- BCV linkage - change the book/chapter/verse externally and the cursor moves; move the cursor and it updates the external book/chapter/verse
-- Nodes supported `<book>`, `<chapter>`, `<verse>`, `<para>`, `<char>`, `<note>`, `<ms>`
-- Nodes not yet supported `<table>`, `<row>`, `<cell>`, `<sidebar>`, `<periph>`, `<figure>`, `<optbreak>`, `<ref>`
-- Node options - callback for when a `<note>` link is clicked
+Annotations are added with a specific `type` via the editor's reference API (see [Editorial Ref](#editorial-ref)). This `type` can then be used to apply custom CSS styles (e.g., a green squiggly underline for a _"grammar"_ type annotation). The CSS classname for an annotation takes the form of `.${annotationPrefix}-${type}`, where `type` is the string you pass to the `addAnnotation()` method and `annotationPrefix` is set by `config.theme.typedMark` (defaults to _"editor-typed-mark"_). If annotations overlap with each other an additional CSS classname is added where `annotationPrefix` is set by `config.theme.typedMarkOverlap` (defaults to _"editor-typed-markOverlap"_).
+
+For example, if an annotation of type _"grammar"_ is overlapping it will have both CSS classnames `editor-typed-mark-grammar` and `editor-typed-markOverlap-grammar`. If it's not overlapping it still has the first classname.
 
 ## `<Editorial />` API
 
