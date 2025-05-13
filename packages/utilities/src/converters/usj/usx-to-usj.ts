@@ -60,7 +60,7 @@ function convertUsxRecurse<T extends Usj | MarkerObject = Usj>(
     inputUsxElement.firstChild &&
     inputUsxElement.firstChild.nodeType === inputUsxElement.firstChild.TEXT_NODE &&
     inputUsxElement.firstChild.nodeValue &&
-    inputUsxElement.firstChild.nodeValue.trim() !== ""
+    asciiTrim(inputUsxElement.firstChild.nodeValue) !== ""
   ) {
     text = inputUsxElement.firstChild.nodeValue;
   }
@@ -98,7 +98,7 @@ function convertUsxRecurse<T extends Usj | MarkerObject = Usj>(
       child.nextSibling &&
       child.nextSibling.nodeType === child.nextSibling.TEXT_NODE &&
       child.nextSibling.nodeValue &&
-      (child.nextSibling.nodeValue.trim() !== "" || child.nextSibling.nodeValue === " ")
+      (asciiTrim(child.nextSibling.nodeValue) !== "" || child.nextSibling.nodeValue === " ")
     ) {
       outObj.content.push(child.nextSibling.nodeValue);
     }
@@ -115,4 +115,16 @@ function convertUsxRecurse<T extends Usj | MarkerObject = Usj>(
   }
 
   return [outObj, action];
+}
+
+/**
+ * Removes leading and trailing ASCII whitespace.
+ *
+ * Only trim ASCII whitespace characters: space, tab, line feed, carriage return, form feed,
+ * vertical tab.
+ * @param str - The string to remove whitespace from.
+ * @returns the string with leading and trailing whitespace removed.
+ */
+function asciiTrim(str: string): string {
+  return str.replace(/(^[ \t\n\r\f\v]+)|([ \t\n\r\f\v]+$)/g, "");
 }
