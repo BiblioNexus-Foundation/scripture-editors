@@ -13,8 +13,8 @@ import { EditorState } from "lexical";
 import { useCallback, useEffect } from "react";
 import { ImmutableNoteCallerNode } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
-import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
-import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
+import { LoadStatePlugin } from "shared-react/plugins/usj/LoadStatePlugin";
+import { NoteNodePlugin } from "shared-react/plugins/usj/NoteNodePlugin";
 import { ViewOptions } from "shared-react/views/view-options.utils";
 import { usjBaseNodes } from "shared/nodes/usj";
 

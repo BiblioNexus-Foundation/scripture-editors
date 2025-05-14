@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { IS_APPLE } from "@lexical/utils";
 import { COPY_COMMAND, CUT_COMMAND } from "lexical";
-import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
+import { useEffect } from "react";
 
-export default function ClipboardPlugin(): null {
+export function ClipboardPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

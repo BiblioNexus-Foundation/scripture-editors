@@ -1,10 +1,10 @@
-import { ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
+import { ImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
 import {
   $addTrailingSpace,
   $isSomeVerseNode,
   SomeVerseNode,
   wasNodeCreated,
-} from "../nodes/usj/node-react.utils";
+} from "../../nodes/usj/node-react.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import { $createTextNode, $isTextNode, LexicalEditor, TextNode } from "lexical";

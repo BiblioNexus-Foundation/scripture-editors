@@ -1,6 +1,6 @@
-import { usjReactNodes } from "../nodes/usj";
-import { ImmutableVerseNode, $createImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
-import { $isSomeVerseNode } from "../nodes/usj/node-react.utils";
+import { usjReactNodes } from "../../nodes/usj";
+import { ImmutableVerseNode, $createImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import { $isSomeVerseNode } from "../../nodes/usj/node-react.utils";
 import { TextSpacingPlugin } from "./TextSpacingPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";

@@ -1,14 +1,14 @@
-import { usjReactNodes } from "../nodes/usj";
+import { usjReactNodes } from "../../nodes/usj";
 import {
   $createImmutableNoteCallerNode,
   defaultNoteCallers,
   GENERATOR_NOTE_CALLER,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
-} from "../nodes/usj/ImmutableNoteCallerNode";
-import { $createImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
-import { UsjNodeOptions } from "../nodes/usj/usj-node-options.model";
-import { ViewOptions } from "../views/view-options.utils";
+} from "../../nodes/usj/ImmutableNoteCallerNode";
+import { $createImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import { UsjNodeOptions } from "../../nodes/usj/usj-node-options.model";
+import { ViewOptions } from "../../views/view-options.utils";
 import { NoteNodePlugin } from "./NoteNodePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";

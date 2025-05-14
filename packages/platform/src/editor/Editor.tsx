@@ -27,26 +27,32 @@ import React, {
   useRef,
   useState,
 } from "react";
-import AnnotationPlugin, { AnnotationRef } from "shared-react/annotation/AnnotationPlugin";
-import { AnnotationRange, SelectionRange } from "shared-react/annotation/selection.model";
+import { usjReactNodes } from "shared-react/nodes/usj";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
+import { ArrowNavigationPlugin } from "shared-react/plugins/usj/ArrowNavigationPlugin";
+import { ClipboardPlugin } from "shared-react/plugins/usj/ClipboardPlugin";
+import { CommandMenuPlugin } from "shared-react/plugins/usj/CommandMenuPlugin";
+import { ContextMenuPlugin } from "shared-react/plugins/usj/ContextMenuPlugin";
+import { EditablePlugin } from "shared-react/plugins/usj/EditablePlugin";
+import { LoadStatePlugin } from "shared-react/plugins/usj/LoadStatePlugin";
+import { NoteNodePlugin } from "shared-react/plugins/usj/NoteNodePlugin";
+import { OnSelectionChangePlugin } from "shared-react/plugins/usj/OnSelectionChangePlugin";
+import { ParaNodePlugin } from "shared-react/plugins/usj/ParaNodePlugin";
+import { TextDirectionPlugin } from "shared-react/plugins/usj/TextDirectionPlugin";
+import { TextSpacingPlugin } from "shared-react/plugins/usj/TextSpacingPlugin";
+import { UsjNodesMenuPlugin } from "shared-react/plugins/usj/UsjNodesMenuPlugin";
+import {
+  AnnotationPlugin,
+  AnnotationRef,
+} from "shared-react/plugins/usj/annotation/AnnotationPlugin";
+import {
+  AnnotationRange,
+  SelectionRange,
+} from "shared-react/plugins/usj/annotation/selection.model";
 import {
   $getRangeFromEditor,
   $getRangeFromSelection,
-} from "shared-react/annotation/selection.utils";
-import { usjReactNodes } from "shared-react/nodes/usj";
-import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
-import { ArrowNavigationPlugin } from "shared-react/plugins/ArrowNavigationPlugin";
-import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
-import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
-import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
-import EditablePlugin from "shared-react/plugins/EditablePlugin";
-import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
-import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
-import OnSelectionChangePlugin from "shared-react/plugins/OnSelectionChangePlugin";
-import ParaNodePlugin from "shared-react/plugins/ParaNodePlugin";
-import TextDirectionPlugin from "shared-react/plugins/TextDirectionPlugin";
-import { TextSpacingPlugin } from "shared-react/plugins/TextSpacingPlugin";
-import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
+} from "shared-react/plugins/usj/annotation/selection.utils";
 import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";

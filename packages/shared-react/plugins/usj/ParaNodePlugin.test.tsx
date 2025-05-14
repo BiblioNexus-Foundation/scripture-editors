@@ -1,5 +1,5 @@
-import { usjReactNodes } from "../nodes/usj";
-import ParaNodePlugin from "./ParaNodePlugin";
+import { usjReactNodes } from "../../nodes/usj";
+import { ParaNodePlugin } from "./ParaNodePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

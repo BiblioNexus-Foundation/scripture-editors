@@ -1,4 +1,4 @@
-import { $isImmutableVerseNode, ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
+import { $isImmutableVerseNode, ImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,

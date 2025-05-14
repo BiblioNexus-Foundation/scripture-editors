@@ -1,7 +1,7 @@
-import { usjReactNodes } from "../nodes/usj";
-import { $createImmutableVerseNode, ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
-import { $isReactNodeWithMarker } from "../nodes/usj/node-react.utils";
-import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
+import { usjReactNodes } from "../../nodes/usj";
+import { $createImmutableVerseNode, ImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import { $isReactNodeWithMarker } from "../../nodes/usj/node-react.utils";
+import { UsjNodesMenuPlugin } from "./UsjNodesMenuPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

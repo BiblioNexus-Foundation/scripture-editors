@@ -9,10 +9,10 @@ import { Usj, usxStringToUsj } from "@biblionexus-foundation/scripture-utilities
 import { SerializedVerseRef } from "@sillsdev/scripture";
 import { BookChapterControl } from "platform-bible-react";
 import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnnotationRange } from "shared-react/annotation/selection.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
-import { TextDirection } from "shared-react/plugins/text-direction.model";
+import { AnnotationRange } from "shared-react/plugins/usj/annotation/selection.model";
+import { TextDirection } from "shared-react/plugins/usj/text-direction.model";
 import {
   getDefaultViewMode,
   getViewOptions,

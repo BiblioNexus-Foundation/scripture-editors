@@ -1,8 +1,8 @@
-import { usjReactNodes } from "../nodes/usj";
-import { $createImmutableNoteCallerNode } from "../nodes/usj/ImmutableNoteCallerNode";
-import { $createImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
+import { usjReactNodes } from "../../nodes/usj";
+import { $createImmutableNoteCallerNode } from "../../nodes/usj/ImmutableNoteCallerNode";
+import { $createImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
 import { ArrowNavigationPlugin } from "./ArrowNavigationPlugin";
-import TextDirectionPlugin from "./TextDirectionPlugin";
+import { TextDirectionPlugin } from "./TextDirectionPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";

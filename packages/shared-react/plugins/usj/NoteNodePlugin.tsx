@@ -4,9 +4,9 @@ import {
   GENERATOR_NOTE_CALLER,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
-} from "../nodes/usj/ImmutableNoteCallerNode";
-import { UsjNodeOptions } from "../nodes/usj/usj-node-options.model";
-import { ViewOptions } from "../views/view-options.utils";
+} from "../../nodes/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "../../nodes/usj/usj-node-options.model";
+import { ViewOptions } from "../../views/view-options.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {

@@ -1,3 +1,4 @@
+import { TextDirection } from "./text-direction.model";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $findMatchingParent } from "@lexical/utils";
 import {
@@ -9,13 +10,8 @@ import {
 } from "lexical";
 import { useEffect } from "react";
 import { getNodeElementTagName } from "shared/nodes/usj/node.utils";
-import { TextDirection } from "./text-direction.model";
 
-export default function TextDirectionPlugin({
-  textDirection,
-}: {
-  textDirection: TextDirection;
-}): null {
+export function TextDirectionPlugin({ textDirection }: { textDirection: TextDirection }): null {
   const [editor] = useLexicalComposerContext();
   useTextDirection(editor, textDirection);
   useArrowKeys(editor);

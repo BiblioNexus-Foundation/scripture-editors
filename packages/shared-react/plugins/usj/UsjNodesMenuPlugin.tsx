@@ -1,3 +1,11 @@
+import { ImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import {
+  $isReactNodeWithMarker,
+  $isSomeVerseNode,
+  SomeVerseNode,
+  wasNodeCreated,
+} from "../../nodes/usj/node-react.utils";
+import UsfmNodesMenuPlugin from "../UsfmNodesMenuPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
@@ -20,19 +28,11 @@ import {
 } from "shared/nodes/usj/node.utils";
 import { VerseNode } from "shared/nodes/usj/VerseNode";
 import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
-import { ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
-import {
-  $isReactNodeWithMarker,
-  $isSomeVerseNode,
-  SomeVerseNode,
-  wasNodeCreated,
-} from "../nodes/usj/node-react.utils";
-import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
 type NodeKeysByChapter = { [chapter: string]: NodeKey[] };
 type ChapterByNodeKey = { [nodeKey: string]: string };
 
-export default function UsjNodesMenuPlugin({
+export function UsjNodesMenuPlugin({
   trigger,
   scrRef,
   getMarkerAction,
