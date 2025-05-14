@@ -24,7 +24,7 @@ import { downloadUsfm } from "./downloadUsfm";
 import OnEditorUpdate from "./Components/OnEditorUpdate";
 
 import { $isUsfmElementNode } from "shared/nodes/UsfmElementNode";
-import { $getCommonAncestorCompatible } from "shared/nodes/scripture/usj/node.utils";
+import { $getCommonAncestorCompatible } from "shared/nodes/usj/node.utils";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { getUsfmMarkerAction } from "shared/utils/usfm/getUsfmMarkerAction";
 import ScriptureReferencePlugin from "shared-react/plugins/ScriptureReferencePlugin";

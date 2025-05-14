@@ -1,10 +1,10 @@
+import { SelectionRange } from "./annotation/selection.model";
+import { $getRangeFromEditor } from "./annotation/selection.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { COMMAND_PRIORITY_LOW, SELECTION_CHANGE_COMMAND } from "lexical";
 import { useEffect } from "react";
-import { SelectionRange } from "../annotation/selection.model";
-import { $getRangeFromEditor } from "../annotation/selection.utils";
 
-export default function OnSelectionChangePlugin({
+export function OnSelectionChangePlugin({
   onChange,
 }: {
   onChange: ((selection: SelectionRange | undefined) => void) | undefined;

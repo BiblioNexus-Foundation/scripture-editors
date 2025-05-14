@@ -1,15 +1,3 @@
-import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
-import { deepEqual } from "fast-equals";
-import { SerializedTextNode } from "lexical";
-import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
-import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/scripture/usj/VerseNode";
-import { createBasicTestEnvironment } from "shared/nodes/test.utils";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
 // Reaching inside only for tests.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import {
@@ -35,8 +23,18 @@ import {
 } from "../../../../utilities/src/converters/usj/converter-test.data";
 import editorUsjAdaptor from "./editor-usj.adaptor";
 import usjEditorAdaptor from "./usj-editor.adaptor";
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
+import { deepEqual } from "fast-equals";
+import { SerializedTextNode } from "lexical";
+import { usjReactNodes } from "shared-react/nodes/usj";
+import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { CHAPTER_MARKER, SerializedChapterNode } from "shared/nodes/usj/ChapterNode";
+import { SerializedParaNode } from "shared/nodes/usj/ParaNode";
+import { SerializedVerseNode, VERSE_MARKER } from "shared/nodes/usj/VerseNode";
+import { getVisibleOpenMarkerText } from "shared/nodes/usj/node.utils";
+import { createBasicTestEnvironment } from "shared/nodes/usj/test.utils";
 
-const nodes = [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes];
+const nodes = [TypedMarkNode, ...usjReactNodes];
 const { editor } = createBasicTestEnvironment(nodes);
 
 describe("Editor USJ Adaptor", () => {

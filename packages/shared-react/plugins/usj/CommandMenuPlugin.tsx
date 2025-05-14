@@ -9,7 +9,7 @@ import { LoggerBasic } from "shared/adaptors/logger-basic.model";
  * Later this plugin will open the command menu to insert USJ elements.
  * @returns `null`. This plugin has no DOM presence.
  */
-export default function CommandMenuPlugin({ logger }: { logger?: LoggerBasic }): null {
+export function CommandMenuPlugin({ logger }: { logger?: LoggerBasic }): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

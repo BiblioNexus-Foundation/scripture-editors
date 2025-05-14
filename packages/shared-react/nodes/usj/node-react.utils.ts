@@ -14,20 +14,20 @@ import {
   SerializedLexicalNode,
 } from "lexical";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+import { NBSP } from "shared/nodes/usj/node-constants";
 import {
   $isNodeWithMarker,
   $isSomeChapterNode,
   isVerseInRange,
   NodesWithMarker,
-} from "shared/nodes/scripture/usj/node.utils";
-import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/node.utils";
+import { $isParaNode } from "shared/nodes/usj/ParaNode";
 import {
   $isVerseNode,
   isSerializedVerseNode,
   SerializedVerseNode,
   VerseNode,
-} from "shared/nodes/scripture/usj/VerseNode";
+} from "shared/nodes/usj/VerseNode";
 
 /** Caller count is in an object so it can be manipulated by passing the object. */
 export type CallerData = {

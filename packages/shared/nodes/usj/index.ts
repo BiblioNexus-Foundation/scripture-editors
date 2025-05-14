@@ -1,18 +1,18 @@
-import { ParagraphNode } from "lexical";
+import { ImmutableUnmatchedNode } from "../features/ImmutableUnmatchedNode";
+import { MarkerNode } from "../features/MarkerNode";
+import { UnknownNode } from "../features/UnknownNode";
 import { BookNode } from "./BookNode";
-import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ChapterNode } from "./ChapterNode";
-import { VerseNode } from "./VerseNode";
 import { CharNode } from "./CharNode";
-import { NoteNode } from "./NoteNode";
-import { MilestoneNode } from "./MilestoneNode";
+import { ImmutableChapterNode } from "./ImmutableChapterNode";
 import { ImpliedParaNode } from "./ImpliedParaNode";
+import { MilestoneNode } from "./MilestoneNode";
+import { NoteNode } from "./NoteNode";
 import { ParaNode } from "./ParaNode";
-import { MarkerNode } from "../../features/MarkerNode";
-import { UnknownNode } from "../../features/UnknownNode";
-import { ImmutableUnmatchedNode } from "../../features/ImmutableUnmatchedNode";
+import { VerseNode } from "./VerseNode";
+import { Klass, LexicalNode, LexicalNodeReplacement, ParagraphNode } from "lexical";
 
-const scriptureUsjNodes = [
+export const usjBaseNodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> = [
   BookNode,
   ImmutableChapterNode,
   ChapterNode,
@@ -31,4 +31,3 @@ const scriptureUsjNodes = [
     with: (node: ParaNode) => new ParaNode(node.__marker, node.__unknownAttributes),
   },
 ];
-export default scriptureUsjNodes;

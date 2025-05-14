@@ -2,13 +2,13 @@
  * Adapted from https://github.com/facebook/lexical/blob/main/packages/lexical-playground/src/plugins/ContextMenuPlugin/index.tsx
  */
 
+import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalContextMenuPlugin, MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
 import { type LexicalNode, COPY_COMMAND, CUT_COMMAND } from "lexical";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as ReactDOM from "react-dom";
-import { isImmutableChapterElement } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { pasteSelection, pasteSelectionAsPlainText } from "./clipboard.utils";
+import { isImmutableChapterElement } from "shared/nodes/usj/ImmutableChapterNode";
 
 function ContextMenuItem({
   index,
@@ -111,7 +111,7 @@ function isEditorInput(
   return element.classList.contains(editorInputClassName);
 }
 
-export default function ContextMenuPlugin(): JSX.Element {
+export function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [isReadonly, setIsReadonly] = useState(() => !editor.isEditable());
   const targetRef = useRef<HTMLElement>();

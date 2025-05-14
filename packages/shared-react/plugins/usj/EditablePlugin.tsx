@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLayoutEffect } from "react";
 
-export default function EditablePlugin({ isEditable }: { isEditable: boolean }): null {
+export function EditablePlugin({ isEditable }: { isEditable: boolean }): null {
   const [editor] = useLexicalComposerContext();
 
   useLayoutEffect(() => {

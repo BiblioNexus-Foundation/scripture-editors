@@ -1,25 +1,23 @@
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { getUsjMarkerAction } from "./usj-marker-action.utils";
+import { $createTextNode, $getRoot, $isTextNode, TextNode } from "lexical";
+import { usjReactNodes } from "shared-react/nodes/usj";
 import {
   $createImmutableVerseNode,
   $isImmutableVerseNode,
-  ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
+} from "shared-react/nodes/usj/ImmutableVerseNode";
+import { $isCharNode } from "shared/nodes/usj/CharNode";
+import {
+  $createImmutableChapterNode,
+  $isImmutableChapterNode,
+} from "shared/nodes/usj/ImmutableChapterNode";
+import { $createParaNode, $isParaNode } from "shared/nodes/usj/ParaNode";
 import {
   $expectSelectionToBe,
   createBasicTestEnvironment,
   updateSelection,
-} from "shared/nodes/test.utils";
-import { getUsjMarkerAction } from "./usj-marker-action.utils";
-import { $createTextNode, $getRoot, $isTextNode, TextNode } from "lexical";
-import { $isCharNode } from "shared/nodes/scripture/usj/CharNode";
-import {
-  $createImmutableChapterNode,
-  $isImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/test.utils";
 
-const nodes = [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes];
+const nodes = usjReactNodes;
 const reference = { book: "GEN", chapterNum: 1, verseNum: 1 };
 
 let secondVerseTextNode: TextNode;

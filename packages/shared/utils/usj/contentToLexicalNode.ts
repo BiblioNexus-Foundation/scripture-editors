@@ -5,7 +5,7 @@ import {
   USJ_VERSION,
 } from "@biblionexus-foundation/scripture-utilities";
 import { EditorAdaptor } from "../../adaptors/editor-adaptor.model";
-import { isSerializedImpliedParaNode } from "../../nodes/scripture/usj/ImpliedParaNode";
+import { isSerializedImpliedParaNode } from "../../nodes/usj/ImpliedParaNode";
 
 export function createLexicalUsjNode(
   content: MarkerContent[],

@@ -1,3 +1,5 @@
+import { AnnotationRange } from "./selection.model";
+import { $getRangeFromSelection } from "./selection.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister, registerNestedElementResolver } from "@lexical/utils";
 import { $getNodeByKey, LexicalEditor, NodeKey } from "lexical";
@@ -11,9 +13,7 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
-import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
-import { AnnotationRange } from "./selection.model";
-import { $getRangeFromSelection } from "./selection.utils";
+import { ANNOTATION_CHANGE_TAG } from "shared/nodes/usj/node-constants";
 
 /** Forward reference for annotations. */
 export type AnnotationRef = {
@@ -100,7 +100,7 @@ function useAnnotations(editor: LexicalEditor, markNodeMap: Map<string, Set<Node
   }, [editor, markNodeMap]);
 }
 
-const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends LoggerBasic>(
+export const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends LoggerBasic>(
   { logger }: { logger?: TLogger },
   ref: React.ForwardedRef<AnnotationRef>,
 ) {
@@ -165,5 +165,3 @@ const AnnotationPlugin = forwardRef(function AnnotationPlugin<TLogger extends Lo
 
   return null;
 });
-
-export default AnnotationPlugin;

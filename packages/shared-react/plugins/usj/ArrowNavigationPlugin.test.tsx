@@ -1,13 +1,8 @@
-import {
-  $createImmutableNoteCallerNode,
-  ImmutableNoteCallerNode,
-} from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $createImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
+import { usjReactNodes } from "../../nodes/usj";
+import { $createImmutableNoteCallerNode } from "../../nodes/usj/ImmutableNoteCallerNode";
+import { $createImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
 import { ArrowNavigationPlugin } from "./ArrowNavigationPlugin";
-import TextDirectionPlugin from "./TextDirectionPlugin";
+import { TextDirectionPlugin } from "./TextDirectionPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -15,16 +10,12 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
 import { $createTextNode, $getRoot, LexicalEditor, TextNode } from "lexical";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createCharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import {
-  $createImpliedParaNode,
-  ImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { $createNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $expectSelectionToBe, pressKey, updateSelection } from "shared/nodes/test.utils";
+import { $createCharNode } from "shared/nodes/usj/CharNode";
+import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
+import { $createImpliedParaNode, ImpliedParaNode } from "shared/nodes/usj/ImpliedParaNode";
+import { $createNoteNode } from "shared/nodes/usj/NoteNode";
+import { $createParaNode, ParaNode } from "shared/nodes/usj/ParaNode";
+import { $expectSelectionToBe, pressKey, updateSelection } from "shared/nodes/usj/test.utils";
 
 let paraNode: ParaNode | ImpliedParaNode;
 let v1TextNode: TextNode;
@@ -265,7 +256,7 @@ async function testEnvironment(
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

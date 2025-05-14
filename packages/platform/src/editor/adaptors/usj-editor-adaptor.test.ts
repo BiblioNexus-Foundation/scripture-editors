@@ -1,13 +1,13 @@
 import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
 import { SerializedEditorState } from "lexical";
 import { typedMarkNodeName } from "shared/nodes/features/TypedMarkNode";
-import { SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
+import { SerializedParaNode } from "shared/nodes/usj/ParaNode";
+import { SerializedNoteNode } from "shared/nodes/usj/NoteNode";
 import {
   defaultNoteCallers,
   immutableNoteCallerNodeName,
   SerializedImmutableNoteCallerNode,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+} from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { UNFORMATTED_VIEW_MODE } from "shared-react/views/view-mode.model";
 import { getViewOptions } from "shared-react/views/view-options.utils";
 // Reaching inside only for tests.

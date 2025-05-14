@@ -41,25 +41,25 @@ import {
   BookNode,
   isSerializedBookNode,
   SerializedBookNode,
-} from "shared/nodes/scripture/usj/BookNode";
+} from "shared/nodes/usj/BookNode";
 import {
   SerializedChapterNode,
   CHAPTER_VERSION,
   ChapterNode,
   CHAPTER_MARKER,
   ChapterMarker,
-} from "shared/nodes/scripture/usj/ChapterNode";
-import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+} from "shared/nodes/usj/ChapterNode";
+import { CHAR_VERSION, CharNode, SerializedCharNode } from "shared/nodes/usj/CharNode";
 import {
   SerializedImmutableChapterNode,
   IMMUTABLE_CHAPTER_VERSION,
   ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+} from "shared/nodes/usj/ImmutableChapterNode";
 import {
   IMPLIED_PARA_VERSION,
   ImpliedParaNode,
   SerializedImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
+} from "shared/nodes/usj/ImpliedParaNode";
 import {
   MILESTONE_VERSION,
   MilestoneNode,
@@ -67,9 +67,9 @@ import {
   STARTING_MS_COMMENT_MARKER,
   ENDING_MS_COMMENT_MARKER,
   isMilestoneCommentMarker,
-} from "shared/nodes/scripture/usj/MilestoneNode";
-import { NOTE_VERSION, NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { NBSP, PARA_MARKER_DEFAULT } from "shared/nodes/scripture/usj/node-constants";
+} from "shared/nodes/usj/MilestoneNode";
+import { NOTE_VERSION, NoteNode, SerializedNoteNode } from "shared/nodes/usj/NoteNode";
+import { NBSP, PARA_MARKER_DEFAULT } from "shared/nodes/usj/node-constants";
 import {
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
@@ -78,40 +78,34 @@ import {
   isSerializedTextNode,
   isSomeSerializedChapterNode,
   removeUndefinedProperties,
-} from "shared/nodes/scripture/usj/node.utils";
+} from "shared/nodes/usj/node.utils";
 import {
   isSerializedParaNode,
   PARA_VERSION,
   ParaNode,
   SerializedParaNode,
-} from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/ParaNode";
 import {
   SerializedVerseNode,
   VERSE_MARKER,
   VERSE_VERSION,
   VerseMarker,
   VerseNode,
-} from "shared/nodes/scripture/usj/VerseNode";
+} from "shared/nodes/usj/VerseNode";
 import {
   IMMUTABLE_NOTE_CALLER_VERSION,
   ImmutableNoteCallerNode,
   OnClick,
   SerializedImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
-} from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+} from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import {
   SerializedImmutableVerseNode,
   IMMUTABLE_VERSE_VERSION,
   ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import {
-  CallerData,
-  isSomeSerializedVerseNode,
-} from "shared-react/nodes/scripture/usj/node-react.utils";
-import {
-  AddMissingComments,
-  UsjNodeOptions,
-} from "shared-react/nodes/scripture/usj/usj-node-options.model";
+} from "shared-react/nodes/usj/ImmutableVerseNode";
+import { CallerData, isSomeSerializedVerseNode } from "shared-react/nodes/usj/node-react.utils";
+import { AddMissingComments, UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import {
   ViewOptions,
   getVerseNodeClass,

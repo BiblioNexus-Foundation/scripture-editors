@@ -26,38 +26,38 @@ import {
 } from "shared/nodes/features/ImmutableUnmatchedNode";
 import { MarkerNode } from "shared/nodes/features/MarkerNode";
 import { SerializedUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
-import { BookNode, SerializedBookNode } from "shared/nodes/scripture/usj/BookNode";
-import { ChapterNode, SerializedChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { CharNode, SerializedCharNode } from "shared/nodes/scripture/usj/CharNode";
+import { BookNode, SerializedBookNode } from "shared/nodes/usj/BookNode";
+import { ChapterNode, SerializedChapterNode } from "shared/nodes/usj/ChapterNode";
+import { CharNode, SerializedCharNode } from "shared/nodes/usj/CharNode";
 import {
   ImmutableChapterNode,
   SerializedImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
+} from "shared/nodes/usj/ImmutableChapterNode";
 import {
   isSerializedImpliedParaNode,
   SerializedImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
+} from "shared/nodes/usj/ImpliedParaNode";
 import {
   ENDING_MS_COMMENT_MARKER,
   MILESTONE_VERSION,
   MilestoneNode,
   STARTING_MS_COMMENT_MARKER,
   SerializedMilestoneNode,
-} from "shared/nodes/scripture/usj/MilestoneNode";
-import { NoteNode, SerializedNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { NBSP } from "shared/nodes/scripture/usj/node-constants";
+} from "shared/nodes/usj/MilestoneNode";
+import { NoteNode, SerializedNoteNode } from "shared/nodes/usj/NoteNode";
+import { NBSP } from "shared/nodes/usj/node-constants";
 import {
   getEditableCallerText,
   parseNumberFromMarkerText,
   removeUndefinedProperties,
-} from "shared/nodes/scripture/usj/node.utils";
-import { ParaNode, SerializedParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { SerializedVerseNode, VerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+} from "shared/nodes/usj/node.utils";
+import { ParaNode, SerializedParaNode } from "shared/nodes/usj/ParaNode";
+import { SerializedVerseNode, VerseNode } from "shared/nodes/usj/VerseNode";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import {
   ImmutableVerseNode,
   SerializedImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+} from "shared-react/nodes/usj/ImmutableVerseNode";
 
 interface EditorUsjAdaptor {
   initialize: typeof initialize;

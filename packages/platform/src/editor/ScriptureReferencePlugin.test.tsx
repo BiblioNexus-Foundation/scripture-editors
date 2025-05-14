@@ -1,29 +1,25 @@
+import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { SerializedVerseRef } from "@sillsdev/scripture";
-import { render, act } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import {
+  TextNode,
   $getRoot,
+  SELECTION_CHANGE_COMMAND,
   $createTextNode,
   LexicalEditor,
-  TextNode,
-  SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useState } from "react";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createBookNode } from "shared/nodes/scripture/usj/BookNode";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $expectSelectionToBe, updateSelection } from "shared/nodes/test.utils";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $createImmutableVerseNode,
-  ImmutableVerseNode,
-} from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import ScriptureReferencePlugin from "./ScriptureReferencePlugin";
+import { usjReactNodes } from "shared-react/nodes/usj";
+import { $createImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerseNode";
+import { $createBookNode } from "shared/nodes/usj/BookNode";
+import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
+import { $createParaNode } from "shared/nodes/usj/ParaNode";
+import { $expectSelectionToBe, updateSelection } from "shared/nodes/usj/test.utils";
 
 let sectionTextNode: TextNode;
 let firstVerseTextNode: TextNode;
@@ -159,7 +155,7 @@ async function testEnvironment(
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

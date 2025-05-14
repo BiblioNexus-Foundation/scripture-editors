@@ -1,10 +1,7 @@
-import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $createImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { $isReactNodeWithMarker } from "../nodes/scripture/usj/node-react.utils";
-import UsjNodesMenuPlugin from "./UsjNodesMenuPlugin";
+import { usjReactNodes } from "../../nodes/usj";
+import { $createImmutableVerseNode, ImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import { $isReactNodeWithMarker } from "../../nodes/usj/node-react.utils";
+import { UsjNodesMenuPlugin } from "./UsjNodesMenuPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -21,14 +18,13 @@ import {
   $createPoint,
   TextNode,
 } from "lexical";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
+import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
 import {
   $createImpliedParaNode,
   $isImpliedParaNode,
   ImpliedParaNode,
-} from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/ImpliedParaNode";
+import { $createParaNode } from "shared/nodes/usj/ParaNode";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 
 let firstVerseNode: ImmutableVerseNode;
@@ -229,7 +225,7 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

@@ -2,9 +2,9 @@ import {
   TEXT_SPACING_CLASS_NAME,
   FORMATTED_FONT_CLASS_NAME,
   MARKER_MODE_CLASS_NAME_PREFIX,
-} from "shared/nodes/scripture/usj/node-constants";
-import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
+} from "shared/nodes/usj/node-constants";
+import { VerseNode } from "shared/nodes/usj/VerseNode";
+import { ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
 import { ViewMode, FORMATTED_VIEW_MODE, UNFORMATTED_VIEW_MODE } from "./view-mode.model";
 
 export type ViewOptions = {

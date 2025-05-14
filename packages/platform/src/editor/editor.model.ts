@@ -1,5 +1,5 @@
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { TextDirection } from "shared-react/plugins/text-direction.model";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
+import { TextDirection } from "shared-react/plugins/usj/text-direction.model";
 import { ViewOptions } from "shared-react/views/view-options.utils";
 
 /** Options to configure the editor. */

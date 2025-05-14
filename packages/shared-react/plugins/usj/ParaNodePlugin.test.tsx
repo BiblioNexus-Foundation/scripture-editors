@@ -1,6 +1,5 @@
-import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
-import ParaNodePlugin from "./ParaNodePlugin";
+import { usjReactNodes } from "../../nodes/usj";
+import { ParaNodePlugin } from "./ParaNodePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -8,13 +7,12 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
 import { $getRoot, $createTextNode, LexicalEditor, TextNode } from "lexical";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
 import {
   $createImmutableChapterNode,
   $isImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createParaNode, $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { pressEnterAtSelection } from "shared/nodes/test.utils";
+} from "shared/nodes/usj/ImmutableChapterNode";
+import { $createParaNode, $isParaNode } from "shared/nodes/usj/ParaNode";
+import { pressEnterAtSelection } from "shared/nodes/usj/test.utils";
 
 let firstVerseTextNode: TextNode;
 
@@ -97,7 +95,7 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

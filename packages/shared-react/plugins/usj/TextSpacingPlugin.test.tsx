@@ -1,9 +1,6 @@
-import { ImmutableNoteCallerNode } from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  ImmutableVerseNode,
-  $createImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { $isSomeVerseNode } from "../nodes/scripture/usj/node-react.utils";
+import { usjReactNodes } from "../../nodes/usj";
+import { ImmutableVerseNode, $createImmutableVerseNode } from "../../nodes/usj/ImmutableVerseNode";
+import { $isSomeVerseNode } from "../../nodes/usj/node-react.utils";
 import { TextSpacingPlugin } from "./TextSpacingPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -20,17 +17,16 @@ import {
   $setSelection,
 } from "lexical";
 import { $createUnknownNode, $isUnknownNode, UnknownNode } from "shared/nodes/features/UnknownNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $createParaNode, $isParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { $createCharNode, $isCharNode } from "shared/nodes/usj/CharNode";
+import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
+import { $createNoteNode } from "shared/nodes/usj/NoteNode";
+import { $createParaNode, $isParaNode, ParaNode } from "shared/nodes/usj/ParaNode";
 import {
   $expectSelectionToBe,
   deleteTextAtSelection,
   typeTextAfterNode,
   typeTextAtSelection,
-} from "shared/nodes/test.utils";
+} from "shared/nodes/usj/test.utils";
 
 let v1Node: ImmutableVerseNode;
 let textNode: TextNode;
@@ -339,7 +335,7 @@ async function testEnvironment($initialEditorState: () => void = $defaultInitial
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

@@ -1,7 +1,4 @@
-import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
-import { $getRoot, NodeKey, $getNodeByKey } from "lexical";
 import { $createImmutableChapterNode } from "./ImmutableChapterNode";
-import { $createParaNode } from "./ParaNode";
 import {
   getNextVerse,
   getUnknownAttributes,
@@ -11,7 +8,10 @@ import {
   removeNodeAndAfter,
   removeNodesBeforeNode,
 } from "./node.utils";
-import { createBasicTestEnvironment } from "../../test.utils";
+import { $createParaNode } from "./ParaNode";
+import { createBasicTestEnvironment } from "./test.utils";
+import { MarkerObject } from "@biblionexus-foundation/scripture-utilities";
+import { $getRoot, NodeKey, $getNodeByKey } from "lexical";
 
 describe("Editor Node Utilities", () => {
   describe("isValidNumberedMarker()", () => {
