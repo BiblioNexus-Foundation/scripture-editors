@@ -66,7 +66,7 @@ describe("TextSpacingPlugin", () => {
     const { editor } = await testEnvironment();
 
     editor.getEditorState().read(() => {
-      expect($getRoot().getTextContent()).toBe(" \n\nb \n\n\n\ne\n\nwat-zf ");
+      expect($getRoot().getTextContent()).toBe("\n\nb \n\n\n\ne\n\nwat-zf ");
     });
   });
 
@@ -291,6 +291,36 @@ describe("TextSpacingPlugin", () => {
       expect(para.getChildren()).toHaveLength(2);
       const spaceNode = para.getChildAtIndex(0);
       expect($isTextNode(spaceNode) && spaceNode.getTextContent() === " ").toBe(true);
+    });
+  });
+
+  it("should not insert a space before a verse if it's empty", async () => {
+    let paraNode: ParaNode;
+    const { editor } = await testEnvironment(() => {
+      paraNode = $createParaNode();
+      $getRoot().append(
+        paraNode.append(
+          $createImmutableVerseNode("1"),
+          $createImmutableVerseNode("2"),
+          $createImmutableVerseNode("3"),
+        ),
+      );
+    });
+
+    // `paraNode` defined by the test environment.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await typeTextAtSelection(editor, "a", paraNode!, 2);
+
+    editor.getEditorState().read(() => {
+      const para = $getRoot().getFirstChild();
+      if (!$isParaNode(para)) throw new Error("Expected a ParaNode");
+      expect(para.getChildren()).toHaveLength(4);
+      expect($isSomeVerseNode(para.getChildAtIndex(0))).toBe(true);
+      expect($isSomeVerseNode(para.getChildAtIndex(1))).toBe(true);
+      expect($isSomeVerseNode(para.getChildAtIndex(3))).toBe(true);
+      const typedTextNode = para.getChildAtIndex(2);
+      if (!$isTextNode(typedTextNode)) throw new Error("Expected a TextNode");
+      $expectSelectionToBe(typedTextNode, 1); // Selection after the typed 'a'
     });
   });
 });

@@ -87,6 +87,11 @@ function $verseNodeTransform(node: SomeVerseNode): void {
   if (!node.isAttached()) return;
 
   const previousSibling = node.getPreviousSibling();
-  if (previousSibling && !$isTextNode(previousSibling) && !$isUnknownNode(previousSibling))
+  if (
+    previousSibling &&
+    !$isSomeVerseNode(previousSibling) &&
+    !$isTextNode(previousSibling) &&
+    !$isUnknownNode(previousSibling)
+  )
     node.insertBefore($createTextNode(" "));
 }
