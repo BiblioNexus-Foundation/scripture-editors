@@ -1,4 +1,5 @@
-import { Connection, Doc, OTType, Query, ShareDBSourceOptions } from "sharedb/lib/client";
+import { Connection, Doc, Query, ShareDBSourceOptions } from "sharedb/lib/client";
+import { OTType } from "sharedb/lib/sharedb";
 import { Json0OpBuilder } from "./json0-op-builder";
 
 export function docFetch(doc: Doc): Promise<void> {
