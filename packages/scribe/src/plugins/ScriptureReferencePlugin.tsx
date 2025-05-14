@@ -8,21 +8,18 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useRef } from "react";
-import { $isBookNode, BookNode } from "shared/nodes/scripture/usj/BookNode";
-import { CURSOR_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
+import { $isBookNode, BookNode } from "shared/nodes/usj/BookNode";
+import { CURSOR_CHANGE_TAG } from "shared/nodes/usj/node-constants";
 import {
   $findChapter,
   $findNextChapter,
   $findThisChapter,
   removeNodeAndAfter,
   removeNodesBeforeNode,
-} from "shared/nodes/scripture/usj/node.utils";
-import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/node.utils";
+import { $isParaNode } from "shared/nodes/usj/ParaNode";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import {
-  $findThisVerse,
-  $findVerseOrPara,
-} from "shared-react/nodes/scripture/usj/node-react.utils";
+import { $findThisVerse, $findVerseOrPara } from "shared-react/nodes/usj/node-react.utils";
 
 /**
  * A component (plugin) that keeps the Scripture reference updated.

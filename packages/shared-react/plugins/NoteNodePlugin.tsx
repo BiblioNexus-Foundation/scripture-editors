@@ -4,8 +4,8 @@ import {
   GENERATOR_NOTE_CALLER,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
-} from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
+} from "../nodes/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "../nodes/usj/usj-node-options.model";
 import { ViewOptions } from "../views/view-options.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
@@ -23,12 +23,9 @@ import {
 } from "lexical";
 import { useEffect, useRef } from "react";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
-import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import {
-  $findFirstAncestorNoteNode,
-  getNoteCallerPreviewText,
-} from "shared/nodes/scripture/usj/node.utils";
+import { $isCharNode, CharNode } from "shared/nodes/usj/CharNode";
+import { $isNoteNode, NoteNode } from "shared/nodes/usj/NoteNode";
+import { $findFirstAncestorNoteNode, getNoteCallerPreviewText } from "shared/nodes/usj/node.utils";
 
 /**
  * This plugin is responsible for handling NoteNode and NoteNodeCaller interactions. It also

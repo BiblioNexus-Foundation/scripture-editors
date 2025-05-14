@@ -1,4 +1,4 @@
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import { TextDirection } from "shared-react/plugins/text-direction.model";
 import { ViewOptions } from "shared-react/views/view-options.utils";
 

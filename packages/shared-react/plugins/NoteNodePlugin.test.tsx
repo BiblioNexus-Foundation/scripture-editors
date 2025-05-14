@@ -1,15 +1,13 @@
+import { usjReactNodes } from "../nodes/usj";
 import {
   $createImmutableNoteCallerNode,
   defaultNoteCallers,
   GENERATOR_NOTE_CALLER,
   ImmutableNoteCallerNode,
   immutableNoteCallerNodeName,
-} from "../nodes/scripture/usj/ImmutableNoteCallerNode";
-import {
-  $createImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
-import { UsjNodeOptions } from "../nodes/scripture/usj/usj-node-options.model";
+} from "../nodes/usj/ImmutableNoteCallerNode";
+import { $createImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
+import { UsjNodeOptions } from "../nodes/usj/usj-node-options.model";
 import { ViewOptions } from "../views/view-options.utils";
 import { NoteNodePlugin } from "./NoteNodePlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -26,12 +24,11 @@ import {
   $isTextNode,
   $getNodeByKey,
 } from "lexical";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { $createCharNode, $isCharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $createImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { NBSP } from "shared/nodes/scripture/usj/node-constants";
-import { $createNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $createParaNode } from "shared/nodes/scripture/usj/ParaNode";
+import { $createCharNode, $isCharNode } from "shared/nodes/usj/CharNode";
+import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
+import { NBSP } from "shared/nodes/usj/node-constants";
+import { $createNoteNode, NoteNode } from "shared/nodes/usj/NoteNode";
+import { $createParaNode } from "shared/nodes/usj/ParaNode";
 
 let firstVerseTextNode: TextNode;
 let firstNoteNode: NoteNode;
@@ -171,7 +168,7 @@ async function testEnvironment(
         initialConfig={{
           editorState: $initialEditorState,
           namespace: "TestEditor",
-          nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+          nodes: usjReactNodes,
           onError: (error) => {
             throw error;
           },

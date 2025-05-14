@@ -1,8 +1,8 @@
 import { Usj, USJ_TYPE, USJ_VERSION } from "@biblionexus-foundation/scripture-utilities";
 import { useState, useMemo, SyntheticEvent, useRef, useEffect } from "react";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
-import { immutableNoteCallerNodeName } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
+import { immutableNoteCallerNodeName } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { getViewOptions, getDefaultViewMode } from "shared-react/views/view-options.utils";
 // import { Usj2Usfm } from "./hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";

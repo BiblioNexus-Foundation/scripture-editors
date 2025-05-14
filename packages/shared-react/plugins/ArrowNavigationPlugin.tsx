@@ -1,7 +1,4 @@
-import {
-  $isImmutableVerseNode,
-  ImmutableVerseNode,
-} from "../nodes/scripture/usj/ImmutableVerseNode";
+import { $isImmutableVerseNode, ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
@@ -15,11 +12,11 @@ import { useEffect } from "react";
 import {
   $isImmutableChapterNode,
   ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $isImpliedParaNode } from "shared/nodes/scripture/usj/ImpliedParaNode";
-import { $getNextNode, $getPreviousNode } from "shared/nodes/scripture/usj/node.utils";
-import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
+} from "shared/nodes/usj/ImmutableChapterNode";
+import { $isImpliedParaNode } from "shared/nodes/usj/ImpliedParaNode";
+import { $getNextNode, $getPreviousNode } from "shared/nodes/usj/node.utils";
+import { $isNoteNode, NoteNode } from "shared/nodes/usj/NoteNode";
+import { $isParaNode } from "shared/nodes/usj/ParaNode";
 
 /**
  * This plugin handles arrow key navigation in the editor, specifically for moving between chapter

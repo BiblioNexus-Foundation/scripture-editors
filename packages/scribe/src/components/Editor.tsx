@@ -1,3 +1,13 @@
+import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
+import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
+import useDeferredState from "../hooks/use-deferred-state.hook";
+import KeyboardShortcutPlugin from "../plugins/KeyboardShortcutPlugin";
+import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
+import UsjNodesMenuPlugin from "../plugins/UsjNodesMenuPlugin";
+import editorTheme from "../themes/editor-theme";
+import LoadingSpinner from "./LoadingSpinner";
+import { Toolbar } from "./Toolbar";
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -9,27 +19,15 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { deepEqual } from "fast-equals";
 import { EditorState, LexicalEditor } from "lexical";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { blackListedChangeTags } from "shared/nodes/scripture/usj/node-constants";
-import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { usjReactNodes } from "shared-react/nodes/usj";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import ContextMenuPlugin from "shared-react/plugins/ContextMenuPlugin";
 import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import { getViewClassList, ViewOptions } from "shared-react/views/view-options.utils";
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
-import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
-import useDeferredState from "../hooks/use-deferred-state.hook";
-import KeyboardShortcutPlugin from "../plugins/KeyboardShortcutPlugin";
-import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
-import UsjNodesMenuPlugin from "../plugins/UsjNodesMenuPlugin";
-import editorTheme from "../themes/editor-theme";
-import LoadingSpinner from "./LoadingSpinner";
-import { Toolbar } from "./Toolbar";
+import { blackListedChangeTags } from "shared/nodes/usj/node-constants";
+import { ScriptureReference } from "shared/utils/get-marker-action.model";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -83,7 +81,7 @@ const Editor = forwardRef(function Editor(
     onError(error: Error) {
       throw error;
     },
-    nodes: [ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+    nodes: usjReactNodes,
   };
 
   useImperativeHandle(ref, () => ({

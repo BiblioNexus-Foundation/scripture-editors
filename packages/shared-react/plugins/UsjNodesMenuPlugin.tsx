@@ -12,21 +12,21 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { useEffect, useMemo, useState } from "react";
-import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/scripture/usj/node-constants";
+import { EXTERNAL_USJ_MUTATION_TAG } from "shared/nodes/usj/node-constants";
 import {
   $findThisChapter,
   $getCommonAncestorCompatible,
   getNextVerse,
-} from "shared/nodes/scripture/usj/node.utils";
-import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+} from "shared/nodes/usj/node.utils";
+import { VerseNode } from "shared/nodes/usj/VerseNode";
 import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
-import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
+import { ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
 import {
   $isReactNodeWithMarker,
   $isSomeVerseNode,
   SomeVerseNode,
   wasNodeCreated,
-} from "../nodes/scripture/usj/node-react.utils";
+} from "../nodes/usj/node-react.utils";
 import UsfmNodesMenuPlugin from "./UsfmNodesMenuPlugin";
 
 type NodeKeysByChapter = { [chapter: string]: NodeKey[] };

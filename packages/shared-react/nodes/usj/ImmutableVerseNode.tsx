@@ -14,12 +14,8 @@ import {
   isHTMLElement,
 } from "lexical";
 import { JSX } from "react";
-import {
-  UnknownAttributes,
-  VERSE_CLASS_NAME,
-  ZWSP,
-} from "shared/nodes/scripture/usj/node-constants";
-import { getVisibleOpenMarkerText } from "shared/nodes/scripture/usj/node.utils";
+import { UnknownAttributes, VERSE_CLASS_NAME, ZWSP } from "shared/nodes/usj/node-constants";
+import { getVisibleOpenMarkerText } from "shared/nodes/usj/node.utils";
 
 export const VERSE_MARKER = "v";
 export const IMMUTABLE_VERSE_VERSION = 1;

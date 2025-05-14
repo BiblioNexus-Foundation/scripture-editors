@@ -1,3 +1,6 @@
+import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
+import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
+import editorTheme from "../themes/editor-theme";
 import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -8,15 +11,12 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { EditorState } from "lexical";
 import { useCallback, useEffect } from "react";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { ImmutableNoteCallerNode } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import { LoadStatePlugin } from "shared-react/plugins/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/NoteNodePlugin";
 import { ViewOptions } from "shared-react/views/view-options.utils";
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import usjNoteEditorAdapter from "../adaptors/note-usj-editor.adaptor";
-import editorTheme from "../themes/editor-theme";
+import { usjBaseNodes } from "shared/nodes/usj";
 
 type NoteEditorProps = {
   /** Scripture data in USJ form */
@@ -42,7 +42,7 @@ export const NoteEditor = ({
     onError(error: Error) {
       throw error;
     },
-    nodes: [ImmutableNoteCallerNode, ...scriptureUsjNodes],
+    nodes: [ImmutableNoteCallerNode, ...usjBaseNodes],
   };
 
   const handleChange = useCallback(

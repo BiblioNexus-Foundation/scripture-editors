@@ -12,7 +12,7 @@ import {
   SerializedTextNode,
   TextNode,
 } from "lexical";
-import { $isUnknownNode, UnknownNode } from "../../features/UnknownNode";
+import { $isUnknownNode, UnknownNode } from "../features/UnknownNode";
 import { $isBookNode, BookNode } from "./BookNode";
 import {
   $isChapterNode,

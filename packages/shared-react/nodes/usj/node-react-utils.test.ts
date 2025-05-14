@@ -1,20 +1,20 @@
-import { $createTextNode, $getNodeByKey, $getRoot, NodeKey } from "lexical";
-import { $createTypedMarkNode, TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { $createBookNode } from "shared/nodes/scripture/usj/BookNode";
+import { ImmutableVerseNode, $createImmutableVerseNode } from "./ImmutableVerseNode";
 import {
-  $createImmutableChapterNode,
-  ImmutableChapterNode,
-} from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $createParaNode, ParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $createVerseNode } from "shared/nodes/scripture/usj/VerseNode";
-import { createBasicTestEnvironment } from "shared/nodes/test.utils";
-import {
+  $findVerseInNode,
+  $findVerseOrPara,
   $findLastVerse,
   $findThisVerse,
-  $findVerseOrPara,
-  $findVerseInNode,
 } from "./node-react.utils";
-import { $createImmutableVerseNode, ImmutableVerseNode } from "./ImmutableVerseNode";
+import { $createTextNode, $getNodeByKey, $getRoot, NodeKey } from "lexical";
+import { TypedMarkNode, $createTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { $createBookNode } from "shared/nodes/usj/BookNode";
+import {
+  ImmutableChapterNode,
+  $createImmutableChapterNode,
+} from "shared/nodes/usj/ImmutableChapterNode";
+import { $createParaNode, ParaNode } from "shared/nodes/usj/ParaNode";
+import { createBasicTestEnvironment } from "shared/nodes/usj/test.utils";
+import { $createVerseNode } from "shared/nodes/usj/VerseNode";
 
 describe("Editor Node Utilities", () => {
   describe("$findVerseInNode()", () => {

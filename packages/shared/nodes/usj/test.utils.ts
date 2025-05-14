@@ -1,3 +1,4 @@
+import { usjBaseNodes } from ".";
 import { act } from "@testing-library/react";
 import {
   $createPoint,
@@ -17,7 +18,6 @@ import {
   LexicalNodeReplacement,
   createEditor,
 } from "lexical";
-import scriptureUsjNodes from "./scripture/usj";
 
 export type TestEnv = {
   editor: LexicalEditor;
@@ -32,7 +32,7 @@ export type TestEnv = {
  * @returns a test environment.
  */
 export function createBasicTestEnvironment(
-  nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> = scriptureUsjNodes,
+  nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> = usjBaseNodes,
   $initialEditorState?: () => void,
 ): TestEnv {
   const container = document.createElement("div");

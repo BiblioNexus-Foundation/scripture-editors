@@ -1,5 +1,6 @@
 /** Marker node used when displaying USFM */
 
+import { closingMarkerText, openingMarkerText } from "../usj/node.utils";
 import {
   $applyNodeReplacement,
   EditorConfig,
@@ -10,7 +11,6 @@ import {
   Spread,
   TextNode,
 } from "lexical";
-import { closingMarkerText, openingMarkerText } from "../scripture/usj/node.utils";
 
 export const MARKER_VERSION = 1;
 

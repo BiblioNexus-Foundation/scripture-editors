@@ -8,7 +8,7 @@ import {
   LexicalEditor,
 } from "lexical";
 import { useEffect } from "react";
-import { getNodeElementTagName } from "shared/nodes/scripture/usj/node.utils";
+import { getNodeElementTagName } from "shared/nodes/usj/node.utils";
 import { TextDirection } from "./text-direction.model";
 
 export default function TextDirectionPlugin({

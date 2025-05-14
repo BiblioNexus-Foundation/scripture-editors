@@ -5,16 +5,16 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { TreeView } from "@lexical/react/LexicalTreeView";
 import { LexicalNode } from "lexical";
-import { $isImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { $isImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
+import { $isImmutableNoteCallerNode } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
+import { $isImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerseNode";
 import { $isTypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { $isBookNode } from "shared/nodes/scripture/usj/BookNode";
-import { $isChapterNode } from "shared/nodes/scripture/usj/ChapterNode";
-import { $isCharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isImmutableChapterNode } from "shared/nodes/scripture/usj/ImmutableChapterNode";
-import { $isNoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { $isParaNode } from "shared/nodes/scripture/usj/ParaNode";
-import { $isVerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { $isBookNode } from "shared/nodes/usj/BookNode";
+import { $isChapterNode } from "shared/nodes/usj/ChapterNode";
+import { $isCharNode } from "shared/nodes/usj/CharNode";
+import { $isImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
+import { $isNoteNode } from "shared/nodes/usj/NoteNode";
+import { $isParaNode } from "shared/nodes/usj/ParaNode";
+import { $isVerseNode } from "shared/nodes/usj/VerseNode";
 
 function $customPrintNode(node: LexicalNode) {
   if ($isBookNode(node)) return `${node.__code}`;

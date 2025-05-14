@@ -11,7 +11,7 @@ import {
   TypedMarkNode,
   TypedIDs,
 } from "shared/nodes/features/TypedMarkNode";
-import { ANNOTATION_CHANGE_TAG } from "shared/nodes/scripture/usj/node-constants";
+import { ANNOTATION_CHANGE_TAG } from "shared/nodes/usj/node-constants";
 import { AnnotationRange } from "./selection.model";
 import { $getRangeFromSelection } from "./selection.utils";
 

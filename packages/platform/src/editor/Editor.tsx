@@ -33,9 +33,8 @@ import {
   $getRangeFromEditor,
   $getRangeFromSelection,
 } from "shared-react/annotation/selection.utils";
-import { ImmutableNoteCallerNode } from "shared-react/nodes/scripture/usj/ImmutableNoteCallerNode";
-import { ImmutableVerseNode } from "shared-react/nodes/scripture/usj/ImmutableVerseNode";
-import { UsjNodeOptions } from "shared-react/nodes/scripture/usj/usj-node-options.model";
+import { usjReactNodes } from "shared-react/nodes/usj";
+import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import { ArrowNavigationPlugin } from "shared-react/plugins/ArrowNavigationPlugin";
 import ClipboardPlugin from "shared-react/plugins/ClipboardPlugin";
 import CommandMenuPlugin from "shared-react/plugins/CommandMenuPlugin";
@@ -51,11 +50,7 @@ import UsjNodesMenuPlugin from "shared-react/plugins/UsjNodesMenuPlugin";
 import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import scriptureUsjNodes from "shared/nodes/scripture/usj";
-import {
-  blackListedChangeTags,
-  SELECTION_CHANGE_TAG,
-} from "shared/nodes/scripture/usj/node-constants";
+import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/usj/node-constants";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
@@ -125,7 +120,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   onError(error) {
     throw error;
   },
-  nodes: [TypedMarkNode, ImmutableNoteCallerNode, ImmutableVerseNode, ...scriptureUsjNodes],
+  nodes: [TypedMarkNode, ...usjReactNodes],
 };
 
 const defaultViewOptions = getViewOptions();

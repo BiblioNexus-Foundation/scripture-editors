@@ -1,18 +1,18 @@
-import { ImmutableVerseNode } from "../nodes/scripture/usj/ImmutableVerseNode";
+import { ImmutableVerseNode } from "../nodes/usj/ImmutableVerseNode";
 import {
   $addTrailingSpace,
   $isSomeVerseNode,
   SomeVerseNode,
   wasNodeCreated,
-} from "../nodes/scripture/usj/node-react.utils";
+} from "../nodes/usj/node-react.utils";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import { $createTextNode, $isTextNode, LexicalEditor, TextNode } from "lexical";
 import { useEffect } from "react";
 import { $isUnknownNode } from "shared/nodes/features/UnknownNode";
-import { $isCharNode, CharNode } from "shared/nodes/scripture/usj/CharNode";
-import { $isNoteNode, NoteNode } from "shared/nodes/scripture/usj/NoteNode";
-import { VerseNode } from "shared/nodes/scripture/usj/VerseNode";
+import { $isCharNode, CharNode } from "shared/nodes/usj/CharNode";
+import { $isNoteNode, NoteNode } from "shared/nodes/usj/NoteNode";
+import { VerseNode } from "shared/nodes/usj/VerseNode";
 
 /** This plugin ensures that there is a space following a text node including before verse nodes. */
 export function TextSpacingPlugin() {

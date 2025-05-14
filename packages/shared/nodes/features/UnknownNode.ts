@@ -1,3 +1,4 @@
+import { UnknownAttributes } from "../usj/node-constants";
 import {
   $applyNodeReplacement,
   DOMExportOutput,
@@ -8,7 +9,6 @@ import {
   SerializedLexicalNode,
   Spread,
 } from "lexical";
-import { UnknownAttributes } from "../scripture/usj/node-constants";
 
 export type SerializedUnknownNode = Spread<
   {
