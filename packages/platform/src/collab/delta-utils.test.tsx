@@ -6,15 +6,21 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
-import { $createTextNode, $getRoot, LexicalEditor } from "lexical";
+import { $createTextNode, $getRoot, $isTextNode, LexicalEditor } from "lexical";
 import { Op } from "quill-delta";
 import { usjReactNodes } from "shared-react/nodes/usj";
 import { $createImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerseNode";
+import { $isSomeVerseNode } from "shared-react/nodes/usj/node-react.utils";
+import { getViewOptions, ViewOptions } from "shared-react/views/view-options.utils";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
+import { $isCharNode } from "shared/nodes/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
 import { $createImpliedParaNode } from "shared/nodes/usj/ImpliedParaNode";
+import { $isMilestoneNode } from "shared/nodes/usj/MilestoneNode";
 import { $isSomeChapterNode } from "shared/nodes/usj/node.utils";
-import { $createParaNode } from "shared/nodes/usj/ParaNode";
+import { $createParaNode, $isParaNode } from "shared/nodes/usj/ParaNode";
+
+const defaultViewOptions = getViewOptions() as ViewOptions;
 
 describe("Delta Utils $applyUpdate", () => {
   let consoleDebugSpy: jest.SpyInstance;
@@ -201,7 +207,7 @@ describe("Delta Utils $applyUpdate", () => {
       });
     });
 
-    it("should correctly log an insert operation with an object (embed)", async () => {
+    it("should insert a chapter embed", async () => {
       const { editor } = await testEnvironment();
       const embedChapter = { chapter: { number: "1", style: "c" } };
       const ops: Op[] = [{ insert: embedChapter }];
@@ -210,9 +216,118 @@ describe("Delta Utils $applyUpdate", () => {
 
       editor.getEditorState().read(() => {
         const c1 = $getRoot().getFirstChild();
-        if (!$isSomeChapterNode(c1)) throw new Error("v1 is not a chapter node");
+        if (!$isSomeChapterNode(c1)) throw new Error("c1 is not a chapter node");
         expect(c1.getNumber()).toBe("1");
         expect(c1.getMarker()).toBe("c");
+      });
+    });
+
+    it("should insert a verse embed inside text", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("Hello World")));
+      });
+      const embedVerse = { verse: { number: "1", style: "v" } };
+      const ops: Op[] = [{ retain: 7 }, { insert: embedVerse }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a para node");
+        expect(p.getChildrenSize()).toBe(3);
+        const t1 = p.getFirstChild();
+        if (!$isTextNode(t1)) throw new Error("t1 is not a text node");
+        expect(t1.getTextContent()).toBe("Hello ");
+        const v1 = p.getChildAtIndex(1);
+        if (!$isSomeVerseNode(v1)) throw new Error("v1 is not a verse node");
+        expect(v1.getNumber()).toBe("1");
+        expect(v1.getMarker()).toBe("v");
+        const t2 = p.getChildAtIndex(2);
+        if (!$isTextNode(t2)) throw new Error("t2 is not a text node");
+        expect(t2.getTextContent()).toBe("World");
+      });
+    });
+
+    it("should insert milestone embeds in empty para", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode());
+      });
+      const embedStartMS = { ms: { style: "qt-s", status: "start", who: "Jesus" } };
+      const ops: Op[] = [{ retain: 1 }, { insert: embedStartMS }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a para node");
+        expect(p.getChildrenSize()).toBe(1);
+        const startMilestone = p.getFirstChild();
+        if (!$isMilestoneNode(startMilestone))
+          throw new Error("startMilestone is not a milestone node");
+        expect(startMilestone.getMarker()).toBe("qt-s");
+        expect(startMilestone.getUnknownAttributes()).toEqual({ status: "start", who: "Jesus" });
+      });
+    });
+
+    it("should insert milestone embeds before and in text", async () => {
+      const text = "“So you say,” answered Jesus.";
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode(text)));
+      });
+      const embedStartMS = { ms: { style: "qt-s", status: "start", who: "Jesus" } };
+      const embedEndMS = { ms: { style: "qt-e", status: "end" } };
+      const ops: Op[] = [
+        { retain: 1 },
+        { insert: embedStartMS },
+        { retain: 13 },
+        { insert: embedEndMS },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a para node");
+        expect(p.getTextContent()).toBe(text);
+        expect(p.getChildrenSize()).toBe(4);
+        const msStart = p.getFirstChild();
+        if (!$isMilestoneNode(msStart)) throw new Error("msStart is not a milestone node");
+        expect(msStart.getMarker()).toBe(embedStartMS.ms.style);
+        const t1 = p.getChildAtIndex(1);
+        if (!$isTextNode(t1)) throw new Error("t1 is not a text node");
+        expect(t1.getTextContent()).toBe("“So you say,”");
+        const msEnd = p.getChildAtIndex(2);
+        if (!$isMilestoneNode(msEnd)) throw new Error("msEnd is not a milestone node");
+        expect(msEnd.getMarker()).toBe(embedEndMS.ms.style);
+        const t2 = p.getChildAtIndex(3);
+        if (!$isTextNode(t2)) throw new Error("t2 is not a text node");
+        expect(t2.getTextContent()).toBe(" answered Jesus.");
+      });
+    });
+
+    xit("should insert a char embed", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode());
+      });
+      const wordsOfJesus = "It is finished.";
+      const embedChar = {
+        insert: wordsOfJesus,
+        attributes: {
+          segment: "verse_1_1",
+          char: { style: "wj", cid: "afd886c6-2397-4e4c-8a94-696bf9f2e545" },
+        },
+      };
+      const ops: Op[] = [{ insert: embedChar }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a para node");
+        const char = p.getFirstChild();
+        if (!$isCharNode(char)) throw new Error("char is not a char node");
+        expect(char.getMarker()).toBe("wj");
+        expect(char.getTextContent()).toBe(wordsOfJesus);
       });
     });
   });
@@ -258,11 +373,15 @@ async function testEnvironment($initialEditorState?: () => void) {
   return { editor: editor! };
 }
 
-/** SUT (Software Under test) to apply an OT update. */
-async function sutApplyUpdate(editor: LexicalEditor, ops: Op[]) {
+/** SUT (Software Under Test) to apply an OT update. */
+async function sutApplyUpdate(
+  editor: LexicalEditor,
+  ops: Op[],
+  viewOptions: ViewOptions = defaultViewOptions,
+) {
   await act(async () => {
     editor.update(() => {
-      $applyUpdate(ops, console);
+      $applyUpdate(ops, viewOptions, console);
     });
   });
 }

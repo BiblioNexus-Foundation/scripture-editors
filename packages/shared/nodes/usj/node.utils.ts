@@ -380,11 +380,15 @@ export function getNoteCallerPreviewText(childNodes: LexicalNode[]): string {
 /**
  * Remove all known properties of the `markerObject`.
  * @param markerObject - Scripture marker and its contents.
+ * @param markerObjectProps - List of known properties to remove. Defaults to `MARKER_OBJECT_PROPS`.
  * @returns all the unknown properties or `undefined` if all are known.
  */
-export function getUnknownAttributes(markerObject: MarkerObject): UnknownAttributes | undefined {
-  const attributes: Partial<MarkerObject> = { ...markerObject };
-  MARKER_OBJECT_PROPS.forEach((property) => delete attributes[property]);
+export function getUnknownAttributes<T extends object = MarkerObject>(
+  markerObject: T,
+  markerObjectProps: (keyof T)[] = MARKER_OBJECT_PROPS as (keyof T)[],
+): UnknownAttributes | undefined {
+  const attributes: Partial<T> = { ...markerObject };
+  markerObjectProps.forEach((property) => delete attributes[property]);
   return Object.keys(attributes).length === 0 ? undefined : (attributes as UnknownAttributes);
 }
 

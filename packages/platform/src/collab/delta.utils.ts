@@ -1,21 +1,40 @@
+import {
+  OTEmbedChapter,
+  OTEmbedVerse,
+  OTEmbedMilestone,
+  OT_CHAPTER_PROPS,
+  OT_VERSE_PROPS,
+  OT_MILESTONE_PROPS,
+} from "./rich-text-ot.model";
 import { $getRoot, $createTextNode, $isElementNode, $isTextNode, LexicalNode } from "lexical";
 import { Op } from "quill-delta";
 import { $createImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerseNode";
 import { $isSomeVerseNode } from "shared-react/nodes/usj/node-react.utils";
+import { ViewOptions } from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { $isUnknownNode } from "shared/nodes/features/UnknownNode";
+import { $createChapterNode } from "shared/nodes/usj/ChapterNode";
 import { $isCharNode } from "shared/nodes/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
-import { $isSomeChapterNode } from "shared/nodes/usj/node.utils";
+import { $createMilestoneNode, $isMilestoneNode } from "shared/nodes/usj/MilestoneNode";
+import {
+  $isSomeChapterNode,
+  getUnknownAttributes,
+  getVisibleOpenMarkerText,
+} from "shared/nodes/usj/node.utils";
 import { $isNoteNode } from "shared/nodes/usj/NoteNode";
 import { $createParaNode, $isParaNode } from "shared/nodes/usj/ParaNode";
+import { $createVerseNode } from "shared/nodes/usj/VerseNode";
 
 /**
- * Apply Operational Transform updates to the editor.
+ * Apply Operational Transform rich-text updates to the editor.
  * @param ops - Operations array.
+ * @param viewOptions - View options of the editor.
  * @param logger - Logger to use, if any.
+ *
+ * @see https://github.com/ottypes/rich-text
  */
-export function $applyUpdate(ops: Op[], logger?: LoggerBasic) {
+export function $applyUpdate(ops: Op[], viewOptions: ViewOptions, logger?: LoggerBasic) {
   /** Tracks the current position in the OT document */
   let currentIndex = 0;
   ops.forEach((op) => {
@@ -39,12 +58,11 @@ export function $applyUpdate(ops: Op[], logger?: LoggerBasic) {
     } else if ("insert" in op) {
       if (typeof op.insert === "string") {
         logger?.debug(`Insert: '${op.insert}'`);
-        $insertStringAtCurrentIndex(currentIndex, op.insert, logger);
+        $insertTextAtCurrentIndex(currentIndex, op.insert, logger);
         currentIndex += op.insert.length;
-      } else if (typeof op.insert === "object" && op.insert != null) {
+      } else if (typeof op.insert === "object" && op.insert !== null) {
         logger?.debug(`Insert embed: ${JSON.stringify(op.insert)}`);
-        const wasEmbedInserted = $insertEmbedAtCurrentIndex(currentIndex, op.insert, logger);
-        if (wasEmbedInserted) {
+        if ($insertEmbedAtCurrentIndex(currentIndex, op.insert, viewOptions, logger)) {
           currentIndex += 1;
         } else {
           // If embed insertion fails, currentIndex is not advanced to prevent desync.
@@ -93,7 +111,11 @@ function $deleteTextAtCurrentIndex(targetIndex: number, count: number, logger?: 
         }
       }
       charWalkerOffset += textLength;
-    } else if ($isSomeChapterNode(currentNode) || $isSomeVerseNode(currentNode)) {
+    } else if (
+      $isSomeChapterNode(currentNode) ||
+      $isSomeVerseNode(currentNode) ||
+      $isMilestoneNode(currentNode)
+    ) {
       charWalkerOffset += 1;
     } else if ($isElementNode(currentNode)) {
       let elementEmbedLength = 0;
@@ -139,7 +161,7 @@ function $deleteTextAtCurrentIndex(targetIndex: number, count: number, logger?: 
   }
 }
 
-function $insertStringAtCurrentIndex(
+function $insertTextAtCurrentIndex(
   targetIndex: number,
   textToInsert: string,
   logger?: LoggerBasic,
@@ -173,9 +195,11 @@ function $insertStringAtCurrentIndex(
         return true;
       }
       charWalkerOffset += textLength;
-    } else if ($isSomeChapterNode(currentNode) || $isSomeVerseNode(currentNode)) {
-      // These nodes contribute to length. Insertion typically happens in adjacent TextNodes
-      // or by creating new TextNodes, handled by traversal logic.
+    } else if (
+      $isSomeChapterNode(currentNode) ||
+      $isSomeVerseNode(currentNode) ||
+      $isMilestoneNode(currentNode)
+    ) {
       charWalkerOffset += 1;
     } else if ($isElementNode(currentNode)) {
       let elementEmbedLength = 0;
@@ -271,37 +295,31 @@ function $insertStringAtCurrentIndex(
 
 /**
  * Inserts an embed (LexicalNode) at a given flat index in the document.
- * @param targetIndex - The 0-based index in the document's flat representation where the embed
+ * @param targetIndex - The index in the document's flat representation where the embed
  *   should be inserted.
  * @param embedObject - The object defining the embed, e.g., `{ chapter: { ... } }`.
+ * @param viewOptions - View options of the editor.
  * @param logger - Logger to use, if any.
  * @returns `true` if the embed was successfully inserted, `false` otherwise.
  */
 function $insertEmbedAtCurrentIndex(
   targetIndex: number,
   embedObject: object,
+  viewOptions: ViewOptions,
   logger?: LoggerBasic,
 ): boolean {
   let newNodeToInsert: LexicalNode | undefined;
 
   // Determine the LexicalNode to create based on the embedObject structure
-  if (
-    "chapter" in embedObject &&
-    typeof embedObject.chapter === "object" &&
-    embedObject.chapter != null
-  ) {
-    const chapterData = embedObject.chapter as { number: string; style: string };
-    newNodeToInsert = $createImmutableChapterNode(chapterData.number);
-  } else if (
-    "verse" in embedObject &&
-    typeof embedObject.verse === "object" &&
-    embedObject.verse != null
-  ) {
-    const verseData = embedObject.verse as { number: string; style: string };
-    newNodeToInsert = $createImmutableVerseNode(verseData.number);
+  if (isEmbedOfType("chapter", embedObject)) {
+    newNodeToInsert = $insertChapter(embedObject.chapter as OTEmbedChapter, viewOptions);
+  } else if (isEmbedOfType("verse", embedObject)) {
+    newNodeToInsert = $insertVerse(embedObject.verse as OTEmbedVerse, viewOptions);
+  } else if (isEmbedOfType("ms", embedObject)) {
+    newNodeToInsert = $insertMilestone(embedObject.ms as OTEmbedMilestone);
   }
-  // TODO: Add other embed types here as needed (e.g., Note, Milestone, Char)
-  // else if ('note' in embedObject && ...) { newNodeToInsert = $createNoteNode(...); }
+  // TODO: Add other embed types here as needed (e.g., BookNode, CharNode, NoteNode, ParaNode, ImmutableUnmatchedNode)
+  // else if ('char' in embedObject && ...) { newNodeToInsert = $createCharNode(...); }
 
   if (!newNodeToInsert) {
     logger?.error(`Cannot create LexicalNode for embed object: ${JSON.stringify(embedObject)}`);
@@ -313,11 +331,10 @@ function $insertEmbedAtCurrentIndex(
   let wasInserted = false;
 
   // Recursive function to traverse the document and find the insertion point.
-  function $traverseAndInsert(parentElement: LexicalNode): boolean {
+  function $traverseAndInsertRecursive(parentElement: LexicalNode): boolean {
     if (wasInserted) return true;
 
     // Handle insertion at the beginning of the document or into an empty root.
-    // As per test expectations, embeds like chapters are wrapped in a ParaNode.
     if (parentElement === root && targetIndex === 0 && newNodeToInsert) {
       const firstChild = root.getFirstChild();
       if (!firstChild) {
@@ -340,7 +357,7 @@ function $insertEmbedAtCurrentIndex(
 
     const children = parentElement.getChildren();
     for (const child of children) {
-      // If targetIndex matches currentOffset, insert newNodeToInsert *before* the current child.
+      // Case 1: Insert *before* the current child
       if (targetIndex === currentOffset && newNodeToInsert) {
         child.insertBefore(newNodeToInsert);
         logger?.debug(
@@ -350,31 +367,52 @@ function $insertEmbedAtCurrentIndex(
         return true;
       }
 
-      // Advance currentOffset based on the type of the child node.
+      // Case 2: Process current `child`
       if ($isTextNode(child)) {
-        currentOffset += child.getTextContentSize();
-      } else if (
-        $isSomeChapterNode(child) ||
-        $isSomeVerseNode(child) ||
-        $isParaNode(child) ||
-        $isCharNode(child) ||
-        $isNoteNode(child) ||
-        $isUnknownNode(child)
-        // TODO: Add other nodes that have a Delta length of 1.
-      ) {
+        const textLength = child.getTextContentSize();
+        // Case 2a: Insert *within* this TextNode
+        if (
+          newNodeToInsert &&
+          targetIndex > currentOffset &&
+          targetIndex < currentOffset + textLength
+        ) {
+          const splitOffset = targetIndex - currentOffset;
+          const splitNodes = child.splitText(splitOffset);
+          splitNodes[0].insertAfter(newNodeToInsert);
+          logger?.debug(
+            `Inserted embed ${newNodeToInsert.getType()} by splitting TextNode at offset ${splitOffset}. targetIndex: ${targetIndex}, currentOffset at node start: ${currentOffset}`,
+          );
+          wasInserted = true;
+          return true;
+        }
+        // If not inserted within, advance offset by full length of text node
+        currentOffset += textLength;
+      } else if ($isSomeChapterNode(child) || $isSomeVerseNode(child) || $isMilestoneNode(child)) {
         currentOffset += 1;
+      } else if ($isElementNode(child)) {
+        let childOtLength = 0;
+        let isAtomicEmbed = false;
+
+        if ($isCharNode(child) || $isNoteNode(child) || $isUnknownNode(child)) {
+          childOtLength = 1;
+          isAtomicEmbed = true; // These are generally atomic and don't contain further indexed content for OT
+        } else if ($isParaNode(child)) {
+          childOtLength = 1; // ParaNode itself counts as 1 for its tag
+        }
+        // else: ImpliedParaNode, RootNode (parentElement) - their OT length is 0, content is traversed.
+
+        // Advance currentOffset by the OT length of the element itself
+        currentOffset += childOtLength;
+
+        // Recurse if it's not an atomic embed (i.e., it's a container like ParaNode or ImpliedParaNode)
+        if (!isAtomicEmbed) {
+          if ($traverseAndInsertRecursive(child)) return true;
+        }
       }
+      // Else: other node types (LineBreakNode, DecoratorNode) - assume 0 OT length for now.
+    } // End for loop over children
 
-      if ($isElementNode(child) && !$isSomeChapterNode(child) && !$isSomeVerseNode(child)) {
-        // For other ElementNodes (e.g., ImpliedParaNode), recurse. Their length is sum of children.
-        if ($traverseAndInsert(child)) return true;
-      }
-      // Other node types (e.g., LineBreakNode, DecoratorNodes) might need specific length handling if they contribute to OT index.
-
-      if (wasInserted) return true;
-    }
-
-    // After iterating all children, if targetIndex matches currentOffset,
+    // After iterating all children of parentElement, if targetIndex matches currentOffset,
     // it means the insertion point is at the end of parentElement's content.
     if (targetIndex === currentOffset && newNodeToInsert && $isElementNode(parentElement)) {
       if (parentElement === root) {
@@ -402,7 +440,7 @@ function $insertEmbedAtCurrentIndex(
     return wasInserted;
   }
 
-  $traverseAndInsert(root);
+  $traverseAndInsertRecursive(root);
 
   if (!wasInserted) {
     logger?.warn(
@@ -411,4 +449,75 @@ function $insertEmbedAtCurrentIndex(
     );
   }
   return wasInserted;
+}
+
+function $insertChapter(chapterData: OTEmbedChapter, viewOptions: ViewOptions) {
+  const { number, sid, altnumber, pubnumber } = chapterData;
+  const unknownAttributes = getUnknownAttributes(chapterData, OT_CHAPTER_PROPS);
+  let newNodeToInsert: LexicalNode;
+  if (viewOptions.markerMode === "editable") {
+    newNodeToInsert = $createChapterNode(number, sid, altnumber, pubnumber, unknownAttributes);
+  } else {
+    const showMarker = viewOptions.markerMode === "visible";
+    newNodeToInsert = $createImmutableChapterNode(
+      number,
+      showMarker,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    );
+  }
+  return newNodeToInsert;
+}
+
+function $insertVerse(verseData: OTEmbedVerse, viewOptions: ViewOptions) {
+  const { style, number, sid, altnumber, pubnumber } = verseData;
+  const unknownAttributes = getUnknownAttributes(verseData, OT_VERSE_PROPS);
+  let newNodeToInsert: LexicalNode;
+  if (viewOptions.markerMode === "editable") {
+    const text = getVisibleOpenMarkerText(style, number);
+    newNodeToInsert = $createVerseNode(number, text, sid, altnumber, pubnumber, unknownAttributes);
+  } else {
+    const showMarker = viewOptions.markerMode === "visible";
+    newNodeToInsert = $createImmutableVerseNode(
+      number,
+      showMarker,
+      sid,
+      altnumber,
+      pubnumber,
+      unknownAttributes,
+    );
+  }
+  return newNodeToInsert;
+}
+
+function $insertMilestone(msData: OTEmbedMilestone) {
+  const { style, sid, eid } = msData;
+  const unknownAttributes = getUnknownAttributes(msData, OT_MILESTONE_PROPS);
+  let newNodeToInsert: LexicalNode | undefined;
+  if (style) newNodeToInsert = $createMilestoneNode(style, sid, eid, unknownAttributes);
+  return newNodeToInsert;
+}
+
+/**
+ * Type guard to check if an object has a specific property that is a non-null object.
+ * @param embedObj The object to check.
+ * @param embedType The property key to check for.
+ * @returns `true` if `embedObj` has a property `embedType` and `embedObj[embedType]` is a non-null object, `false` otherwise.
+ * @template T The type of the object.
+ * @template K The type of the property key.
+ */
+function isEmbedOfType<T extends object, K extends PropertyKey>(
+  embedType: K,
+  embedObj: T,
+): embedObj is T & { [P in K]: object } {
+  if (!(embedType in embedObj)) {
+    return false;
+  }
+  // After the 'embedType in embedObj' check, TypeScript knows that 'embedObj' has the property 'embedType'.
+  // The type of 'embedObj' is narrowed to 'T & Record<K, unknown>'.
+  // So, we can safely access embedObj[embedType], and its type will be 'unknown'.
+  const value = (embedObj as T & Record<K, unknown>)[embedType];
+  return typeof value === "object" && value !== null;
 }

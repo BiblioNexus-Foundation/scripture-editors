@@ -55,7 +55,11 @@ import {
   $getRangeFromEditor,
   $getRangeFromSelection,
 } from "shared-react/plugins/usj/annotation/selection.utils";
-import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
+import {
+  getViewClassList,
+  getViewOptions,
+  ViewOptions,
+} from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import {
@@ -137,7 +141,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   nodes: [TypedMarkNode, ...usjReactNodes],
 };
 
-const defaultViewOptions = getViewOptions();
+const defaultViewOptions = getViewOptions() as ViewOptions;
 const defaultNodeOptions: UsjNodeOptions = {};
 const defaultOptions: EditorOptions = {};
 
@@ -206,7 +210,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       }
     },
     applyUpdate(ops) {
-      editorRef.current?.update(() => $applyUpdate(ops, logger), { tag: DELTA_CHANGE_TAG });
+      editorRef.current?.update(() => $applyUpdate(ops, viewOptions, logger), {
+        tag: DELTA_CHANGE_TAG,
+      });
     },
     getSelection() {
       return editorRef.current?.read($getRangeFromEditor);
