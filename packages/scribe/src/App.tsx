@@ -7,7 +7,7 @@ import { getViewOptions, getDefaultViewMode } from "shared-react/views/view-opti
 import { SelectionRange } from "shared-react/plugins/usj/annotation/selection.model";
 // import { Usj2Usfm } from "@/hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";
-import "@/styles/App.css";
+import "@/styles/index.css";
 import Editor, { EditorRef } from "@/editor/Editor";
 import { useUsfm2Usj } from "@/hooks/useUsfm2Usj";
 

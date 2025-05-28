@@ -1,0 +1,231 @@
+/* Editor Core Styles */
+.editor-input > p {
+  direction: inherit;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.editor-input {
+  min-height: 200px;
+  counter-reset: caller;
+}
+
+.editor-input.reset-counters {
+  counter-reset: none;
+}
+
+/* Note Caller Styles */
+.immutable-note-caller > button,
+.caller_preview,
+.previewcallee {
+  color: rgba(18, 82, 179, 1);
+  font-weight: bold;
+  line-height: 1;
+  vertical-align: super;
+  font-size: 0.66em;
+}
+
+.immutable-note-caller > button {
+  cursor: pointer;
+  text-decoration: none;
+  border: 0;
+  padding: 0;
+  background-color: inherit;
+}
+
+@counter-style note-callers {
+  system: alphabetic;
+  symbols: "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v"
+    "w" "x" "y" "z";
+}
+
+.immutable-note-caller[data-caller="+"] {
+  counter-increment: caller;
+}
+
+.immutable-note-caller[data-caller="+"] > button::before {
+  content: counter(caller, note-callers);
+}
+
+.formatted-font.text-spacing .immutable-note-caller[data-caller="-"] {
+  display: none;
+}
+
+.formatted-font .immutable-note-caller {
+  font-size: 0.75rem;
+  color: #3b82f6;
+}
+
+.caller_big {
+  unicode-bidi: normal;
+  color: rgba(18, 82, 179, 1);
+  font-weight: bold;
+  text-indent: 0pt;
+  vertical-align: text-top;
+  font-size: 0.66em;
+}
+
+.caller_small {
+  unicode-bidi: normal;
+  color: rgba(18, 82, 179, 1);
+  font-family: "Times New Roman", serif;
+  vertical-align: text-top;
+  text-indent: 0pt;
+  font-size: 0.66em;
+}
+
+.caller_highlight {
+  background-color: #ffffb5;
+  border-top: solid 1px #0000ff;
+  border-bottom: solid 1px #0000ff;
+}
+
+.opennote {
+  color: #7777ff;
+}
+
+/* Annotation Cursor Styles */
+.annot_greencursor {
+  background-color: rgba(152, 235, 157, 1);
+}
+
+.annot_goldcursor {
+  background-color: rgba(255, 255, 163, 1);
+}
+
+.annot_bluecursor {
+  background-color: rgba(204, 224, 255, 1);
+}
+
+.annot_greycursor {
+  background-color: rgba(222, 222, 222, 1);
+}
+
+.annot_violetcursor {
+  background-color: rgba(233, 212, 255, 1);
+}
+
+/* Spelling and Grammar Annotations */
+.annot_spellingerror {
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  padding-bottom: 0px;
+  vertical-align: text-top;
+}
+
+.annot_spellingunknown {
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  padding-bottom: 0px;
+  vertical-align: text-top;
+}
+
+/* Comment Annotations */
+.annot_comment_todo {
+  border-bottom: 1px dashed #888888;
+}
+
+.annot_comment_done {
+  border-bottom: 1px dashed #888888;
+}
+
+/* Term Highlighting */
+.found_term {
+  background-color: rgba(222, 222, 222, 1);
+  text-indent: 0;
+  margin-left: 0;
+  display: inline-block;
+  border-bottom-style: solid;
+  border-bottom-width: medium medium thick medium;
+  border-bottom-color: rgba(252, 252, 252, 1);
+  text-decoration: inherit;
+}
+
+.guessed_term {
+  background-color: rgba(255, 191, 143, 1);
+  text-indent: 0;
+  margin-left: 0;
+  display: inline-block;
+  border-bottom-style: solid;
+  border-bottom-width: medium medium thick medium;
+  border-bottom-color: rgba(252, 252, 252, 1);
+  text-decoration: inherit;
+}
+
+.found_term.unselected_term {
+  background-color: rgba(222, 222, 222, 0.6);
+  text-indent: 0;
+  margin-left: 0;
+  display: inline-block;
+  border-bottom-style: solid;
+  border-bottom-width: medium medium thick medium;
+  border-bottom-color: rgba(252, 252, 252, 1);
+  text-decoration: inherit;
+}
+
+.guessed_term.unselected_term {
+  background-color: rgba(255, 191, 143, 0.3);
+  text-indent: 0;
+  margin-left: 0;
+  display: inline-block;
+  border-bottom-style: solid;
+  border-bottom-width: medium medium thick medium;
+  border-bottom-color: rgba(252, 252, 252, 1);
+  text-decoration: inherit;
+}
+
+.selected_term {
+  border-style: none none solid none;
+  text-indent: 0;
+  margin-left: 0;
+  display: inline-block;
+  border-bottom-style: solid;
+  border-bottom-width: medium medium thick medium;
+  border-bottom-color: rgba(252, 252, 252, 1);
+  text-decoration: inherit;
+}
+
+/* Reference Links */
+.annot_reference_link {
+  border-bottom: 1px solid #93c4ff;
+}
+
+.annot_invalid_reference {
+  border-bottom: 1px solid #ff8080;
+}
+
+.annot_checkError {
+  border-top: 1px solid #ff0000;
+  border-bottom: 1px solid #ff0000;
+  background-color: rgba(255, 204, 204, 0.5);
+}
+
+/* Status Indicators */
+.status_unknown {
+  color: rgba(204, 30, 20, 1);
+  font-weight: bold;
+}
+
+.status_invalid {
+  border-bottom: 1px solid rgba(204, 30, 20, 1);
+  color: rgba(204, 30, 20, 1);
+}
+
+/* Image States */
+span.unread img {
+  background-color: #ffff99;
+  position: relative;
+  bottom: -1px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #808080;
+}
+
+span.read img {
+  background-color: transparent;
+  position: relative;
+  bottom: 0px;
+  border-width: 0px;
+  border-style: none;
+}

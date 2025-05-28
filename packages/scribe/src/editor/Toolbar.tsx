@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { ViewOptions } from "shared-react/views/view-options.utils";
-import "./Toolbar.css";
+import "@/styles/editor/toolbar.css";
 import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
 import useModal from "@/hooks/useModal";
 import Button from "@/components/Button";

@@ -1,4 +1,4 @@
-import "./Input.css";
+import "@/styles/components/input.css";
 import { LexicalEditor } from "lexical";
 import React, { ReactNode, useEffect, useState } from "react";
 
