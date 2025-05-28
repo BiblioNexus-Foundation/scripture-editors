@@ -1,14 +1,3 @@
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
-import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
-import useDeferredState from "../hooks/use-deferred-state.hook";
-import KeyboardShortcutPlugin from "../plugins/KeyboardShortcutPlugin";
-import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
-import UsjNodesMenuPlugin from "../plugins/UsjNodesMenuPlugin";
-import editorTheme from "../themes/editor-theme";
-import LoadingSpinner from "./LoadingSpinner";
-import { Toolbar } from "./Toolbar";
-import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -16,6 +5,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { Usj } from "@biblionexus-foundation/scripture-utilities";
 import { deepEqual } from "fast-equals";
 import { EditorState, LexicalEditor } from "lexical";
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
@@ -25,16 +15,46 @@ import { ClipboardPlugin } from "shared-react/plugins/usj/ClipboardPlugin";
 import { ContextMenuPlugin } from "shared-react/plugins/usj/ContextMenuPlugin";
 import { LoadStatePlugin } from "shared-react/plugins/usj/LoadStatePlugin";
 import { NoteNodePlugin } from "shared-react/plugins/usj/NoteNodePlugin";
+import { ArrowNavigationPlugin } from "shared-react/plugins/usj/ArrowNavigationPlugin";
+import { CommandMenuPlugin } from "shared-react/plugins/usj/CommandMenuPlugin";
+import { OnSelectionChangePlugin } from "shared-react/plugins/usj/OnSelectionChangePlugin";
+import { ParaNodePlugin } from "shared-react/plugins/usj/ParaNodePlugin";
+import { TextDirectionPlugin } from "shared-react/plugins/usj/TextDirectionPlugin";
+import { TextSpacingPlugin } from "shared-react/plugins/usj/TextSpacingPlugin";
+import { SelectionRange } from "shared-react/plugins/usj/annotation/selection.model";
+import { $getRangeFromEditor } from "shared-react/plugins/usj/annotation/selection.utils";
 import { getViewClassList, ViewOptions } from "shared-react/views/view-options.utils";
 import { blackListedChangeTags } from "shared/nodes/usj/node-constants";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
+import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
+import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
+import useDeferredState from "@/hooks/use-deferred-state.hook";
+import KeyboardShortcutPlugin from "./plugins/KeyboardShortcutPlugin";
+import { ScriptureReferencePlugin } from "./plugins/ScriptureReferencePlugin";
+import UsjNodesMenuPlugin from "./plugins/UsjNodesMenuPlugin";
+import editorTheme from "./themes/editor-theme";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { Toolbar } from "./Toolbar";
 
 /** Forward reference for the editor. */
 export type EditorRef = {
   /** Method to focus the editor. */
   focus(): void;
+  /** Method to get the USJ Scripture data. */
+  getUsj(): Usj | undefined;
   /** Method to set the USJ Scripture data. */
   setUsj(usj: Usj): void;
+  /**
+   * Get the selection location or range.
+   * @returns the selection location or range, or `undefined` if there is no selection.
+   */
+  getSelection(): SelectionRange | undefined;
+  /**
+   * Set the selection location or range.
+   * @param selection - A selection location or range.
+   */
+  setSelection(selection: SelectionRange): void;
 };
 
 /** Options to configure the editor. */
@@ -57,15 +77,25 @@ type EditorProps = {
   /** Scripture data in USJ form */
   usjInput?: Usj;
   onChange?: (usj: Usj) => void;
+  /** Callback function when the cursor selection changes. */
+  onSelectionChange?: (selection: SelectionRange | undefined) => void;
   viewOptions?: ViewOptions;
   nodeOptions?: UsjNodeOptions;
   scrRef: ScriptureReference;
-  setScrRef: React.Dispatch<React.SetStateAction<ScriptureReference>>;
+  onScrRefChange: (scrRef: ScriptureReference) => void;
 };
 // const NODE_MENU_TRIGGER = "//";
 
 const Editor = forwardRef(function Editor(
-  { usjInput, onChange, viewOptions, nodeOptions = {}, scrRef, setScrRef }: EditorProps,
+  {
+    usjInput,
+    onChange,
+    onSelectionChange,
+    viewOptions,
+    nodeOptions = {},
+    scrRef,
+    onScrRefChange,
+  }: EditorProps,
   ref: React.ForwardedRef<EditorRef>,
 ): JSX.Element {
   const editorRef = useRef<LexicalEditor>(null);
@@ -96,6 +126,12 @@ const Editor = forwardRef(function Editor(
         editedUsjRef.current = editedUsj;
         setUsj(editedUsj);
       }
+    },
+    getSelection() {
+      return editorRef.current?.read(() => $getRangeFromEditor());
+    },
+    setSelection(_selection: SelectionRange) {
+      // Implementation needed - will be added later
     },
   }));
 
@@ -151,7 +187,13 @@ const Editor = forwardRef(function Editor(
       <ContextMenuPlugin />
       <KeyboardShortcutPlugin />
       <ClipboardPlugin />
-      <ScriptureReferencePlugin scrRef={scrRef} setScrRef={setScrRef} />
+      <ScriptureReferencePlugin scrRef={scrRef} onScrRefChange={onScrRefChange} />
+      <ArrowNavigationPlugin />
+      <CommandMenuPlugin />
+      <OnSelectionChangePlugin onChange={onSelectionChange} />
+      <ParaNodePlugin />
+      <TextDirectionPlugin textDirection="auto" />
+      <TextSpacingPlugin />
     </LexicalComposer>
   );
 });

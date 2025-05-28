@@ -13,6 +13,11 @@ export default defineConfig({
       aliasesExclude: ["@biblionexus-foundation/scripture-utilities"],
     }),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
   build: {
     sourcemap: true,
     lib: {

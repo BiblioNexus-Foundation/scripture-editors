@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useMenuActions } from "./useMenuActions";
+import { useMenuActions } from "@/components/NodesMenu/Menu/useMenuActions";
 import { COMMAND_PRIORITY_HIGH, KEY_DOWN_COMMAND } from "lexical";
 
 export const useLexicalMenuNavigation = () => {

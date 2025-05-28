@@ -1,7 +1,7 @@
 import { $getSelection, $isRangeSelection } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useCallback, useEffect, useState } from "react";
-import FloatingBoxAtCursor from "../FloatingBox/FloatingBoxAtCursor";
+import FloatingBoxAtCursor from "@/components/FloatingBox/FloatingBoxAtCursor";
 import { NodeSelectionMenu } from "./NodeSelectionMenu";
 import { OptionItem } from "./Menu";
 

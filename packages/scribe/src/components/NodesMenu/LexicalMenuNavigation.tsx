@@ -1,4 +1,4 @@
-import { useLexicalMenuNavigation } from "./Menu/useLexicalMenuNavigation";
+import { useLexicalMenuNavigation } from "@/hooks/useLexicalMenuNavigation";
 
 export default function LexicalMenuNavigation() {
   useLexicalMenuNavigation();

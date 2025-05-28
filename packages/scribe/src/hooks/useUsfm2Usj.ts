@@ -14,7 +14,7 @@ export const useUsfm2Usj = () => {
   };
 
   useEffect(() => {
-    import("../data/tit.usfm").then((data) => {
+    import("../editor/data/tit.usfm").then((data) => {
       setUsfm(data.default);
     });
   }, []);
