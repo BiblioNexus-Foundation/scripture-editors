@@ -26,15 +26,15 @@ import { $getRangeFromEditor } from "shared-react/plugins/usj/annotation/selecti
 import { getViewClassList, ViewOptions } from "shared-react/views/view-options.utils";
 import { blackListedChangeTags } from "shared/nodes/usj/node-constants";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
-import editorUsjAdaptor from "../adaptors/editor-usj.adaptor";
-import usjEditorAdaptor from "../adaptors/usj-editor.adaptor";
-import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
-import useDeferredState from "../hooks/use-deferred-state.hook";
-import KeyboardShortcutPlugin from "../plugins/KeyboardShortcutPlugin";
-import { ScriptureReferencePlugin } from "../plugins/ScriptureReferencePlugin";
-import UsjNodesMenuPlugin from "../plugins/UsjNodesMenuPlugin";
-import editorTheme from "../themes/editor-theme";
-import LoadingSpinner from "./LoadingSpinner";
+import editorUsjAdaptor from "./adaptors/editor-usj.adaptor";
+import usjEditorAdaptor from "./adaptors/usj-editor.adaptor";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
+import useDeferredState from "@/hooks/use-deferred-state.hook";
+import KeyboardShortcutPlugin from "./plugins/KeyboardShortcutPlugin";
+import { ScriptureReferencePlugin } from "./plugins/ScriptureReferencePlugin";
+import UsjNodesMenuPlugin from "./plugins/UsjNodesMenuPlugin";
+import editorTheme from "./themes/editor-theme";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Toolbar } from "./Toolbar";
 
 /** Forward reference for the editor. */
@@ -130,7 +130,7 @@ const Editor = forwardRef(function Editor(
     getSelection() {
       return editorRef.current?.read(() => $getRangeFromEditor());
     },
-    setSelection(selection: SelectionRange) {
+    setSelection(_selection: SelectionRange) {
       // Implementation needed - will be added later
     },
   }));
