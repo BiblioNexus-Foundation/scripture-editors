@@ -4,6 +4,7 @@ import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { getViewOptions, getDefaultViewMode } from "shared-react/views/view-options.utils";
+import { SelectionRange } from "shared-react/plugins/usj/annotation/selection.model";
 // import { Usj2Usfm } from "./hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";
 import Editor, { EditorRef } from "./components/Editor";
@@ -37,12 +38,19 @@ function App() {
 
   const [viewMode] = useState(getDefaultViewMode);
   const viewOptions = useMemo(() => getViewOptions(viewMode), [viewMode]);
+
   const onChange = async (usj: Usj) => {
     console.log(usj);
   };
+
+  const onSelectionChange = (selection: SelectionRange | undefined) => {
+    console.log("Selection changed:", selection);
+  };
+
   useEffect(() => {
     console.log({ scrRef });
   }, [scrRef]);
+
   return (
     <div className="flex-center m-2 flex h-editor justify-center p-8">
       <div className="relative w-2/3 overflow-hidden rounded-md border-2 border-secondary">
@@ -51,10 +59,11 @@ function App() {
             usjInput={defaultUsj}
             ref={editorRef}
             onChange={onChange}
+            onSelectionChange={onSelectionChange}
             viewOptions={viewOptions}
             nodeOptions={nodeOptions}
             scrRef={scrRef}
-            setScrRef={setScrRef}
+            onScrRefChange={setScrRef}
           />
         </div>
       </div>

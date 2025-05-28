@@ -479,6 +479,9 @@ function createUnknown(
   const tag = markerObject.type;
   const unknownAttributes = getUnknownAttributes(markerObject);
   const children: SerializedLexicalNode[] = [...childNodes];
+  children.forEach((node) => {
+    if (isSerializedTextNode(node)) node.mode = "token";
+  });
   return removeUndefinedProperties({
     type: UnknownNode.getType(),
     tag,
