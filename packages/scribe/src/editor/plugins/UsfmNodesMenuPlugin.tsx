@@ -1,6 +1,6 @@
 import { GetMarkerAction, ScriptureReference } from "shared/utils/get-marker-action.model";
-import useUsfmMakersForMenu from "./PerfNodesItems/useUsfmMarkersForMenu";
-import NodesMenu from "./NodesMenu";
+import useUsfmMakersForMenu from "@/hooks/useUsfmMarkersForMenu";
+import NodesMenu from "@/components/NodesMenu/NodesMenu";
 
 export default function UsfmNodesMenuPlugin({
   trigger,

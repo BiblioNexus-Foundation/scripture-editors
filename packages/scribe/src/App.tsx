@@ -5,10 +5,11 @@ import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import { immutableNoteCallerNodeName } from "shared-react/nodes/usj/ImmutableNoteCallerNode";
 import { getViewOptions, getDefaultViewMode } from "shared-react/views/view-options.utils";
 import { SelectionRange } from "shared-react/plugins/usj/annotation/selection.model";
-// import { Usj2Usfm } from "./hooks/usj2Usfm";
+// import { Usj2Usfm } from "@/hooks/usj2Usfm";
 import "shared/styles/nodes-menu.css";
-import Editor, { EditorRef } from "./components/Editor";
-import { useUsfm2Usj } from "./hooks/useUsfm2Usj";
+import "@/styles/App.css";
+import Editor, { EditorRef } from "@/editor/Editor";
+import { useUsfm2Usj } from "@/hooks/useUsfm2Usj";
 
 const defaultUsj: Usj = {
   type: USJ_TYPE,
