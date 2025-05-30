@@ -7,7 +7,7 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, act } from "@testing-library/react";
 import { $createTextNode, $getRoot, $isTextNode, LexicalEditor } from "lexical";
-import { Op } from "quill-delta";
+import Delta, { Op } from "quill-delta";
 import { usjReactNodes } from "shared-react/nodes/usj";
 import { $createImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerseNode";
 import { $isSomeVerseNode } from "shared-react/nodes/usj/node-react.utils";
@@ -580,6 +580,33 @@ describe("Delta Utils $applyUpdate", () => {
       });
     });
 
+    it("should insert a chapter embed after an existing ParaNode at the root level", async () => {
+      const initialText = "Some initial content in a para.";
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode(initialText)));
+      });
+      const embedChapter = { chapter: { number: "2", style: "c" } };
+      // Retain past the initial text in the para node (length + 1 for the para itself)
+      const ops: Op[] = [{ retain: 1 + initialText.length }, { insert: embedChapter }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        expect(root.getChildrenSize()).toBe(2); // ParaNode and ChapterNode
+
+        const firstChild = root.getFirstChild();
+        if (!$isParaNode(firstChild)) throw new Error("First child should be ParaNode");
+        expect(firstChild.getTextContent()).toBe(initialText);
+        expect(firstChild.getChildrenSize()).toBe(1); // Only the TextNode
+
+        const secondChild = root.getChildAtIndex(1);
+        if (!$isSomeChapterNode(secondChild)) throw new Error("Second child should be ChapterNode");
+        expect(secondChild.getNumber()).toBe("2");
+        expect(secondChild.getMarker()).toBe("c");
+      });
+    });
+
     it("should insert a verse embed at the end of a document with existing content", async () => {
       const initialText = "Initial text.";
       const { editor } = await testEnvironment(() => {
@@ -634,6 +661,66 @@ describe("Delta Utils $applyUpdate", () => {
         const t2 = p.getChildAtIndex(2);
         if (!$isTextNode(t2)) throw new Error("t2 is not a text node");
         expect(t2.getTextContent()).toBe("wept.");
+      });
+    });
+
+    it("should insert an embed when the targetIndex is out of bounds", async () => {
+      const initialText = "Short text."; // Length 11
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode(initialText)));
+      });
+      const embedVerse = { verse: { number: "10", style: "v" } };
+      // Retain past the end of the text and the para node itself.
+      // initialText.length (11) + 1 (for ParaNode) = 12. Retain 20.
+      const ops: Op[] = [{ retain: 20 }, { insert: embedVerse }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        expect(root.getChildrenSize()).toBe(1);
+        const paraNode = root.getFirstChild();
+        if (!$isParaNode(paraNode)) throw new Error("First child is not a ParaNode");
+        expect(paraNode.getChildrenSize()).toBe(2); // Initial TextNode + VerseNode
+
+        const verseNode = paraNode.getLastChild();
+        if (!$isSomeVerseNode(verseNode)) throw new Error("Last child of para is not a VerseNode");
+        expect(verseNode.getNumber()).toBe("10");
+        expect(verseNode.getMarker()).toBe("v");
+      });
+    });
+
+    it("should insert an embed between two existing embed nodes", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createParaNode().append($createImmutableVerseNode("1"), $createImmutableVerseNode("3")),
+        );
+      });
+      const embedVerseToInsert = { verse: { number: "2", style: "v" } };
+      // Retain past the ParaNode (1) and the first VerseNode (1)
+      const ops: Op[] = [{ retain: 1 + 1 }, { insert: embedVerseToInsert }];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        expect(root.getChildrenSize()).toBe(1); // Root should still have one ParaNode
+
+        const paraNode = root.getFirstChild();
+        if (!$isParaNode(paraNode)) throw new Error("First child is not a ParaNode");
+        expect(paraNode.getChildrenSize()).toBe(3); // Verse1, VerseToInsert, Verse3
+
+        const verse1 = paraNode.getChildAtIndex(0);
+        if (!$isSomeVerseNode(verse1)) throw new Error("Child 0 of para is not VerseNode");
+        expect(verse1.getNumber()).toBe("1");
+
+        const verse2 = paraNode.getChildAtIndex(1);
+        if (!$isSomeVerseNode(verse2)) throw new Error("Child 1 of para is not VerseNode");
+        expect(verse2.getNumber()).toBe("2");
+
+        const verse3 = paraNode.getChildAtIndex(2);
+        if (!$isSomeVerseNode(verse3)) throw new Error("Child 2 of para is not VerseNode");
+        expect(verse3.getNumber()).toBe("3");
       });
     });
 
@@ -773,6 +860,82 @@ describe("Delta Utils $applyUpdate", () => {
         const t2 = p.getChildAtIndex(3);
         if (!$isTextNode(t2)) throw new Error("t2 is not a text node");
         expect(t2.getTextContent()).toBe(" answered Jesus.");
+      });
+    });
+
+    xit("Delta playground of the following test", async () => {
+      const delta = new Delta()
+        .insert({ chapter: { number: "1", style: "c" } })
+        .insert({ para: { style: "p" } })
+        .insert({ chapter: { number: "2", style: "c" } })
+        .insert({ para: { style: "q1" } })
+        .insert({ ms: { style: "ts-s", sid: "TS1" } });
+
+      delta.eachLine((line, attributes, i) => console.debug(line, attributes, i));
+
+      expect(consoleDebugSpy).toHaveBeenCalledTimes(1);
+      expect(consoleDebugSpy).toHaveBeenNthCalledWith(
+        1,
+        {
+          ops: [
+            { insert: { chapter: { number: "1", style: "c" } } },
+            { insert: { para: { style: "p" } } },
+            { insert: { chapter: { number: "2", style: "c" } } },
+            { insert: { para: { style: "q1" } } },
+            { insert: { ms: { style: "ts-s", sid: "TS1" } } },
+          ],
+        },
+        {},
+        0,
+      );
+    });
+
+    xit("should sequentially insert multiple embeds into an empty document", async () => {
+      const { editor } = await testEnvironment();
+      const embedChapter1 = { chapter: { number: "1", style: "c" } };
+      const embedParaP = { para: { style: "p" } };
+      const embedChapter2 = { chapter: { number: "2", style: "c" } };
+      const embedParaQ1 = { para: { style: "q1" } };
+      const embedMilestone = { ms: { style: "ts-s", sid: "TS1" } };
+      const ops: Op[] = [
+        { insert: embedChapter1 },
+        { insert: embedParaP },
+        { insert: embedChapter2 },
+        { insert: embedParaQ1 },
+        { insert: embedMilestone },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        expect(root.getChildrenSize()).toBe(3); // Chapter1, ParaP, Chapter2, ParaQ1, Milestone
+
+        const chapter1Node = root.getChildAtIndex(0);
+        if (!$isSomeChapterNode(chapter1Node)) throw new Error("Child 0 is not a ChapterNode");
+        expect(chapter1Node.getNumber()).toBe("1");
+        expect(chapter1Node.getMarker()).toBe("c");
+
+        const paraPNode = root.getChildAtIndex(1);
+        if (!$isParaNode(paraPNode)) throw new Error("Child 1 is not a ParaNode");
+        expect(paraPNode.getMarker()).toBe("p");
+        expect(paraPNode.getChildrenSize()).toBe(0); // ParaP should be empty
+
+        const chapter2Node = root.getChildAtIndex(2);
+        if (!$isSomeChapterNode(chapter2Node)) throw new Error("Child 2 is not a ChapterNode");
+        expect(chapter2Node.getNumber()).toBe("2");
+        expect(chapter2Node.getMarker()).toBe("c2");
+
+        const paraQ1Node = root.getChildAtIndex(3);
+        if (!$isParaNode(paraQ1Node)) throw new Error("Child 3 is not a ParaNode");
+        expect(paraQ1Node.getMarker()).toBe("q1");
+        expect(paraQ1Node.getChildrenSize()).toBe(0);
+
+        const milestoneNode = root.getChildAtIndex(4);
+        if (!$isMilestoneNode(milestoneNode))
+          throw new Error("Child of ParaQ1 is not a MilestoneNode");
+        expect(milestoneNode.getMarker()).toBe("ts-s");
+        expect(milestoneNode.getUnknownAttributes()).toEqual({ sid: "TS1" });
       });
     });
   });
