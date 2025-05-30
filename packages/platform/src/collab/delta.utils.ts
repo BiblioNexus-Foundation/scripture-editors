@@ -860,23 +860,22 @@ function $insertNodeAtCharacterOffset(
     // After iterating all children of parentElement:
     // If targetIndex matches charWalkerOffset, it means the insertion is at the end of parentElement's content.
     if (targetIndex === charWalkerOffset && $isElementNode(parentElement)) {
-      logger?.debug(
-        `Appending node ${nodeToInsert.getType()} to ${parentElement.getType()} (key: ${parentElement.getKey()}). targetIndex: ${targetIndex}, charWalkerOffset: ${charWalkerOffset}`,
-      );
-      if (parentElement === root && $isElementNode(nodeToInsert) && nodeToInsert.isInline()) {
+      if (parentElement === root) {
+        // Append to root, wrapped in a ParaNode.
+        logger?.debug(
+          `Appending embed to root, wrapped in ParaNode. targetIndex: ${targetIndex}, charWalkerOffset: ${charWalkerOffset}`,
+        );
         const para = $createParaNode().append(nodeToInsert);
         parentElement.append(para);
-      } else if (
-        $isParaNode(parentElement) ||
-        $isCharNode(parentElement) ||
-        $isNoteNode(parentElement) /* other valid direct containers for nodeToInsert */
-      ) {
+      } else if ($isParaNode(parentElement) /* || other suitable containers */) {
+        logger?.debug(
+          `Appending embed to ${parentElement.getType()} (key: ${parentElement.getKey()}). targetIndex: ${targetIndex}, charWalkerOffset: ${charWalkerOffset}`,
+        );
         parentElement.append(nodeToInsert);
-      } else if (parentElement === root) {
-        parentElement.append(nodeToInsert); // Appending a block node to root
       } else {
+        // Fallback for other element types, may need refinement based on desired structure.
         logger?.warn(
-          `Attempting to append node to a generic ElementNode ${parentElement.getType()} (key: ${parentElement.getKey()}). Review structure if this is not intended. Appending anyway.`,
+          `Appending embed to a generic ElementNode ${parentElement.getType()} (key: ${parentElement.getKey()}) that might not be an ideal container. Review structure if issues arise. targetIndex: ${targetIndex}`,
         );
         parentElement.append(nodeToInsert);
       }
@@ -947,23 +946,24 @@ function $insertEmbedAtCurrentIndex(
     return false;
   }
 
+  const nodeToInsert: LexicalNode = newNodeToInsert;
   const root = $getRoot();
   let currentOffset = 0;
   let wasInserted = false;
 
   // Recursive function to traverse the document and find the insertion point.
-  function $traverseAndInsertRecursive(parentElement: LexicalNode): boolean {
+  function $traverseAndInsertRecursive(parentNode: LexicalNode): boolean {
     if (wasInserted) return true;
 
     // Handle insertion at the beginning of the document or into an empty root.
-    if (parentElement === root && targetIndex === 0 && newNodeToInsert) {
+    if (parentNode === root && targetIndex === 0) {
       const firstChild = root.getFirstChild();
       if (!firstChild) {
         // Root is empty
         logger?.debug(
           `Inserting embed into empty root, wrapped in ParaNode. targetIndex: ${targetIndex}`,
         );
-        const para = $createParaNode().append(newNodeToInsert);
+        const para = $createParaNode().append(nodeToInsert);
         root.append(para);
         wasInserted = true;
         return true;
@@ -971,18 +971,18 @@ function $insertEmbedAtCurrentIndex(
       // If root is not empty, the loop below will handle inserting before the first child.
     }
 
-    if (!$isElementNode(parentElement)) {
+    if (!$isElementNode(parentNode)) {
       // Should not happen if called correctly, as we only recurse on ElementNodes.
       return false;
     }
 
-    const children = parentElement.getChildren();
+    const children = parentNode.getChildren();
     for (const child of children) {
       // Case 1: Insert *before* the current child
-      if (targetIndex === currentOffset && newNodeToInsert) {
-        child.insertBefore(newNodeToInsert);
+      if (targetIndex === currentOffset) {
+        child.insertBefore(nodeToInsert);
         logger?.debug(
-          `Inserted embed ${newNodeToInsert.getType()} before child ${child.getType()} (key: ${child.getKey()}) in ${parentElement.getType()} (key: ${parentElement.getKey()}). targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
+          `Inserted embed ${nodeToInsert.getType()} before child ${child.getType()} (key: ${child.getKey()}) in ${parentNode.getType()} (key: ${parentNode.getKey()}). targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
         );
         wasInserted = true;
         return true;
@@ -992,16 +992,12 @@ function $insertEmbedAtCurrentIndex(
       if ($isTextNode(child)) {
         const textLength = child.getTextContentSize();
         // Case 2a: Insert *within* this TextNode
-        if (
-          newNodeToInsert &&
-          targetIndex > currentOffset &&
-          targetIndex < currentOffset + textLength
-        ) {
+        if (targetIndex > currentOffset && targetIndex < currentOffset + textLength) {
           const splitOffset = targetIndex - currentOffset;
           const splitNodes = child.splitText(splitOffset);
-          splitNodes[0].insertAfter(newNodeToInsert);
+          splitNodes[0].insertAfter(nodeToInsert);
           logger?.debug(
-            `Inserted embed ${newNodeToInsert.getType()} by splitting TextNode at offset ${splitOffset}. targetIndex: ${targetIndex}, currentOffset at node start: ${currentOffset}`,
+            `Inserted embed ${nodeToInsert.getType()} by splitting TextNode at offset ${splitOffset}. targetIndex: ${targetIndex}, currentOffset at node start: ${currentOffset}`,
           );
           wasInserted = true;
           return true;
@@ -1035,25 +1031,31 @@ function $insertEmbedAtCurrentIndex(
 
     // After iterating all children of parentElement, if targetIndex matches currentOffset,
     // it means the insertion point is at the end of parentElement's content.
-    if (targetIndex === currentOffset && newNodeToInsert && $isElementNode(parentElement)) {
-      if (parentElement === root) {
-        // Append to root, wrapped in a ParaNode.
+    if (targetIndex >= currentOffset && $isElementNode(parentNode)) {
+      if (parentNode === root) {
+        // Append to root, potentially wrapped in a ParaNode if inline.
         logger?.debug(
-          `Appending embed to root, wrapped in ParaNode. targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
+          `Appending embed to root. targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
         );
-        const para = $createParaNode().append(newNodeToInsert);
-        parentElement.append(para);
-      } else if ($isParaNode(parentElement) /* || other suitable containers */) {
+        if ($isElementNode(nodeToInsert) && nodeToInsert.isInline()) {
+          const para = $createParaNode().append(nodeToInsert);
+          parentNode.append(para);
+        } else {
+          parentNode.append(nodeToInsert);
+        }
+      } else if (targetIndex === currentOffset && !nodeToInsert.isInline()) {
+        parentNode.insertAfter(nodeToInsert);
+      } else if ($isParaNode(parentNode) /* || other suitable containers */) {
         logger?.debug(
-          `Appending embed to ${parentElement.getType()} (key: ${parentElement.getKey()}). targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
+          `Appending embed to ${parentNode.getType()} (key: ${parentNode.getKey()}). targetIndex: ${targetIndex}, currentOffset: ${currentOffset}`,
         );
-        parentElement.append(newNodeToInsert);
+        parentNode.append(nodeToInsert);
       } else {
         // Fallback for other element types, may need refinement based on desired structure.
         logger?.warn(
-          `Appending embed to a generic ElementNode ${parentElement.getType()} (key: ${parentElement.getKey()}) that might not be an ideal container. Review structure if issues arise. targetIndex: ${targetIndex}`,
+          `Appending embed to a generic ElementNode ${parentNode.getType()} (key: ${parentNode.getKey()}) that might not be an ideal container. Review structure if issues arise. targetIndex: ${targetIndex}`,
         );
-        parentElement.append(newNodeToInsert);
+        parentNode.append(nodeToInsert);
       }
       wasInserted = true;
       return true;
