@@ -41,6 +41,7 @@ export default function UsjNodesMenuPlugin({
 }) {
   const { book, chapterNum, verseNum, verse } = scrRef;
   // This is intentionally missing the `scrRef` dependency to ensure property changes are updated.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const scriptureReference = useMemo(() => scrRef, [book, chapterNum, verseNum, verse]);
 
   const [editor] = useLexicalComposerContext();
