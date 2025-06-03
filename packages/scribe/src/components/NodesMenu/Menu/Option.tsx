@@ -1,5 +1,5 @@
 import React, { useCallback, forwardRef } from "react";
-import { useMenuContext } from "./MenuContext";
+import { useMenuContext } from "./useMenuContext";
 
 type OptionProps = {
   index: number;

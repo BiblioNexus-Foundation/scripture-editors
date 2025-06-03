@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMenuContext } from "./MenuContext";
+import { useMenuContext } from "./useMenuContext";
 
 export function useMenuActions() {
   const { moveUp, moveDown, select } = useMenuContext();

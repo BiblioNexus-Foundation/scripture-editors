@@ -3,11 +3,11 @@ import { useState, useRef, useEffect } from "react";
 import { REDO_COMMAND, UNDO_COMMAND } from "lexical";
 import { ScriptureReference } from "shared/utils/get-marker-action.model";
 import { ViewOptions } from "shared-react/views/view-options.utils";
-import { getUsjMarkerAction } from "../adaptors/usj-marker-action.utils";
-import useModal from "../hooks/useModal";
-import Button from "./Button";
-import { InsertDialog } from "./Input/TextInput";
 import "./Toolbar.css";
+import { getUsjMarkerAction } from "./adaptors/usj-marker-action.utils";
+import useModal from "@/hooks/useModal";
+import Button from "@/components/Button";
+import { InsertDialog } from "@/components/Input/TextInput";
 
 export const Toolbar = ({
   scrRef,

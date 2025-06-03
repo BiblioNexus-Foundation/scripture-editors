@@ -1,7 +1,7 @@
 import { memo, ReactNode, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { FloatingBox } from "./FloatingBox";
-import useCursorCoords from "./useCursorCoords";
+import useCursorCoords from "@/hooks/useCursorCoords";
 import { Placement } from "@floating-ui/dom";
 
 const DOM_ELEMENT = document.body;

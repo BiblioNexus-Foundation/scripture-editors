@@ -7,7 +7,7 @@ import React, {
   ReactElement,
   useRef,
 } from "react";
-import { useMenuContext } from "./MenuContext";
+import { useMenuContext } from "./useMenuContext";
 import { MenuOption } from "./Option";
 import { OptionItem } from "./types";
 
