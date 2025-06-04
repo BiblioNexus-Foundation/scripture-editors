@@ -69,7 +69,7 @@ import {
   isMilestoneCommentMarker,
 } from "shared/nodes/usj/MilestoneNode";
 import { NOTE_VERSION, NoteNode, SerializedNoteNode } from "shared/nodes/usj/NoteNode";
-import { NBSP, PARA_MARKER_DEFAULT } from "shared/nodes/usj/node-constants";
+import { NBSP } from "shared/nodes/usj/node-constants";
 import {
   getEditableCallerText,
   getPreviewTextFromSerializedNodes,
@@ -118,6 +118,8 @@ interface UsjEditorAdaptor extends EditorAdaptor {
   serializeEditorState: typeof serializeEditorState;
 }
 
+/** empty implied-para node for an 'empty' editor */
+const emptyImpliedParaNode: SerializedImpliedParaNode = createImpliedPara([]);
 const serializedLineBreakNode: SerializedLineBreakNode = {
   type: LineBreakNode.getType(),
   version: 1,
@@ -159,10 +161,6 @@ export function serializeEditorState(
 ): SerializedEditorState {
   // use default view options if no `viewOptions`
   _viewOptions = viewOptions ?? getDefaultViewOptions();
-  const emptyParaNode: SerializedParaNode = createPara({
-    type: ParaNode.getType(),
-    marker: PARA_MARKER_DEFAULT,
-  });
   let children: SerializedLexicalNode[];
   if (usj) {
     if (usj.type !== USJ_TYPE)
@@ -173,9 +171,9 @@ export function serializeEditorState(
       );
 
     if (usj.content.length > 0) children = insertImpliedParasRecurse(recurseNodes(usj.content));
-    else children = [emptyParaNode];
+    else children = [emptyImpliedParaNode];
   } else {
-    children = [emptyParaNode];
+    children = [emptyImpliedParaNode];
   }
 
   addMissingComments?.(commentIds);

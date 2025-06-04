@@ -18,8 +18,7 @@ export const editorStateEmpty = {
     version: 1,
     children: [
       {
-        type: "para",
-        marker: "p",
+        type: "implied-para",
         direction: null,
         format: "",
         indent: 0,

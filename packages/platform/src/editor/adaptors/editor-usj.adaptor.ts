@@ -64,6 +64,8 @@ interface EditorUsjAdaptor {
   deserializeEditorState: typeof deserializeEditorState;
 }
 
+const emptyUsj: Usj = { type: USJ_TYPE, version: USJ_VERSION, content: [] };
+
 /** Logger instance */
 let _logger: LoggerBasic;
 
@@ -72,21 +74,19 @@ export function initialize(logger: LoggerBasic | undefined) {
 }
 
 export function deserializeEditorState(editorState: EditorState): Usj | undefined {
-  if (editorState.isEmpty()) return { type: USJ_TYPE, version: USJ_VERSION, content: [] };
+  if (editorState.isEmpty()) return emptyUsj;
 
   const serializedEditorState = editorState.toJSON();
   if (!serializedEditorState.root || !serializedEditorState.root.children) return;
 
   const rootChildren = serializedEditorState.root.children;
-  // check for default empty para node
+  // check for default empty implied-para node
   if (
     rootChildren.length === 1 &&
-    rootChildren[0].type === "para" &&
-    (rootChildren[0] as SerializedParaNode).marker === "p" &&
-    (!(rootChildren[0] as SerializedParaNode).children ||
-      (rootChildren[0] as SerializedParaNode).children.length === 0)
+    isSerializedImpliedParaNode(rootChildren[0]) &&
+    (!rootChildren[0].children || rootChildren[0].children.length === 0)
   )
-    return { type: USJ_TYPE, version: USJ_VERSION, content: [] };
+    return emptyUsj;
 
   const children = removeImpliedParasRecurse(rootChildren);
   const content = recurseNodes(children);
