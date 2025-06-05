@@ -16,6 +16,15 @@ on:
         required: false
         default: false
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+# Needed for nx-set-shas when run on the main branch
+permissions:
+  actions: read
+  contents: read
+  pull-requests: read
+
 jobs:
   test:
     name: Build on ${{ matrix.os }}, node ${{ matrix.node_version }}, PNPM ${{ matrix.pnpm_version }}
@@ -50,22 +59,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
       - name: Check formatting
         run: |
           pnpm prettier --check .
           pnpm nx format:check
 
       - name: Check linting
-        run: pnpm nx run-many -t lint
+        run: pnpm nx affected -t lint
 
       - name: Check types
-        run: pnpm nx run-many -t typecheck
+        run: pnpm nx affected -t typecheck
 
       - name: Check tests
-        run: pnpm nx run-many -t test
+        run: pnpm nx affected -t test
 
       - name: Production build
-        run: pnpm nx run-many -t build
+        run: pnpm nx affected -t build
 
       # With help from https://stackoverflow.com/questions/75357158/github-actions-npm-publish-fails-with-err-code-eneedauth
       - name: pnpm publish platform
