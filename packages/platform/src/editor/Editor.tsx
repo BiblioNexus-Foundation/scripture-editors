@@ -53,7 +53,7 @@ import {
   $getRangeFromEditor,
   $getRangeFromSelection,
 } from "shared-react/plugins/usj/annotation/selection.utils";
-import { getViewClassList, getViewOptions } from "shared-react/views/view-options.utils";
+import { getDefaultViewOptions, getViewClassList } from "shared-react/views/view-options.utils";
 import { LoggerBasic } from "shared/adaptors/logger-basic.model";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
 import { blackListedChangeTags, SELECTION_CHANGE_TAG } from "shared/nodes/usj/node-constants";
@@ -129,7 +129,7 @@ const editorConfig: Mutable<InitialConfigType> = {
   nodes: [TypedMarkNode, ...usjReactNodes],
 };
 
-const defaultViewOptions = getViewOptions();
+const defaultViewOptions = getDefaultViewOptions();
 const defaultNodeOptions: UsjNodeOptions = {};
 const defaultOptions: EditorOptions = {};
 
