@@ -91,8 +91,8 @@ import { CallerData } from "shared-react/nodes/usj/node-react.utils";
 import { UsjNodeOptions } from "shared-react/nodes/usj/usj-node-options.model";
 import {
   ViewOptions,
+  getDefaultViewOptions,
   getVerseNodeClass,
-  getViewOptions,
 } from "shared-react/views/view-options.utils";
 
 interface UsjNoteEditorAdapter extends EditorAdaptor {
@@ -148,9 +148,8 @@ export function serializeEditorState(
   usj: Usj | undefined,
   viewOptions?: ViewOptions,
 ): SerializedEditorState {
-  if (viewOptions) _viewOptions = viewOptions;
-  // use default view mode
-  else _viewOptions = getViewOptions();
+  // use default view options if no `viewOptions`
+  _viewOptions = viewOptions ?? getDefaultViewOptions();
   /** empty para node for an 'empty' editor */
   const emptyParaNode: SerializedParaNode = createPara({
     type: ParaNode.getType(),

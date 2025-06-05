@@ -17,15 +17,17 @@ export type ViewOptions = {
 };
 
 let defaultViewMode: ViewMode;
-let defaultViewOptions: ViewOptions | undefined;
+let defaultViewOptions: ViewOptions;
 
 /**
  * Sets the default view mode and options.
  * @param viewMode - View mode of the editor.
  */
 export function setDefaultView(viewMode: ViewMode) {
+  const _viewOptions = getViewOptions(viewMode);
+  if (!_viewOptions) throw new Error(`Invalid view mode: ${viewMode}`);
   defaultViewMode = viewMode;
-  defaultViewOptions = getViewOptions(viewMode);
+  defaultViewOptions = _viewOptions;
 }
 
 setDefaultView(FORMATTED_VIEW_MODE);
