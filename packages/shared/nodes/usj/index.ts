@@ -5,7 +5,7 @@ import { BookNode } from "./BookNode";
 import { ChapterNode } from "./ChapterNode";
 import { CharNode } from "./CharNode";
 import { ImmutableChapterNode } from "./ImmutableChapterNode";
-import { ImpliedParaNode } from "./ImpliedParaNode";
+import { $createImpliedParaNode, ImpliedParaNode } from "./ImpliedParaNode";
 import { MilestoneNode } from "./MilestoneNode";
 import { NoteNode } from "./NoteNode";
 import { ParaNode } from "./ParaNode";
@@ -23,11 +23,11 @@ export const usjBaseNodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplace
   MarkerNode,
   UnknownNode,
   ImmutableUnmatchedNode,
-  ImpliedParaNode,
   ParaNode,
+  ImpliedParaNode,
   {
     replace: ParagraphNode,
-    withKlass: ParaNode,
-    with: (node: ParaNode) => new ParaNode(node.__marker, node.__unknownAttributes),
+    with: () => $createImpliedParaNode(),
+    withKlass: ImpliedParaNode,
   },
 ];

@@ -31,12 +31,6 @@ export class ImpliedParaNode extends ParagraphNode {
     return PARA_MARKER_DEFAULT;
   }
 
-  createDOM(): HTMLElement {
-    // Define the DOM element here
-    const dom = document.createElement("p");
-    return dom;
-  }
-
   exportJSON(): SerializedImpliedParaNode {
     return {
       ...super.exportJSON(),

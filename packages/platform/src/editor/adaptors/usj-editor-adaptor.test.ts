@@ -53,6 +53,12 @@ function removeOnClick(
 }
 
 describe("USJ Editor Adaptor", () => {
+  it("should convert from undefined USJ to Lexical editor state JSON", () => {
+    const serializedEditorState = serializeEditorState(undefined);
+
+    expect(serializedEditorState).toEqual(editorStateEmpty);
+  });
+
   it("should convert from empty USJ to Lexical editor state JSON", () => {
     const serializedEditorState = serializeEditorState(usjEmpty);
 
