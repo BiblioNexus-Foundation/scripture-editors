@@ -13,7 +13,7 @@ import { $createImmutableVerseNode } from "shared-react/nodes/usj/ImmutableVerse
 import { $isSomeVerseNode } from "shared-react/nodes/usj/node-react.utils";
 import { getDefaultViewOptions, ViewOptions } from "shared-react/views/view-options.utils";
 import { TypedMarkNode } from "shared/nodes/features/TypedMarkNode";
-import { $isCharNode } from "shared/nodes/usj/CharNode";
+import { $isCharNode, $createCharNode } from "shared/nodes/usj/CharNode";
 import { $createImmutableChapterNode } from "shared/nodes/usj/ImmutableChapterNode";
 import { $createImpliedParaNode, $isImpliedParaNode } from "shared/nodes/usj/ImpliedParaNode";
 import { $isMilestoneNode } from "shared/nodes/usj/MilestoneNode";
@@ -83,6 +83,29 @@ describe("Delta Utils $applyUpdate", () => {
 
       expect(consoleDebugSpy).toHaveBeenNthCalledWith(1, "Retain: 0");
       expect(consoleDebugSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle retain with negative value", async () => {
+      const { editor } = await testEnvironment();
+      const ops: Op[] = [{ retain: -5 }];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Invalid retain operation"),
+      );
+    });
+
+    it("should handle retain value larger than document length", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("Short text")));
+      });
+      const ops: Op[] = [{ retain: 1000 }]; // Much larger than document
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      expect(consoleDebugSpy).toHaveBeenCalledWith("Retain: 1000");
     });
 
     it("should retain with format attributes", async () => {
@@ -425,6 +448,443 @@ describe("Delta Utils $applyUpdate", () => {
         expect(v1Node.getUnknownAttributes()).toEqual(
           expect.objectContaining({ customVerseAttr: "applied" }),
         );
+      });
+    });
+
+    // Error handling and boundary conditions
+
+    it("should handle multiple format attributes simultaneously", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("This is a test text.")));
+      });
+      const ops: Op[] = [
+        { retain: 5 }, // "This "
+        {
+          retain: 4, // "is a"
+          attributes: {
+            char: { style: "bd", cid: "test-id" },
+            bold: true,
+          },
+        },
+        { retain: 11 },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+
+        const charNode = p.getChildAtIndex(1);
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+
+        expect(charNode.getMarker()).toBe("bd");
+        expect(charNode.getUnknownAttributes()).toEqual(
+          expect.objectContaining({ cid: "test-id" }),
+        );
+
+        // Check that inner text has bold formatting
+        const innerText = charNode.getFirstChild();
+        if (!$isTextNode(innerText)) throw new Error("innerText is not a TextNode");
+        expect(innerText.hasFormat("bold")).toBe(true);
+      });
+    });
+
+    it("should handle format removal with false attribute values", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createParaNode().append(
+            $createCharNode("bd").append($createTextNode("bold text").toggleFormat("highlight")),
+            $createTextNode(" normal text"),
+          ),
+        );
+      });
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        const charNode = p.getFirstChild();
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+        const t1 = charNode.getFirstChild();
+        if (!$isTextNode(t1)) throw new Error("t1 is not a TextNode");
+        expect(t1.getTextContent()).toBe("bold text");
+        expect(t1.hasFormat("highlight")).toBe(true);
+      });
+      const ops: Op[] = [
+        {
+          retain: 1 + 9, // 1 (CharNode) + "bold text" length
+          attributes: {
+            char: false,
+            highlight: false,
+          },
+        },
+        { retain: 11 },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        expect(p.getTextContent()).toBe("bold text normal text");
+
+        // TODO: this should no longer be a CharNode, but a TextNode
+        const charNode = p.getFirstChild();
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+
+        const t1 = charNode.getFirstChild();
+        if (!$isTextNode(t1)) throw new Error("t1 is not a TextNode");
+        expect(t1.getTextContent()).toBe("bold text");
+        expect(t1.hasFormat("highlight")).toBe(false);
+      });
+    });
+
+    it("should handle retain at exact text boundaries", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createParaNode().append(
+            $createTextNode("First"),
+            // Adding a format prevents the TextNodes from being combined.
+            $createTextNode(" Second").toggleFormat("bold"),
+            $createTextNode(" Third"),
+          ),
+        );
+      });
+      const ops: Op[] = [
+        { retain: 5 }, // Exactly at end of "First"
+        { retain: 7, attributes: { char: { style: "it" } } }, // Exactly " Second"
+        { retain: 6 }, // Exactly " Third"
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        expect(p.getChildrenSize()).toBe(3);
+
+        const charNode = p.getChildAtIndex(1);
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+        expect(charNode.getMarker()).toBe("it");
+        expect(charNode.getTextContent()).toBe(" Second");
+      });
+    });
+
+    it("should handle retain spanning multiple elements", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createParaNode().append(
+            $createTextNode("Start "),
+            $createCharNode("bd").append($createTextNode("bold")),
+            $createTextNode(" end"),
+          ),
+        );
+      });
+      const ops: Op[] = [
+        { retain: 3 }, // "Sta"
+        {
+          retain: 3 + 1 + 4 + 2, // "rt bold e" - spans across text, CharNode and its text, and text
+          attributes: { char: { style: "it" } },
+        },
+        { retain: 2 }, // "nd"
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        expect(p.getTextContent()).toBe("Start bold end");
+        expect(p.getChildrenSize()).toBe(5);
+
+        const t1 = p.getFirstChild();
+        if (!$isTextNode(t1)) throw new Error("t1 is not a TextNode");
+        expect(t1.getTextContent()).toBe("Sta");
+
+        const char1 = p.getChildAtIndex(1);
+        if (!$isCharNode(char1)) throw new Error("char1 is not a CharNode");
+        expect(char1.getMarker()).toBe("it");
+
+        const t2 = char1.getChildAtIndex(0);
+        if (!$isTextNode(t2)) throw new Error("t2 is not a TextNode");
+        expect(t2.getTextContent()).toBe("rt ");
+
+        const char2 = p.getChildAtIndex(2);
+        if (!$isCharNode(char2)) throw new Error("char2 is not a CharNode");
+        expect(char2.getMarker()).toBe("it");
+
+        const t3 = char2.getChildAtIndex(0);
+        if (!$isTextNode(t3)) throw new Error("t3 is not a TextNode");
+        expect(t3.getTextContent()).toBe("bold");
+
+        const char3 = p.getChildAtIndex(3);
+        if (!$isCharNode(char3)) throw new Error("char3 is not a CharNode");
+        expect(char3.getMarker()).toBe("it");
+
+        const t4 = char3.getChildAtIndex(0);
+        if (!$isTextNode(t4)) throw new Error("t4 is not a TextNode");
+        expect(t4.getTextContent()).toBe(" e");
+
+        const t5 = p.getChildAtIndex(4);
+        if (!$isTextNode(t5)) throw new Error("t5 is not a TextNode");
+        expect(t5.getTextContent()).toBe("nd");
+      });
+    });
+
+    it("should handle invalid attribute values gracefully", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("Test text")));
+      });
+      const ops: Op[] = [
+        { retain: 4 },
+        {
+          retain: 4,
+          attributes: {
+            char: { style: "invalid-style" },
+            invalidAttr: null,
+            undefinedAttr: undefined,
+          },
+        },
+        { retain: 1 },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      // Should not crash, but may log warnings
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+
+        // Should still apply the operation, even with invalid values
+        expect(p.getTextContent()).toBe("Test text");
+        expect(p.getChildrenSize()).toBe(3);
+
+        const t1 = p.getFirstChild();
+        if (!$isTextNode(t1)) throw new Error("t1 is not a TextNode");
+        expect(t1.getTextContent()).toBe("Test");
+
+        const charNode = p.getChildAtIndex(1);
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+        expect(charNode.getMarker()).toBe("invalid-style");
+        // Non-string attributes (null, undefined) should be filtered out gracefully
+        // The system should not crash, but these values should not be stored
+        expect(charNode.getUnknownAttributes()).toBeUndefined();
+
+        const t2 = charNode.getChildAtIndex(0);
+        if (!$isTextNode(t2)) throw new Error("t2 is not a TextNode");
+        expect(t2.getTextContent()).toBe(" tex");
+
+        const t3 = p.getChildAtIndex(2);
+        if (!$isTextNode(t3)) throw new Error("t3 is not a TextNode");
+        expect(t3.getTextContent()).toBe("t");
+      });
+    });
+
+    it("should handle retain in mixed operations context", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("Initial text for testing")));
+      });
+      const ops: Op[] = [
+        { retain: 8 }, // "Initial "
+        { delete: 4 }, // Delete "text"
+        { insert: "content" },
+        { retain: 13, attributes: { char: { style: "bd" } } }, // " for testing"
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        expect(p.getTextContent()).toBe("Initial content for testing");
+
+        // Check if a CharNode was created for the formatted text
+        const lastChild = p.getLastChild();
+        if ($isCharNode(lastChild)) {
+          expect(lastChild.getMarker()).toBe("bd");
+          expect(lastChild.getTextContent()).toBe(" for testing");
+        }
+      });
+    });
+
+    it("should handle conflicting attribute updates", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createParaNode().append(
+            $createCharNode("bd", { color: "red" }).append($createTextNode("formatted text")),
+          ),
+        );
+      });
+      const ops: Op[] = [
+        {
+          retain: 1 + 14, // 1 for CharNode + length of "formatted text"
+          attributes: {
+            // Keep same style but add new cid and change color
+            char: { style: "bd", cid: "new-id", color: "blue" },
+          },
+        },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+
+        const charNode = p.getFirstChild();
+        if (!$isCharNode(charNode)) throw new Error("charNode is not a CharNode");
+
+        // Should maintain the style and apply new attributes
+        expect(charNode.getMarker()).toBe("bd");
+        expect(charNode.getUnknownAttributes()).toEqual(
+          expect.objectContaining({
+            cid: "new-id",
+            color: "blue",
+          }),
+        );
+      });
+    });
+
+    it("should handle zero-length retain with attributes", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append($createParaNode().append($createTextNode("Test text")));
+      });
+      const ops: Op[] = [{ retain: 0, attributes: { char: { style: "bd" } } }, { retain: 9 }];
+
+      await sutApplyUpdate(editor, ops);
+
+      // Zero-length retain should not crash but also should not affect content
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+      editor.getEditorState().read(() => {
+        const p = $getRoot().getFirstChild();
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        expect(p.getTextContent()).toBe("Test text");
+        expect(p.getChildrenSize()).toBe(1);
+      });
+    });
+
+    it("should handle complex nested container attributes with deep nesting with cross references", async () => {
+      const { editor } = await testEnvironment(() => {
+        $getRoot().append(
+          $createImmutableChapterNode("3"),
+          $createParaNode().append(
+            $createImmutableVerseNode("16"),
+            $createCharNode("qt").append(
+              $createCharNode("w").append($createTextNode("God")),
+              $createTextNode(" so "),
+              $createCharNode("w").append($createTextNode("loved")),
+              $createTextNode(" the world"),
+            ),
+            $createTextNode(" that he "),
+            $createCharNode("w").append($createTextNode("gave")),
+            $createTextNode(" his son"),
+          ),
+        );
+      });
+      const ops: Op[] = [
+        {
+          retain: 1, // Chapter node at root level
+          attributes: {
+            pubnumber: "3a",
+            altnumber: "Three",
+          },
+        },
+        {
+          retain: 1, // Verse node inside para
+          attributes: {
+            number: "16",
+            altnumber: "sixteen",
+          },
+        },
+        {
+          retain: 1, // First CharNode (qt) - speaker attributes
+          attributes: {
+            who: "Jesus",
+            context: "teaching",
+          },
+        },
+        {
+          retain: 1, // First nested CharNode (w for "God") - lexical data
+          attributes: {
+            strong: "G2316",
+            lemma: "θεός",
+          },
+        },
+        {
+          // Skip "God", " so " text, next w node and text, and " the world" text
+          retain: 3 + 4 + 1 + 5 + 10,
+        },
+        {
+          retain: 9, // Text " that he "
+        },
+        {
+          retain: 1, // Last CharNode (w for "gave") - verb analysis
+          attributes: {
+            strong: "G1325",
+            lemma: "δίδωμι",
+          },
+        },
+      ];
+
+      await sutApplyUpdate(editor, ops);
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        expect(root.getChildrenSize()).toBe(2); // Chapter and ParaNode at root level
+
+        const ch3 = root.getFirstChild();
+        if (!$isSomeChapterNode(ch3)) throw new Error("ch3 is not SomeChapterNode");
+        expect(ch3.getNumber()).toBe("3");
+        expect(ch3.getPubnumber()).toBe("3a");
+        expect(ch3.getAltnumber()).toBe("Three");
+
+        const p = root.getChildAtIndex(1);
+        if (!$isParaNode(p)) throw new Error("p is not a ParaNode");
+        const children = p.getChildren();
+        expect(children.length).toBe(5); // v16, qt CharNode, text, last w node, text
+
+        const v16 = children[0];
+        if (!$isSomeVerseNode(v16)) throw new Error("v16 is not SomeVerseNode");
+        expect(v16.getNumber()).toBe("16");
+        expect(v16.getAltnumber()).toBe("sixteen");
+
+        const qtCharNode = children[1];
+        if (!$isCharNode(qtCharNode)) throw new Error("qtCharNode is not CharNode");
+        expect(qtCharNode.getMarker()).toBe("qt");
+        expect(qtCharNode.getUnknownAttributes()).toEqual({
+          who: "Jesus",
+          context: "teaching",
+        });
+        const qtChildren = qtCharNode.getChildren();
+        expect(qtChildren.length).toBe(4); // 2 nested w nodes and 2 text nodes
+
+        const godCharNode = qtChildren[0];
+        if (!$isCharNode(godCharNode)) throw new Error("godCharNode is not CharNode");
+        expect(godCharNode.getMarker()).toBe("w");
+        expect(godCharNode.getUnknownAttributes()).toEqual({
+          strong: "G2316",
+          lemma: "θεός",
+        });
+
+        // Check second nested w node (loved)
+        const lovedCharNode = qtChildren[2];
+        if (!$isCharNode(lovedCharNode)) throw new Error("lovedCharNode is not CharNode");
+        expect(lovedCharNode.getMarker()).toBe("w");
+        expect(lovedCharNode.getUnknownAttributes()).toBeUndefined();
+
+        // Verify final w node (gave) received verb analysis
+        const gaveCharNode = children[3];
+        if (!$isCharNode(gaveCharNode)) throw new Error("gaveCharNode is not CharNode");
+        expect(gaveCharNode.getMarker()).toBe("w");
+        expect(gaveCharNode.getUnknownAttributes()).toEqual({
+          strong: "G1325",
+          lemma: "δίδωμι",
+        });
       });
     });
   });

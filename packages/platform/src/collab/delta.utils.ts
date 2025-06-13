@@ -94,7 +94,7 @@ export function $applyUpdate(ops: Op[], viewOptions: ViewOptions, logger?: Logge
         if ($insertEmbedAtCurrentIndex(currentIndex, op.insert, viewOptions, logger)) {
           currentIndex += 1;
         } else {
-          // If embed insertion fails, currentIndex is not advanced to prevent desync.
+          // If embed insertion fails, currentIndex is not advanced to prevent de-sync.
           logger?.error(
             `Failed to process insert embed operation: ${JSON.stringify(op.insert)} at index ${
               currentIndex
@@ -131,105 +131,83 @@ function $applyAttributes(
   attributes: AttributeMap,
   logger: LoggerBasic | undefined,
 ) {
-  // Handle char transformation: text to CharNode
-  if (
-    attributes.char &&
-    typeof attributes.char === "object" &&
-    attributes.char !== null &&
-    "style" in attributes.char
-  ) {
-    const charEmbedData = attributes.char as OTEmbedChar;
-    logger?.debug(
-      `Attempting char transformation for range [${targetIndex}, ${
-        targetIndex + retain - 1
-      }] with char attributes: ${JSON.stringify(charEmbedData)}`,
-    );
-
-    const textToEmbed = $extractTextFromRange(targetIndex, retain, logger);
-
-    if (textToEmbed !== undefined && textToEmbed.length > 0) {
-      $deleteTextAtCurrentIndex(targetIndex, retain, logger);
-
-      const newCharNode = $createChar(charEmbedData);
-      if (!$isCharNode(newCharNode)) {
-        logger?.error(
-          `Failed to create CharNode for transformation. Style: ${charEmbedData.style}. ` +
-            `Attributes: ${JSON.stringify(charEmbedData)}. Text was deleted.`,
-        );
-        return;
-      }
-
-      const textNode = $createTextNode(textToEmbed);
-      const topLevelTextAttributes = { ...attributes };
-      delete topLevelTextAttributes.char;
-      applyTextAttributes(topLevelTextAttributes, textNode);
-      newCharNode.append(textNode);
-
-      if ($insertNodeAtCharacterOffset(targetIndex, newCharNode, logger)) {
-        logger?.debug(
-          `Successfully transformed text range (length ${retain}, content "${textToEmbed}") ` +
-            `at index ${targetIndex} to CharNode: ${newCharNode.getKey()}`,
-        );
-        return;
-      } else {
-        logger?.error(
-          `Failed to insert new CharNode (key: ${newCharNode.getKey()}) during transformation ` +
-            `at index ${targetIndex}. Text was deleted. Attributes not fully applied.`,
-        );
-        return;
-      }
-    } else if (textToEmbed === undefined) {
-      logger?.warn(
-        `Char transformation: Failed to extract text for range [${targetIndex}, ${
-          targetIndex + retain - 1
-        }]. Skipping transformation, falling back to standard attribute application.`,
-      );
-    } else {
-      // textToEmbed is ""
-      logger?.debug(
-        `Char transformation: Text to embed is empty for range [${targetIndex}, ${
-          targetIndex + retain - 1
-        }]. Skipping transformation, falling back to standard attribute application.`,
-      );
-    }
-  }
-
-  // Standard attribute application logic
+  // Apply attributes using standard traversal logic
   logger?.debug(
-    `Applying standard attributes for range [${targetIndex}, ${
+    `Applying attributes for range [${targetIndex}, ${
       targetIndex + retain - 1
     }] with attributes: ${JSON.stringify(attributes)}`,
   );
-  let charsToFormat = retain;
+  let lengthToFormat = retain;
   let currentIndex = 0;
   const root = $getRoot();
 
   function $traverseAndApplyAttributesRecursive(currentNode: LexicalNode): boolean {
-    if (charsToFormat <= 0) return true;
+    if (lengthToFormat <= 0) return true;
 
     if ($isTextNode(currentNode)) {
       const textLength = currentNode.getTextContentSize();
-      if (targetIndex < currentIndex + textLength && currentIndex < targetIndex + charsToFormat) {
+      if (targetIndex < currentIndex + textLength && currentIndex < targetIndex + retain) {
         const offsetInNode = Math.max(0, targetIndex - currentIndex);
-        const charsAvailableInNodeAfterOffset = textLength - offsetInNode;
-        const charsToApplyInThisNode = Math.min(charsToFormat, charsAvailableInNodeAfterOffset);
+        const lengthAvailableInNodeAfterOffset = textLength - offsetInNode;
+        const lengthToApplyInThisNode = Math.min(lengthToFormat, lengthAvailableInNodeAfterOffset);
 
-        if (charsToApplyInThisNode > 0) {
+        if (lengthToApplyInThisNode > 0) {
           let targetNode = currentNode;
           const needsSplitAtStart = offsetInNode > 0;
-          const needsSplitAtEnd = charsToApplyInThisNode < textLength - offsetInNode;
+          const needsSplitAtEnd = lengthToApplyInThisNode < textLength - offsetInNode;
 
           if (needsSplitAtStart && needsSplitAtEnd) {
             let middleNode;
             [, middleNode] = currentNode.splitText(offsetInNode);
-            [targetNode] = middleNode.splitText(charsToApplyInThisNode);
+            [targetNode] = middleNode.splitText(lengthToApplyInThisNode);
           } else if (needsSplitAtStart) {
             [, targetNode] = currentNode.splitText(offsetInNode);
           } else if (needsSplitAtEnd) {
-            [targetNode] = currentNode.splitText(charsToApplyInThisNode);
+            [targetNode] = currentNode.splitText(lengthToApplyInThisNode);
           }
-          applyTextAttributes(attributes, targetNode);
-          charsToFormat -= charsToApplyInThisNode;
+
+          // Check if we need to convert TextNode to CharNode
+          if (
+            attributes.char &&
+            typeof attributes.char === "object" &&
+            attributes.char !== null &&
+            "style" in attributes.char
+          ) {
+            // Check if this text node is already inside a CharNode
+            const parentNode = targetNode.getParent();
+            if ($isCharNode(parentNode)) {
+              // Don't create a new CharNode, just apply non-char attributes to the text
+              const topLevelTextAttributes = { ...attributes };
+              delete topLevelTextAttributes.char;
+              applyTextAttributes(topLevelTextAttributes, targetNode);
+            } else {
+              // Create new CharNode with the char attributes
+              const charEmbedData = attributes.char as OTEmbedChar;
+              const textContent = targetNode.getTextContent();
+
+              const newCharNode = $createChar(charEmbedData);
+              if ($isCharNode(newCharNode)) {
+                // Create text node with the content and apply non-char attributes
+                const newTextNode = $createTextNode(textContent);
+                const topLevelTextAttributes = { ...attributes };
+                delete topLevelTextAttributes.char;
+                applyTextAttributes(topLevelTextAttributes, newTextNode);
+
+                // Add text to CharNode and replace the original text node
+                newCharNode.append(newTextNode);
+                targetNode.replace(newCharNode);
+              } else {
+                logger?.error(
+                  `Failed to create CharNode for text transformation. Style: ${charEmbedData.style}. ` +
+                    `Falling back to standard text attributes.`,
+                );
+                applyTextAttributes(attributes, targetNode);
+              }
+            }
+          } else {
+            applyTextAttributes(attributes, targetNode);
+          }
+          lengthToFormat -= lengthToApplyInThisNode;
         }
       }
       currentIndex += textLength;
@@ -237,12 +215,12 @@ function $applyAttributes(
       const atomicNodeOtLength = 1;
       if (
         targetIndex <= currentIndex &&
-        currentIndex < targetIndex + charsToFormat &&
-        charsToFormat > 0
+        currentIndex < targetIndex + retain &&
+        lengthToFormat > 0
       ) {
         // Apply attributes to the atomic node itself
         $applyEmbedAttributes(currentNode, attributes);
-        charsToFormat -= atomicNodeOtLength;
+        lengthToFormat -= atomicNodeOtLength;
       }
       currentIndex += atomicNodeOtLength;
     } else if ($isContainerEmbedNode(currentNode)) {
@@ -250,22 +228,42 @@ function $applyAttributes(
       const containerEmbedOtLength = 1;
       if (
         targetIndex <= currentIndex &&
-        currentIndex < targetIndex + charsToFormat &&
-        charsToFormat > 0
+        currentIndex < targetIndex + retain &&
+        lengthToFormat > 0
       ) {
-        // Apply attributes to the container node itself (its "tag")
-        $applyEmbedAttributes(currentNode, attributes);
-        charsToFormat -= containerEmbedOtLength;
+        // For char attributes on CharNodes, we need special handling
+        if (
+          $isCharNode(currentNode) &&
+          attributes.char &&
+          typeof attributes.char === "object" &&
+          attributes.char !== null &&
+          "style" in attributes.char
+        ) {
+          const charEmbedData = attributes.char as OTEmbedChar;
+          // Update the CharNode's marker and attributes to match the retain attributes
+          currentNode.setMarker(charEmbedData.style);
+          const unknownAttributes = getUnknownAttributes(charEmbedData, OT_CHAR_PROPS);
+          if (unknownAttributes && Object.keys(unknownAttributes).length > 0) {
+            currentNode.setUnknownAttributes({
+              ...(currentNode.getUnknownAttributes() ?? {}),
+              ...unknownAttributes,
+            });
+          }
+        } else {
+          // Apply attributes to the container node itself (its "tag")
+          $applyEmbedAttributes(currentNode, attributes);
+        }
+        lengthToFormat -= containerEmbedOtLength;
       }
       currentIndex += containerEmbedOtLength;
 
       // Then, process children of these container embeds
-      if (charsToFormat > 0) {
+      if (lengthToFormat > 0) {
         const children = currentNode.getChildren();
         for (const child of children) {
-          if (charsToFormat <= 0) break;
+          if (lengthToFormat <= 0) break;
           if ($traverseAndApplyAttributesRecursive(child)) {
-            if (charsToFormat <= 0) return true;
+            if (lengthToFormat <= 0) return true;
           }
         }
       }
@@ -274,9 +272,9 @@ function $applyAttributes(
       // length.
       const children = currentNode.getChildren();
       for (const child of children) {
-        if (charsToFormat <= 0) break;
+        if (lengthToFormat <= 0) break;
         if ($traverseAndApplyAttributesRecursive(child)) {
-          if (charsToFormat <= 0) return true; // Early exit if formatting complete
+          if (lengthToFormat <= 0) return true; // Early exit if formatting complete
         }
       }
 
@@ -286,14 +284,14 @@ function $applyAttributes(
       // Check if the retain operation targets this closing marker.
       if (
         targetIndex <= currentIndex &&
-        currentIndex < targetIndex + charsToFormat &&
-        charsToFormat > 0
+        currentIndex < targetIndex + lengthToFormat &&
+        lengthToFormat > 0
       ) {
         $applyEmbedAttributes(
           currentNode as ParaNode /*or ImpliedParaNode, handled by $applyEmbedAttributes type*/,
           attributes,
         );
-        charsToFormat -= paraClosingOtLength;
+        lengthToFormat -= paraClosingOtLength;
       }
       currentIndex += paraClosingOtLength;
     } else if ($isElementNode(currentNode)) {
@@ -301,9 +299,9 @@ function $applyAttributes(
       // Process children. These elements themselves usually have OT length 0.
       const children = currentNode.getChildren();
       for (const child of children) {
-        if (charsToFormat <= 0) break;
+        if (lengthToFormat <= 0) break;
         if ($traverseAndApplyAttributesRecursive(child)) {
-          if (charsToFormat <= 0) return true;
+          if (lengthToFormat <= 0) return true;
         }
       }
     }
@@ -311,150 +309,19 @@ function $applyAttributes(
     // explicitly handled). These typically don't contribute to OT length in this model or are
     // handled by Lexical internally.
 
-    return charsToFormat <= 0;
+    return lengthToFormat <= 0;
   }
 
   $traverseAndApplyAttributesRecursive(root);
-  if (charsToFormat > 0) {
+  if (lengthToFormat > 0) {
     logger?.warn(
       `$applyAttributes: Not all characters in the retain operation (length ${
         retain
-      }) could be processed. Remaining: ${charsToFormat}. targetIndex: ${
+      }) could be processed. Remaining: ${lengthToFormat}. targetIndex: ${
         targetIndex
       }, final currentIndex: ${currentIndex}`,
     );
   }
-}
-
-// Helper function to extract text from a given flat index and length from the document
-function $extractTextFromRange(
-  targetIndex: number,
-  length: number,
-  logger: LoggerBasic | undefined,
-): string | undefined {
-  if (length <= 0) {
-    logger?.debug("$extractTextFromRange: Requested length is 0 or less. Returning empty string.");
-    return "";
-  }
-
-  const root = $getRoot();
-  let currentIndex = 0;
-  let remainingToExtract = length;
-  let extractedText = "";
-  let scanStartIndex = targetIndex;
-  let scanEndIndex = targetIndex + length;
-
-  logger?.debug(
-    `$extractTextFromRange: Attempting to extract ${length} chars starting at index ${
-      targetIndex
-    }.`,
-  );
-
-  function $traverseAndExtract(currentNode: LexicalNode): boolean {
-    if (remainingToExtract <= 0) return true;
-
-    if ($isTextNode(currentNode)) {
-      const textLength = currentNode.getTextContentSize();
-      const nodeStartOffsetInDoc = currentIndex;
-      const nodeEndOffsetInDoc = currentIndex + textLength;
-      const effectiveStart = Math.max(scanStartIndex, nodeStartOffsetInDoc);
-      const effectiveEnd = Math.min(scanEndIndex, nodeEndOffsetInDoc);
-
-      if (effectiveStart < effectiveEnd) {
-        const offsetInNode = effectiveStart - nodeStartOffsetInDoc;
-        const countToExtractFromNode = effectiveEnd - effectiveStart;
-        extractedText += currentNode
-          .getTextContent()
-          .substring(offsetInNode, offsetInNode + countToExtractFromNode);
-        remainingToExtract -= countToExtractFromNode;
-      }
-      currentIndex += textLength;
-    } else if ($isAtomicEmbedNode(currentNode)) {
-      const nodeOtLength = 1;
-      if (scanStartIndex < currentIndex + nodeOtLength && scanEndIndex > currentIndex) {
-        logger?.warn(
-          `$extractTextFromRange: Range [${targetIndex}, ${
-            targetIndex + length - 1
-          }] includes atomic embed ${currentNode.getType()} at offset ${
-            currentIndex
-          }. Text extraction might be partial or invalid.`,
-        );
-      }
-      currentIndex += nodeOtLength;
-    } else if ($isContainerEmbedNode(currentNode)) {
-      const containerEmbedOtLength = 1;
-      if (scanStartIndex < currentIndex + containerEmbedOtLength && scanEndIndex > currentIndex) {
-        logger?.warn(
-          `$extractTextFromRange: Range [${targetIndex}, ${
-            targetIndex + length - 1
-          }] includes container embed tag ${currentNode.getType()} (OT length ${
-            containerEmbedOtLength
-          }) at offset ${currentIndex}. Text extraction might be partial or invalid.`,
-        );
-      }
-      currentIndex += containerEmbedOtLength;
-
-      const children = currentNode.getChildren();
-      for (const child of children) {
-        if (remainingToExtract <= 0) break;
-        if ($traverseAndExtract(child)) {
-          if (remainingToExtract <= 0) return true;
-        }
-      }
-    } else if ($isSomeParaNode(currentNode)) {
-      // Paragraph-like nodes: process children first
-      const children = currentNode.getChildren();
-      for (const child of children) {
-        if (remainingToExtract <= 0) break;
-        if ($traverseAndExtract(child)) {
-          if (remainingToExtract <= 0) return true;
-        }
-      }
-      // After children, account for the ParaNode/ImpliedParaNode's closing marker
-      const paraClosingOtLength = 1;
-      if (scanStartIndex < currentIndex + paraClosingOtLength && scanEndIndex > currentIndex) {
-        logger?.warn(
-          `$extractTextFromRange: Range [${targetIndex}, ${
-            targetIndex + length - 1
-          }] includes closing marker of ${currentNode.getType()} at offset ${
-            currentIndex
-          }. Text extraction might be partial or invalid.`,
-        );
-        // If extracting the newline character itself:
-        // const effectiveStartPara = Math.max(scanStartIndex, currentIndex);
-        // const effectiveEndPara = Math.min(scanEndIndex, currentIndex + paraClosingOtLength);
-        // if (effectiveStartPara < effectiveEndPara && remainingToExtract > 0) {
-        //   extractedText += '\n'; // Or some representation of the para break
-        //   remainingToExtract--;
-        // }
-      }
-      currentIndex += paraClosingOtLength;
-    } else if ($isElementNode(currentNode)) {
-      // Other generic ElementNodes (like RootNode)
-      const children = currentNode.getChildren();
-      for (const child of children) {
-        if (remainingToExtract <= 0) break;
-        if ($traverseAndExtract(child)) {
-          if (remainingToExtract <= 0) return true;
-        }
-      }
-    }
-    return remainingToExtract <= 0;
-  }
-
-  $traverseAndExtract(root);
-
-  if (remainingToExtract > 0) {
-    logger?.warn(
-      `$extractTextFromRange: Could not extract all ${length} chars. Extracted: "${
-        extractedText
-      }" (${extractedText.length}). Target: ${targetIndex}. Remaining: ${
-        remainingToExtract
-      }. Final currentIndex: ${currentIndex}.`,
-    );
-    return undefined;
-  }
-  return extractedText;
 }
 
 // Apply attributes to the given embed node
@@ -464,8 +331,29 @@ function $applyEmbedAttributes(
 ) {
   for (const key of Object.keys(attributes)) {
     const value = attributes[key];
+
+    // Special handling for char attributes on CharNodes
+    if (key === "char" && $isCharNode(node) && typeof value === "object" && value !== null) {
+      const charAttributes = value as Record<string, unknown>;
+
+      // Update marker if style is provided
+      if ("style" in charAttributes && typeof charAttributes.style === "string") {
+        node.setMarker(charAttributes.style);
+      }
+
+      // Apply other char attributes to unknownAttributes
+      const unknownAttributes = getUnknownAttributes(charAttributes, OT_CHAR_PROPS);
+      if (unknownAttributes && Object.keys(unknownAttributes).length > 0) {
+        node.setUnknownAttributes({
+          ...(node.getUnknownAttributes() ?? {}),
+          ...unknownAttributes,
+        });
+      }
+      continue;
+    }
+
     if (typeof value !== "string") {
-      // Skip non-string attributes
+      // Skip non-string attributes (except char which is handled above)
       continue;
     }
 
@@ -569,17 +457,17 @@ function $deleteTextAtCurrentIndex(
         currentIndex < targetIndex + remainingToDelete
       ) {
         const offsetInNode = Math.max(0, targetIndex - currentIndex);
-        const deletableCharsInNode = textLength - offsetInNode;
-        const numCharsToDeleteFromThisNode = Math.min(remainingToDelete, deletableCharsInNode);
+        const deletableLengthInNode = textLength - offsetInNode;
+        const lengthToDeleteFromThisNode = Math.min(remainingToDelete, deletableLengthInNode);
 
-        if (numCharsToDeleteFromThisNode > 0) {
-          currentNode.spliceText(offsetInNode, numCharsToDeleteFromThisNode, "");
+        if (lengthToDeleteFromThisNode > 0) {
+          currentNode.spliceText(offsetInNode, lengthToDeleteFromThisNode, "");
           logger?.debug(
-            `Deleted ${numCharsToDeleteFromThisNode} chars from TextNode ` +
+            `Deleted ${lengthToDeleteFromThisNode} length from TextNode ` +
               `(key: ${currentNode.getKey()}) at nodeOffset ${offsetInNode}. ` +
               `Original targetIndex: ${targetIndex}, current currentIndex: ${currentIndex}.`,
           );
-          remainingToDelete -= numCharsToDeleteFromThisNode;
+          remainingToDelete -= lengthToDeleteFromThisNode;
         }
       }
       currentIndex += textLength;
