@@ -65,10 +65,10 @@ export function LoadStatePlugin<TLogger extends LoggerBasic>({
     // Every exit from this effect reports `false` exactly once - including a throw out of the
     // adaptor, or out of `reportLoading(true)` itself - otherwise a caller that gates work on the
     // load waits forever.
-    let settled = false;
+    let isSettled = false;
     const settle = () => {
-      if (settled) return;
-      settled = true;
+      if (isSettled) return;
+      isSettled = true;
       reportLoading?.(false);
     };
 

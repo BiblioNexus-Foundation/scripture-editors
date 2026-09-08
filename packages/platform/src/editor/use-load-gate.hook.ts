@@ -21,7 +21,7 @@ export function useLoadGate(logger?: LoggerBasic) {
   // A load always follows mount, and this hook runs before LoadStatePlugin's effect reports it.
   const isLoadRequestedRef = useRef(true);
   const activeLoadCountRef = useRef(0);
-  const queuedOpsRef = useRef<(() => void)[]>([]);
+  const queuedActionsRef = useRef<(() => void)[]>([]);
   const isTornDownRef = useRef(false);
   // Read at call time so the gate's callbacks stay referentially stable while a logger swap is
   // still picked up (and so teardown can report against the logger the editor last had).
@@ -38,15 +38,15 @@ export function useLoadGate(logger?: LoggerBasic) {
 
   const drain = useCallback(() => {
     // Re-check the gate: a load can be requested between the settle that scheduled this drain and
-    // the drain itself. Leaving the ops queued lets the next settle run them against a document
+    // the drain itself. Leaving the actions queued lets the next settle run them against a document
     // that is actually live, rather than one about to be replaced.
     if (!isDocumentSettled()) return;
 
-    const ops = queuedOpsRef.current;
-    queuedOpsRef.current = [];
-    for (const op of ops) {
+    const actions = queuedActionsRef.current;
+    queuedActionsRef.current = [];
+    for (const action of actions) {
       try {
-        op();
+        action();
       } catch (error) {
         // These run from a microtask, so there is no caller left to throw to: an escaping error
         // would be an unhandled global one and would drop the rest of the queue with it.
@@ -84,14 +84,14 @@ export function useLoadGate(logger?: LoggerBasic) {
 
   /** Run now if the document is settled, otherwise once the load in flight finishes. */
   const runWhenLoaded = useCallback(
-    (op: () => void) => {
+    (action: () => void) => {
       // Deliberately not wrapped: with the gate open this is still the caller's own call stack, so
       // a throw must reach them exactly as it did before the gate existed.
       if (isDocumentSettled()) {
-        op();
+        action();
         return;
       }
-      queuedOpsRef.current.push(op);
+      queuedActionsRef.current.push(action);
     },
     [isDocumentSettled],
   );
@@ -100,8 +100,8 @@ export function useLoadGate(logger?: LoggerBasic) {
     isTornDownRef.current = false;
     return () => {
       // Whatever is queued belongs to the instance going away, so a remount starts clean.
-      const droppedCount = queuedOpsRef.current.length;
-      queuedOpsRef.current = [];
+      const droppedCount = queuedActionsRef.current.length;
+      queuedActionsRef.current = [];
       if (droppedCount === 0) return;
 
       isTornDownRef.current = true;
