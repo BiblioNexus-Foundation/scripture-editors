@@ -12,6 +12,7 @@ const { build } = createRequire(require.resolve("vite"))("esbuild");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageRoot = path.join(root, "packages/platform");
 const packageName = "@eten-tech-foundation/platform-editor";
+const manifest = JSON.parse(readFileSync(path.join(packageRoot, "package.json"), "utf8"));
 const measureOnly = process.argv.includes("--measure-only");
 const cases = [
   ["root-editorial", "", "Editorial"],
@@ -22,7 +23,7 @@ const cases = [
 const measurements = {};
 
 for (const [name, subpath, symbol] of cases) {
-  if (measureOnly && subpath && !existsSync(path.join(packageRoot, "dist", subpath + ".js"))) {
+  if (measureOnly && subpath && !manifest.exports["." + subpath]) {
     continue;
   }
   const result = await build({
@@ -85,7 +86,7 @@ for (const [name, subpath, symbol] of cases) {
 
 // A published entry's declaration must be self-contained, including private workspace types.
 if (!measureOnly) {
-  for (const entry of ["index", "editorial", "view-options"]) {
+  for (const entry of ["index", "editorial-entry", "view-options"]) {
     const declarations = readFileSync(path.join(packageRoot, "dist", entry + ".d.ts"), "utf8");
     assert(
       !/from ["']shared(?:-react)?["']/.test(declarations),
@@ -109,7 +110,7 @@ if (!measureOnly) {
       moduleResolution: ts.ModuleResolutionKind.Bundler,
       paths: {
         [packageName]: [path.join(packageRoot, "dist/index.d.ts")],
-        [packageName + "/editorial"]: [path.join(packageRoot, "dist/editorial.d.ts")],
+        [packageName + "/editorial"]: [path.join(packageRoot, "dist/editorial-entry.d.ts")],
         [packageName + "/view-options"]: [path.join(packageRoot, "dist/view-options.d.ts")],
       },
     },

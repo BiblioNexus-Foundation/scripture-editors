@@ -23,9 +23,9 @@
       "default": "./dist/index.js"
     },
     "./editorial": {
-      "types": "./dist/editorial.d.ts",
-      "import": "./dist/editorial.js",
-      "default": "./dist/editorial.js"
+      "types": "./dist/editorial-entry.d.ts",
+      "import": "./dist/editorial-entry.js",
+      "default": "./dist/editorial-entry.js"
     },
     "./view-options": {
       "types": "./dist/view-options.d.ts",

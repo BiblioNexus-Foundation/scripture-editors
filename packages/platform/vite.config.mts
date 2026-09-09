@@ -42,7 +42,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: "src/index.ts",
-        editorial: "src/editorial.ts",
+        "editorial-entry": "src/editorial-entry.ts",
         "view-options": "src/view-options.ts",
       },
       name: "@eten-tech-foundation/platform-editor",

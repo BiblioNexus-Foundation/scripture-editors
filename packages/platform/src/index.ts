@@ -29,7 +29,7 @@
  * - Apply [Delta Operation](https://github.com/slab/delta) changes to the editor and see Delta Operations when changes are made in the editor. For use with realtime collaborative editing.
  */
 
-export * from "./editorial";
+export * from "./editorial-entry";
 /**
  * @deprecated Marginal will be removed in a future release. Prefer {@link Editorial}. Install the
  * optional `yjs` peer dependency if you continue using margin comments during the transition.
