@@ -55,6 +55,8 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
+        // Keep stylesheet export filenames stable while JavaScript retains its directories.
+        assetFileNames: (asset) => path.basename(asset.names[0] ?? "[name][extname]"),
         preserveModules: true,
         preserveModulesRoot: path.resolve(__dirname, "../.."),
       },

@@ -101,10 +101,33 @@ if (!measureOnly) {
       `${entry}.d.ts exposes a private workspace import`,
     );
   }
-  assert(
-    existsSync(path.join(packageRoot, "dist/index.css")),
-    "Keep the existing CSS artifact name",
-  );
+  const cssExports = Object.entries(manifest.exports).filter(([name]) => name.endsWith(".css"));
+  if (cssExports.length === 0) {
+    assert(
+      existsSync(path.join(packageRoot, "dist/index.css")),
+      "Keep the existing CSS artifact name",
+    );
+  }
+  for (const [subpath, target] of cssExports) {
+    assert(
+      typeof target === "string" && existsSync(path.join(packageRoot, target)),
+      `Missing stylesheet export: ${subpath}`,
+    );
+    const styled = await build({
+      stdin: {
+        contents: `import "${packageName}${subpath.slice(1)}";`,
+        resolveDir: packageRoot,
+      },
+      bundle: true,
+      write: false,
+      outfile: path.join(root, "tmp/platform-bundle/style-check.js"),
+      logLevel: "silent",
+    });
+    assert(
+      styled.outputFiles.some((file) => file.path.endsWith(".css") && file.contents.length > 0),
+      `Consumer bundling drops stylesheet: ${subpath}`,
+    );
+  }
 }
 if (!measureOnly) {
   const program = ts.createProgram({
