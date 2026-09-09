@@ -50,7 +50,9 @@ version used by Vite, with React, React DOM, and Yjs external. It reports minifi
 checks that `Editorial` does not include margin comments, and checks that view helpers do not
 include Lexical. For a before/after comparison, use the same lockfile, Node version, build command,
 and script on both revisions. `node scripts/check-platform-bundle.mjs --measure-only` reports
-sizes without requiring the new subpaths on an older revision.
+sizes without requiring the new subpaths on an older revision. Add
+`--package-dir /path/to/built/package` to compare an archived baseline with the same script.
+That package must have its dependencies available for resolution.
 
 ## Install
 

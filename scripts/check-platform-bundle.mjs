@@ -10,13 +10,21 @@ import ts from "typescript";
 const require = createRequire(import.meta.url);
 const { build } = createRequire(require.resolve("vite"))("esbuild");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const packageRoot = path.join(root, "packages/platform");
+const packageArg = process.argv.indexOf("--package-dir");
+if (packageArg >= 0 && !process.argv[packageArg + 1]) {
+  throw new Error("--package-dir requires a built package directory");
+}
+const packageRoot =
+  packageArg < 0
+    ? path.join(root, "packages/platform")
+    : path.resolve(process.argv[packageArg + 1]);
 const packageName = "@eten-tech-foundation/platform-editor";
 const manifest = JSON.parse(readFileSync(path.join(packageRoot, "package.json"), "utf8"));
 const measureOnly = process.argv.includes("--measure-only");
 const cases = [
   ["root-editorial", "", "Editorial"],
   ["root-all", "", "*"],
+  ["root-view-options", "", "getViewOptions"],
   ["editorial", "/editorial", "Editorial"],
   ["view-options", "/view-options", "getViewOptions"],
 ];
@@ -57,7 +65,7 @@ for (const [name, subpath, symbol] of cases) {
   };
   if (measureOnly) continue;
 
-  if (name === "root-editorial" || name === "editorial" || name === "view-options") {
+  if (name === "root-editorial" || name === "editorial" || name.endsWith("view-options")) {
     assert(
       !inputs.some((file) => /\/marginal\/|@lexical\/yjs|LexicalCollaboration/.test(file)),
       `${name} includes margin comments or the Yjs binding`,
@@ -69,7 +77,7 @@ for (const [name, subpath, symbol] of cases) {
       `${name} imports the optional yjs peer`,
     );
   }
-  if (name === "view-options") {
+  if (name.endsWith("view-options")) {
     assert(
       !inputs.some((file) => /node_modules\/(@lexical\/|lexical\/|react\/)/.test(file)),
       "View helpers include an editor runtime",
