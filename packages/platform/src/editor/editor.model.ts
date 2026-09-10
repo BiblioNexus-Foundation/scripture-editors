@@ -574,6 +574,8 @@ export interface EditorRef {
   /**
    * Key of the note at the given document-order index (the inverse of `getNoteIndex`), so a host
    * that addresses notes by index can hand the editor the key `replaceEmbedUpdate` needs.
+   * @param noteIndex - The document-order index of the note (e.g. from `getNoteIndex` or a
+   *   USJ-built notes list).
    * @returns The key, or `undefined` when no note exists at that index.
    */
   getNoteKey(noteIndex: number): string | undefined;
