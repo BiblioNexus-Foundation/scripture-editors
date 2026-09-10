@@ -38,13 +38,13 @@ function renderOpenGate(logger: LoggerBasic = createLogger()) {
 describe("useLoadGate", () => {
   it("runs an operation immediately when no load is in flight", () => {
     const { result } = renderOpenGate();
-    const op = vi.fn();
+    const action = vi.fn();
 
     act(() => {
-      result.current.runWhenLoaded(op);
+      result.current.runWhenLoaded(action);
     });
 
-    expect(op).toHaveBeenCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
   });
 
   it("lets an immediate operation throw to its caller, as it did before the gate existed", () => {
@@ -59,37 +59,38 @@ describe("useLoadGate", () => {
 
   it("defers an operation issued while a load is in flight until that load settles", async () => {
     const { result } = renderOpenGate();
-    const op = vi.fn();
+    const action = vi.fn();
 
     act(() => {
       result.current.handleLoadingChange(true);
-      result.current.runWhenLoaded(op);
+      result.current.runWhenLoaded(action);
     });
-    expect(op).not.toHaveBeenCalled();
+    expect(action).not.toHaveBeenCalled();
 
     act(() => {
       result.current.handleLoadingChange(false);
     });
     await flushMicrotasks();
 
-    expect(op).toHaveBeenCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
   });
 
-  it("re-checks the gate when draining: an operation waits for the load that is next to commit", async () => {
+  it("waits for a load requested before the previous load settles", async () => {
     // Load A is settling, but a load B has already been requested (a `setUsj`, or a view-option
     // change React has not re-rendered yet). Draining at A's settle would apply the operation to
-    // a document B is about to replace — the very loss #515 is about.
+    // a document B is about to replace.
     const { result } = renderOpenGate();
-    const op = vi.fn();
+    await flushMicrotasks();
+    const action = vi.fn();
 
     act(() => {
       result.current.handleLoadingChange(true); // load A starts
-      result.current.runWhenLoaded(op);
+      result.current.runWhenLoaded(action);
       result.current.noteLoadRequested(); // load B is certain
       result.current.handleLoadingChange(false); // load A settles
     });
     await flushMicrotasks();
-    expect(op).not.toHaveBeenCalled();
+    expect(action).not.toHaveBeenCalled();
 
     act(() => {
       result.current.handleLoadingChange(true); // load B starts
@@ -98,28 +99,50 @@ describe("useLoadGate", () => {
     await flushMicrotasks();
 
     // Once, against B's document — not twice, and not against A's.
-    expect(op).toHaveBeenCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-checks the gate when draining after another load is requested", async () => {
+    const { result } = renderOpenGate();
+    await flushMicrotasks();
+    const action = vi.fn();
+
+    act(() => {
+      result.current.handleLoadingChange(true);
+      result.current.runWhenLoaded(action);
+      result.current.handleLoadingChange(false); // schedules the drain with the gate open
+      result.current.noteLoadRequested(); // closes the gate before the drain runs
+    });
+    await flushMicrotasks();
+    expect(action).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.handleLoadingChange(true);
+      result.current.handleLoadingChange(false);
+    });
+    await flushMicrotasks();
+    expect(action).toHaveBeenCalledTimes(1);
   });
 
   it("drains overlapping loads only once they have all settled", async () => {
     const { result } = renderOpenGate();
-    const op = vi.fn();
+    const action = vi.fn();
 
     act(() => {
       result.current.handleLoadingChange(true);
       result.current.handleLoadingChange(true);
-      result.current.runWhenLoaded(op);
+      result.current.runWhenLoaded(action);
       result.current.handleLoadingChange(false);
     });
     await flushMicrotasks();
-    expect(op).not.toHaveBeenCalled();
+    expect(action).not.toHaveBeenCalled();
 
     act(() => {
       result.current.handleLoadingChange(false);
     });
     await flushMicrotasks();
 
-    expect(op).toHaveBeenCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
   });
 
   it("drains in the order the operations were issued", async () => {
