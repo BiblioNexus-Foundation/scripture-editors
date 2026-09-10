@@ -1941,3 +1941,122 @@ describe("usfmFragmentToUsjContent — figures parse without a project styleshee
     ]);
   });
 });
+
+describe("usfmFragmentToUsjContent — peripheral divisions (\\periph)", () => {
+  const PERIPH_USJ = {
+    type: "periph",
+    alt: "Title Page",
+    id: "title",
+    content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+  };
+
+  it("assembles a periph division, splitting its marker-line text into alt and attributes", () => {
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"\\mt1 The Title')).toEqual([
+      PERIPH_USJ,
+    ]);
+  });
+
+  it("reads the line-per-marker spelling identically — the next marker delimits the attribute run, not the line break", () => {
+    // A USFM writer puts `\periph` on its own line, but the newline is ordinary whitespace to a
+    // tokenizer: the marker line's text ends where the next `\marker` begins either way. That is
+    // what lets an opaque construct copy out on ONE line and still parse (`$startsBlockLine`,
+    // whitespaceDisplay.plugin.utils.ts) — and it is why a periph's content can be reassembled at
+    // all, since a Tier-2 rebuild only ever re-tokenizes a single paragraph's bytes.
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"\n\\mt1 The Title')).toEqual([
+      PERIPH_USJ,
+    ]);
+  });
+
+  it("takes every following block into the division — periph has no closing marker", () => {
+    expect(
+      usfmFragmentToUsjContent('\\periph Title Page|id="title"\\mt1 The Title\\p Body.'),
+    ).toEqual([
+      {
+        type: "periph",
+        alt: "Title Page",
+        id: "title",
+        content: [
+          { type: "para", marker: "mt1", content: ["The Title"] },
+          { type: "para", marker: "p", content: ["Body."] },
+        ],
+      },
+    ]);
+  });
+
+  it("ends one division at the next, since peripheral divisions never nest", () => {
+    expect(usfmFragmentToUsjContent("\\periph One\\p a\\periph Two\\p b")).toEqual([
+      { type: "periph", alt: "One", content: [{ type: "para", marker: "p", content: ["a"] }] },
+      { type: "periph", alt: "Two", content: [{ type: "para", marker: "p", content: ["b"] }] },
+    ]);
+  });
+
+  it("keeps a marker-line with no attributes as pure alt text, its structural line break included", () => {
+    expect(usfmFragmentToUsjContent("\\periph Title Page\n\\mt1 The Title")).toEqual([
+      {
+        type: "periph",
+        alt: "Title Page",
+        content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+      },
+    ]);
+  });
+
+  it("keeps an attributes-only marker-line free of an empty alt", () => {
+    expect(usfmFragmentToUsjContent('\\periph |id="title"\\mt1 The Title')).toEqual([
+      {
+        type: "periph",
+        id: "title",
+        content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+      },
+    ]);
+  });
+
+  it("emits a contentless division for a marker line with nothing after it", () => {
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"')).toEqual([
+      { type: "periph", alt: "Title Page", id: "title" },
+    ]);
+  });
+
+  it("nests a sidebar inside the open division rather than beside it", () => {
+    expect(
+      usfmFragmentToUsjContent("\\periph One\\esb \\cat History\\cat*\\p in sidebar\\esbe"),
+    ).toEqual([
+      {
+        type: "periph",
+        alt: "One",
+        content: [
+          {
+            type: "sidebar",
+            marker: "esb",
+            category: "History",
+            content: [{ type: "para", marker: "p", content: ["in sidebar"] }],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("degrades to an ordinary paragraph when the attribute list does not parse, keeping every byte", () => {
+    // Same refusal as every other attribute list here: `|id=""` is not a reading Paratext agrees
+    // with, so the bytes stay literal text where the author can see and fix them.
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id=""\\mt1 The Title')).toEqual([
+      { type: "para", marker: "periph", content: ['Title Page|id=""'] },
+      { type: "para", marker: "mt1", content: ["The Title"] },
+    ]);
+  });
+
+  it("opens no division inside note content, where peripheral divisions do not occur", () => {
+    expect(
+      usfmFragmentToUsjContent("\\ft text \\periph Title\\mt1 The Title", { isNoteContext: true }),
+    ).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [
+          { type: "char", marker: "ft", content: ["text "], closed: "false" },
+          { type: "char", marker: "periph", content: ["Title"], closed: "false" },
+        ],
+      },
+      { type: "para", marker: "mt1", content: ["The Title"] },
+    ]);
+  });
+});

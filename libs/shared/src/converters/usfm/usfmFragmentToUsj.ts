@@ -28,17 +28,21 @@
  * element. A stray `\*` with no milestone to close is NOT literal either — it
  * becomes an unmatched element (see above).
  *
- * Figures, tables, and sidebars assemble to their faithful USJ shapes at the
- * assembly level, marker-name driven (they are parser-level structures in
- * ParatextData, independent of stylesheet classification): `\fig …\fig*` folds
- * to an inline `figure` object (USFM's `src` attribute renamed to USX/USJ's
- * `file`), `\tr` plus `t[hc][rc]#(-#)` cell markers build `table` →
- * `table:row` → `table:cell` with name-derived `align`/`colspan`, and
+ * Figures, tables, sidebars, and peripheral divisions assemble to their faithful
+ * USJ shapes at the assembly level, marker-name driven (they are parser-level
+ * structures in ParatextData, independent of stylesheet classification):
+ * `\fig …\fig*` folds to an inline `figure` object (USFM's `src` attribute
+ * renamed to USX/USJ's `file`), `\tr` plus `t[hc][rc]#(-#)` cell markers build
+ * `table` → `table:row` → `table:cell` with name-derived `align`/`colspan`,
  * `\esb`…`\esbe` wraps the following blocks in a `sidebar` (`\cat` directly
- * after `\esb` folds to its `category`). Anything off the clean shapes —
- * nested markup or positional (USFM 2.0) attributes in a figure, a missing
- * `\fig*`, a cell marker with no open row — degrades to the plain char/para
- * output the marker classification produces on its own.
+ * after `\esb` folds to its `category`), and `\periph` opens a `periph`
+ * division that takes every following block until the next `\periph`, a
+ * chapter, or the fragment end — its marker line splitting at the first `|`
+ * into the division title (`alt`) and an ordinary attribute list. Anything off
+ * the clean shapes — nested markup or positional (USFM 2.0) attributes in a
+ * figure, a missing `\fig*`, a cell marker with no open row, a periph
+ * attribute list that does not parse — degrades to the plain char/para output
+ * the marker classification produces on its own.
  *
  * Input is USFM text: `~` means NBSP; U+FFFC sentinels (atomic-node placeholders
  * from the Tier 2 fragment builder) ride through as ordinary text characters.
@@ -69,6 +73,7 @@ const FIGURE_MARKER = "fig";
 const TABLE_ROW_MARKER = "tr";
 const SIDEBAR_MARKER = "esb";
 const SIDEBAR_END_MARKER = "esbe";
+const PERIPH_MARKER = "periph";
 
 /**
  * Table cell marker names: `t` + header/cell (`h`/`c`) + optional alignment infix (`r`/`c`) +
@@ -814,10 +819,20 @@ export function usfmFragmentToUsjContent(
   // tables). Implicit close (fragment end or a chapter token) marks it closed="false" —
   // ParatextData auto-closes sidebars at the chapter boundary.
   let sidebar: ClosableMarkerObject | undefined;
+  // Current open peripheral division: `\periph` opens one and takes every following block into
+  // it. Nothing closes a division but the next `\periph`, a chapter boundary, or the end of the
+  // fragment — USFM gives a division marker no closing bytes at all, so unlike a sidebar there is
+  // no terminated/implicit distinction to record. The marker LINE's own text (the division title
+  // and its attribute list) is captured first; see `periphCapture`.
+  let periph: MarkerObject | undefined;
 
-  /** Where top-level blocks (paragraphs, tables) land: an open sidebar's content, else the
-   * fragment result. */
-  const blockTarget = (): MarkerContent[] => (sidebar ? getContent(sidebar) : result);
+  /** Where top-level blocks (paragraphs, tables) land: an open sidebar's content, else an open
+   * peripheral division's content, else the fragment result. */
+  const blockTarget = (): MarkerContent[] => {
+    if (sidebar) return getContent(sidebar);
+    if (periph) return getContent(periph);
+    return result;
+  };
 
   // True between a chapter token and the next opened block: loose content there sits at the
   // DOCUMENT ROOT in ParatextData's output, not in an implied paragraph — text typed after
@@ -912,6 +927,11 @@ export function usfmFragmentToUsjContent(
     sidebar = undefined;
   };
 
+  /** End the open division. Nothing to record: a division has no closing bytes to be missing. */
+  const closePeriph = () => {
+    periph = undefined;
+  };
+
   // ---- attribute-marker folding state (see ATTRIBUTE_MARKERS) ----
   // The most recent chapter/verse/note object, still "receptive": an adjacent attribute
   // marker folds onto it as an attribute. Any real content clears it.
@@ -978,6 +998,47 @@ export function usfmFragmentToUsjContent(
     if (!attrCapture) return;
     startParagraph(attrCapture.marker, attrCapture.value);
     attrCapture = undefined;
+  };
+
+  // ---- peripheral-division capture state ----
+  // The text of a `\periph` marker line, collected between the marker and the next marker token.
+  // `\periph` has no closing bytes, so the next marker is the only thing that ends the line —
+  // the same delimiter whether a USFM writer put the division on its own line or a copy laid the
+  // whole construct out on one (a line break is ordinary whitespace to a tokenizer). That is what
+  // lets a Tier-2 rebuild, which only ever re-tokenizes a single paragraph's bytes, reassemble a
+  // whole division from one fragment.
+  let periphCapture: { value: string } | undefined;
+  /**
+   * Close the captured marker line and open the division it describes: everything before the
+   * line's first `|` is the division title (USX/USJ's `alt`), the rest an ordinary named-attribute
+   * list.
+   *
+   * A list that does not parse degrades the whole division to an ordinary paragraph carrying the
+   * literal bytes, exactly as an unfoldable figure span degrades — every byte the author wrote
+   * stays where they can see and fix it.
+   *
+   * @param atBlockBoundary - Whether the token that ended the line starts a new block (or the
+   *   fragment ended). The line's trailing line break is structural there, the same rule the text
+   *   case applies: the line ends where the next block marker begins, and ParatextData emits no
+   *   content for it.
+   */
+  const finishPeriphLine = (atBlockBoundary: boolean) => {
+    if (!periphCapture) return;
+    let { value } = periphCapture;
+    periphCapture = undefined;
+    if (atBlockBoundary && value.endsWith("\n")) value = value.slice(0, -1);
+    const pipeIndex = value.indexOf("|");
+    const attributes =
+      pipeIndex >= 0 ? parseAttributeText(value.slice(pipeIndex + 1), PERIPH_MARKER) : undefined;
+    if (pipeIndex >= 0 && !attributes) {
+      startParagraph(PERIPH_MARKER, value);
+      return;
+    }
+    const title = pipeIndex >= 0 ? value.slice(0, pipeIndex) : value;
+    periph = { type: "periph", ...(title ? { alt: toUsjText(title) } : {}), ...attributes };
+    periph.content = [];
+    result.push(periph);
+    para = undefined;
   };
 
   // ---- figure capture state ----
@@ -1109,6 +1170,20 @@ export function usfmFragmentToUsjContent(
         tokenIndex--;
         continue;
       }
+    }
+
+    if (periphCapture) {
+      // The marker line runs to the next marker token. An optbreak rejoins as the literal `//`
+      // the author typed, for the same reason the figure capture rejoins one: `//` inside an
+      // attribute value (a URL, say) is plain value bytes to ParatextData, which strips the
+      // attribute segment out at tokenize-time before its `//` pass ever runs.
+      if (token.kind === "text" || token.kind === "optbreak") {
+        periphCapture.value += token.kind === "text" ? token.text : "//";
+        continue;
+      }
+      finishPeriphLine(token.kind === "para" || token.kind === "chapter");
+      tokenIndex--;
+      continue;
     }
 
     if (figCapture) {
@@ -1276,8 +1351,15 @@ export function usfmFragmentToUsjContent(
           closeNote(false);
           // Sidebars never nest: an unterminated previous sidebar closes implicitly.
           closeSidebar(false);
-          sidebar = { type: "sidebar", marker: SIDEBAR_MARKER, content: [] };
-          result.push(sidebar);
+          // Landed BEFORE `sidebar` is set: `blockTarget()` answers "the open sidebar's content"
+          // whenever one is open, so assigning first would nest the new sidebar inside itself.
+          const opened: ClosableMarkerObject = {
+            type: "sidebar",
+            marker: SIDEBAR_MARKER,
+            content: [],
+          };
+          blockTarget().push(opened);
+          sidebar = opened;
           para = undefined;
           attrTarget = sidebar; // receptive to \cat (directly after \esb only)
           atChapterRootScope = false;
@@ -1290,6 +1372,19 @@ export function usfmFragmentToUsjContent(
           // no open sidebar it falls through to today's unknown-paragraph behavior.
           closeSidebar(true);
           para = undefined;
+          break;
+        }
+        // ---- peripheral-division assembly ----
+        if (!isNoteContext && token.marker === PERIPH_MARKER) {
+          closeCharStack();
+          closeNote(false);
+          // A division ends every block structure open inside it, including a sidebar the author
+          // never terminated; divisions themselves never nest.
+          closeSidebar(false);
+          closePeriph();
+          periphCapture = { value: "" };
+          para = undefined;
+          atChapterRootScope = false;
           break;
         }
         startParagraph(token.marker);
@@ -1312,9 +1407,11 @@ export function usfmFragmentToUsjContent(
         closeCharStack();
         closeNote(false);
         // A chapter boundary ends any open table and implicitly closes an open sidebar
-        // (ParatextData auto-closes sidebars at the end of the chapter).
+        // (ParatextData auto-closes sidebars at the end of the chapter). A peripheral division
+        // ends there too: chapters are book body, which is never division content.
         endTable();
         closeSidebar(false);
+        closePeriph();
         para = undefined;
         const chapter: MarkerObject = {
           type: "chapter",
@@ -1406,6 +1503,9 @@ export function usfmFragmentToUsjContent(
         break;
     }
   }
+  // Fragment ended on a `\periph` marker line: the division has its title and attributes but no
+  // content, which is a complete division — a periph never had a closer to be missing.
+  if (periphCapture) finishPeriphLine(true);
   // Fragment ended mid-figure: no `\fig*` closer — degrade to the plain char/para span.
   if (figCapture) materializeFigCapture();
   if (attrCapture) {

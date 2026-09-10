@@ -232,31 +232,34 @@ describe("sidebar (UnknownNode) copy→paste across all three payload shapes", (
 
 describe("periph (UnknownNode) copy→paste across all three payload shapes", () => {
   const usj = corpusUsj("periph");
-  it("full payload (lexical flavor) round-trips the periph construct whole — its id/alt attributes and nested paragraph included", async () => {
+  SHAPES.forEach((shape) => {
     // Compared construct-to-construct rather than document-to-document: `periph` is book-level
     // front matter with no chapter, so this sweep's "header plus one empty `\\p` host" target
     // leaves the pasted block nested inside that host paragraph. Where the block LANDS is generic
-    // Lexical insertion, not construct fidelity; what this pin is about is that nothing inside the
-    // construct was lost on the way.
-    const pasted = await pastedUsjFor(usj, "full");
-    expect(objectsOfType(pasted, "periph")).toEqual(objectsOfType(usj, "periph"));
+    // Lexical insertion, not construct fidelity; what these pins are about is that nothing inside
+    // the construct was lost on the way.
+    it(`${shape} payload round-trips the periph construct whole — its id/alt attributes and nested paragraph included`, async () => {
+      const pasted = await pastedUsjFor(usj, shape);
+      expect(objectsOfType(pasted, "periph")).toEqual(objectsOfType(usj, "periph"));
+    });
   });
 
-  (["plain", "plain+html"] as const).forEach((shape) => {
-    // Not a block split: an opaque construct copies out on ONE line (`$startsBlockLine`,
-    // `whitespaceDisplay.plugin.utils.ts`), which is what lets the sidebar above round-trip. Two
-    // `\periph`-specific gaps stop periph taking the same route: the fragment tokenizer has no
-    // periph assembly (nothing turns `\periph …` back into a `periph` object), and periph's display
-    // renders its non-`alt` attributes as a `|name="value"` run on a marker that has no closing
-    // bytes, so nothing marks where the attribute run ends and the content resumes. The paste
-    // therefore comes back as an ORDINARY paragraph whose marker is `periph`, carrying the
-    // attribute bytes as literal text.
-    it(`${shape} payload loses the periph construct — it re-tokenizes as an ordinary paragraph carrying its own attribute bytes as text`, async () => {
-      const pasted = await pastedUsjFor(usj, shape);
-      expect(objectsOfType(pasted, "periph")).toEqual([]);
-      const degraded = objectsOfType(pasted, "para").find((item) => item.marker === "periph");
-      expect(degraded?.content).toEqual(['Title Page|id="title"']);
-    });
+  it("loses the division's content if the copy is laid out line-per-marker instead of on one line", async () => {
+    // Why the one-line copy rule (`$startsBlockLine`, `whitespaceDisplay.plugin.utils.ts`) has to
+    // cover a peripheral division too, measured rather than argued. A `\periph` line and the
+    // blocks it contains are separate USFM lines the way a writer emits them, and a paste replays
+    // every line break as a paragraph split — after which Tier 2 re-tokenizes each paragraph on
+    // its own and no single pass ever sees the division together with its content. The tokenizer
+    // reads both spellings identically (`usfmFragmentToUsj.test.ts`); it is the paste's line
+    // splitting, not the byte form, that decides whether the content can be reassembled.
+    const payload = await copyContentPayload(usj);
+    const lineBroken = payload[PLAIN].replace("\\mt1", "\n\\mt1");
+    const pasted = await pasteIntoFreshHost(usj, { [PLAIN]: lineBroken });
+    if (!pasted) throw new Error("editor produced no USJ");
+    expect(objectsOfType(pasted, "periph")).toEqual([
+      { type: "periph", alt: "Title Page", id: "title" },
+    ]);
+    expect(objectsOfType(pasted, "para").map((item) => item.marker)).toContain("mt1");
   });
 });
 
