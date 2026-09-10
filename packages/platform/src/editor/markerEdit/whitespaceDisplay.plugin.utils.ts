@@ -319,27 +319,60 @@ function $isSelectionInAttributeContext(selection: RangeSelection): boolean {
 }
 
 /**
+ * True when the WHOLE of `selection` stays inside ONE attribute-display node — a collapsed caret in
+ * attribute context, or a range whose anchor and focus are the same node and that node is in
+ * attribute context.
+ *
+ * This is the only shape whose pasted bytes are genuinely attribute VALUE bytes. The value-byte
+ * carve-outs ({@link $insertPastedTextIntoAttributeContext}) are earned by exactly one fact: the
+ * bytes land in a node that stays tagged "attribute", which `$textNodeTier2Transform` skips, so
+ * they are never read as markers and never re-tokenize.
+ *
+ * A selection that merely TOUCHES attribute context does not have that property. Removing the
+ * range takes the bytes out of the run, and when the range covers a char span's closing glyph it
+ * deletes the closer too, so the whole span re-tokenizes around whatever just arrived. Measured
+ * both ways round — a range starting in body text and reaching INTO the run, and a range starting
+ * inside the run and reaching PAST the closer — a pasted `\c 5` produced a real chapter node
+ * mid-paragraph, which is exactly the save-loop poisoning {@link $stripPastedChapterAndBookId}
+ * exists to prevent (`attributeContextPasteFidelity.test.tsx`).
+ */
+function $isSelectionWithinOneAttributeNode(selection: RangeSelection): boolean {
+  const { anchor, focus } = selection;
+  return anchor.key === focus.key && $isNodeInAttributeContext(anchor.getNode());
+}
+
+/**
  * Paste normalization for a selection touching attribute-display text — the binding design
  * principle: paste ≡ typing the same characters at the same caret. Each `\n` in `text` becomes a
  * single space (a PER-NEWLINE replacement, not a run-collapsing one: `"a\n\nb"` becomes `"a  b"`,
  * two spaces, matching what two individual Enter-less keystrokes over an attribute run would
  * produce — attribute values are single-line, so there is no multi-line attribute byte shape to
  * collapse INTO). `text` arrives with bare `\n` line endings ({@link getPastePayload} normalizes
- * them for every paste claim) — no `\r` reaches this function. The result is inserted via the exact
- * `selection.insertText` a keystroke uses — no chapter/book-id strip, no positional NBSP mapping,
- * no marker tokenization, all of which exist for BODY content's marker-recognition and
- * whitespace-display invariants and apply to none of it: a pasted `\c 5` or `\p` here is literal
- * value text, not a structural marker, and
+ * them for every paste claim) — no `\r` reaches this function. For a non-collapsed (mixed or
+ * fully-inside) selection, `selection.insertText` removes the selected range before inserting, the
+ * same as it does for a typed keystroke over that selection — no separate removal step is needed
+ * here. The existing attribute pend/settle machinery (`$textNodeTier2Transform`'s attribute-tagged
+ * early return, `$resolvePendingMarkers`) takes over identically whether the text arrived by typing
+ * or this call.
+ *
+ * The two BODY-content paste rules — the `\c`/`\id` strip and the positional NBSP mapping, the only
+ * two places a paste deliberately diverges from typing the same bytes — are skipped only for a
+ * selection that stays wholly inside one attribute node ({@link $isSelectionWithinOneAttributeNode}).
+ * There the bytes really are value text: a pasted `\c 5` is literal, not a structural marker, and
  * `$displayWhitespaceTransform` (this file) already skips textType "attribute" nodes outright, so a
- * literal NBSP a user TYPES into an attribute run is never touched — a pasted one must not be
- * treated any differently. For a non-collapsed (mixed or fully-inside) selection,
- * `selection.insertText` removes the selected range before inserting, the same as it does for a
- * typed keystroke over that selection — no separate removal step is needed here. The existing
- * attribute pend/settle machinery (`$textNodeTier2Transform`'s attribute-tagged early return,
- * `$resolvePendingMarkers`) takes over identically whether the text arrived by typing or this call.
+ * literal NBSP a user TYPES into an attribute run is never touched and a pasted one must not be
+ * either. A selection that only TOUCHES an attribute run does not qualify: its bytes end up as
+ * ordinary paragraph content that re-tokenizes, so they get body content's rules. What does NOT
+ * change with them is the insertion MECHANISM — one `insertText`, never the paragraph-splitting
+ * line replay and never Lexical's rich-paste node insertion, both of which corrupt the
+ * attribute-run end of the range. A multi-line payload landing in body content this way therefore
+ * still collapses per newline instead of splitting the paragraph; splitting a paragraph the removal
+ * has just cut a char span in half in is the corruption this path exists to avoid.
  */
 function $insertPastedTextIntoAttributeContext(selection: RangeSelection, text: string): void {
-  selection.insertText(text.replace(/\n/g, " "));
+  const valueBytes = $isSelectionWithinOneAttributeNode(selection);
+  const resolved = valueBytes ? text : $normalizePastedNbsp($stripPastedChapterAndBookId(text));
+  selection.insertText(resolved.replace(/\n/g, " "));
 }
 
 /**
@@ -400,9 +433,11 @@ function $insertPastedTextIntoAttributeContext(selection: RangeSelection, text: 
  * documented case for when that CAN still reach a handler, unlike the reconstructed-`DataTransfer`
  * path); (2) a multi-line plain-text payload, which the ordinary external-paste pipeline below
  * would split into real paragraphs via `INSERT_PARAGRAPH_COMMAND` — inside an attribute run that
- * is exactly as destructive as the rich-paste shape; (3) a marker-bearing payload (`\c 5`), which
- * the ordinary pipeline's `$stripPastedChapterAndBookId` would eat bytes out of an attribute VALUE
- * that were never a chapter token to begin with; (4) a MIXED selection (one end inside the run, one
+ * is exactly as destructive as the rich-paste shape; (3) a marker-bearing payload (`\c 5`) landing
+ * wholly INSIDE one attribute node, where the ordinary pipeline's `$stripPastedChapterAndBookId`
+ * would eat bytes out of an attribute VALUE that were never a chapter token to begin with — bytes
+ * merely TOUCHING a run get that strip, since they end up as re-tokenizing paragraph content
+ * ({@link $insertPastedTextIntoAttributeContext}); (4) a MIXED selection (one end inside the run, one
  * end outside) combined with either (1) or (2) above — the selection touches attribute context, so
  * it must not be allowed to reach either risky branch merely because its OTHER end sits outside.
  * Attribute value bytes are never rich content — a user cannot "type formatting" into one either —

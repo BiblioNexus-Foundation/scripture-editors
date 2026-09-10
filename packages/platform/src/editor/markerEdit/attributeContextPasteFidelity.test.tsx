@@ -34,6 +34,14 @@
  * caret (or over the same selection). Every "paste ≡ typed" pin below proves paste and the
  * character-by-character TYPED equivalent settle to the identical USJ, not merely to
  * individually-plausible-looking results.
+ *
+ * That equivalence governs the insertion MECHANISM for every selection touching a run. It does NOT
+ * extend to the two rules a body-content paste applies that typing does not — the `\c`/`\id` strip
+ * and the positional NBSP mapping — which are skipped only for a selection that stays wholly inside
+ * ONE attribute node, the only shape whose bytes end up in a node that stays tagged "attribute" and
+ * therefore never re-tokenizes. The "mixed selection: the pasted bytes are BODY content" describe
+ * pins that split from both directions and pins the wholly-inside boundary that keeps value-byte
+ * semantics.
  */
 
 import {
@@ -672,6 +680,167 @@ describe("mixed selection: spans BOTH attribute and non-attribute content", () =
 });
 
 // ---------------------------------------------------------------------------------------------
+// Single-paragraph mixed-selection fixture: `\p before \nd asdf|who="hi"\nd* after`, with body
+// text on BOTH sides of the span in the SAME paragraph, plus a second paragraph to depart to. A
+// mixed selection needs ordinary content and attribute-display text in one range, and a
+// cross-paragraph range does not hold in jsdom — within one paragraph it does.
+// ---------------------------------------------------------------------------------------------
+
+function $inlineCharFixture(): void {
+  const char = $createCharNode("nd");
+  char.setUnknownAttributes({ who: "hi" });
+  const run = $createTextNode('|who="hi"');
+  $setState(run, textTypeState, "attribute");
+  char.append(
+    $createMarkerNode("nd"),
+    $createTextNode(`${NBSP}asdf`),
+    run,
+    $createMarkerNode("nd", "closing"),
+  );
+  const [glyph, separator] = $createMarkerPrefix("p");
+  const [glyph2, separator2] = $createMarkerPrefix("p");
+  $getRoot().append(
+    $createParaNode("p").append(
+      glyph,
+      separator,
+      $createTextNode("before "),
+      char,
+      $createTextNode(" after"),
+    ),
+    $createParaNode("p").append(glyph2, separator2, $createTextNode("body")),
+  );
+}
+
+const $leadingBodyText = (): TextNode => {
+  const node = $firstPara().getChildren()[2];
+  if (!$isTextNode(node)) throw new Error("leading body text missing");
+  return node;
+};
+const $trailingBodyText = (): TextNode => {
+  const node = $firstPara().getLastChild();
+  if (!$isTextNode(node)) throw new Error("trailing body text missing");
+  return node;
+};
+
+/** anchor in the leading BODY text, focus inside the attribute run — the range crosses the span's
+ * opening glyph on its way in. */
+function $selectBodyIntoRun(): void {
+  $leadingBodyText().select(3, 3);
+  const selection = $getSelection();
+  if ($isRangeSelection(selection))
+    selection.focus.set($charAttributeRun($firstChar()).getKey(), 5, "text");
+}
+
+/** anchor inside the attribute run, focus in the trailing BODY text — the range covers the span's
+ * CLOSING glyph, so removing it leaves the span unterminated. */
+function $selectRunPastCloser(): void {
+  const run = $charAttributeRun($firstChar());
+  run.select(1, 1);
+  const selection = $getSelection();
+  if ($isRangeSelection(selection)) selection.focus.set($trailingBodyText().getKey(), 3, "text");
+}
+
+describe("mixed selection: the pasted bytes are BODY content, not attribute-value bytes", () => {
+  // Attribute-value semantics (no `\c`/`\id` strip, no positional NBSP mapping) are earned by one
+  // fact: the bytes land in a node that stays tagged "attribute", which `$textNodeTier2Transform`
+  // skips, so they never re-tokenize as markers. Only a selection wholly inside ONE such node has
+  // that property. A selection that merely TOUCHES one loses it — removing the range takes the
+  // bytes out of the run (and, when the range covers the span's closing glyph, deletes the closer
+  // so the whole span re-tokenizes around them) — so the bytes are ordinary body content and get
+  // body content's paste rules. The INSERTION MECHANISM is unchanged either way: one
+  // `selection.insertText`, never the paragraph-splitting line replay and never Lexical's
+  // rich-paste node insertion, both of which corrupt the attribute-run end of the range.
+
+  it("does not create a chapter node when the range starts in body text — the \\c strip applies", async () => {
+    const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => editor.update($selectBodyIntoRun));
+
+    await pasteAndFlush(editor, { "text/plain": "\\c 5 X" });
+    await departAndSettle(editor, () => $bodyTextNode().select(0, 0));
+
+    const content = usjOf(editor).content;
+    expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
+      [],
+    );
+    // The paragraph also stays whole: a chapter token closes the enclosing paragraph, stranding
+    // everything after it as bare top-level USJ.
+    expect(content.every((item) => typeof item !== "string" && item.type === "para")).toBe(true);
+  });
+
+  it("does not create a chapter node when the range STARTS inside the run and reaches past the closing glyph", async () => {
+    // The bytes land at the run's own offset, yet still re-tokenize: the range took the closer with
+    // it, so the span is no longer a span with an attribute run to be inside of.
+    const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => editor.update($selectRunPastCloser));
+
+    await pasteAndFlush(editor, { "text/plain": "\\c 5" });
+    await departAndSettle(editor, () => $bodyTextNode().select(0, 0));
+
+    const content = usjOf(editor).content;
+    expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
+      [],
+    );
+    expect(content.every((item) => typeof item !== "string" && item.type === "para")).toBe(true);
+  });
+
+  it("keeps a pasted interior NBSP as DATA — the positional rule applies to body-bound bytes", async () => {
+    // Body rule: every NBSP that is not a marker-adjacent display separator is user data and
+    // becomes `~`, which the tokenizer reads back as a real NBSP. Inserted raw instead, the same
+    // byte is read as display whitespace and saves as a plain space — the data is gone.
+    const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => editor.update($selectBodyIntoRun));
+
+    await pasteAndFlush(editor, { "text/plain": `X${NBSP}Y` });
+    await departAndSettle(editor, () => $bodyTextNode().select(0, 0));
+
+    expect(JSON.stringify(usjOf(editor).content)).toContain(`X${NBSP}Y`);
+  });
+
+  it("still settles a plain payload identically to the same character typed over the same range", async () => {
+    // The strip and the NBSP rule are the only two places body paste diverges from typing; a
+    // payload carrying neither must still land exactly where a keystroke would. This also answers
+    // the recorded suspicion that a range reaching past the closing glyph corrupts on replacement:
+    // it does not, and typed input over the same range produces the identical bytes — the span
+    // losing its closer is the arithmetic of a range that covered the closer, not a paste defect.
+    const typed = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => typed.editor.update($selectRunPastCloser));
+    await typeCharByChar(typed.editor, "Z");
+    await departAndSettle(typed.editor, () => $bodyTextNode().select(0, 0));
+
+    const pasted = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => pasted.editor.update($selectRunPastCloser));
+    await pasteAndFlush(pasted.editor, { "text/plain": "Z" });
+    await departAndSettle(pasted.editor, () => $bodyTextNode().select(0, 0));
+
+    expect(usjOf(pasted.editor)).toEqual(usjOf(typed.editor));
+  });
+
+  it("leaves a range wholly INSIDE the run on attribute-value semantics — a pasted \\c stays literal there", async () => {
+    // The boundary of the rule above, in its non-collapsed form (the collapsed-caret form is pinned
+    // in the "marker-bearing payload" describe). The run survives this replacement still tagged
+    // "attribute", so the bytes really are value text and the strip must not touch them.
+    const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () =>
+      editor.update(() => {
+        const run = $charAttributeRun($firstChar());
+        const text = run.getTextContent(); // '|who="hi"'
+        run.select(text.indexOf('"') + 1, text.lastIndexOf('"'));
+      }),
+    );
+
+    await pasteAndFlush(editor, { "text/plain": "\\c 5" });
+
+    editor.getEditorState().read(() => {
+      expect($charAttributeRun($firstChar()).getTextContent()).toBe('|who="\\c 5"');
+    });
+    const content = usjOf(editor).content;
+    expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
+      [],
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
 // Milestone attribute run: one paste case, matching milestoneAttributeSettle.test.tsx's idiom.
 // ---------------------------------------------------------------------------------------------
 
@@ -724,6 +893,31 @@ describe("milestone attribute run paste", () => {
       expect(milestone.getSid()).toBe("q1");
       expect(milestone.getUnknownAttributes()).toEqual({ who: "ed" });
     });
+  });
+
+  it("a mixed selection reaching into the milestone's run takes body rules too — the rule is not char-span-specific", async () => {
+    // `$isNodeInAttributeContext` covers all three run kinds through one predicate, so the
+    // wholly-inside-versus-touching distinction is pinned on a second kind rather than left
+    // inferred from the char span that surfaced it.
+    const { editor } = await testEnvironmentWithSpacing($milestoneFixture);
+    await act(async () =>
+      editor.update(() => {
+        const leading = $firstPara().getChildren()[2];
+        if (!$isTextNode(leading)) throw new Error("leading body text missing");
+        leading.select(3, 3);
+        const selection = $getSelection();
+        if ($isRangeSelection(selection))
+          selection.focus.set($milestoneAttributeRun().getKey(), 2, "text");
+      }),
+    );
+
+    await pasteAndFlush(editor, { "text/plain": "\\c 5" });
+    await departAndSettle(editor, () => $milestoneBodyText().select(0, 0));
+
+    const content = usjOf(editor).content;
+    expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
+      [],
+    );
   });
 });
 
