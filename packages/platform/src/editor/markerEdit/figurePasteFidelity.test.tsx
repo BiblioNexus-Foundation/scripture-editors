@@ -36,7 +36,9 @@ if (typeof globalStubs.DragEvent === "undefined")
 if (typeof globalStubs.ClipboardEvent === "undefined")
   globalStubs.ClipboardEvent = class ClipboardEvent extends Event {};
 
-/** The exact bytes from the live report. */
+/** One figure's full USFM: the caption, then its USFM 3 attribute run, then the closer. The
+ * caption sitting BEFORE the attributes is what makes the construct's own content the thing a
+ * rebuild has to keep inside the wrapper. */
 const FIGURE_USFM = `\\fig At once they left their nets.|src="avnt016.jpg" size="span" ref="1.18"\\fig*`;
 
 const CAPTION = "At once they left their nets.";

@@ -5,6 +5,7 @@ import {
   regularizeSpaces,
 } from "./usfmFragmentToUsj.js";
 import { NBSP } from "../../nodes/usj/node-constants.js";
+import { defaultStyleInfo } from "../../utils/usfm/defaultStyleInfo.js";
 import { createMarkerLookup, StyleInfo } from "../../utils/usfm/styleInfo.js";
 
 describe("usfmFragmentToUsjContent — core", () => {
@@ -1500,6 +1501,99 @@ describe("stylesheet-first classification", () => {
     expect(content).toEqual([
       { type: "para", marker: "p", content: ["one "] },
       { type: "para", marker: "zpb", content: ["two"] },
+    ]);
+  });
+});
+
+describe("cell markers under a real stylesheet, which classifies them as Character", () => {
+  // usfm.sty declares every `\th…`/`\tc…` as a Character style, so with a project sheet in play a
+  // cell marker reaches assembly as a `charOpen` token, not a paragraph one — the shape the app
+  // actually runs. ParatextData derives a cell from the marker NAME either way, and the alignment
+  // comes from the name's infix (`thc3` → center, `thr5` → end), so the two token kinds must land
+  // on the same cell.
+  const sheetLookup = createMarkerLookup(defaultStyleInfo);
+
+  it("assembles align-infix cells that arrive as character tokens", () => {
+    expect(
+      usfmFragmentToUsjContent("\\tr \\thc3 middle\\thr5 right", { getMarker: sheetLookup }),
+    ).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              { type: "table:cell", marker: "thc3", align: "center", content: ["middle"] },
+              { type: "table:cell", marker: "thr5", align: "end", content: ["right"] },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("a RANGED cell marker is not in the sheet at all, so it still arrives as a paragraph token", () => {
+    // usfm.sty declares `\tcr1`, never `\tcr1-4` — a span is spelled by ParatextData's range rule,
+    // not by a stylesheet entry — so a ranged cell is an UNKNOWN marker even under a project sheet
+    // and reaches assembly through the paragraph arm. Colspan assembly is therefore untouched by
+    // the character-token arm above; both arms build the cell through the same `pushTableCell`.
+    expect(usfmFragmentToUsjContent("\\tr \\tcr1-4 wide", { getMarker: sheetLookup })).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              { type: "table:cell", marker: "tcr1", align: "end", colspan: "4", content: ["wide"] },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("a cell-named character marker with NO open row stays an ordinary char span", () => {
+    // The cell arm is guarded on an open `\tr`; only that opens a row. Without the guard, a span
+    // that merely shares a cell marker's name would be assembled into a table that does not exist.
+    expect(
+      usfmFragmentToUsjContent("\\p before \\thc3 middle", { getMarker: sheetLookup }),
+    ).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [
+          "before ",
+          { type: "char", marker: "thc3", content: ["middle"], closed: "false" },
+        ],
+      },
+    ]);
+  });
+
+  it("a NESTED cell-named marker inside a cell is a char span, not a second cell", () => {
+    expect(
+      usfmFragmentToUsjContent("\\tr \\thc3 middle \\+tc1 inner\\+tc1*", {
+        getMarker: sheetLookup,
+      }),
+    ).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              {
+                type: "table:cell",
+                marker: "thc3",
+                align: "center",
+                content: ["middle ", { type: "char", marker: "tc1", content: ["inner"] }],
+              },
+            ],
+          },
+        ],
+      },
     ]);
   });
 });

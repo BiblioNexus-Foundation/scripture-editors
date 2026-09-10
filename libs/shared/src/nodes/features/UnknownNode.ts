@@ -3,6 +3,8 @@ import { MarkerObject } from "@eten-tech-foundation/scripture-utilities";
 import {
   $applyNodeReplacement,
   $getSelection,
+  $isRangeSelection,
+  $isTextNode,
   BaseSelection,
   DOMConversionMap,
   DOMConversionOutput,
@@ -225,38 +227,79 @@ export class UnknownNode extends ElementNode {
   // construct's full USFM bytes while its USJ has lost the node and every attribute on it — a
   // convincing display over missing data, which a save then persists with no error.
   //
-  // The `getChildrenSize() > 0` guard keeps a genuinely childless husk excluded, matching
-  // `text/plain`'s "nothing here" for the same node (`markerEditTier1.utils.ts`'s own
-  // husk-removal check recognizes an emptied optbreak by that same zero-child shape). It does NOT,
-  // on its own, cover a DIFFERENT carrier-agreement gap: a selection whose ending boundary resolves
-  // to an ELEMENT-type point ON this node at offset 0 (touching the wrapper without covering any of
-  // its content) still marks a CHILD-BEARING node "selected" under Lexical's default `isSelected`
-  // (key-membership in `selection.getNodes()`, unaffected by this node's own child count), so
-  // `$appendNodesToJSON` would serialize a CHILDLESS placeholder for a node that has children,
-  // disagreeing with `text/plain` (`$selectionToUsfmText`, which walks that same `getNodes()` list
-  // and correctly emits nothing for this boundary). The `isSelected` override below closes that
-  // second gap at its actual source, since `excludeFromCopy` has no visibility into which of a
-  // node's children a given selection will include.
+  // The `getChildrenSize() > 0` guard excludes a node with no children of its OWN — of any kind,
+  // and for whatever reason it has none — because that is exactly when `text/plain` also emits
+  // nothing for it, and the two carriers must agree. Three shapes reach it, and only the first is
+  // a husk: an optbreak whose `//` display child was deleted (`markerEditTier1.utils.ts`'s
+  // husk-removal check recognizes it by that same zero-child shape); a content-less construct in
+  // an editable-marker view, where the marker/attribute display bytes `createUnknown`
+  // (`usj-editor.adaptor.ts`) prepends are themselves children, so only a kind with no display
+  // bytes at all can be childless; and, in a HIDDEN-marker view, ANY content-less construct — a
+  // caption-less `figure`, an empty `ref`, every optbreak — because `createUnknown` builds no
+  // display children there at all. The last is prose-copy semantics rather than a husk: a
+  // hidden-marker view copies what it shows, and it shows no bytes for a construct with no
+  // content.
+  //
+  // The guard does NOT, on its own, cover a DIFFERENT carrier-agreement gap: a selection whose
+  // ending boundary resolves to an ELEMENT-type point ON this node at offset 0 (touching the
+  // wrapper without covering any of its content) still marks a CHILD-BEARING node "selected" under
+  // Lexical's default `isSelected` (key-membership in `selection.getNodes()`, unaffected by this
+  // node's own child count), so `$appendNodesToJSON` would serialize a CHILDLESS placeholder for a
+  // node that has children, disagreeing with `text/plain` (`$selectionToUsfmText`, which walks that
+  // same `getNodes()` list and correctly emits nothing for this boundary). The `isSelected`
+  // override below closes that second gap at its actual source, since `excludeFromCopy` has no
+  // visibility into which of a node's children a given selection will include.
   override excludeFromCopy(destination: "clone" | "html"): boolean {
     return this.getChildrenSize() > 0 ? false : destination !== "clone";
   }
 
   // An `UnknownNode` is only meaningfully "selected" (and so only copy-included, per the
-  // `excludeFromCopy` guard above) when at least one of its own children is — mirrors
-  // `$selectionToUsfmText`'s copy walker so both clipboard carriers agree at the same selection
-  // boundary, the same way Lexical's own base `isSelected` (`LexicalNode.prototype.isSelected`)
-  // already special-cases an inline DECORATOR node sitting as a parent's last child at an
-  // exactly-there boundary point, for the identical reason. Without this, a selection ending
-  // exactly at this node's own start (an ElementNode touch-boundary that covers none of its
-  // content) still counts the WRAPPER as selected via the default `ElementNode.isSelected`
-  // (key-membership in `selection.getNodes()`), while no child is — producing a childless entry in
-  // the `application/x-lexical-editor` copy with nothing corresponding to it in `text/plain`.
+  // `excludeFromCopy` guard above) when the selection actually covers CONTENT of one of its own
+  // children — mirrors `$selectionToUsfmText`'s copy walker so both clipboard carriers agree at
+  // the same selection boundary, the same way Lexical's own base `isSelected`
+  // (`LexicalNode.prototype.isSelected`) already special-cases an inline DECORATOR node sitting as
+  // a parent's last child at an exactly-there boundary point, for the identical reason. Without
+  // this, a selection ending exactly at this node's own start counts the WRAPPER as selected via
+  // the default `ElementNode.isSelected` (key-membership in `selection.getNodes()`) while none of
+  // its content is covered — producing an entry in the `application/x-lexical-editor` copy with
+  // nothing corresponding to it in `text/plain`.
+  //
+  // Membership alone is not the whole test, because a boundary reaches the children two different
+  // ways depending on what the first child IS. A construct whose display bytes lead (a `figure`'s
+  // `\fig ` glyph) starts with a DECORATOR, so an element-type boundary point on the wrapper stays
+  // one and no child is in `getNodes()` at all. A construct with no display bytes (a `ref`, whose
+  // container USFM never carried) starts with a real `TextNode`, and Lexical normalizes that same
+  // boundary point into a TEXT point at that child's offset 0 — so the child IS in `getNodes()`
+  // while contributing zero characters, exactly as the copy walker computes it. Hence the
+  // zero-width check: a boundary point that touches a child at its very start or very end covers
+  // none of it.
   override isSelected(selection?: BaseSelection | null): boolean {
     const targetSelection = selection ?? $getSelection();
     if (!targetSelection) return false;
     const selectedNodes = targetSelection.getNodes();
-    return this.getChildren().some((child) => selectedNodes.some((node) => node.is(child)));
+    return this.getChildren().some(
+      (child) =>
+        selectedNodes.some((node) => node.is(child)) &&
+        $selectionCoversContent(child, targetSelection),
+    );
   }
+}
+
+/**
+ * Whether `selection` covers at least one character of `child`, as opposed to merely touching it at
+ * a boundary. Only a range selection's own endpoint can be zero-width against a text node — a child
+ * reached any other way is genuinely inside the range — so every other shape answers `true`.
+ */
+function $selectionCoversContent(child: LexicalNode, selection: BaseSelection): boolean {
+  if (!$isRangeSelection(selection) || !$isTextNode(child)) return true;
+  const { anchor, focus } = selection;
+  const [start, end] = anchor.isBefore(focus) ? [anchor, focus] : [focus, anchor];
+  if (end.type === "text" && end.key === child.getKey() && end.offset === 0) return false;
+  return !(
+    start.type === "text" &&
+    start.key === child.getKey() &&
+    start.offset === child.getTextContentSize()
+  );
 }
 
 function $convertUnknownElement(element: HTMLElement): DOMConversionOutput {

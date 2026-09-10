@@ -28,8 +28,23 @@ import { mountStandardViewEditor } from "../settledGetUsj.test-helpers";
 import { corpusFixtures } from "../adaptors/corpus/corpus-data";
 import { MarkerObject, Usj, usxStringToUsj } from "@eten-tech-foundation/scripture-utilities";
 import { act } from "@testing-library/react";
-import { $getRoot, COPY_COMMAND, PASTE_COMMAND, RootNode } from "lexical";
-import { $isChapterNode, $isImmutableChapterNode } from "shared";
+import {
+  $createPoint,
+  $createRangeSelection,
+  $getRoot,
+  $setSelection,
+  COPY_COMMAND,
+  PASTE_COMMAND,
+  RootNode,
+} from "lexical";
+import {
+  $isChapterNode,
+  $isImmutableChapterNode,
+  $isParaNode,
+  $isUnknownNode,
+  ParaNode,
+  UnknownNode,
+} from "shared";
 
 // jsdom implements neither `ClipboardEvent` nor `DragEvent`; Lexical's own rich-paste fallback —
 // the path a lexical-flavor payload takes once the Standard-view handler declines — duck-types
@@ -157,6 +172,44 @@ function objectsOfType(usj: Usj, type: string): MarkerObject[] {
   return found;
 }
 
+/** The document's first paragraph PAST the header — the one a user would be selecting in. */
+function $firstContentPara(): ParaNode {
+  const root = $getRoot();
+  const para = root.getChildren().slice($contentStartIndex(root)).find($isParaNode);
+  if (!para) throw new Error("no content paragraph past the header");
+  return para;
+}
+
+/** The first `UnknownNode` of `tag` in that paragraph. */
+function $constructOfTag(tag: string): UnknownNode {
+  const construct = $firstContentPara()
+    .getChildren()
+    .filter($isUnknownNode)
+    .find((node) => node.getTag() === tag);
+  if (!construct) throw new Error(`no ${tag} UnknownNode in the first content paragraph`);
+  return construct;
+}
+
+/** Copies a selection running from the paragraph's content start to an ELEMENT-type point ON the
+ * `tag` construct at `offset`, and hands back what both carriers wrote. `offset` 0 TOUCHES the
+ * wrapper without covering any of its children; `offset` 1 covers the first one. */
+async function copyToConstructBoundary(usj: Usj, tag: string, offset: number): Promise<Payload> {
+  const { lexical } = await mountStandardViewEditor(usj);
+  await act(async () =>
+    lexical.update(() => {
+      const para = $firstContentPara();
+      const construct = $constructOfTag(tag);
+      const selection = $createRangeSelection();
+      selection.anchor = $createPoint(para.getKey(), 2, "element"); // past the para's own glyph
+      selection.focus = $createPoint(construct.getKey(), offset, "element");
+      $setSelection(selection);
+    }),
+  );
+  const { event, getData } = copyEvent();
+  await act(async () => lexical.dispatchCommand(COPY_COMMAND, event));
+  return { [PLAIN]: getData(PLAIN), [HTML]: getData(HTML), [LEXICAL]: getData(LEXICAL) };
+}
+
 const SHAPES = ["plain", "plain+html", "full"] as const;
 
 describe("figure (UnknownNode) copy→paste across all three payload shapes", () => {
@@ -221,6 +274,33 @@ describe("ref (UnknownNode) copy→paste across all three payload shapes", () =>
       const pasted = await pastedUsjFor(usj, shape);
       expect(objectsOfType(pasted, "ref")).toEqual([]);
       expect(JSON.stringify(pasted)).toContain("Genesis 1:1");
+    });
+  });
+});
+
+describe("carrier agreement at a construct's own start boundary (the shared isSelected rule)", () => {
+  // `UnknownNode.isSelected` asks whether any of the node's OWN CHILDREN are selected, rather than
+  // taking Lexical's default key-membership answer — so the lexical-JSON copy agrees with
+  // `text/plain`, whose walker reads the same `getNodes()` list. The rule is written once for every
+  // kind and keys on nothing kind-specific, so it is pinned on more than the optbreak that
+  // surfaced it (`optbreakClipboardFidelity.test.tsx`); these two constructs have real attributes
+  // and real content, which an optbreak does not.
+  const BOUNDARY_KINDS = [
+    { tag: "figure", fixture: "figure (USFM 3 attributes)", bytes: "\\fig" },
+    { tag: "ref", fixture: "cross-reference ref target", bytes: "Genesis 1:1" },
+  ];
+
+  BOUNDARY_KINDS.forEach(({ tag, fixture, bytes }) => {
+    it(`a selection ending exactly at the ${tag}'s own start excludes it from BOTH carriers`, async () => {
+      const payload = await copyToConstructBoundary(corpusUsj(fixture), tag, 0);
+      expect(payload[PLAIN]).not.toContain(bytes);
+      expect(payload[LEXICAL]).not.toContain(`"${tag}"`);
+    });
+
+    it(`extending that same selection over the ${tag}'s first child puts it back in BOTH carriers`, async () => {
+      const payload = await copyToConstructBoundary(corpusUsj(fixture), tag, 1);
+      expect(payload[PLAIN]).toContain(bytes);
+      expect(payload[LEXICAL]).toContain(`"${tag}"`);
     });
   });
 });
