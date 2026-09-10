@@ -583,6 +583,13 @@ export interface EditorRef {
    * Highlights the caller of the given note in the text with PT9's selected-note style (a thin
    * top-and-bottom border, class `caller_highlight`), replacing any previous highlight. Pass
    * `undefined` to clear. Purely presentational: never changes the document.
+   *
+   * Silently does nothing for a note BUILT expanded under `markerMode: "editable"`, whose caller
+   * is plain text rather than the immutable caller element the style attaches to — a note built
+   * collapsed keeps that element through an expand toggle, so Standard view is unaffected. The
+   * note is resolved when this is called and never retried, so a call made before the document
+   * has loaded, or with a stale key or an out-of-range index, is discarded and clears any
+   * highlight already showing.
    * @param noteKeyOrIndex - Note key or document-order index (see `getNoteIndex`).
    */
   highlightNote(noteKeyOrIndex: string | number | undefined): void;

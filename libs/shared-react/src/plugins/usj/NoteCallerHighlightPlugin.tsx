@@ -14,6 +14,12 @@ export interface NoteCallerHighlightHandle {
   /**
    * Highlights the caller of the given note (by key or document-order index); `undefined` clears
    * the highlight. Only one note is highlighted at a time.
+   *
+   * Silently does nothing for a note BUILT expanded under `markerMode: "editable"`, whose caller
+   * is a plain TextNode rather than the ImmutableNoteCallerNode this class attaches to — a note
+   * built collapsed keeps that node through an expand toggle. The note is resolved here and
+   * never retried, so a call made before the document has loaded, or with a stale key or an
+   * out-of-range index, is discarded and clears any highlight already showing.
    */
   setHighlightedNote(noteKeyOrIndex: string | number | undefined): void;
 }
