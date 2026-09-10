@@ -175,9 +175,12 @@ export interface EditorRef {
             height: number;
         };
     }) | undefined;
+    getNoteIndex(noteKey: string): number | undefined;
+    getNoteKey(noteIndex: number): string | undefined;
     getNoteOps(noteKeyOrIndex: string | number): DeltaOp[] | undefined;
     getSelection(): SelectionRange | undefined;
     getUsj(): Usj | undefined;
+    highlightNote(noteKeyOrIndex: string | number | undefined): void;
     insertMarker(marker: string): string | undefined;
     // @deprecated
     insertNote(marker: string, caller?: string, selection?: SelectionRange): void;
