@@ -278,29 +278,62 @@ describe("ref (UnknownNode) copy→paste across all three payload shapes", () =>
   });
 });
 
-describe("carrier agreement at a construct's own start boundary (the shared isSelected rule)", () => {
-  // `UnknownNode.isSelected` asks whether any of the node's OWN CHILDREN are selected, rather than
-  // taking Lexical's default key-membership answer — so the lexical-JSON copy agrees with
-  // `text/plain`, whose walker reads the same `getNodes()` list. The rule is written once for every
-  // kind and keys on nothing kind-specific, so it is pinned on more than the optbreak that
-  // surfaced it (`optbreakClipboardFidelity.test.tsx`); these two constructs have real attributes
-  // and real content, which an optbreak does not.
-  const BOUNDARY_KINDS = [
-    { tag: "figure", fixture: "figure (USFM 3 attributes)", bytes: "\\fig" },
-    { tag: "ref", fixture: "cross-reference ref target", bytes: "Genesis 1:1" },
-  ];
+describe("a construct's own start boundary (the shared isSelected rule)", () => {
+  // `UnknownNode.isSelected` asks whether any of the node's OWN CHILDREN are in the selection,
+  // rather than taking Lexical's default key-membership answer for the WRAPPER — so the
+  // lexical-JSON copy agrees with `text/plain`, whose walker reads the same `getNodes()` list. The
+  // rule is written once for every kind and keys on nothing kind-specific, so it is pinned on more
+  // than the optbreak that surfaced it (`optbreakClipboardFidelity.test.tsx`): these constructs
+  // have real attributes and real content, which an optbreak does not.
+  //
+  // Every assertion below reads the construct's own CONTENT BYTES, never just its tag. A tag-only
+  // assertion cannot see the shape that matters here — a copy that dropped the wrapper while
+  // HOISTING its characters out has no tag in it and its content bytes are all still there.
+  const FIGURE = { tag: "figure", fixture: "figure (USFM 3 attributes)" };
+  const REF = { tag: "ref", fixture: "cross-reference ref target" };
+  const FIGURE_BYTES = "At once they left their nets.";
+  const REF_BYTES = "Genesis 1:1";
 
-  BOUNDARY_KINDS.forEach(({ tag, fixture, bytes }) => {
-    it(`a selection ending exactly at the ${tag}'s own start excludes it from BOTH carriers`, async () => {
-      const payload = await copyToConstructBoundary(corpusUsj(fixture), tag, 0);
-      expect(payload[PLAIN]).not.toContain(bytes);
-      expect(payload[LEXICAL]).not.toContain(`"${tag}"`);
-    });
+  it("a selection ending exactly at a DISPLAY-BYTE-LED construct's start excludes it from both carriers", async () => {
+    // A figure's first child is the `\fig ` display decorator, so the element-type focus point
+    // stays an element point and reaches none of the figure's children: neither carrier carries
+    // the caption, and the lexical flavor has no figure node either.
+    const payload = await copyToConstructBoundary(corpusUsj(FIGURE.fixture), FIGURE.tag, 0);
+    expect(payload[PLAIN]).not.toContain(FIGURE_BYTES);
+    expect(payload[PLAIN]).not.toContain("\\fig");
+    expect(payload[LEXICAL]).not.toContain(FIGURE_BYTES);
+    expect(payload[LEXICAL]).not.toContain('"figure"');
+  });
 
-    it(`extending that same selection over the ${tag}'s first child puts it back in BOTH carriers`, async () => {
+  it("a selection ending exactly at a TEXT-LED construct's start carries it WHOLE in the lexical flavor — a superset of text/plain, deliberately, because the alternative loses the node", async () => {
+    // A `ref` has no display bytes of its own (USJ invented the container), so its first child is a
+    // real TextNode and Lexical normalizes the same focus point into a TEXT point at that child's
+    // offset 0. The child is then in `getNodes()` contributing zero characters: `text/plain`
+    // correctly emits none of it, while `isSelected` answers true and the lexical flavor keeps the
+    // construct.
+    //
+    // That residual disagreement is the DELIBERATE half of the trade. Answering false instead makes
+    // `$appendNodesToJSON` hoist the construct's children in place of the excluded wrapper, and a
+    // token-mode child is never sliced, so the copy carries `Genesis 1:1` with the `ref` node and
+    // its `loc` attribute silently gone — the same convincing-lie shape this suite's header
+    // describes. Measured both ways; this pin fixes which one ships.
+    const payload = await copyToConstructBoundary(corpusUsj(REF.fixture), REF.tag, 0);
+    expect(payload[PLAIN]).not.toContain(REF_BYTES);
+    expect(payload[LEXICAL]).toContain(REF_BYTES);
+    // Whole, not hoisted: the wrapper and the attribute it carries travel with those bytes.
+    expect(payload[LEXICAL]).toContain('"ref"');
+    expect(payload[LEXICAL]).toContain('"loc":"GEN 1:1"');
+  });
+
+  [
+    { ...FIGURE, bytes: FIGURE_BYTES },
+    { ...REF, bytes: REF_BYTES },
+  ].forEach(({ tag, fixture, bytes }) => {
+    it(`extending that selection over the ${tag}'s first child puts its content in BOTH carriers`, async () => {
       const payload = await copyToConstructBoundary(corpusUsj(fixture), tag, 1);
-      expect(payload[PLAIN]).toContain(bytes);
       expect(payload[LEXICAL]).toContain(`"${tag}"`);
+      expect(payload[LEXICAL]).toContain(bytes);
+      expect(payload[PLAIN]).toContain(tag === "figure" ? "\\fig" : bytes);
     });
   });
 });

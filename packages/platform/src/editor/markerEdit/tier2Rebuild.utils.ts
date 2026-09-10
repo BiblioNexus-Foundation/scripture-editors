@@ -94,13 +94,14 @@ export interface Tier2Context {
    * Armed by `$handlePasteForStandardView` (whitespaceDisplay.plugin.utils.ts), alongside
    * `MarkerEditContext.splitExpected`, for the duration of one external paste's update — reset by
    * the same per-commit update listener that resets `splitExpected`. A rebuild that update DEFERS
-   * outlives the flag; {@link pastePendedKeys} is what carries the same provenance to it. `$rebuildParas` reads it to
-   * decide whether `$buildParaFragment`'s own-marker-prefix dedup (`$withoutRedundantOwnPrefix`)
-   * may run: that dedup is a PASTE-shape recognition ("a whole-paragraph copy's own glyph rides
-   * along with the pasted text"), not a general typed-retag rule — applying it unconditionally
-   * made typing a paragraph-kind marker literal at an existing paragraph's content start silently
-   * DELETE or no-op the paragraph's prior marker instead of the engine's existing (P9-parity)
-   * split-with-empty behavior, a product decision this task must not make for typed input.
+   * outlives the flag; {@link pastePendedKeys} is what carries the same provenance to it.
+   * `$rebuildParas` reads it to decide whether `$buildParaFragment`'s own-marker-prefix dedup
+   * (`$withoutRedundantOwnPrefix`) may run: that dedup is a PASTE-shape recognition ("a
+   * whole-paragraph copy's own glyph rides along with the pasted text"), not a general
+   * typed-retag rule — applying it unconditionally made typing a paragraph-kind marker literal at
+   * an existing paragraph's content start silently DELETE or no-op the paragraph's prior marker
+   * instead of the engine's existing (P9-parity) split-with-empty behavior, a product decision
+   * this module must not make for typed input.
    * Optional so bare `Tier2Context` objects built directly (tests exercising the tokenizer/rebuild
    * machinery without the full marker-edit engine) default to "not a paste rebuild" — the
    * pre-existing, dedup-free behavior.
@@ -120,8 +121,14 @@ export interface Tier2Context {
    * own; it is consumed (deleted) by the first settle that routes it to a rebuild, so no later
    * rebuild of the same paragraph sees it; and the plugin's per-commit update listener prunes
    * every key that is no longer pending, so provenance never outlives the pend it decorates.
-   * Typing beside the pasted bytes pends its OWN key, which carries no provenance and keeps the
-   * engine's existing split-with-empty behavior.
+   *
+   * What that does NOT mean is "any typing between the paste and the departure is unaffected".
+   * Typing into a DIFFERENT node pends that node's own key, which carries no provenance, and its
+   * rebuild takes the engine's existing split-with-empty behavior. Typing into the still-pending
+   * node ITSELF adds no key at all — the paste's key is already pended and is still the one the
+   * departure settles — so the paste path runs and the dedup applies to the line the typed bytes
+   * are now part of. That is the intended reading of provenance (the line is still the pasted
+   * line), not an escape from it.
    *
    * Optional for the same reason `pasteRebuildArmed` is: a bare `Tier2Context` built directly by a
    * test harness has no pends of its own to decorate.
