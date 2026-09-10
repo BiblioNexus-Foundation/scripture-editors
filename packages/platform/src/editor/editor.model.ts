@@ -579,6 +579,13 @@ export interface EditorRef {
    * @returns The key, or `undefined` when no note exists at that index.
    */
   getNoteKey(noteIndex: number): string | undefined;
+  /**
+   * Highlights the caller of the given note in the text with PT9's selected-note style (a thin
+   * top-and-bottom border, class `caller_highlight`), replacing any previous highlight. Pass
+   * `undefined` to clear. Purely presentational: never changes the document.
+   * @param noteKeyOrIndex - Note key or document-order index (see `getNoteIndex`).
+   */
+  highlightNote(noteKeyOrIndex: string | number | undefined): void;
   /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
   toolbarEndRef: RefObject<HTMLElement | null> | null;
 }

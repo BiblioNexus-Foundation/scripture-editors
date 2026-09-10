@@ -11,6 +11,7 @@ export * from "./DisableHistoryShortcutsPlugin";
 export * from "./EditablePlugin";
 export * from "./EmptyVerseCaretGuardPlugin";
 export * from "./LoadStatePlugin";
+export * from "./NoteCallerHighlightPlugin";
 export * from "./NoteNodePlugin";
 export * from "./NoteShellCaretGuardPlugin";
 export * from "./OnSelectionChangePlugin";

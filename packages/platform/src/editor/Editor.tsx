@@ -121,6 +121,8 @@ import {
   getViewClassList,
   isBlockVerseLayout,
   LoadStatePlugin,
+  NoteCallerHighlightHandle,
+  NoteCallerHighlightPlugin,
   NoteNodePlugin,
   NoteShellCaretGuardPlugin,
   OnSelectionChangePlugin,
@@ -181,6 +183,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 ): ReactElement {
   const editorRef = useRef<LexicalEditor | null>(null);
   const annotationRef = useRef<AnnotationRef | null>(null);
+  const noteCallerHighlightRef = useRef<NoteCallerHighlightHandle | null>(null);
   const toolbarEndRef = useRef<HTMLDivElement>(null);
   const editedUsjRef = useRef(defaultUsj);
   const expandedNoteKeyRef = useRef<string>(undefined);
@@ -943,6 +946,9 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     getNoteKey(noteIndex) {
       return editorRef.current?.read(() => $getNoteByKeyOrIndex(noteIndex)?.getKey());
     },
+    highlightNote(noteKeyOrIndex) {
+      noteCallerHighlightRef.current?.setHighlightedNote(noteKeyOrIndex);
+    },
     get toolbarEndRef() {
       return toolbarEndRef;
     },
@@ -1166,6 +1172,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
             viewOptions={viewOptions}
             logger={stableLogger}
           />
+          <NoteCallerHighlightPlugin ref={noteCallerHighlightRef} />
           <NoteNodePlugin
             expandedNoteKeyRef={expandedNoteKeyRef}
             nodeOptions={nodeOptions}

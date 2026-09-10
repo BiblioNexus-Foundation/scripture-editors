@@ -238,6 +238,9 @@ const Marginal = forwardRef(function Marginal<TLogger extends LoggerBasic>(
     getNoteKey(noteIndex) {
       return editorRef.current?.getNoteKey(noteIndex);
     },
+    highlightNote(noteKeyOrIndex) {
+      editorRef.current?.highlightNote(noteKeyOrIndex);
+    },
     setComments(comments) {
       commentStoreRef.current?.setComments(comments);
       hasCommentsBeenSetRef.current = true;
