@@ -2,7 +2,7 @@
 
 import { $getParticularNodeOps } from "../../plugins/usj/collab/editor-delta.adaptor";
 import { DeltaOpInsertNoteEmbed } from "../../plugins/usj/collab/rich-text-ot.model";
-import { $dfs } from "@lexical/utils";
+import { $getNoteIndex } from "./note.utils";
 import {
   $applyNodeReplacement,
   $getNodeByKey,
@@ -312,15 +312,7 @@ function getNoteOps(
  * pane). `undefined` when the note is no longer attached.
  */
 function getNoteIndex(editor: LexicalEditor, noteNodeKey: NodeKey): number | undefined {
-  return editor.getEditorState().read(() => {
-    let index = 0;
-    for (const { node } of $dfs()) {
-      if (!$isNoteNode(node)) continue;
-      if (node.getKey() === noteNodeKey) return index;
-      index += 1;
-    }
-    return undefined;
-  });
+  return editor.getEditorState().read(() => $getNoteIndex(noteNodeKey));
 }
 
 /** Possible note callers to use when caller is '+'. Up to 2 characters are used, e.g. a-zz */

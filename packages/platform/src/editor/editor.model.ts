@@ -564,6 +564,19 @@ export interface EditorRef {
    *   editor.
    */
   getNoteOps(noteKeyOrIndex: string | number): DeltaOp[] | undefined;
+  /**
+   * Document-order index of the note with the given key — the coordinate a USJ-built notes list
+   * (e.g. a footnotes pane) addresses notes by, and the same index `noteCallerOnClick` reports.
+   * @param noteKey - The note node's key (e.g. from `insertMarker` or `noteCallerOnClick`).
+   * @returns The index, or `undefined` when the key is not a note in the document.
+   */
+  getNoteIndex(noteKey: string): number | undefined;
+  /**
+   * Key of the note at the given document-order index (the inverse of `getNoteIndex`), so a host
+   * that addresses notes by index can hand the editor the key `replaceEmbedUpdate` needs.
+   * @returns The key, or `undefined` when no note exists at that index.
+   */
+  getNoteKey(noteIndex: number): string | undefined;
   /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
   toolbarEndRef: RefObject<HTMLElement | null> | null;
 }

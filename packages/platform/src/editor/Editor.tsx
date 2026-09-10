@@ -95,6 +95,7 @@ import {
 import {
   $applyUpdate,
   $getNoteByKeyOrIndex,
+  $getNoteIndex,
   $getParticularNodeOps,
   $getUsjSelectionFromEditor,
   $getRangeFromUsjSelection,
@@ -935,6 +936,12 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
 
         return $getParticularNodeOps(noteNode);
       });
+    },
+    getNoteIndex(noteKey) {
+      return editorRef.current?.read(() => $getNoteIndex(noteKey));
+    },
+    getNoteKey(noteIndex) {
+      return editorRef.current?.read(() => $getNoteByKeyOrIndex(noteIndex)?.getKey());
     },
     get toolbarEndRef() {
       return toolbarEndRef;
