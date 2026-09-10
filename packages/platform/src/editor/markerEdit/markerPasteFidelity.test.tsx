@@ -450,6 +450,93 @@ describe("own-marker-prefix dedup: unknown/custom.sty markers", () => {
   });
 });
 
+/** A `\p` host holding "A", plus a second paragraph to depart into. Returns the host's content
+ * text node (the caret target: a paste at "A"'s offset 0 is a paste at the paragraph's content
+ * start) and the departure paragraph's text node. */
+async function deferredSettleHost(): Promise<{
+  editor: LexicalEditor;
+  content: TextNode;
+  departure: TextNode;
+}> {
+  initializeDeserialize(undefined);
+  let content!: TextNode;
+  let departure!: TextNode;
+  const { editor } = await historyTestEnvironment(() => {
+    const host = $createParaNode("p");
+    const separator = $createTextNode(NBSP);
+    $setState(separator, textTypeState, "marker-trailing-space");
+    content = $createTextNode("A");
+    const departurePara = $createParaNode("p");
+    departure = $createTextNode("depart here");
+    $getRoot().append(
+      host.append($createMarkerNode("p"), separator, content),
+      departurePara.append($createMarkerNode("p"), departure),
+    );
+  });
+  return { editor, content, departure };
+}
+
+/** Moves the caret out of the host paragraph and flushes the settle it triggers. */
+async function departAndSettle(editor: LexicalEditor, departure: TextNode): Promise<void> {
+  await act(async () => editor.update(() => departure.select(0, 0)));
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+}
+
+describe("own-marker-prefix dedup survives a DEFERRED settle", () => {
+  // Bytes whose rebuild would EJECT content out of a milestone deliberately do NOT settle in the
+  // update that produced them (`markerEditTier2Trigger.utils.ts`: ejection rearranges the line
+  // under a caret the user is still on) — they pend until caret departure. A PASTE of such bytes
+  // therefore reaches its rebuild in a later update than the one that inserted it, which is the
+  // one shape where "is this a paste?" cannot be answered by a per-commit flag.
+  const EJECTING_LINE = '\\p \\qt1-s\\*|who=""\\*';
+  /** What loading `EJECTING_LINE` produces: the ejected fixed point — the milestone closed, the
+   * attribute list it could not hold left outside it, and the author's own `\*` stranded. */
+  const EJECTED_PARA = {
+    type: "para",
+    marker: "p",
+    content: [{ type: "ms", marker: "qt1-s" }, '|who=""', { type: "unmatched", marker: "*" }, "A"],
+  };
+  const DEPARTURE_PARA = { type: "para", marker: "p", content: ["depart here"] };
+
+  it("paste at an existing paragraph's content start: the pasted line owns the paragraph even though its rebuild waits for caret departure", async () => {
+    const { editor, content, departure } = await deferredSettleHost();
+
+    await pasteAndSettle(editor, () => content.select(0, 0), EJECTING_LINE);
+    // The paste's own update inserted the bytes and stopped: the paragraph still holds them as
+    // literal text. Asserted so this pin cannot pass through the immediate-rebuild path it exists
+    // to look past.
+    expect(usjOf(editor).content).toEqual([
+      { type: "para", marker: "p", content: [`${EJECTING_LINE}A`] },
+      DEPARTURE_PARA,
+    ]);
+
+    await departAndSettle(editor, departure);
+
+    expect(usjOf(editor).content).toEqual([EJECTED_PARA, DEPARTURE_PARA]);
+  });
+
+  it("the same bytes arriving with no paste behind them still split with an empty predecessor — what carries across the settle is the paste's provenance, not the shape of the bytes", async () => {
+    const { editor, content, departure } = await deferredSettleHost();
+
+    await act(async () =>
+      editor.update(() => {
+        const selection = content.select(0, 0);
+        selection.insertText(EJECTING_LINE);
+      }),
+    );
+    await departAndSettle(editor, departure);
+
+    expect(usjOf(editor).content).toEqual([
+      { type: "para", marker: "p" },
+      EJECTED_PARA,
+      DEPARTURE_PARA,
+    ]);
+  });
+});
+
 describe("paste-as-plain-text equivalence (S4): no literal mode, plain always wins", () => {
   // S4 (docs/superpowers/specs/2026-08-06-clipboard-semantics.md): Ctrl+Shift+V / "paste as plain
   // text" narrows the clipboard payload down to `text/plain` only, but `$handlePasteForStandardView`

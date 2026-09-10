@@ -36,6 +36,7 @@ import {
   $parseSerializedNode,
   ElementNode,
   LexicalNode,
+  NodeKey,
   SerializedLexicalNode,
   TextNode,
 } from "lexical";
@@ -92,7 +93,8 @@ export interface Tier2Context {
   /**
    * Armed by `$handlePasteForStandardView` (whitespaceDisplay.plugin.utils.ts), alongside
    * `MarkerEditContext.splitExpected`, for the duration of one external paste's update — reset by
-   * the same per-commit update listener that resets `splitExpected`. `$rebuildParas` reads it to
+   * the same per-commit update listener that resets `splitExpected`. A rebuild that update DEFERS
+   * outlives the flag; {@link pastePendedKeys} is what carries the same provenance to it. `$rebuildParas` reads it to
    * decide whether `$buildParaFragment`'s own-marker-prefix dedup (`$withoutRedundantOwnPrefix`)
    * may run: that dedup is a PASTE-shape recognition ("a whole-paragraph copy's own glyph rides
    * along with the pasted text"), not a general typed-retag rule — applying it unconditionally
@@ -104,6 +106,27 @@ export interface Tier2Context {
    * pre-existing, dedup-free behavior.
    */
   pasteRebuildArmed?: { current: boolean };
+  /**
+   * The pended keys whose deferred rebuild still belongs to a paste. A paste's own update does not
+   * always get to perform the rebuild its bytes ask for: a paragraph whose re-tokenization would
+   * EJECT content out of a milestone deliberately waits for caret departure
+   * (`markerEditTier2Trigger.utils.ts`), and by then {@link pasteRebuildArmed} — a per-commit flag
+   * — has long since reset. Recording the pended key here carries the paste's provenance to
+   * whichever settle finally runs that rebuild, so a pasted line's own marker literal still wins
+   * over the host's redundant glyph.
+   *
+   * Scoped by KEY, not by paragraph or by time, which is what keeps it from leaking into typed
+   * input: a key is only ever added while `pasteRebuildArmed` says the current update IS a paste's
+   * own; it is consumed (deleted) by the first settle that routes it to a rebuild, so no later
+   * rebuild of the same paragraph sees it; and the plugin's per-commit update listener prunes
+   * every key that is no longer pending, so provenance never outlives the pend it decorates.
+   * Typing beside the pasted bytes pends its OWN key, which carries no provenance and keeps the
+   * engine's existing split-with-empty behavior.
+   *
+   * Optional for the same reason `pasteRebuildArmed` is: a bare `Tier2Context` built directly by a
+   * test harness has no pends of its own to decorate.
+   */
+  pastePendedKeys?: Set<NodeKey>;
 }
 
 /**
@@ -1102,9 +1125,9 @@ function $withoutRedundantOwnPrefix(
  * call site, every TYPED-input rebuild, and the read-only virtual settle): the own-marker-prefix
  * dedup recognizes a PASTE shape (a whole-paragraph copy's own glyph riding along with the pasted
  * text) and must not also apply to a user typing the same byte sequence — see that function's doc
- * comment for why. `$rebuildParas` is the only caller that ever passes `true`, and only when
- * `Tier2Context.pasteRebuildArmed` says the triggering rebuild is inside an external paste's own
- * update.
+ * comment for why. `$rebuildParas` is the only caller that ever passes `true`, and only for a
+ * rebuild a paste asked for: one inside the paste's own update (`Tier2Context.pasteRebuildArmed`),
+ * or one the paste's update deferred to a later settle (`Tier2Context.pastePendedKeys`).
  */
 export function $buildParaFragment(
   para: ParaNode,
@@ -1574,13 +1597,21 @@ function $restoreSelectionInNoteContent(
  * the resulting USJ byte-for-byte (pinned by settledGetUsj.test.tsx and
  * settleDifferential.test.tsx).
  *
+ * `isPasteRebuild` says whether a PASTE asked for this rebuild — see `$buildParaFragment`'s own
+ * parameter of the same name. It defaults to "is this the paste's own update"
+ * (`Tier2Context.pasteRebuildArmed`); a settle performing a rebuild the paste deferred passes the
+ * provenance it consumed from `Tier2Context.pastePendedKeys` instead.
+ *
  * Mutating: call inside `editor.update()` (dispatched from the Tier-2 trigger transform, the
  * caret-departure and commit paths in MarkerEditPlugin.tsx, and `$requestTier2ForNode`).
  */
-export function $rebuildParas(paras: ParaNode[], context: Tier2Context): boolean {
+export function $rebuildParas(
+  paras: ParaNode[],
+  context: Tier2Context,
+  isPasteRebuild = context.pasteRebuildArmed?.current ?? false,
+): boolean {
   if (paras.length === 0) return false;
-  const { viewOptions, getMarker: getMarkerFn, logger, pasteRebuildArmed } = context;
-  const isPasteRebuild = pasteRebuildArmed?.current ?? false;
+  const { viewOptions, getMarker: getMarkerFn, logger } = context;
 
   const combined: FragmentAccumulator = { text: "", spans: [], sentinels: [] };
   for (const para of paras) {
@@ -2282,13 +2313,18 @@ export function $settleScopeForNode(
 /** Route a Tier-1-unexpressible edit to Tier 2 via its scope ({@link $settleScopeForNode}).
  * Returns whether the routed rebuild actually SPLICED — a guard-rail or fixed-point refusal mutates
  * nothing, and the deferred-resolution history bookkeeping ($resolvePendingMarkers callers) needs to
- * tell the two apart. */
-export function $requestTier2ForNode(node: LexicalNode, context: Tier2Context): boolean {
+ * tell the two apart. `isPasteRebuild` is forwarded to {@link $rebuildParas} (omit it to take that
+ * function's own default). */
+export function $requestTier2ForNode(
+  node: LexicalNode,
+  context: Tier2Context,
+  isPasteRebuild?: boolean,
+): boolean {
   const scope = $settleScopeForNode(node);
   if (!scope) return false;
   if ($isNoteNode(scope)) return $rebuildNoteContent(scope, context);
   if ($isChapterNode(scope)) return $rebuildChapter(scope, context);
-  return $rebuildParas([scope], context);
+  return $rebuildParas([scope], context, isPasteRebuild);
 }
 
 /** USJ marker-object keys that are never attribute-list display bytes. `closed` is a USJ key but

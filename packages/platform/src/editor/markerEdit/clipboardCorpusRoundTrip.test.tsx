@@ -128,20 +128,6 @@ function chapterHeaderSkeletonUsj(usj: Usj): Usj {
  *   sibling `"unclosed note (closed=false)"` fixture, whose unclosed span IS the last thing in its
  *   paragraph, has no such trailing content to lose and round-trips clean.
  *
- * - **"milestones (ts)"** — a COMPOUND of two deliberate behaviors, neither of them a byte-level
- *   copy or normalization defect: the copied text is byte-correct
- *   (`\p \ts-s\*\v 1 Translator section text.\ts-e\*`), and pasting it into a host with NO marker
- *   prefix of its own round-trips clean. A milestone whose rebuild would EJECT content deliberately
- *   does NOT settle inside the commit that produced it (`markerEditTier2Trigger.utils.ts`:
- *   rearranging the line under a caret the user is still on is worse than waiting) — it pends until
- *   caret departure. But the own-marker-prefix dedup (`$withoutRedundantOwnPrefix`,
- *   `tier2Rebuild.utils.ts`) is armed only for the PASTE's own update, so the later
- *   departure-triggered settle no longer knows the fragment came from a paste and takes the typed
- *   path instead: the host's own `\p ` glyph and the pasted line's `\p ` literal both survive as
- *   two paragraphs, the first of them empty. Closing it means giving the dedup's arm a lifetime
- *   that spans the deferred settle — a paste-provenance change, not a tokenizer one, and out of
- *   scope here.
- *
  * - **"paragraph-leading space (display rule)"** — ACCEPTED normalization, matching Paratext 9,
  *   not a bug: isolated with a minimal non-corpus repro, pasting the literal text `"\p  X"`
  *   (marker, its own required separator, and a SECOND, real content-leading space) into a fresh
@@ -170,11 +156,6 @@ const KNOWN_LOSSY: { name: string; reason: string }[] = [
     name: "paragraph-leading space (display rule)",
     reason:
       "consumeSeparator() eats the whole whitespace run after a marker, matching P9's NormalizeUsfm parity — accepted, not a bug",
-  },
-  {
-    name: "milestones (ts)",
-    reason:
-      "a milestone that ejects content pends until caret departure, and the paste-scoped own-marker-prefix dedup is armed only for the paste's own commit — so the deferred settle leaves the host's now-redundant \\p glyph behind as an empty paragraph",
   },
 ];
 

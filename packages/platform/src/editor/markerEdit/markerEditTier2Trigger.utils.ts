@@ -142,6 +142,20 @@ function $inLiteralOnlyBlock(node: LexicalNode): boolean {
 }
 
 /**
+ * Pend `node`'s own key for a rebuild this update declines to perform, carrying the paste's
+ * provenance along with it when the update IS an external paste's own
+ * ({@link MarkerEditContext.pastePendedKeys}). A pasted line's terminated marker literal would
+ * otherwise reach the caret-departure settle with nothing recording where its bytes came from, and
+ * the settle would rebuild it as though the user had TYPED them — splitting the host paragraph in
+ * two instead of letting the pasted marker replace the host's now-redundant glyph.
+ */
+function $pendDeferredRebuild(node: TextNode, context: MarkerEditContext): void {
+  const key = node.getKey();
+  context.pendingKeys.add(key);
+  if (context.pasteRebuildArmed.current) context.pastePendedKeys.add(key);
+}
+
+/**
  * The engine's plain-`TextNode` transform — the TRIGGER that decides what a text edit means for
  * the settle. Exactly one of: clear the node's pend (bytes at rest/canonical), record a pend for
  * caret-departure settling (a chapter's own glyph text, display-run values, attribute bytes,
@@ -293,7 +307,7 @@ export function $textNodeTier2Transform(node: TextNode, context: MarkerEditConte
     // rearranges the line under the caret while the user is still on it. Pending instead leaves
     // what they typed alone until they depart, and the departure settle performs the same rebuild.
     if (milestoneEjectionPending(text)) {
-      context.pendingKeys.add(node.getKey());
+      $pendDeferredRebuild(node, context);
       return;
     }
     context.pendingKeys.delete(node.getKey());
@@ -309,7 +323,7 @@ export function $textNodeTier2Transform(node: TextNode, context: MarkerEditConte
       // materializes no nodes — see `$rebuildParas`), so pending never destabilizes the
       // damping; for the identical-second-paragraph case it performs the rebuild the guard
       // would otherwise have swallowed.
-      context.pendingKeys.add(node.getKey());
+      $pendDeferredRebuild(node, context);
       return;
     }
     context.rebuildAttempted.add(text);
