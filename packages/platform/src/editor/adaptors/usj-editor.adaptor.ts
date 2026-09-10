@@ -121,6 +121,7 @@ import {
   UNKNOWN_MARKER_OBJECT_PROPS,
   UNKNOWN_VERSION,
   UnknownAttributes,
+  tableCellMarkerWithSpan,
   unknownDisplayParts,
   UnknownNode,
   unmatchedGlyphText,
@@ -633,16 +634,20 @@ function createTableCell(
   const { marker, align, colspan } = markerObject as ImmutableTableCellMarker;
   const children: SerializedLexicalNode[] = [];
   const cellMarker = marker ?? TABLE_CELL_DEFAULT_MARKER;
+  // USFM tables carry no pipe attributes at all: a spanning cell's width IS part of its marker
+  // name (`\thc3-4`), which the tokenizer trimmed off into `colspan` on the way in. Displaying
+  // the bare marker would show — and copy, and re-tokenize as — a one-column cell.
+  const displayMarker = tableCellMarkerWithSpan(cellMarker, colspan) ?? cellMarker;
   if (_viewOptions?.markerMode === "editable")
     children.push(
-      createMarker(cellMarker),
+      createMarker(displayMarker),
       createText(NBSP, MARKER_TRAILING_SPACE_TEXT_TYPE, "token"),
     );
   else if (_viewOptions?.markerMode === "visible" || _viewOptions?.hasGutterParaMarkers)
     children.push(
       createImmutableTypedText(
         "marker",
-        openingMarkerText(cellMarker) + NBSP,
+        openingMarkerText(displayMarker) + NBSP,
         _viewOptions?.hasGutterParaMarkers,
       ),
     );

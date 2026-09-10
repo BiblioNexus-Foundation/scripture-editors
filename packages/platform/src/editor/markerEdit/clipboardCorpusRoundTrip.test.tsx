@@ -18,22 +18,16 @@
  * `"periph"` is a named `it.skip` rather than a swept case: it is book-level front matter with no
  * chapter at all, so it does not fit "a single-chapter editor state" — there is no chapter-content
  * selection for it to exercise. Every other fixture is either swept clean or recorded in
- * `KNOWN_LOSSY` below with the exact byte-level divergence — none are silently dropped. All 21
- * fixtures run in well under a second; no sampling is needed.
+ * `KNOWN_LOSSY` below with the exact byte-level divergence — none are silently dropped.
  *
- * The OTHER USJ corpus in this repo, `libs/test-data/src/data/2sa.usj.ts` (141 paragraphs; IS
- * single-chapter — one top-level chapter object, despite the size), is deliberately NOT included
- * here. It was tried against this exact harness and did not round-trip clean: it hit the sidebar
- * gap three times (2SA's own sidebar coverage) — since closed — PLUS several additional, unrelated
- * fidelity gaps this sweep's one-construct-per-fixture design has no clean way to itemize as a
- * single byte diff (an empty `\b` blank-line paragraph folds into literal text inside a `p`
- * paragraph; a verse's derived `sid` attribute is dropped; a `\ref` cross-reference target degrades
- * differently than the corpus's own dedicated `ref` fixture above). It has not been re-measured
- * since the sidebar gap closed, so how much of that residual survives is unknown. `tier2Rebuild.corpus
- * .test.tsx` already exercises this exact fixture, but for a narrower, DIFFERENT property (an
- * unedited `$rebuildParas` call refusing as a fixed point) — that coverage does not include the
- * paste path (NBSP normalization, `\c`/`\id` strip, own-marker-wins dedup) this sweep does, so
- * excluding 2sa here is a real coverage gap, not a redundant re-test.
+ * The repo's OTHER USJ corpus, `libs/test-data/src/data/2sa.usj.ts`, is swept too — see the
+ * `"real-world multi-construct fixture (2sa)"` describe at the bottom of this file for what it adds
+ * and for the one attribute it cannot carry. `tier2Rebuild.corpus.test.tsx` already exercises that
+ * fixture, but for a narrower, DIFFERENT property (an unedited `$rebuildParas` call refusing as a
+ * fixed point) that does not cover the paste path (NBSP normalization, `\c`/`\id` strip,
+ * own-marker-wins dedup) this sweep does.
+ *
+ * The whole file, 2sa included, runs in about a second; no sampling is needed.
  */
 import { MarkerEditPlugin } from "./MarkerEditPlugin";
 import {
@@ -51,9 +45,16 @@ import { act } from "@testing-library/react";
 // Reaching inside only for tests (same pattern as markerEdit.test-helpers).
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { baseTestEnvironment } from "../../../../../libs/shared-react/src/plugins/usj/react-test.utils";
-import { MarkerObject, Usj, usxStringToUsj } from "@eten-tech-foundation/scripture-utilities";
+import {
+  MarkerContent,
+  MarkerObject,
+  Usj,
+  USJ_VERSION,
+  usxStringToUsj,
+} from "@eten-tech-foundation/scripture-utilities";
 import { $getRoot, COPY_COMMAND, PASTE_COMMAND, RootNode } from "lexical";
 import { $isChapterNode, $isImmutableChapterNode } from "shared";
+import { usj2Sa } from "test-data";
 
 /** The index of the top-level child right after the document's (LAST) chapter node — every corpus
  * fixture but `"periph"` has exactly one, but a document could in principle carry more than one
@@ -159,6 +160,40 @@ const KNOWN_LOSSY: { name: string; reason: string }[] = [
   },
 ];
 
+/** Loads `usj` into a Standard-view editor, copies the chapter's own content, pastes the resulting
+ * `text/plain` into a fresh editor holding the same header, settles, and returns the USJ a host
+ * would save. */
+async function copyPasteRoundTrip(usj: Usj): Promise<Usj | undefined> {
+  initializeDeserialize(undefined);
+  const { editor: sourceEditor } = await baseTestEnvironment(
+    serializedState(usj),
+    <MarkerEditPlugin viewOptions={viewOptions} />,
+  );
+  await act(async () => sourceEditor.update(() => $selectChapterContent($getRoot())));
+  const { event, getData } = copyEvent();
+  await act(async () => sourceEditor.dispatchCommand(COPY_COMMAND, event));
+  const copiedText = getData("text/plain");
+
+  const { editor: targetEditor } = await baseTestEnvironment(
+    serializedState(chapterHeaderSkeletonUsj(usj)),
+    <MarkerEditPlugin viewOptions={viewOptions} />,
+  );
+  await act(async () =>
+    targetEditor.update(() => {
+      $getRoot().getLastChild()?.selectEnd();
+      targetEditor.dispatchCommand(PASTE_COMMAND, plainTextPasteEvent(copiedText));
+    }),
+  );
+  // Settle: flush any reconciliation the paste-triggered Tier 2 re-tokenization schedules beyond
+  // the synchronous update above (the same double-microtask flush every paste-adjacent suite in
+  // this directory uses).
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+  return deserializeSerializedEditorState(targetEditor.getEditorState().toJSON(), viewOptions);
+}
+
 describe("corpus copy/paste round trip (Standard view)", () => {
   for (const fixture of corpusFixtures) {
     if (fixture.name === "periph") {
@@ -174,41 +209,64 @@ describe("corpus copy/paste round trip (Standard view)", () => {
     const lossy = KNOWN_LOSSY.find((entry) => entry.name === fixture.name);
     const run = lossy ? it.skip : it;
     run(`${fixture.name}${lossy ? ` (${lossy.reason})` : ""}`, async () => {
-      initializeDeserialize(undefined);
       const usj = usxStringToUsj(fixture.usx);
-
-      const { editor: sourceEditor } = await baseTestEnvironment(
-        serializedState(usj),
-        <MarkerEditPlugin viewOptions={viewOptions} />,
-      );
-      await act(async () => sourceEditor.update(() => $selectChapterContent($getRoot())));
-      const { event, getData } = copyEvent();
-      await act(async () => sourceEditor.dispatchCommand(COPY_COMMAND, event));
-      const copiedText = getData("text/plain");
-
-      const { editor: targetEditor } = await baseTestEnvironment(
-        serializedState(chapterHeaderSkeletonUsj(usj)),
-        <MarkerEditPlugin viewOptions={viewOptions} />,
-      );
-      await act(async () =>
-        targetEditor.update(() => {
-          $getRoot().getLastChild()?.selectEnd();
-          targetEditor.dispatchCommand(PASTE_COMMAND, plainTextPasteEvent(copiedText));
-        }),
-      );
-      // Settle: flush any reconciliation the paste-triggered Tier 2 re-tokenization schedules
-      // beyond the synchronous update above (the same double-microtask flush every paste-adjacent
-      // suite in this directory uses).
-      await act(async () => {
-        await Promise.resolve();
-        await Promise.resolve();
-      });
-
-      const pastedUsj = deserializeSerializedEditorState(
-        targetEditor.getEditorState().toJSON(),
-        viewOptions,
-      );
-      expect(pastedUsj).toEqual(usj);
+      expect(await copyPasteRoundTrip(usj)).toEqual(usj);
     });
   }
+});
+
+/**
+ * The one real-world fixture in the repo — 143 top-level items, every construct the editor supports
+ * in one document, in the shapes an actual project produced rather than one-construct-per-fixture.
+ * It is swept here rather than omitted: the corpus fixtures above each isolate one construct, so
+ * only this one can catch a loss that needs two constructs in the same paragraph, or a construct in
+ * a shape nobody wrote a fixture for. It costs about a second.
+ *
+ * It round-trips byte-for-byte with ONE exception, asserted by name below rather than waived: a
+ * verse's `sid`. That attribute is DERIVED (book + chapter + verse) when ParatextData produces
+ * USX/USJ; USFM has no bytes for it anywhere, so the plain-text clipboard carrier (S3) cannot carry
+ * one and the paste cannot invent one. Measured, not assumed: a plain load→save of this same fixture
+ * keeps all 26 of them, so the loss belongs to the carrier and not to the adaptors. The chapter's
+ * own `sid` survives only because the target editor is SEEDED with the chapter header. Same family
+ * as the `<ref>` wrapper above — see "Known Lossy Constructs" in the semantics doc.
+ */
+describe("real-world multi-construct fixture (2sa)", () => {
+  /** Every `verse` object's `sid` removed, everywhere, leaving the document otherwise untouched. */
+  function withoutVerseSids(usj: Usj): Usj {
+    const stripItems = (items: MarkerContent[] | undefined): MarkerContent[] | undefined =>
+      items?.map((item) => {
+        if (typeof item === "string") return item;
+        const stripped: MarkerObject = { ...item };
+        const content = stripItems(item.content);
+        if (content) stripped.content = content;
+        if (stripped.type === "verse") delete stripped.sid;
+        return stripped;
+      });
+    return { ...usj, content: stripItems(usj.content) ?? [] };
+  }
+
+  /** How many `verse` objects anywhere in `usj` still carry a `sid`. */
+  function countVerseSids(usj: Usj | undefined): number {
+    const count = (items: MarkerContent[] | undefined): number =>
+      (items ?? []).reduce<number>((total, item) => {
+        if (typeof item === "string") return total;
+        return (
+          total + (item.type === "verse" && item.sid !== undefined ? 1 : 0) + count(item.content)
+        );
+      }, 0);
+    return count(usj?.content);
+  }
+
+  it("round-trips every construct in the document, losing only the verse sid USFM has no bytes for", async () => {
+    const pasted = await copyPasteRoundTrip(usj2Sa);
+    // Both counts guard the carve-out: without them the equality could pass because the source
+    // never had a sid, or keep passing unchanged on the day the loss is closed.
+    expect(countVerseSids(usj2Sa)).toBe(26);
+    expect(countVerseSids(pasted)).toBe(0);
+    // The editor re-stamps the document's USJ version on export, and a plain load→save of this
+    // same fixture does exactly the same (it declares 3.0), so it is not a clipboard property —
+    // asserted on its own rather than waived, then normalized out of the whole-document compare.
+    expect(pasted?.version).toBe(USJ_VERSION);
+    expect({ ...pasted, version: usj2Sa.version }).toEqual(withoutVerseSids(usj2Sa));
+  });
 });

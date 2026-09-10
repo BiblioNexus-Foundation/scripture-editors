@@ -240,6 +240,89 @@ describe("phantom-space live-repro pins (2026-08-07) — collapsed note, byte-id
   });
 });
 
+describe("attributes a construct carries in bytes the display had to reconstruct", () => {
+  /** A collapsed footnote carrying a `category`. In the file the category is a `\cat` span on the
+   * note's own marker line, directly after the caller (`\f + \cat People\cat*\fr …`); a COLLAPSED
+   * note deliberately does not DISPLAY it (`createNote`, usj-editor.adaptor.ts), which is a view
+   * decision, not a licence for the copy to drop the attribute. */
+  function categorizedNoteUsj(): Usj {
+    return {
+      type: "USJ",
+      version: "3.1",
+      content: [
+        {
+          type: "para",
+          marker: "p",
+          content: [
+            {
+              type: "note",
+              marker: "f",
+              caller: "-",
+              category: "People",
+              content: [
+                { type: "char", marker: "fr", content: ["1:1 "], closed: "false" },
+                { type: "char", marker: "ft", content: ["Caller test."], closed: "false" },
+              ],
+            },
+          ],
+        },
+      ],
+    } as unknown as Usj;
+  }
+
+  /** A one-row table whose first cell spans two columns. USFM tables have no attribute syntax at
+   * all: a cell's width lives in its MARKER NAME (`\thc3-4`), which the tokenizer splits into
+   * marker `thc3` + `colspan` "2" on the way in. */
+  function spanningCellTableUsj(): Usj {
+    return {
+      type: "USJ",
+      version: "3.1",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "table:row",
+              marker: "tr",
+              content: [
+                {
+                  type: "table:cell",
+                  marker: "thc3",
+                  align: "center",
+                  colspan: "2",
+                  content: ["wide"],
+                },
+                { type: "table:cell", marker: "th5", align: "start", content: ["last"] },
+              ],
+            },
+          ],
+        },
+      ],
+    } as unknown as Usj;
+  }
+
+  it("copies a collapsed note's category as the `\\cat` span the file carries", async () => {
+    // Same rule as the note caller above: what you copy > what you see. The category has no bytes
+    // on screen in a collapsed note, so the walker contributes them, exactly as it contributes the
+    // caller a collapsed note renders as an empty glyph.
+    const { editor } = await renderUsjEditor(categorizedNoteUsj());
+    await act(async () => editor.update($selectWholeDocument));
+    const { event, getData } = copyEvent();
+    await act(async () => editor.dispatchCommand(COPY_COMMAND, event));
+    expect(getData("text/plain")).toBe(
+      "\\p \\f - \\cat People\\cat*\\fr 1:1 \\ft Caller test.\\f*",
+    );
+  });
+
+  it("copies a spanning cell's width as the span suffix its marker name carries", async () => {
+    const { editor } = await renderUsjEditor(spanningCellTableUsj());
+    await act(async () => editor.update($selectWholeDocument));
+    const { event, getData } = copyEvent();
+    await act(async () => editor.dispatchCommand(COPY_COMMAND, event));
+    expect(getData("text/plain")).toBe("\\tr \\thc3-4 wide\\th5 last");
+  });
+});
+
 describe("multi-paragraph selections", () => {
   it("joins a full multi-paragraph selection with a single \\n, each paragraph keeping its own \\marker", async () => {
     let secondText: TextNode;

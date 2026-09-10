@@ -529,6 +529,33 @@ function $isNoteInternalDisplaySeparator(node: TextNode): boolean {
   return !$isImmutableNoteCallerNode(node.getPreviousSibling());
 }
 
+/**
+ * The `\cat …\cat*` bytes a COLLAPSED note's category needs, contributed by the one display node
+ * that sits where those bytes belong: the separator directly after the caller. `""` for every
+ * other node, and for a note with no category.
+ *
+ * A collapsed note deliberately displays no category at all — `createNote` (`usj-editor.adaptor.ts`)
+ * builds the `\cat` run only for the editable EXPANDED layout, mirroring `\va`/`\vp`. That is a
+ * view decision, and it is not a licence for the copy to drop the attribute: this is the same rule
+ * that already recovers a collapsed note's caller from an `ImmutableNoteCallerNode` that renders as
+ * an empty glyph — what you COPY is the note's bytes, not the note's pixels.
+ *
+ * Scoped to the collapsed layout by construction: only that layout puts an
+ * `ImmutableNoteCallerNode` before this separator (the expanded one uses a plain caller TextNode
+ * and carries the real `\cat` run among its children), so an expanded note can never double-emit.
+ * Placed AFTER the separator's own space and with none of its own, which is where the file has the
+ * span: `\f + \cat People\cat*\fr 1:1 …` — a trailing space here would re-tokenize into a stray
+ * text child inside the note.
+ */
+function $collapsedNoteCategoryBytes(node: TextNode): string {
+  if (node.getTextContent() !== NBSP) return "";
+  const note = node.getParent();
+  if (!$isNoteNode(note)) return "";
+  if (!$isImmutableNoteCallerNode(node.getPreviousSibling())) return "";
+  const category = note.getCategory();
+  return category ? `\\cat ${category}\\cat*` : "";
+}
+
 /** The nearest enclosing `NoteNode`'s USJ caller value, falling back to the auto-generated-caller
  * marker (`+`) when the note has none set. */
 function $noteCallerText(callerNode: LexicalNode): string {
@@ -619,7 +646,9 @@ export function $selectionToUsfmText(selection: RangeSelection): string {
       } else if (node === lastNode) {
         nodeText = isBefore ? nodeText.slice(0, focusOffset) : nodeText.slice(0, anchorOffset);
       }
-      text += $isNoteInternalDisplaySeparator(node) ? "" : nodeText.replaceAll(NBSP, " ");
+      text += $isNoteInternalDisplaySeparator(node)
+        ? ""
+        : nodeText.replaceAll(NBSP, " ") + $collapsedNoteCategoryBytes(node);
     } else if (
       ($isDecoratorNode(node) || $isLineBreakNode(node)) &&
       (node !== lastNode || !selection.isCollapsed())
