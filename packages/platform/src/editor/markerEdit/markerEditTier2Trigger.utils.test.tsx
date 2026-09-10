@@ -1075,7 +1075,9 @@ describe("$textNodeTier2Transform on `//` inside a table", () => {
       getMarker: bundledGetMarker,
       pendingKeys: new Set<NodeKey>(),
       splitExpected: { current: false },
+      pasteRebuildArmed: { current: false },
       rebuildAttempted: new Set<string>(),
+      structureProtectionMode: "off",
     };
   }
 
