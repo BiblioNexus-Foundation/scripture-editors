@@ -461,6 +461,34 @@ describe("TextSpacingPlugin", () => {
     });
   });
 
+  it("should keep the content of an UnknownNode created WITH its content in one update — only a later intrusion is ejected", async () => {
+    // A construct that arrives whole (a Tier-2 rebuild materializing a pasted `\fig …\fig*`, a
+    // document load, a collab insert, an undo restore) creates the wrapper and its content
+    // children in the SAME update, so that content is indistinguishable from typed text by
+    // newness alone. Ejecting it strands a figure's caption outside its own box, both on screen
+    // and in the exported USJ.
+    const { editor } = await testEnvironment(() => {
+      $getRoot().append($createParaNode());
+    });
+
+    await act(async () => {
+      editor.update(() => {
+        const para = $getRoot().getFirstChild();
+        if (!$isParaNode(para)) throw new Error("Expected a ParaNode");
+        para.append($createUnknownNode("figure", "fig").append($createTextNode("a caption")));
+      });
+    });
+
+    editor.getEditorState().read(() => {
+      const para = $getRoot().getFirstChild();
+      if (!$isParaNode(para)) throw new Error("Expected a ParaNode");
+      expect(para.getChildren()).toHaveLength(1);
+      const unknown = para.getFirstChild();
+      if (!$isUnknownNode(unknown)) throw new Error("Expected an UnknownNode");
+      expect(unknown.getTextContent()).toBe("a caption");
+    });
+  });
+
   it("should insert a space before a verse if preceded by a CharNode", async () => {
     const { editor } = await testEnvironment(() => {
       $getRoot().append(

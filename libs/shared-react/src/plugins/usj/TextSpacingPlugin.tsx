@@ -176,7 +176,8 @@ function $textNodeTrailingSpaceTransform(node: TextNode): void {
 }
 
 /**
- * Moves a TextNode after its parent if the parent is an UnknownNode.
+ * Moves a TextNode out of an UnknownNode when it was planted there by an edit, so a read-only
+ * opaque block never gains prose of its own.
  * @param node - The TextNode to check.
  * @param editor - The LexicalEditor instance.
  */
@@ -184,9 +185,15 @@ function $textNodeInUnknownTransform(node: TextNode, editor: LexicalEditor): voi
   const unknownNode = node.getParent();
   if (!$isUnknownNode(unknownNode) || !node.isAttached()) return;
 
-  // If a text node is created inside an UnknownNode (e.g., by typing), move it after the
-  // UnknownNode.
-  if (wasNodeCreated(editor, node.getKey())) unknownNode.insertAfter(node);
+  // Only text planted inside a PRE-EXISTING opaque block is an intrusion (e.g. typing into a
+  // figure). A wrapper that appeared in this SAME update brought its own content with it — a
+  // Tier-2 rebuild materializing a pasted `\fig caption|src="…"\fig*`, a document load, a collab
+  // insert, an undo restore — and every one of those creates the wrapper and its content children
+  // together. Ejecting there strands the construct's own text outside it: a figure's caption
+  // lands after the `\fig*` glyph as ordinary paragraph prose, and the exported USJ keeps a
+  // `figure` object with no content at all.
+  if (wasNodeCreated(editor, node.getKey()) && !wasNodeCreated(editor, unknownNode.getKey()))
+    unknownNode.insertAfter(node);
 }
 
 /** Transform for a verse node (handles non-TextNode predecessors) */
