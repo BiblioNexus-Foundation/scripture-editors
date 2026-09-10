@@ -25,8 +25,8 @@ import { isMilestoneHeuristicName, MarkerLookup, MarkerType, NoteNode } from "sh
  *
  * `tier2Rebuild.utils.ts`'s own-marker-prefix dedup needs this exact rule too — the SAME
  * stylesheet-first/unknown-as-paragraph classification `$buildParaFragment` already uses for the
- * paragraph's own marker. A second, narrower `type === MarkerType.Paragraph` check there
- * disagreed with it for any unknown/custom.sty marker.
+ * paragraph's own marker. A second, narrower `type === MarkerType.Paragraph` check there would
+ * disagree with it for any unknown/custom.sty marker.
  */
 export function isParaKindMarker(marker: string, getMarkerFn: MarkerLookup): boolean {
   const clean = marker.replace(/^\+/, "");

@@ -2,33 +2,28 @@
  * Paste (and cut) fidelity for a selection that TOUCHES an attribute display run — a char span's
  * `|attrs` list, a milestone's attribute run, or a verse's `\va`/`\vp` run.
  *
- * TJ's live repro (filed 2026-08-11, against a pre-branch build): existing span
- * `\nd asdf|who="hi"\nd*`, caret at the end of the `who="hi"` run, paste plain text
- * `sid="things"`. Observed: the `who` attribute display AND the closing `\nd*` glyph disappeared
- * from the editor, the pasted text rendered visually outside the span, and the saved file diverged
- * from the editor. `sid="things"` carries no NBSP, and the pre-branch build's paste handler still
- * had its OLD NBSP-gated form (generalized to claim every external paste, NBSP or not, on
- * 2026-08-07 — see `$handlePasteForStandardView`'s own doc comment) — so the most plausible
- * mechanism is that OLD gate declining an NBSP-free paste outright and falling through to Lexical's
- * default rich-paste node insertion, NOT a same-namespace `application/x-lexical-editor` payload on
- * the clipboard. On THIS branch's current code, a single-line, NBSP-free, flavor-free external
- * paste like TJ's literal repro was already safe (see the "typed characterization"/"paste ≡ typed"
- * pins below, which pin that fact rather than a corruption).
+ * Concrete example of the failure mode: with existing span `\nd asdf|who="hi"\nd*`, caret at the
+ * end of the `who="hi"` run, pasting plain text `sid="things"` (which carries no NBSP) observably
+ * drops the `who` attribute display AND the closing `\nd*` glyph, renders the pasted text visually
+ * outside the span, and diverges the saved file from the editor. A single-line, NBSP-free,
+ * flavor-free external paste like this one is already safe on its own (see the "typed
+ * characterization"/"paste ≡ typed" pins below, which pin that fact rather than a corruption) — it
+ * takes one of the shapes below to reach the corruption class this file exists to catch.
  *
  * What this file's "root cause" describe block reproduces and fixes is the SHAPE that corruption
  * takes whenever ANY handler declines an attribute-context paste to Lexical's default rich-paste
  * node insertion: it has no notion that an attribute run's text must stay inside its ONE tagged
  * TextNode, and merges the run, the closing glyph, and even the FOLLOWING paragraph sibling's text
  * into one plain node — destroying the attribute display, the closing marker, and the paragraph
- * boundary in one move. Confirmed regression classes on this branch, each pinned below: a live
- * native paste event that still carries a same-namespace `application/x-lexical-editor` flavor; a
- * multi-line plain-text payload (the ordinary pipeline splits it via `insertParagraph()`); a
- * marker-bearing payload (the ordinary pipeline's `\c`/`\id` strip eats bytes out of an attribute
- * VALUE that were never a chapter token); and a selection that only PARTLY touches the attribute
- * run combined with either of the first two. Fixed by always routing a paste whose selection
- * TOUCHES attribute-display text through plain-text insertion, regardless of what other MIME
- * flavors the clipboard also carries or how much of the selection sits outside the run — see
- * `$handlePasteForStandardView`'s doc comment for the full design.
+ * boundary in one move. Regression classes pinned below, each reaching that same failure mode a
+ * different way: a live native paste event that still carries a same-namespace
+ * `application/x-lexical-editor` flavor; a multi-line plain-text payload (the ordinary pipeline
+ * splits it via `insertParagraph()`); a marker-bearing payload (the ordinary pipeline's `\c`/`\id`
+ * strip eats bytes out of an attribute VALUE that were never a chapter token); and a selection that
+ * only PARTLY touches the attribute run combined with either of the first two. Fixed by always
+ * routing a paste whose selection TOUCHES attribute-display text through plain-text insertion,
+ * regardless of what other MIME flavors the clipboard also carries or how much of the selection
+ * sits outside the run — see `$handlePasteForStandardView`'s doc comment for the full design.
  *
  * Binding design principle: paste in attribute context ≡ typing the same characters at the same
  * caret (or over the same selection). Every "paste ≡ typed" pin below proves paste and the
@@ -199,9 +194,10 @@ function usjOf(editor: EditorHandle): Usj {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Char span fixture: TJ's exact repro shape, `\nd asdf|who="hi"\nd*`, plus a second paragraph to
-// depart to. Mounts BOTH CharNodePlugin (self-heal) and MarkerEditPlugin (pend/settle) — the real
-// app's plugin stack — matching charAttributeDeletionSettle.test.tsx's idiom.
+// Char span fixture: the shape this whole file is built around, `\nd asdf|who="hi"\nd*`, plus a
+// second paragraph to depart to. Mounts BOTH CharNodePlugin (self-heal) and MarkerEditPlugin
+// (pend/settle) — the real app's plugin stack — matching charAttributeDeletionSettle.test.tsx's
+// idiom.
 // ---------------------------------------------------------------------------------------------
 
 function $charFixture(): void {
@@ -313,8 +309,8 @@ describe("paste ≡ typed (TJ's repro shape): plain-text-only paste at the end o
 
     await pasteAndFlush(editor, { "text/plain": 'sid="things"' });
 
-    // Pre-settle: no escaped text, closer intact, attribute display present (the exact live-repro
-    // symptoms — hidden display, escaped text — must not appear even transiently).
+    // Pre-settle: no escaped text, closer intact, attribute display present — the corruption
+    // symptoms (hidden display, escaped text) must not appear even transiently.
     editor.getEditorState().read(() => {
       const char = $firstChar();
       expect($charCloser(char).getTextContent()).toBe("\\nd*");
@@ -352,10 +348,8 @@ describe("root cause: a native paste event carrying a same-namespace application
     // a live native paste event that still carries the flavor (a genuine same-page copy, not the
     // reconstructed-DataTransfer paste path S3's own doc comment shows can never carry it) keeps
     // Lexical's exact-node-tree fast path for ORDINARY content — but that guard must never win over
-    // an attribute-context destination; this reproduces the corruption class the guard used to
-    // cause there (a confirmed regression class on this branch — not necessarily TJ's own
-    // pre-branch repro, whose most plausible mechanism was the OLD NBSP-gated handler; see this
-    // file's header comment).
+    // an attribute-context destination, so this pins the corruption that fast path would otherwise
+    // cause there.
     const { editor } = await testEnvironmentWithCharSync(() => {
       $charFixture();
       $getRoot().append(
@@ -532,7 +526,7 @@ describe("multi-line payload collapses to a single space, per newline (attribute
 });
 
 describe("marker-bearing payload: literal value text, no strip — and what the settle then does with it", () => {
-  /** The run-end caret of TJ's repro, the shape the whole attribute-context path was built for. */
+  /** The run-end caret this whole attribute-context path was built for. */
   function $selectRunEnd(): void {
     const run = $charAttributeRun($firstChar());
     run.select(run.getTextContentSize(), run.getTextContentSize());
@@ -624,16 +618,14 @@ describe("CUT of a selection inside the attribute value", () => {
 });
 
 describe("mixed selection: spans BOTH attribute and non-attribute content", () => {
-  // Design choice (brief-permitted either way): a selection that only PARTLY sits inside
-  // attribute-display text now TAKES the attribute-context path (widened from an earlier
-  // both-ends-must-qualify check) rather than declining it — under paste ≡ typing, a user typing a
+  // Design choice: a selection that only PARTLY sits inside attribute-display text TAKES the
+  // attribute-context path rather than declining it — under paste ≡ typing, a user typing a
   // character over this exact selection gets `selection.insertText`'s own removeText-then-insert
   // behavior regardless of which node the selection's OTHER end sits on, so paste must take the
   // identical path instead of falling through to a branch (the ordinary pipeline's
   // `insertParagraph()` for a multi-line payload, or Lexical's rich-node paste for a
   // same-namespace-flavored one) that CAN corrupt the attribute-run end of the range — reproduced
-  // in the two pins below this one, each of which used to reach exactly one of those two branches
-  // before the OR-widening.
+  // in the two pins below this one, each of which reaches exactly one of those two branches.
   function $selectRunThroughCloserStart(): void {
     const char = $firstChar();
     const run = $charAttributeRun(char);
@@ -659,10 +651,10 @@ describe("mixed selection: spans BOTH attribute and non-attribute content", () =
   });
 
   it("mixed selection + same-namespace application/x-lexical-editor flavor: does not reach Lexical's rich-paste node insertion (regression for the corruption class this closes)", async () => {
-    // Before the OR-widening, this exact shape (one end in attribute context, one end not) failed
-    // the (then AND-based) attribute-context check, so the same-namespace-flavor decline above ran
-    // unconditionally and handed the paste to Lexical's default rich-paste node insertion — the
-    // SAME corruption class as the "root cause" describe block above, reached via a mixed selection
+    // This exact shape (one end in attribute context, one end not) must also take the
+    // attribute-context path: were the same-namespace-flavor decline above to run unconditionally
+    // here, it would hand the paste to Lexical's default rich-paste node insertion — the SAME
+    // corruption class as the "root cause" describe block above, reached via a mixed selection
     // instead of a fully-inside one.
     const { editor } = await testEnvironmentWithCharSync(() => {
       $charFixture();
@@ -912,8 +904,8 @@ describe("mixed selection: the pasted bytes are BODY content, not attribute-valu
   ] as const)(
     "strips a pasted \\c for %s too — the rule is about touching, not about which end touches",
     async (_name, shape) => {
-      // The report for this branch measured four mixed-selection shapes; only one was pinned. The
-      // other three live here so the claim is in the suite rather than in a transcript.
+      // All four mixed-selection shapes are covered: the rule is about whether the selection
+      // touches attribute-value context, not about which end of the range does the touching.
       const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
       await act(async () =>
         editor.update(() => {

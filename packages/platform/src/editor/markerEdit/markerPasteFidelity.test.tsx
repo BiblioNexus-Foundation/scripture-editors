@@ -1,8 +1,8 @@
 /**
- * Multi-line marker-bearing paste semantics (live-verified, 2026-08-07) and the `\c`/`\id` strip.
+ * Multi-line marker-bearing paste semantics and the `\c`/`\id` strip.
  * A pasted line starting with its own paragraph-marker literal owns that marker instead of also
  * getting the host paragraph's cloned prefix; a marker-free line inherits the host's. `\c`/`\id`
- * never survive paste normalization — pasting either used to be able to reach an unsaveable
+ * never survive paste normalization — pasting either would otherwise reach an unsaveable
  * editor state (a second chapter/book-id node the PDP rejects on save). Kept separate from
  * `whitespaceDisplay.plugin.utils.test.tsx` (the NBSP/claim-policy contract) and
  * `clipboardCopyFidelity.test.tsx` (copy-side byte fidelity) so this file stays focused on the
@@ -357,12 +357,12 @@ describe("\\c/\\id strip on paste", () => {
   });
 
   it("a pasted \\c never leaves the editor in the unsaveable state the live repro produced: exactly one chapter survives, no bare top-level string strands outside the paragraph", async () => {
-    // Live repro (2026-08-07): pasting a bare `\c 2` mid-chapter put a second chapter node in a
-    // real book/chapter/paragraph document, and every subsequent save failed with the PDP's
-    // "Multiple chapter markers present" — the error surfaced only in the renderer log, so disk
-    // and other editors silently stopped updating. Reproduced here in a realistic book+chapter+
-    // paragraph document (not the bare single-paragraph fixture the pins above use) so the
-    // chapter-count assertion means something.
+    // A pasted bare `\c 2` mid-chapter must not put a second chapter node into a real
+    // book/chapter/paragraph document: the PDP rejects a save with a second chapter marker
+    // ("Multiple chapter markers present"), and that failure surfaces only in the renderer log —
+    // disk and other editors would silently stop reflecting further edits. Reproduced here in a
+    // realistic book+chapter+paragraph document (not the bare single-paragraph fixture the pins
+    // above use) so the chapter-count assertion means something.
     const { editor, text } = await bookChapterParaHost();
 
     await pasteAndSettle(editor, () => text.select(7, 7), "\\c 5");

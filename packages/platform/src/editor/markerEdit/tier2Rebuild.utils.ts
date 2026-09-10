@@ -1084,8 +1084,9 @@ const LEADING_MARKER_LITERAL = /^\\\+?([\w-]+)(?:\*|[ \u00A0])/;
  * The embedded literal's marker-kind check uses `isParaKindMarker` (markerKind.utils.ts) —
  * stylesheet-first, UNKNOWN-AS-PARAGRAPH, the same classification `$buildParaFragment`'s own guard
  * below applies to the paragraph's own marker — rather than a bare `type === MarkerType.Paragraph`
- * comparison, which rejected every unknown/custom.sty marker and left the stray-empty-paragraph
- * bug reachable for any of them (e.g. a pasted `\zz one two`, unrecognized by the bundled sheet).
+ * comparison, which would reject every unknown/custom.sty marker and leave the
+ * stray-empty-paragraph bug reachable for any of them (e.g. a pasted `\zz one two`, unrecognized by
+ * the bundled sheet).
  *
  * Operates on the ALREADY-BUILT fragment (offsets into `out.text`/`out.spans`) rather than
  * pre-filtering which child nodes contribute, because the glyph's one-character trailing

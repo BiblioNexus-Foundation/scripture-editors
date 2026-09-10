@@ -1047,12 +1047,11 @@ describe("load/engine para prefix drift pin", () => {
 });
 
 describe("selection-delete at a settled char-span boundary (WI-2 filed)", () => {
-  // Regression armor for a QA-filed live repro: after typing settled a `\wj …\wj*` char span, a
-  // PROGRAMMATIC DOM selection built with `range.setEndAfter(spanElement)` — anchor in the text
-  // BEFORE the span, focus set immediately after the span's whole DOM element — was deleted, and
-  // the deletion absorbed one character AFTER the selection's own end: the closing curly quote
-  // `”` that immediately follows the span. Mouse-drawn selections never reproduced it, so this
-  // mirrors the DOM shape at the Lexical level with an ELEMENT-point focus (offset = the
+  // A PROGRAMMATIC DOM selection built with `range.setEndAfter(spanElement)` — anchor in the text
+  // BEFORE a settled `\wj …\wj*` char span, focus set immediately after the span's whole DOM
+  // element — must not absorb the character AFTER the selection's own end: the closing curly quote
+  // `”` that immediately follows the span. Mouse-drawn selections never reproduce this shape, so
+  // this mirrors the DOM shape at the Lexical level with an ELEMENT-point focus (offset = the
   // CharNode's own index within its parent, plus one — the exact mapping `setEndAfter` produces),
   // not a text point landing inside either neighboring text node.
 

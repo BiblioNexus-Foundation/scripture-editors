@@ -1,8 +1,8 @@
 /**
- * Copy-fidelity pins for Standard-view `text/plain`: note callers (previously silently dropped),
- * source-faithful NBSP handling around a collapsed note's internal markers (previously a blanket
- * NBSP→space mapping produced phantom spaces the source USFM never had), multi-paragraph joining,
- * and the copy→paste USJ round trip. Kept separate from `whitespaceDisplay.plugin.utils.test.tsx`
+ * Copy-fidelity pins for Standard-view `text/plain`: note callers render in the copied text,
+ * source-faithful NBSP handling around a collapsed note's internal markers (a blanket NBSP→space
+ * mapping would produce phantom spaces the source USFM never had), multi-paragraph joining, and
+ * the copy→paste USJ round trip. Kept separate from `whitespaceDisplay.plugin.utils.test.tsx`
  * (which already covers the NBSP display-run invariant and the plain payload-builder contract) so
  * this file can stay focused on `$selectionToUsfmText`'s USFM-shape behavior.
  */
@@ -124,9 +124,9 @@ function noteUsj(caller: string): Usj {
 }
 
 /**
- * The 2026-08-07 live-repro footnote: `\f - \fr 1:1 \ft Caller test.\f*` — content chars carry
- * `closed: "false"` (ParatextData's real shape for footnote content — `\fr`/`\ft` never get their
- * own closer), matching the exact bytes the repro pinned.
+ * A footnote shaped like real ParatextData output: `\f - \fr 1:1 \ft Caller test.\f*` — content
+ * chars carry `closed: "false"` (ParatextData's real shape for footnote content — `\fr`/`\ft`
+ * never get their own closer).
  */
 function footnoteReproUsj(): Usj {
   return {
@@ -153,9 +153,8 @@ function footnoteReproUsj(): Usj {
 }
 
 /**
- * The 2026-08-07 live-repro cross-reference: `\x - \xo 1:3: \xo*\xt 2Cor 4:6\xt*\x*` — content
- * chars carry no `closed` flag (explicitly closed, real cross-reference shape), matching the exact
- * bytes the repro pinned.
+ * A cross-reference shaped like real ParatextData output: `\x - \xo 1:3: \xo*\xt 2Cor 4:6\xt*\x*`
+ * — content chars carry no `closed` flag (explicitly closed, real cross-reference shape).
  */
 function xrefReproUsj(): Usj {
   return {

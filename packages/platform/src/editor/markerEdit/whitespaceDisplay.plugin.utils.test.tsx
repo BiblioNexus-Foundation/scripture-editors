@@ -665,10 +665,9 @@ describe("clipboard normalization — null-event leg (ClipboardPlugin/ContextMen
  * appending a hidden placeholder element to the editor, pointing the DOM selection at it, and
  * running `document.execCommand("copy")` to provoke a real event to fill in. With nothing
  * selected, that filling step bails before it can suppress the browser's own copy, so the browser
- * copies the placeholder and whatever the user had on the clipboard is gone. Live report
- * (2026-08-26): trying to copy the marker text of a read-only construct put a single stray
- * character on the clipboard; a plain collapsed caret anywhere in the view does the same, and so
- * does cut.
+ * copies the placeholder and whatever the user had on the clipboard is gone. Without this guard,
+ * trying to copy the marker text of a read-only construct puts a single stray character on the
+ * clipboard; a plain collapsed caret anywhere in the view does the same, and so does cut.
  *
  * Two observables, because either alone can lie. `belowTheClaim` watches at a priority between this
  * handler's HIGH and rich-text's EDITOR: reached means the command was NOT claimed here, which is
@@ -743,9 +742,9 @@ describe("copying an empty selection leaves the clipboard alone", () => {
   });
 
   it("COPY_COMMAND(null) with the caret beside a read-only figure is claimed and writes nothing", async () => {
-    // The reported shape: a figure renders `contentEditable="false"` and its marker/attribute
-    // glyphs are display decorators that are not keyboard-selectable, so an attempt to select the
-    // marker text inside one leaves the caret in the prose beside it rather than in the figure.
+    // A figure renders `contentEditable="false"` and its marker/attribute glyphs are display
+    // decorators that are not keyboard-selectable, so an attempt to select the marker text inside
+    // one leaves the caret in the prose beside it rather than in the figure.
     const { editor } = await copyEnvironmentWithFigure();
     await act(async () =>
       editor.update(() => {
@@ -802,9 +801,9 @@ describe("copying an empty selection leaves the clipboard alone", () => {
  * rebuilds it — and that rebuild re-derives its OWN structural separator byte regardless of
  * whether this handler inserted a plain space or left an NBSP, so asserting on raw post-paste
  * text content pins Tier 2's rebuild timing, not this handler's contract. Comparing USFM strings
- * before and after a full round trip is what the live repro and this task actually care about:
- * whether the marker was recognized and the data survived — not which byte an about-to-be-
- * rebuilt separator held for one commit. `$selectionToUsfmText` (the copy leg) inverts every
+ * before and after a full round trip is what these pins care about: whether the marker was
+ * recognized and the data survived — not which byte an about-to-be-rebuilt separator held for one
+ * commit. `$selectionToUsfmText` (the copy leg) inverts every
  * STRUCTURAL NBSP back to a plain space regardless of which one Tier 2 chose, so the round trip
  * is meaningful however Tier 2 shapes the interim tree.
  */
@@ -887,10 +886,9 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
   });
 
   it("claims an external plain-text paste with no NBSP at all, inserting it unchanged", async () => {
-    // Previously this handler only claimed NBSP-bearing pastes; every OTHER external paste fell
-    // through to Lexical's own HTML/plain-text handling. It now claims every non-lexical paste —
-    // Standard view has no fidelity carrier but plain text, so an NBSP-free paste re-tokenizes
-    // the same way an NBSP-bearing one does.
+    // This handler claims every non-lexical paste, not just NBSP-bearing ones — Standard view has
+    // no fidelity carrier but plain text, so an NBSP-free paste must re-tokenize the same way an
+    // NBSP-bearing one does.
     let text: TextNode;
     const { editor } = await testEnvironment(() => {
       const para = $createParaNode("p");
@@ -1039,9 +1037,9 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
   });
 
   it("claims Word-style external HTML, inserting plain text with no formatting nodes", async () => {
-    // Previously this fell through to Lexical's own HTML import whenever text/html carried no
-    // NBSP, which would have created a bold-formatted TextNode from the `<b>`. It now claims
-    // every non-lexical paste and never imports the html at all.
+    // This handler claims every non-lexical paste and never imports the html at all — a
+    // text/html-only fallback here would run Lexical's own HTML import instead and create a
+    // bold-formatted TextNode from the `<b>`.
     let text: TextNode;
     const { editor } = await testEnvironment(() => {
       const para = $createParaNode("p");
@@ -1137,11 +1135,11 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
   });
 
   describe("positional NBSP normalization", () => {
-    // These replace the old blanket NBSP→`~` pins above (the ones with no marker in the pasted
-    // text stay unaffected — every existing NBSP-preservation pin above still holds byte-for-byte
-    // under the positional rule; there was simply no marker adjacency in them to normalize).
+    // The pins above hold byte-for-byte under the positional rule wherever the pasted text carries
+    // no marker adjacent to an NBSP (nothing there to normalize). These add the marker-adjacent
+    // cases the positional rule exists for.
     it("an NBSP immediately after a marker token is treated as a display artifact, not corrupted into `~` (the 2026-08-07 live-repro shape, fixed)", async () => {
-      // Live repro: a same-editor paste of a copied footnote turned every display-NBSP into a
+      // A same-editor paste of a copied footnote would otherwise turn every display-NBSP into a
       // literal `~`, corrupting `\f`/`\fr`/`\ft` into unknown-marker soup (see the round-trip
       // regression below for the full footnote). This is the minimal reproduction of one such
       // position — the required separator right after an opening glyph. Round-tripped through
@@ -1331,10 +1329,10 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
 
   describe("multi-line paste interplay (splitExpected arming)", () => {
     it("an NBSP-bearing multi-line paste both splits into prefixed paragraphs AND normalizes NBSPs positionally", async () => {
-      // Latent bug this closes: the old NBSP-only gate called `selection.insertText` on the
-      // WHOLE multi-line string with no paragraph-splitting logic at all, so a pasted "\n"
-      // landed as a literal character inside one text run instead of a paragraph break — an
-      // NBSP-bearing multi-line paste was never actually split. Dispatched via PASTE_COMMAND (not
+      // Without paragraph-splitting logic, calling `selection.insertText` on the WHOLE multi-line
+      // string would leave a pasted "\n" as a literal character inside one text run instead of a
+      // paragraph break, so an NBSP-bearing multi-line paste would never actually split.
+      // Dispatched via PASTE_COMMAND (not
       // a direct handler call) so MarkerEditPlugin's own registration arms
       // `context.splitExpected` before inserting; a direct call defaults that callback to a
       // no-op and the freshly split paragraphs would be merged back as "marker deleted".
@@ -1480,7 +1478,7 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
   });
 
   describe("tilde-corruption regression (2026-08-07 live repro)", () => {
-    /** The exact live-repro footnote: `\f - \fr 1:1 \ft Caller test.\f*`. */
+    /** The footnote shape this describe block pins: `\f - \fr 1:1 \ft Caller test.\f*`. */
     function footnoteUsj(): Usj {
       return {
         type: "USJ",
@@ -1537,7 +1535,7 @@ describe("paste normalization ($handlePasteForStandardView)", () => {
       await act(async () => sourceEditor.dispatchCommand(COPY_COMMAND, copyStub.event));
       const sourceText = copyStub.getData("text/plain");
       // Ground truth: no NBSP at all in a correct copy (matches
-      // clipboardCopyFidelity.test.tsx's pin for this exact live-repro footnote).
+      // clipboardCopyFidelity.test.tsx's pin for this exact footnote).
       expect(sourceText).toBe("\\f - \\fr 1:1 \\ft Caller test.\\f*");
 
       let text: TextNode;

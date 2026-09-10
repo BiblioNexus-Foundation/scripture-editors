@@ -75,12 +75,11 @@ function $contentStartIndex(root: RootNode): number {
  * document — the chapter's own CONTENT, matching what Standard view actually copies out of an
  * open chapter (never the book/chapter header itself). Element-offset (`root.select`), not
  * node-anchored: this is used ONLY on the source/copy side (the paste side below always targets a
- * fresh EMPTY host via `selectEnd()`), so it never hits the "replacing a large non-collapsed
- * selection on paste" doubling bug a node-anchored `"text"`-typed focus point was once written to
- * dodge here — and the element-offset form is strictly more general: it does not require the
- * chapter's last node be a `TextNode` (a `"text"`-typed focus point does, and crashed with
- * `TypeError: focusNode.selectionTransform is not a function` against a real corpus document,
- * `libs/test-data/src/data/2sa.usj.ts`, whose last node isn't one). */
+ * fresh EMPTY host via `selectEnd()`). A node-anchored `"text"`-typed focus point requires the
+ * chapter's last node be a `TextNode` — it crashes with `TypeError:
+ * focusNode.selectionTransform is not a function` against a real corpus document,
+ * `libs/test-data/src/data/2sa.usj.ts`, whose last node isn't one — so the element-offset form
+ * used here, which carries no such requirement, is strictly more general. */
 function $selectChapterContent(root: RootNode): void {
   const start = $contentStartIndex(root);
   root.select(start, root.getChildrenSize());

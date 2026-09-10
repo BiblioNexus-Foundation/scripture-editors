@@ -1,59 +1,56 @@
 /**
- * Optbreak (`//`) copy/paste coverage (filed 2026-08-13). Live symptom (TJ, most likely a
- * pre-branch or parent-branch build): copying a selection containing an optbreak put `//` on the
- * clipboard correctly, but pasting that same clipboard back did NOT insert the optbreak, while
- * pasting external plaintext `//` DID.
+ * Optbreak (`//`) copy/paste coverage. Symptom under investigation: copying a selection containing
+ * an optbreak puts `//` on the clipboard correctly, but pasting that same clipboard back can fail
+ * to insert the optbreak, even though pasting external plaintext `//` always works.
  *
  * Three hypotheses, verified below rather than assumed:
  *
- * - **H1** (the live symptom, on an OLD build): with the lexical flavor stripped by the async
- *   Ctrl+V clipboard read, Lexical's default paste prefers `text/html`; `//` renders in `text/html`
- *   as nothing at all (see "copy characterization" below — `UnknownNode.exportDOM` returns
- *   `{element: null}` unconditionally, so `@lexical/html`'s `$appendNodesToHTML` returns `false`
- *   before ever visiting the optbreak's display child, dropping it silently). This branch's
+ * - **H1** (a real native paste, whose async clipboard read strips the lexical flavor): with no
+ *   lexical flavor to fall back on, Lexical's default paste prefers `text/html`; `//` renders in
+ *   `text/html` as nothing at all (see "copy characterization" below — `UnknownNode.exportDOM`
+ *   returns `{element: null}` unconditionally, so `@lexical/html`'s `$appendNodesToHTML` returns
+ *   `false` before ever visiting the optbreak's display child, dropping it silently).
  *   `$handlePasteForStandardView` (`whitespaceDisplay.plugin.utils.ts`) prefers `text/plain`
- *   whenever present, and this branch's own copy always populates `text/plain` — H1 predicts the
- *   symptom is already fixed here for the plain path. Pinned, not assumed, in "paste round trip"
- *   below.
+ *   whenever present, and Standard view's own copy always populates `text/plain` — H1 predicts the
+ *   symptom does not reach the plain path here. Pinned, not assumed, in "paste round trip" below.
  * - **H2**: `$normalizePastedNbsp`'s marker-token regexes (`whitespaceDisplay.plugin.utils.ts`)
  *   only match `\`-shaped tokens — an NBSP adjacent to `//` would not be recognized as display
- *   whitespace and would fall to the blanket data-`~` rule instead. Characterized below: this
- *   branch's own copy walker (`$selectionToUsfmText`) inverts every TextNode's NBSP to a plain
- *   space unconditionally (the note-internal-separator special case aside), so `text/plain` never
- *   carries an NBSP next to `//` to begin with — H2 does not bite the round trip this task is
- *   scoped to, and doubly so: this branch's own `text/html` never carries `//` at all for an
- *   optbreak either (see the `text/html` pin below), so there is no `//` in P10's OWN html for a
- *   foreign NBSP to even land beside. A synthetic html-only foreign payload that DOES carry such
- *   an NBSP is characterized (not "fixed" — unreachable via this branch's own copy, reachable only
- *   via a genuinely foreign clipboard source) for completeness: the NBSP is genuine data from that
+ *   whitespace and would fall to the blanket data-`~` rule instead. Characterized below: Standard
+ *   view's own copy walker (`$selectionToUsfmText`) inverts every TextNode's NBSP to a plain space
+ *   unconditionally (the note-internal-separator special case aside), so `text/plain` never
+ *   carries an NBSP next to `//` to begin with — H2 does not bite the round trip this file covers,
+ *   and doubly so: Standard view's own `text/html` never carries `//` at all for an optbreak
+ *   either (see the `text/html` pin below), so there is no `//` in its OWN html for a foreign NBSP
+ *   to even land beside. A synthetic html-only foreign payload that DOES carry such an NBSP is
+ *   characterized (not "fixed" — unreachable via Standard view's own copy, reachable only via a
+ *   genuinely foreign clipboard source) for completeness: the NBSP is genuine data from that
  *   foreign source, and settles to the correct display form for real data-NBSP (`~`), just one
  *   position off from where a marker-adjacent rule would have recognized it as a separator.
- * - **H3** (confirmed root cause, TWO independent gaps): the same-namespace
- *   `application/x-lexical-editor` fast path (S2 in the clipboard semantics doc) reconstructs
- *   nodes via `@lexical/clipboard`'s JSON generator/parser, not DOM `importDOM`. That generator
- *   (`$appendNodesToJSON`, inside `@lexical/clipboard`'s `LexicalClipboard.dev.js`) computes
- *   `shouldExclude` from `currentNode.excludeFromCopy('html')` — the literal string `'html'`,
- *   hardcoded, for EVERY copy-out destination `$appendNodesToJSON` handles (`'clone'` is never
- *   passed by any Lexical-shipped code path in the installed version). `UnknownNode.excludeFromCopy`
- *   (`UnknownNode.ts`) returned `destination !== "clone"` — excluding itself unconditionally. When
- *   a node is excluded, `$appendNodesToJSON` does not drop it silently — it HOISTS the excluded
- *   node's own children into the parent's list in its place. For an optbreak, that stranded the
- *   `//` `ImmutableTypedTextNode` (a DecoratorNode) as a bare sibling with no owning `UnknownNode`
- *   wrapper: `$parseSerializedNode` on paste reconstructed a loose decorator, not a recognized
- *   optbreak — `$isUnknownNode` is false for it, and nothing re-tokenizes a decorator's text.
- *   `text/html` is UNAFFECTED by this whole mechanism: `$appendNodesToHTML` (`@lexical/html`)
- *   computes the same `excludeFromCopy('html')` value but returns early on `UnknownNode`'s
- *   unconditional `{element: null}` export BEFORE ever consulting it — so the fix below changes
- *   ONLY the lexical-JSON flavor. Fixed by narrowing `UnknownNode.excludeFromCopy` to leave a
- *   CHILD-BEARING "optbreak" out of the exclusion. A SECOND, independent gap surfaced while
- *   verifying that fix: a selection whose ending boundary resolves to an ELEMENT-type point ON the
- *   optbreak at offset 0 (touching the wrapper without covering its own `//` child) still marked
+ * - **H3** (the root cause, TWO independent gaps): the same-namespace `application/x-lexical-editor`
+ *   fast path (S2 in the clipboard semantics doc) reconstructs nodes via `@lexical/clipboard`'s
+ *   JSON generator/parser, not DOM `importDOM`. That generator (`$appendNodesToJSON`, inside
+ *   `@lexical/clipboard`'s `LexicalClipboard.dev.js`) computes `shouldExclude` from
+ *   `currentNode.excludeFromCopy('html')` — the literal string `'html'`, hardcoded, for EVERY
+ *   copy-out destination `$appendNodesToJSON` handles (`'clone'` is never passed by any
+ *   Lexical-shipped code path in the installed version). An `UnknownNode` that excludes itself
+ *   unconditionally from that check loses its content on exclusion: `$appendNodesToJSON` does not
+ *   drop an excluded node silently — it HOISTS the excluded node's own children into the parent's
+ *   list in its place. For an optbreak, that strands the `//` `ImmutableTypedTextNode` (a
+ *   DecoratorNode) as a bare sibling with no owning `UnknownNode` wrapper: `$parseSerializedNode`
+ *   on paste reconstructs a loose decorator, not a recognized optbreak — `$isUnknownNode` is false
+ *   for it, and nothing re-tokenizes a decorator's text. `text/html` is UNAFFECTED by this whole
+ *   mechanism: `$appendNodesToHTML` (`@lexical/html`) computes the same `excludeFromCopy('html')`
+ *   value but returns early on `UnknownNode`'s unconditional `{element: null}` export BEFORE ever
+ *   consulting it — so narrowing `UnknownNode.excludeFromCopy` to leave a CHILD-BEARING "optbreak"
+ *   out of the exclusion (see `UnknownNode.ts`) changes ONLY the lexical-JSON flavor. The SECOND,
+ *   independent gap: a selection whose ending boundary resolves to an ELEMENT-type point ON the
+ *   optbreak at offset 0 (touching the wrapper without covering its own `//` child) still marks
  *   the wrapper "selected" under Lexical's default `isSelected` (key-membership in
  *   `selection.getNodes()`, blind to the node's own child count), producing a CHILDLESS
  *   `{type:"optbreak"}` placeholder in the lexical-JSON copy even though the live node has a
  *   child — disagreeing with `text/plain`, which correctly emits nothing for that same boundary.
  *   `excludeFromCopy` cannot see this (it has no visibility into which children a given selection
- *   will include), so an `isSelected` override closes it directly, mirroring
+ *   will include), so `UnknownNode`'s `isSelected` override closes it directly, mirroring
  *   `$selectionToUsfmText`'s own `getNodes()`-based walk. Both rules key on the node's own child
  *   count rather than on its kind, so every other `UnknownNode` construct (figure, sidebar, periph,
  *   ref) is covered by the same predicate — their per-kind copy→paste round trips are pinned in
@@ -235,15 +232,14 @@ describe("copy characterization: what the walker actually emits around an optbre
   });
 
   it("carrier agreement at a childless boundary: a selection ending exactly at the optbreak's own start (touching the wrapper, not its `//` child) excludes it from BOTH carriers, not just text/plain", async () => {
-    // Before the `isSelected` override (`UnknownNode.ts`), this selection shape — a focus point
-    // resolving as an ELEMENT-type point ON the optbreak at offset 0 — still marked the WRAPPER
-    // "selected" under Lexical's default `isSelected` (key-membership in `selection.getNodes()`,
-    // blind to whether any of the wrapper's own children are actually covered), even though the
-    // `//` child itself was not selected. `$appendNodesToJSON` then serialized a CHILDLESS
-    // `{type:"unknown", tag:"optbreak", children:[]}` placeholder into the lexical-JSON payload —
-    // a carrier disagreement (`text/plain`, walking the same `getNodes()` list via
-    // `$selectionToUsfmText`, correctly emitted nothing for this boundary). Measured directly
-    // against this exact selection shape before writing the fix.
+    // Without `UnknownNode`'s `isSelected` override, this selection shape — a focus point
+    // resolving as an ELEMENT-type point ON the optbreak at offset 0 — would still mark the
+    // WRAPPER "selected" under Lexical's default `isSelected` (key-membership in
+    // `selection.getNodes()`, blind to whether any of the wrapper's own children are actually
+    // covered), even though the `//` child itself is not selected. `$appendNodesToJSON` would then
+    // serialize a CHILDLESS `{type:"unknown", tag:"optbreak", children:[]}` placeholder into the
+    // lexical-JSON payload — a carrier disagreement (`text/plain`, walking the same `getNodes()`
+    // list via `$selectionToUsfmText`, correctly emits nothing for this boundary).
     const { editor } = await renderUsjEditor(optbreakUsj());
     let optbreakKey = "";
     editor.getEditorState().read(() => {
@@ -280,8 +276,8 @@ describe("copy characterization: what the walker actually emits around an optbre
     // split, usfmFragmentToUsj.ts, is a plain string `.split("//")`, unaffected by an adjacent
     // `~`) — asserted below by settling and checking the resulting USJ, not just the pre-settle
     // display text. This shape is reachable only via a foreign clipboard source supplying
-    // `text/html` with no `text/plain` at all — this branch's own copy never produces it (the two
-    // pins above).
+    // `text/html` with no `text/plain` at all — Standard view's own copy never produces it (the
+    // two pins above).
     let text: TextNode;
     const { editor } = await testEnvironment(() => {
       const para = $createParaNode("p");
@@ -327,8 +323,8 @@ describe("copy characterization: what the walker actually emits around an optbre
 });
 
 describe("paste round trip: all three payload shapes carry a copied optbreak back", () => {
-  /** Harvests the genuine text/plain, text/html, and application/x-lexical-editor bytes this
-   * branch's own copy produces for `optbreakUsj()`'s paragraph CONTENT (marker excluded, see
+  /** Harvests the genuine text/plain, text/html, and application/x-lexical-editor bytes Standard
+   * view's own copy produces for `optbreakUsj()`'s paragraph CONTENT (marker excluded, see
    * `$selectParaContent`'s doc comment) — the same `COPY_COMMAND` path `$handleCopyForStandardView`
    * (`whitespaceDisplay.plugin.utils.ts`) runs for a real Ctrl+C. */
   async function copyOptbreakContentPayload(): Promise<{ [key: string]: string }> {

@@ -228,8 +228,8 @@ export function $normalizePastedNbsp(text: string): string {
 /** A `\c`/`\id` marker token ANYWHERE in a line, capturing its payload up to — but not including —
  * the next marker or line end. Not anchored to the line's start: a chapter/book-id token can sit
  * mid-line (`x \c 5 y`, a paste landing mid-sentence), and an anchor there would silently miss it
- * — the exact live-repro shape (see `$stripPastedChapterAndBookId`'s doc comment). Global so more
- * than one occurrence on the same line is fully swept, not just the first. */
+ * (see `$stripPastedChapterAndBookId`'s doc comment). Global so more than one occurrence on the
+ * same line is fully swept, not just the first. */
 const CHAPTER_OR_BOOK_ID_TOKEN = /\\(?:c|id)(?![\w-])[^\n\\]*/g;
 
 /**
@@ -237,11 +237,11 @@ const CHAPTER_OR_BOOK_ID_TOKEN = /\\(?:c|id)(?![\w-])[^\n\\]*/g;
  * next marker or newline) before insertion. Both create a document-structural node PT9 allows
  * only once per book (a `ChapterNode`/`BookNode`, materialized from the marker name alone —
  * `usj-editor.adaptor.ts` — same as a real load), and Standard view has no per-paste "am I the
- * only one" check the way an initial document load does. Live repro (2026-08-07): pasting a bare
- * `\c 2` mid-chapter created a second chapter node in the editor; every subsequent save then
- * failed with the PDP's "Multiple chapter markers present" (the error surfaces only in the
- * renderer log — disk and other editors silently stop updating). `\id` is the book-level twin of
- * the same hazard and is stripped identically. A token need not be its own line — `x \c 5 y`
+ * only one" check the way an initial document load does. A pasted bare `\c 2` mid-chapter would
+ * otherwise create a second chapter node in the editor, and every subsequent save would then fail
+ * with the PDP's "Multiple chapter markers present" (an error that surfaces only in the renderer
+ * log — disk and other editors would silently stop updating). `\id` is the book-level twin of the
+ * same hazard and is stripped identically. A token need not be its own line — `x \c 5 y`
  * mid-paragraph reaches the same tokenizer branch (chapter/book-id tokens are recognized wherever
  * they occur, not just at a fragment's start) and left unstripped produces the identical poisoned
  * shape: a second chapter node PLUS the trailing bytes (`y`) stranding as a bare top-level USJ
@@ -395,13 +395,12 @@ function $insertPastedTextIntoAttributeContext(selection: RangeSelection, text: 
  * the private `application/x-lexical-editor` flavor Lexical writes on copy is not one of them, so
  * the `DataTransfer` `pasteSelection` (`clipboard.utils.ts`) rebuilds from `navigator.clipboard.
  * read()` can never contain it. A real Ctrl+V — even a same-editor paste of the editor's own
- * copy — therefore always rides `text/html`/`text/plain` like any external source. Previously
- * this only claimed NBSP-bearing pastes and inserted the text with a BLANKET NBSP→`~` mapping;
- * live repro (2026-08-07) showed that corrupts a same-editor paste of its own copy — every
- * display-NBSP (the separator after `\f`/`\fr`/`\ft`) became a literal `~`, turning recognized
- * markers into unknown-marker soup — and a browser-hop `\nd …\nd*` paste came back with an
- * unmatched closer. `$normalizePastedNbsp` above replaces that blanket mapping with the
- * positional rule.
+ * copy — therefore always rides `text/html`/`text/plain` like any external source. A BLANKET
+ * NBSP→`~` mapping would corrupt a same-editor paste of its own copy: every display-NBSP (the
+ * separator after `\f`/`\fr`/`\ft`) would become a literal `~`, turning recognized markers into
+ * unknown-marker soup, and a browser-hop `\nd …\nd*` paste would come back with an unmatched
+ * closer. `$normalizePastedNbsp` above uses a positional rule instead, so only genuine data-NBSPs
+ * become `~`.
  *
  * A MULTI-LINE payload is replayed line by line with an `INSERT_PARAGRAPH_COMMAND` dispatch
  * between lines, because no USFM line can carry a newline. Going through the COMMAND (rather than
@@ -420,46 +419,33 @@ function $insertPastedTextIntoAttributeContext(selection: RangeSelection, text: 
  * never runs for them); or no text can be resolved.
  *
  * The same-namespace-flavor decline is SUSPENDED whenever the selection TOUCHES attribute-display
- * text at either end ({@link $isSelectionInAttributeContext}). TJ's live repro (2026-08-11, filed
- * against a pre-branch build): existing span `\nd asdf|who="hi"\nd*`, caret at the end of the
- * `who="hi"` run, paste plain text `sid="things"` — the `who` attribute display and the closing
- * `\nd*` glyph both vanished from the editor, the pasted text rendered outside the span, and the
- * saved file diverged from the editor. `sid="things"` carries no NBSP, and that pre-branch build's
- * `$handlePasteForStandardView` still had its OLD gate (documented above: "previously this only
- * claimed NBSP-bearing pastes") — so the most plausible mechanism is that OLD gate declining an
- * NBSP-free paste outright and falling through to Lexical's own default rich-paste node insertion,
- * not the same-namespace-flavor path below (this branch's OWN copy already carries `text/plain`
- * unconditionally, per the doc comment above, and the "private Lexical flavor is dead on Ctrl+V"
- * fact recorded in the semantics doc's S3 still holds for the reconstructed-`DataTransfer` paste
- * path this repro most likely used). What both mechanisms — the old NBSP gate and this file's own
- * same-namespace-flavor decline — share is the SAME failure shape once either one declines:
- * Lexical's default rich-paste node insertion has no notion that an attribute run's text must stay
- * inside its one tagged TextNode, and (reproduced directly on THIS branch, see
- * `attributeContextPasteFidelity.test.tsx`'s "root cause" describe) merges the run, the closing
- * glyph, and even the FOLLOWING paragraph's own sibling text into one plain node: the attribute
- * display and the closing marker both vanish, and the pasted bytes end up loose in body content.
- * Confirmed regression classes on THIS branch, closed by this suspension: (1) a live native paste
- * event that still carries a same-namespace `application/x-lexical-editor` flavor (S2's own
- * documented case for when that CAN still reach a handler, unlike the reconstructed-`DataTransfer`
- * path); (2) a multi-line plain-text payload, which the ordinary external-paste pipeline below
- * would split into real paragraphs via `INSERT_PARAGRAPH_COMMAND` — inside an attribute run that
- * is exactly as destructive as the rich-paste shape; (3) a marker-bearing payload (`\c 5`) landing
- * wholly INSIDE one attribute node, where the ordinary pipeline's `$stripPastedChapterAndBookId`
- * would eat bytes out of an attribute VALUE that were never a chapter token to begin with — bytes
- * merely TOUCHING a run get that strip, since they end up as re-tokenizing paragraph content
- * ({@link $insertPastedTextIntoAttributeContext}); (4) a MIXED selection (one end inside the run, one
- * end outside) combined with either (1) or (2) above — the selection touches attribute context, so
- * it must not be allowed to reach either risky branch merely because its OTHER end sits outside.
- * Attribute value bytes are never rich content — a user cannot "type formatting" into one either —
- * so this handler must always claim a paste touching one and insert it as plain text
- * ({@link $insertPastedTextIntoAttributeContext}), regardless of what other MIME flavors the
+ * text at either end ({@link $isSelectionInAttributeContext}). Lexical's default rich-paste node
+ * insertion has no notion that an attribute run's text must stay inside its one tagged TextNode,
+ * and (see `attributeContextPasteFidelity.test.tsx`'s "root cause" describe) merges the run, the
+ * closing glyph, and even the FOLLOWING paragraph's own sibling text into one plain node: the
+ * attribute display and the closing marker both vanish, and the pasted bytes end up loose in body
+ * content. Regression classes closed by this suspension: (1) a live native paste event that still
+ * carries a same-namespace `application/x-lexical-editor` flavor (S2's own documented case for
+ * when that CAN still reach a handler, unlike the reconstructed-`DataTransfer` path); (2) a
+ * multi-line plain-text payload, which the ordinary external-paste pipeline below would split into
+ * real paragraphs via `INSERT_PARAGRAPH_COMMAND` — inside an attribute run that is exactly as
+ * destructive as the rich-paste shape; (3) a marker-bearing payload (`\c 5`) landing wholly INSIDE
+ * one attribute node, where the ordinary pipeline's `$stripPastedChapterAndBookId` would eat bytes
+ * out of an attribute VALUE that were never a chapter token to begin with — bytes merely TOUCHING
+ * a run get that strip, since they end up as re-tokenizing paragraph content
+ * ({@link $insertPastedTextIntoAttributeContext}); (4) a MIXED selection (one end inside the run,
+ * one end outside) combined with either (1) or (2) above — the selection touches attribute
+ * context, so it must not be allowed to reach either risky branch merely because its OTHER end
+ * sits outside. Attribute value bytes are never rich content — a user cannot "type formatting"
+ * into one either — so this handler must always claim a paste touching one and insert it as plain
+ * text ({@link $insertPastedTextIntoAttributeContext}), regardless of what other MIME flavors the
  * clipboard also carries. Structure protection still takes precedence (checked first, below): an
  * attribute run inside a protected document defers to the same protection contract as everything
- * else. One further pre-existing precedence is UNCHANGED by this suspension: the CRITICAL-priority
- * in-note multi-line `PASTE_COMMAND` claim (`MarkerEditPlugin.tsx`) still runs BEFORE this handler
- * and still wins for a multi-line payload whose selection touches EXPANDED note content — an
- * attribute run that happens to sit inside an expanded note's content is reached by this handler
- * (and this suspension) only when that in-note claim itself declines.
+ * else. One further precedence is unaffected by this suspension: the CRITICAL-priority in-note
+ * multi-line `PASTE_COMMAND` claim (`MarkerEditPlugin.tsx`) still runs BEFORE this handler and
+ * still wins for a multi-line payload whose selection touches EXPANDED note content — an attribute
+ * run that happens to sit inside an expanded note's content is reached by this handler (and this
+ * suspension) only when that in-note claim itself declines.
  *
  * Mutating: call inside `editor.update()`. It inserts text, removes the selected range, and
  * dispatches `INSERT_PARAGRAPH_COMMAND` against the editor it reads from `$getEditor()` — none of

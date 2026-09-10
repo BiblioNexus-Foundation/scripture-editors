@@ -1243,11 +1243,11 @@ describe("multi-line plain-text paste inside note content", () => {
     it("strips \\c/\\id bytes from a multi-line paste — they never land in note content", async () => {
       // Single-line in-note pastes decline to the main external-paste handler
       // ($handlePasteForStandardView, whitespaceDisplay.plugin.utils.ts), which already strips
-      // `\c`/`\id`; this CRITICAL multi-line claim is a SEPARATE code path that did not share the
-      // strip until now. A `\c`/`\id` token landing in note content re-tokenizes through the same
+      // `\c`/`\id`; this CRITICAL multi-line claim is a SEPARATE code path with its own strip. A
+      // `\c`/`\id` token landing in note content re-tokenizes through the same
       // Tier 2 tokenizer a paragraph does, so it is just as reachable — and just as save-poisoning
-      // (a live-verified `\c` paste anywhere puts a second chapter node in the editor and fails
-      // every subsequent PDP save) — as one landing in body text.
+      // (a `\c` paste anywhere puts a second chapter node in the editor and fails every subsequent
+      // PDP save) — as one landing in body text.
       const { editor } = await renderStandardEditorWithUnclosedNote();
 
       await pasteAt(editor, "first\n\\c 5\nlast", $selectFtEnd);
@@ -1298,12 +1298,13 @@ describe("multi-line plain-text paste inside note content", () => {
   });
 
   it("normalizes a marker-adjacent pasted NBSP positionally, not into `~` (the same corruption class the main paste path was fixed for)", async () => {
-    // Before this was wired to the shared positional rule, this claim's OWN blanket NBSP→`~`
-    // mapping turned the required separator after a marker's opener into data, corrupting a
-    // recognizable `\nd`…`\nd*` pair the same way a same-editor footnote paste once corrupted
-    // `\f`/`\fr`/`\ft` on the main external-paste path (whitespaceDisplay.plugin.utils.test.tsx's
-    // "2026-08-07 live-repro" pin). Multi-line so this CRITICAL in-note claim (not the HIGH
-    // external-paste handler) is the one doing the normalization.
+    // This claim runs its own NBSP normalization via the shared positional rule
+    // (`$normalizePastedNbsp`), not a blanket NBSP→`~` mapping: a blanket mapping would turn the
+    // required separator after a marker's opener into data, corrupting a recognizable
+    // `\nd`…`\nd*` pair — the same corruption class the main external-paste path guards against
+    // (see whitespaceDisplay.plugin.utils.test.tsx's NBSP-normalization pins). Multi-line so this
+    // CRITICAL in-note claim (not the HIGH external-paste handler) is the one doing the
+    // normalization.
     const { editor } = await renderStandardEditorWithUnclosedNote();
 
     await pasteAt(editor, `\\nd${NBSP}light\\nd*\nsecond`, $selectFtEnd);

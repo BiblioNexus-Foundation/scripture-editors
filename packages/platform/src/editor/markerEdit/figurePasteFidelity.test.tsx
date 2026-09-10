@@ -8,12 +8,11 @@
  * surrounding prose — and an exported USJ whose `figure` object had no `content` at all, the
  * caption merged into the neighbouring text run instead.
  *
- * Mechanism: `$textNodeInUnknownTransform` (`TextSpacingPlugin`, shared-react) ejects any TextNode
- * that is NEW in the current update out of an `UnknownNode` parent, so a user typing into a
- * read-only opaque block never plants prose inside it. A Tier-2 rebuild materializes the WHOLE
- * figure — wrapper and caption together — in one update, so the caption looked exactly like typed
- * text to that rule. The transform now ejects only when the wrapper predates the update, which is
- * the shape a typed intrusion actually has.
+ * Mechanism: `$textNodeInUnknownTransform` (`TextSpacingPlugin`, shared-react) ejects a TextNode
+ * out of an `UnknownNode` parent only when the WRAPPER predates the current update — the shape a
+ * typed intrusion into an existing read-only opaque block actually has. A Tier-2 rebuild
+ * materializes the WHOLE figure — wrapper and caption together — in the same update, so the
+ * caption stays inside it rather than being ejected as though it were typed text.
  *
  * These pins mount the real `Editor` (via `mountStandardViewEditor`) rather than the marker-edit
  * plugin alone: the ejection lives in a sibling plugin, so a harness carrying only

@@ -1,8 +1,8 @@
 /**
  * Copy→paste fidelity for every opaque construct the editor carries as an `UnknownNode` — figure,
  * sidebar, periph, ref — across the three clipboard payload shapes a real Ctrl+C/Ctrl+V produces,
- * plus the table kinds that used to be `UnknownNode`s and are now their own `ImmutableTable*`
- * nodes.
+ * plus the table kinds, which are their own dedicated `ImmutableTable*` nodes rather than
+ * `UnknownNode`.
  *
  * The shape under test is the one `optbreakClipboardFidelity.test.tsx` established: a payload
  * carrying `application/x-lexical-editor` takes Lexical's own same-namespace fast path, which

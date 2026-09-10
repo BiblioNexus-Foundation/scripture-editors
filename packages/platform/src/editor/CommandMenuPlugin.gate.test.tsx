@@ -288,10 +288,10 @@ describe("MarkerEditPlugin's Standard-view clipboard handlers do not leak into F
 /**
  * The empty-copy rule is not Standard view's. It lives in `ClipboardPlugin` (shared-react), which
  * every view mounts, and this view has no Standard-view copy handler registered at all — so a
- * regression here would leak the same way the reported one did, in a view where nothing else is
- * watching. These exercise the whole real path from the public surface to the clipboard: a keydown
- * on the root element where the plugin listens, and `EditorRef.copy()`/`.cut()`, the API a host
- * app drives the editor through.
+ * regression here would leak silently, in a view where nothing else is watching. These exercise
+ * the whole real path from the public surface to the clipboard: a keydown on the root element
+ * where the plugin listens, and `EditorRef.copy()`/`.cut()`, the API a host app drives the editor
+ * through.
  *
  * `execCommandSpy` supplies the `document.execCommand` jsdom lacks and reports whether anything was
  * written. `ClipboardEvent` is stubbed for the same reason `formattedViewCopyEvent` stubs it:
