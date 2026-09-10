@@ -1,0 +1,244 @@
+/**
+ * Copy→paste fidelity for every opaque construct the editor carries as an `UnknownNode` — figure,
+ * sidebar, periph, ref — across the three clipboard payload shapes a real Ctrl+C/Ctrl+V produces,
+ * plus the table kinds that used to be `UnknownNode`s and are now their own `ImmutableTable*`
+ * nodes.
+ *
+ * The shape under test is the one `optbreakClipboardFidelity.test.tsx` established: a payload
+ * carrying `application/x-lexical-editor` takes Lexical's own same-namespace fast path, which
+ * rebuilds nodes from the JSON generator's output rather than re-tokenizing the plain text. That
+ * generator computes exclusion from `UnknownNode.excludeFromCopy`, and an excluded node is not
+ * dropped — its children are HOISTED into the parent in its place. For a construct whose children
+ * are the content-free display decorators `unknownDisplayParts` builds (`\fig `, `|src="…"`,
+ * `\fig*`), that hoisting produced a convincing lie: the pasted document RENDERED the construct's
+ * full literal USFM bytes as loose siblings while its exported USJ silently dropped the node and
+ * every one of its attributes. A save at that point persisted the loss with no error and a screen
+ * that still showed the bytes.
+ *
+ * These pins mount the full `Editor` rather than `MarkerEditPlugin` alone: the plugins around the
+ * engine take part in what a paste actually produces (see `figurePasteFidelity.test.tsx`), so a
+ * narrower harness can report a paste clean that a user's does not.
+ *
+ * Where a kind cannot round-trip, the LOSS is asserted rather than the fidelity, so the sweep never
+ * hides one — each such pin says in its own name what is lost and why.
+ */
+
+import { copyEvent, pasteEvent } from "./markerEdit.test-helpers";
+import { mountStandardViewEditor } from "../settledGetUsj.test-helpers";
+import { corpusFixtures } from "../adaptors/corpus/corpus-data";
+import { MarkerObject, Usj, usxStringToUsj } from "@eten-tech-foundation/scripture-utilities";
+import { act } from "@testing-library/react";
+import { $getRoot, COPY_COMMAND, PASTE_COMMAND, RootNode } from "lexical";
+import { $isChapterNode, $isImmutableChapterNode } from "shared";
+
+// jsdom implements neither `ClipboardEvent` nor `DragEvent`; Lexical's own rich-paste fallback —
+// the path a lexical-flavor payload takes once the Standard-view handler declines — duck-types
+// against both (`objectKlassEquals`). Same stub as the sibling clipboard suites.
+const globalStubs: { DragEvent?: unknown; ClipboardEvent?: unknown } = globalThis;
+if (typeof globalStubs.DragEvent === "undefined")
+  globalStubs.DragEvent = class DragEvent extends Event {};
+if (typeof globalStubs.ClipboardEvent === "undefined")
+  globalStubs.ClipboardEvent = class ClipboardEvent extends Event {};
+
+const PLAIN = "text/plain";
+const HTML = "text/html";
+const LEXICAL = "application/x-lexical-editor";
+
+interface Payload {
+  [mimeType: string]: string;
+}
+
+function corpusUsj(name: string): Usj {
+  const fixture = corpusFixtures.find((entry) => entry.name === name);
+  if (!fixture) throw new Error(`no corpus fixture named ${name}`);
+  return usxStringToUsj(fixture.usx);
+}
+
+/** The index of the first top-level node after the document's header — everything past the LAST
+ * chapter marker, or past the book node for header-only front matter (`periph`) that has no
+ * chapter at all. This is what Standard view actually copies out of: a user selects inside an open
+ * chapter, never the header itself. */
+function $contentStartIndex(root: RootNode): number {
+  const children = root.getChildren();
+  let headerEnd = 0;
+  children.forEach((child, index) => {
+    if ($isChapterNode(child) || $isImmutableChapterNode(child)) headerEnd = index + 1;
+  });
+  // No chapter: the book node alone is the header.
+  return headerEnd === 0 ? 1 : headerEnd;
+}
+
+/** The fixture's header, byte-identical, plus one EMPTY `\p` paragraph as the paste host — the
+ * same shape `clipboardCorpusRoundTrip.test.tsx` seeds its target editor with, so the paste only
+ * has to reproduce the content (it can neither carry nor rebuild `\c`/`\id`; paste normalization
+ * strips them). */
+function headerSkeletonUsj(usj: Usj): Usj {
+  let headerEnd = 0;
+  usj.content.forEach((item, index) => {
+    if (typeof item !== "string" && (item.type === "chapter" || item.type === "book"))
+      headerEnd = index + 1;
+  });
+  const emptyHost: MarkerObject = { type: "para", marker: "p", content: [] } as MarkerObject;
+  return { ...usj, content: [...usj.content.slice(0, headerEnd), emptyHost] };
+}
+
+async function settle(): Promise<void> {
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+}
+
+/** Copies the fixture's content (header excluded) out of a real Standard-view editor and hands
+ * back all three carriers the copy wrote, so each paste shape below replays the editor's OWN bytes
+ * rather than a hand-written approximation of them. */
+async function copyContentPayload(usj: Usj): Promise<Payload> {
+  const { lexical } = await mountStandardViewEditor(usj);
+  await act(async () =>
+    lexical.update(() => {
+      const root = $getRoot();
+      root.select($contentStartIndex(root), root.getChildrenSize());
+    }),
+  );
+  const { event, getData } = copyEvent();
+  await act(async () => lexical.dispatchCommand(COPY_COMMAND, event));
+  return { [PLAIN]: getData(PLAIN), [HTML]: getData(HTML), [LEXICAL]: getData(LEXICAL) };
+}
+
+/** Pastes `payload` into a fresh header-only editor and returns the USJ a host would save. */
+async function pasteIntoFreshHost(usj: Usj, payload: Payload): Promise<Usj | undefined> {
+  const { ref, lexical } = await mountStandardViewEditor(headerSkeletonUsj(usj));
+  await act(async () =>
+    lexical.update(() => {
+      $getRoot().getLastChild()?.selectEnd();
+      lexical.dispatchCommand(PASTE_COMMAND, pasteEvent(payload).event);
+    }),
+  );
+  await settle();
+  // A pasted literal that pends (a marker completed under the caret) settles only once the caret
+  // DEPARTS the paragraph it landed in; the lexical-flavor path inserts an already-structural tree
+  // and has nothing pending, so this step is a harmless no-op there.
+  await act(async () =>
+    lexical.update(() => {
+      $getRoot().getLastChild()?.selectEnd();
+    }),
+  );
+  await settle();
+  return ref.current?.getUsj();
+}
+
+/** The three real-world clipboard shapes: a plain-text source, the async Ctrl+V read (which drops
+ * the private flavor), and the synchronous/native copy that keeps it. */
+async function pastedUsjFor(usj: Usj, shape: "plain" | "plain+html" | "full"): Promise<Usj> {
+  const payload = await copyContentPayload(usj);
+  const shaped: Payload =
+    shape === "plain"
+      ? { [PLAIN]: payload[PLAIN] }
+      : shape === "plain+html"
+        ? { [PLAIN]: payload[PLAIN], [HTML]: payload[HTML] }
+        : payload;
+  if (shape === "full" && !payload[LEXICAL])
+    throw new Error("copy wrote no application/x-lexical-editor payload");
+  const pasted = await pasteIntoFreshHost(usj, shaped);
+  if (!pasted) throw new Error("editor produced no USJ");
+  return pasted;
+}
+
+/** Every object of `type` anywhere in `usj`, at any depth. */
+function objectsOfType(usj: Usj, type: string): MarkerObject[] {
+  const found: MarkerObject[] = [];
+  const walk = (items: MarkerObject["content"]) =>
+    items?.forEach((item) => {
+      if (typeof item === "string") return;
+      if (item.type === type) found.push(item);
+      walk(item.content);
+    });
+  walk(usj.content);
+  return found;
+}
+
+const SHAPES = ["plain", "plain+html", "full"] as const;
+
+describe("figure (UnknownNode) copy→paste across all three payload shapes", () => {
+  const usj = corpusUsj("figure (USFM 3 attributes)");
+  SHAPES.forEach((shape) => {
+    it(`${shape} payload round-trips the figure, its caption, and every attribute`, async () => {
+      expect(await pastedUsjFor(usj, shape)).toEqual(usj);
+    });
+  });
+});
+
+describe("sidebar (UnknownNode) copy→paste across all three payload shapes", () => {
+  const usj = corpusUsj("sidebar (esb)");
+  it("full payload (lexical flavor) round-trips the sidebar whole — its category attribute and nested paragraph included", async () => {
+    expect(await pastedUsjFor(usj, "full")).toEqual(usj);
+  });
+
+  (["plain", "plain+html"] as const).forEach((shape) => {
+    // The plain carrier cannot express a sidebar in one line: the copy walker puts the nested `\p`
+    // on its own line, paste replays that newline as a paragraph split, and Tier 2 re-tokenizes
+    // one paragraph at a time, so the `\esb`/`\esbe` pairing the tokenizer already implements
+    // never sees both halves at once. The loss is asserted, not the fidelity.
+    it(`${shape} payload loses the sidebar's pairing — the copy-introduced paragraph split outlives the per-paragraph rebuild`, async () => {
+      const pasted = await pastedUsjFor(usj, shape);
+      expect(pasted).not.toEqual(usj);
+      expect(objectsOfType(pasted, "sidebar")[0]?.content ?? []).toEqual([]);
+    });
+  });
+});
+
+describe("periph (UnknownNode) copy→paste across all three payload shapes", () => {
+  const usj = corpusUsj("periph");
+  it("full payload (lexical flavor) round-trips the periph construct whole — its id/alt attributes and nested paragraph included", async () => {
+    // Compared construct-to-construct rather than document-to-document: `periph` is book-level
+    // front matter with no chapter, so this sweep's "header plus one empty `\\p` host" target
+    // leaves the pasted block nested inside that host paragraph. Where the block LANDS is generic
+    // Lexical insertion, not construct fidelity; what this pin is about is that nothing inside the
+    // construct was lost on the way.
+    const pasted = await pastedUsjFor(usj, "full");
+    expect(objectsOfType(pasted, "periph")).toEqual(objectsOfType(usj, "periph"));
+  });
+
+  (["plain", "plain+html"] as const).forEach((shape) => {
+    // Same block-split mechanism as the sidebar above: `\periph` has no closing bytes at all, so
+    // once the nested paragraph lands on its own line there is nothing to reunite the two.
+    it(`${shape} payload loses the periph's nested paragraph — the copy-introduced split outlives the per-paragraph rebuild`, async () => {
+      const pasted = await pastedUsjFor(usj, shape);
+      expect(objectsOfType(pasted, "periph")).not.toEqual(objectsOfType(usj, "periph"));
+      expect(objectsOfType(pasted, "periph")[0]?.content ?? []).toEqual([]);
+    });
+  });
+});
+
+describe("ref (UnknownNode) copy→paste across all three payload shapes", () => {
+  const usj = corpusUsj("cross-reference ref target");
+  it("full payload (lexical flavor) round-trips the ref wrapper and its loc attribute", async () => {
+    expect(await pastedUsjFor(usj, "full")).toEqual(usj);
+  });
+
+  (["plain", "plain+html"] as const).forEach((shape) => {
+    // Inherent to the construct, not to the clipboard: USJ invented the `<ref>` container and USFM
+    // never carried it, so a plain-text carrier has no bytes anywhere that mark the wrapper's
+    // extent. A raw USFM export of the same document has the identical gap.
+    it(`${shape} payload loses the ref wrapper — USFM has no bytes for it, so only its child text survives`, async () => {
+      const pasted = await pastedUsjFor(usj, shape);
+      expect(objectsOfType(pasted, "ref")).toEqual([]);
+      expect(JSON.stringify(pasted)).toContain("Genesis 1:1");
+    });
+  });
+});
+
+describe("table (ImmutableTable* nodes, not UnknownNode) copy→paste across all three payload shapes", () => {
+  const usj = corpusUsj("table with header and cells");
+  it("full payload (lexical flavor) round-trips the table whole — rows, cells, and their markers", async () => {
+    expect(await pastedUsjFor(usj, "full")).toEqual(usj);
+  });
+
+  (["plain", "plain+html"] as const).forEach((shape) => {
+    // A table's rows and cells are real block-level nodes, so the plain carrier spreads one table
+    // over eight lines and the paste replays each as its own paragraph.
+    it(`${shape} payload loses the table's assembly — every row and cell copies onto its own line`, async () => {
+      expect(await pastedUsjFor(usj, shape)).not.toEqual(usj);
+    });
+  });
+});

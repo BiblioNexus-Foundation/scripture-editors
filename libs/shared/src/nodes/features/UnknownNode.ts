@@ -207,69 +207,51 @@ export class UnknownNode extends ElementNode {
     return false;
   }
 
-  // Narrowed from an unconditional `return destination !== "clone"` to leave a CHILD-BEARING
-  // "optbreak" out of the exclusion. This changes ONLY the `application/x-lexical-editor` (lexical-
-  // JSON) flavor — `text/html` is byte-identical before and after, for every `UnknownNode` kind, not
-  // only optbreak: `$appendNodesToHTML` (`@lexical/html`) computes this same `excludeFromCopy('html')`
-  // value too, but `UnknownNode.exportDOM()` always returns `{element: null}`, and
-  // `$appendNodesToHTML` returns early on a null `element` BEFORE ever consulting the exclusion
-  // value it just computed — so this predicate's return value has no observable effect on `text/html`
-  // output at all, confirmed by reading `LexicalHtml.dev.js`. `'clone'` is never passed by any
-  // Lexical-shipped code path in the installed version (confirmed by reading
-  // `LexicalClipboard.dev.js`), so the old, unconditional form excluded every `UnknownNode` from the
-  // lexical-JSON flavor unconditionally. Excluding a node does not drop it silently:
-  // `$appendNodesToJSON` hoists the excluded node's own children into its parent's list in its place.
-  // For an optbreak, whose only child is the `//` `ImmutableTypedTextNode` display token (a
-  // content-free DecoratorNode with no meaning once separated from its owning `UnknownNode`), that
-  // stranded a loose decorator on the same-namespace `application/x-lexical-editor` paste fast
-  // path — `$parseSerializedNode` reconstructed the bare decorator, not a recognized optbreak, so the
-  // paste silently lost the discretionary line break (live report: copying an optbreak worked,
-  // pasting the same clipboard back did not restore it).
+  // A CHILD-BEARING `UnknownNode` of any kind stays IN the copy. This affects ONLY the
+  // `application/x-lexical-editor` (lexical-JSON) flavor: `$appendNodesToHTML` (`@lexical/html`)
+  // computes this same `excludeFromCopy('html')` value, but `exportDOM()` above always returns
+  // `{element: null}` and `$appendNodesToHTML` returns early on a null `element` BEFORE ever
+  // consulting the exclusion value it just computed, so `text/html` output is byte-identical for
+  // every kind whatever this predicate answers (confirmed by reading `LexicalHtml.dev.js`).
+  // `'clone'` is never passed by any Lexical-shipped code path in the installed version (confirmed
+  // by reading `LexicalClipboard.dev.js`), so an unconditional `destination !== "clone"` would
+  // exclude every `UnknownNode` from the lexical-JSON flavor outright.
   //
-  // Every OTHER `UnknownNode` kind (figure, table, sidebar, periph, ref) keeps the OLD, still-
-  // excluding behavior — NOT because their content differs meaningfully from optbreak's (it doesn't:
-  // every kind's marker/attribute bytes are the SAME content-free `ImmutableTypedTextNode` display
-  // decorators optbreak's `//` is, built by the identical `unknownDisplayParts` machinery), but
-  // PENDING per-kind paste verification this task did not do. The measured shape of the un-fixed
-  // residual for those kinds (a lexical-flavor copy of `\fig …\fig*` renders its full literal USFM
-  // bytes on screen after paste — the hoisted decorators still `decorate()` their own text as loose
-  // siblings — while the pasted document's USJ silently drops the figure node AND its attributes
-  // entirely, keeping only its real caption text merged into surrounding prose) is recorded in the
-  // clipboard semantics doc's "Deferred / Out of Scope" list rather than fixed here.
+  // Excluding a node does not drop it silently: `$appendNodesToJSON` HOISTS the excluded node's own
+  // children into its parent's list in its place. Every kind's marker and attribute bytes are
+  // content-free `ImmutableTypedTextNode` display decorators (`unknownDisplayParts` builds them
+  // identically for all of them), so hoisting strands decorators that still `decorate()` their own
+  // literal text as loose siblings with no owning wrapper: the pasted document RENDERS the
+  // construct's full USFM bytes while its USJ has lost the node and every attribute on it — a
+  // convincing display over missing data, which a save then persists with no error.
   //
-  // The `getChildrenSize() > 0` guard covers a genuinely childless live optbreak (an emptied husk
-  // mid-settle — `markerEditTier1.utils.ts`'s own husk-removal check uses the identical shape,
-  // "optbreak" plus zero children): such a node falls back to excluded, matching `text/plain`'s
-  // "nothing here" for the same case. It does NOT, on its own, cover a DIFFERENT carrier-agreement
-  // gap: a selection whose ending boundary resolves to an ELEMENT-type point ON this node at
-  // offset 0 (touching the wrapper without covering its own `//` child) still marks a CHILD-BEARING
-  // optbreak "selected" under Lexical's default `isSelected` (key-membership in
-  // `selection.getNodes()`, unaffected by this node's own child count), while the child itself is
-  // not — `$appendNodesToJSON` then serializes a CHILDLESS `{type:"optbreak"}` placeholder even
-  // though the live node has a child, disagreeing with `text/plain` (`$selectionToUsfmText`, which
-  // walks that same `getNodes()` list and correctly emits nothing for this boundary). The
-  // `isSelected` override below closes that second gap directly, at its actual source, since
-  // `excludeFromCopy` has no visibility into which of a node's children will end up selected.
+  // The `getChildrenSize() > 0` guard keeps a genuinely childless husk excluded, matching
+  // `text/plain`'s "nothing here" for the same node (`markerEditTier1.utils.ts`'s own
+  // husk-removal check recognizes an emptied optbreak by that same zero-child shape). It does NOT,
+  // on its own, cover a DIFFERENT carrier-agreement gap: a selection whose ending boundary resolves
+  // to an ELEMENT-type point ON this node at offset 0 (touching the wrapper without covering any of
+  // its content) still marks a CHILD-BEARING node "selected" under Lexical's default `isSelected`
+  // (key-membership in `selection.getNodes()`, unaffected by this node's own child count), so
+  // `$appendNodesToJSON` would serialize a CHILDLESS placeholder for a node that has children,
+  // disagreeing with `text/plain` (`$selectionToUsfmText`, which walks that same `getNodes()` list
+  // and correctly emits nothing for this boundary). The `isSelected` override below closes that
+  // second gap at its actual source, since `excludeFromCopy` has no visibility into which of a
+  // node's children a given selection will include.
   override excludeFromCopy(destination: "clone" | "html"): boolean {
-    return this.getTag() === "optbreak" && this.getChildrenSize() > 0
-      ? false
-      : destination !== "clone";
+    return this.getChildrenSize() > 0 ? false : destination !== "clone";
   }
 
-  // An optbreak is only meaningfully "selected" (and so only copy-included, per the
-  // `excludeFromCopy` guard above) when at least one of its own display children is — mirrors
+  // An `UnknownNode` is only meaningfully "selected" (and so only copy-included, per the
+  // `excludeFromCopy` guard above) when at least one of its own children is — mirrors
   // `$selectionToUsfmText`'s copy walker so both clipboard carriers agree at the same selection
   // boundary, the same way Lexical's own base `isSelected` (`LexicalNode.prototype.isSelected`)
   // already special-cases an inline DECORATOR node sitting as a parent's last child at an
   // exactly-there boundary point, for the identical reason. Without this, a selection ending
   // exactly at this node's own start (an ElementNode touch-boundary that covers none of its
   // content) still counts the WRAPPER as selected via the default `ElementNode.isSelected`
-  // (key-membership in `selection.getNodes()`), while the child is not — producing a childless
-  // `{type:"optbreak"}` entry in the `application/x-lexical-editor` copy with no corresponding
-  // `//` in `text/plain`. Scoped to "optbreak" only, matching `excludeFromCopy`'s own scoping; every
-  // other kind keeps the inherited default.
+  // (key-membership in `selection.getNodes()`), while no child is — producing a childless entry in
+  // the `application/x-lexical-editor` copy with nothing corresponding to it in `text/plain`.
   override isSelected(selection?: BaseSelection | null): boolean {
-    if (this.getTag() !== "optbreak") return super.isSelected(selection);
     const targetSelection = selection ?? $getSelection();
     if (!targetSelection) return false;
     const selectedNodes = targetSelection.getNodes();

@@ -343,15 +343,16 @@ describe("UnknownNode", () => {
     });
   });
 
-  // The narrowed predicate behind the same-namespace `application/x-lexical-editor` optbreak copy
-  // fix: @lexical/clipboard's `$appendNodesToJSON` computes node exclusion from
+  // The predicate behind the same-namespace `application/x-lexical-editor` copy path:
+  // @lexical/clipboard's `$appendNodesToJSON` computes node exclusion from
   // `excludeFromCopy('html')` for EVERY copy-out format it handles, not only
   // actual `text/html` generation (see `excludeFromCopy`'s own doc comment). A direct unit pin on
   // the predicate here — independent of the integration-level clipboard pins in
-  // `optbreakClipboardFidelity.test.tsx` — catches a regression to this method locally, without
-  // needing the full editor/selection/clipboard-event machinery those pins exercise.
+  // `optbreakClipboardFidelity.test.tsx` and `unknownClipboardFidelity.test.tsx` — catches a
+  // regression to this method locally, without needing the full editor/selection/clipboard-event
+  // machinery those pins exercise.
   describe("excludeFromCopy()", () => {
-    it("does NOT exclude a CHILD-BEARING optbreak — the fix that lets a copied optbreak survive the lexical-flavor paste path", () => {
+    it("does NOT exclude a CHILD-BEARING optbreak — what lets a copied optbreak survive the lexical-flavor paste path", () => {
       const { editor } = createBasicTestEnvironment([UnknownNode, ImmutableTypedTextNode]);
       editor.update(() => {
         const optbreak = $createUnknownNode("optbreak");
@@ -360,7 +361,7 @@ describe("UnknownNode", () => {
       });
     });
 
-    it('excludes a CHILDLESS optbreak — a genuinely empty live husk falls back to the old, excluding behavior, matching text/plain\'s own "nothing here" for that shape', () => {
+    it('excludes a CHILDLESS optbreak — a genuinely empty live husk stays excluded, matching text/plain\'s own "nothing here" for that shape', () => {
       const { editor } = createBasicTestEnvironment([UnknownNode]);
       editor.update(() => {
         const optbreak = $createUnknownNode("optbreak");
@@ -369,11 +370,19 @@ describe("UnknownNode", () => {
       });
     });
 
-    it('still excludes a figure, child-bearing or not — the fix is scoped to "optbreak" only; every other UnknownNode kind is an un-fixed, documented residual (clipboard semantics doc, "Deferred / Out of Scope")', () => {
+    it("does NOT exclude a child-bearing figure either — the rule is the node's own child count, not its kind, because every kind's display bytes are the same content-free decorators that get stranded by a hoist", () => {
       const { editor } = createBasicTestEnvironment([UnknownNode, ImmutableTypedTextNode]);
       editor.update(() => {
         const figure = $createUnknownNode("figure", "fig");
         figure.append($createImmutableTypedTextNode("marker", "\\fig "));
+        expect(figure.excludeFromCopy("html")).toBe(false);
+      });
+    });
+
+    it("excludes a CHILDLESS figure — nothing of it would survive the copy anyway, and a childless placeholder in the lexical flavor has no counterpart in text/plain", () => {
+      const { editor } = createBasicTestEnvironment([UnknownNode]);
+      editor.update(() => {
+        const figure = $createUnknownNode("figure", "fig");
         expect(figure.excludeFromCopy("html")).toBe(true);
       });
     });

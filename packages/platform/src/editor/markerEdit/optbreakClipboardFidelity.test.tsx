@@ -53,15 +53,11 @@
  *   `{type:"optbreak"}` placeholder in the lexical-JSON copy even though the live node has a
  *   child — disagreeing with `text/plain`, which correctly emits nothing for that same boundary.
  *   `excludeFromCopy` cannot see this (it has no visibility into which children a given selection
- *   will include), so a scoped `isSelected` override closes it directly, mirroring
- *   `$selectionToUsfmText`'s own `getNodes()`-based walk. Every OTHER `UnknownNode` kind (figure,
- *   table, sidebar, periph, ref) keeps the OLD, still-excluding behavior — not because their
- *   content differs meaningfully (it doesn't: every kind's marker/attribute bytes are the same
- *   content-free `ImmutableTypedTextNode` display decorators optbreak's `//` is), but pending
- *   per-kind paste verification this task did not do; the measured, more severe residual for those
- *   kinds (a lexical-flavor figure paste renders its full literal USFM bytes on screen while the
- *   USJ silently drops the figure node and its attributes) is recorded in the clipboard semantics
- *   doc's "Deferred / Out of Scope" list rather than fixed here.
+ *   will include), so an `isSelected` override closes it directly, mirroring
+ *   `$selectionToUsfmText`'s own `getNodes()`-based walk. Both rules key on the node's own child
+ *   count rather than on its kind, so every other `UnknownNode` construct (figure, sidebar, periph,
+ *   ref) is covered by the same predicate — their per-kind copy→paste round trips are pinned in
+ *   `unknownClipboardFidelity.test.tsx`.
  */
 
 import { MarkerEditPlugin } from "./MarkerEditPlugin";
