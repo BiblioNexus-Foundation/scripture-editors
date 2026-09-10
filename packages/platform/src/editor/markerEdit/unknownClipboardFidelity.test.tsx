@@ -170,19 +170,9 @@ describe("figure (UnknownNode) copy→paste across all three payload shapes", ()
 
 describe("sidebar (UnknownNode) copy→paste across all three payload shapes", () => {
   const usj = corpusUsj("sidebar (esb)");
-  it("full payload (lexical flavor) round-trips the sidebar whole — its category attribute and nested paragraph included", async () => {
-    expect(await pastedUsjFor(usj, "full")).toEqual(usj);
-  });
-
-  (["plain", "plain+html"] as const).forEach((shape) => {
-    // The plain carrier cannot express a sidebar in one line: the copy walker puts the nested `\p`
-    // on its own line, paste replays that newline as a paragraph split, and Tier 2 re-tokenizes
-    // one paragraph at a time, so the `\esb`/`\esbe` pairing the tokenizer already implements
-    // never sees both halves at once. The loss is asserted, not the fidelity.
-    it(`${shape} payload loses the sidebar's pairing — the copy-introduced paragraph split outlives the per-paragraph rebuild`, async () => {
-      const pasted = await pastedUsjFor(usj, shape);
-      expect(pasted).not.toEqual(usj);
-      expect(objectsOfType(pasted, "sidebar")[0]?.content ?? []).toEqual([]);
+  SHAPES.forEach((shape) => {
+    it(`${shape} payload round-trips the sidebar whole — its category attribute and nested paragraph included`, async () => {
+      expect(await pastedUsjFor(usj, shape)).toEqual(usj);
     });
   });
 });
@@ -200,12 +190,19 @@ describe("periph (UnknownNode) copy→paste across all three payload shapes", ()
   });
 
   (["plain", "plain+html"] as const).forEach((shape) => {
-    // Same block-split mechanism as the sidebar above: `\periph` has no closing bytes at all, so
-    // once the nested paragraph lands on its own line there is nothing to reunite the two.
-    it(`${shape} payload loses the periph's nested paragraph — the copy-introduced split outlives the per-paragraph rebuild`, async () => {
+    // Not a block split: an opaque construct copies out on ONE line (`$startsBlockLine`,
+    // `whitespaceDisplay.plugin.utils.ts`), which is what lets the sidebar above round-trip. Two
+    // `\periph`-specific gaps stop periph taking the same route: the fragment tokenizer has no
+    // periph assembly (nothing turns `\periph …` back into a `periph` object), and periph's display
+    // renders its non-`alt` attributes as a `|name="value"` run on a marker that has no closing
+    // bytes, so nothing marks where the attribute run ends and the content resumes. The paste
+    // therefore comes back as an ORDINARY paragraph whose marker is `periph`, carrying the
+    // attribute bytes as literal text.
+    it(`${shape} payload loses the periph construct — it re-tokenizes as an ordinary paragraph carrying its own attribute bytes as text`, async () => {
       const pasted = await pastedUsjFor(usj, shape);
-      expect(objectsOfType(pasted, "periph")).not.toEqual(objectsOfType(usj, "periph"));
-      expect(objectsOfType(pasted, "periph")[0]?.content ?? []).toEqual([]);
+      expect(objectsOfType(pasted, "periph")).toEqual([]);
+      const degraded = objectsOfType(pasted, "para").find((item) => item.marker === "periph");
+      expect(degraded?.content).toEqual(['Title Page|id="title"']);
     });
   });
 });
@@ -230,15 +227,9 @@ describe("ref (UnknownNode) copy→paste across all three payload shapes", () =>
 
 describe("table (ImmutableTable* nodes, not UnknownNode) copy→paste across all three payload shapes", () => {
   const usj = corpusUsj("table with header and cells");
-  it("full payload (lexical flavor) round-trips the table whole — rows, cells, and their markers", async () => {
-    expect(await pastedUsjFor(usj, "full")).toEqual(usj);
-  });
-
-  (["plain", "plain+html"] as const).forEach((shape) => {
-    // A table's rows and cells are real block-level nodes, so the plain carrier spreads one table
-    // over eight lines and the paste replays each as its own paragraph.
-    it(`${shape} payload loses the table's assembly — every row and cell copies onto its own line`, async () => {
-      expect(await pastedUsjFor(usj, shape)).not.toEqual(usj);
+  SHAPES.forEach((shape) => {
+    it(`${shape} payload round-trips the table whole — rows, cells, their markers and derived alignment`, async () => {
+      expect(await pastedUsjFor(usj, shape)).toEqual(usj);
     });
   });
 });

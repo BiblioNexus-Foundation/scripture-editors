@@ -882,6 +882,28 @@ export function usfmFragmentToUsjContent(
     table = undefined;
     tableRow = undefined;
   };
+  /**
+   * Open a cell in the current row and make it the content container: text, char spans, notes and
+   * verses then flow into it through the ordinary `para`-based container logic. Shared by both
+   * token kinds a cell marker can arrive as — a stylesheet that knows `\th1`/`\tc1` classifies
+   * them as Character (usfm.sty does), one that does not delivers them as unknown paragraph
+   * markers, and ParatextData derives a cell from the NAME either way.
+   */
+  const pushTableCell = (row: MarkerObject, marker: string, cellMatch: RegExpExecArray) => {
+    closeCharStack();
+    const [, alignInfix, spanStart, spanEnd] = cellMatch;
+    // The cell keeps only the starting column in its marker (`thc3-4` → `thc3`); the span width
+    // becomes `colspan`, a string of columns spanned (`thc3-4` → "2").
+    const cell: TableCellObject = {
+      type: "table:cell",
+      marker: spanEnd ? marker.slice(0, marker.indexOf("-")) : marker,
+      align: TABLE_CELL_ALIGN_BY_INFIX[alignInfix],
+      content: [],
+    };
+    if (spanEnd) cell.colspan = String(Number(spanEnd) + 1 - Number(spanStart));
+    getContent(row).push(cell);
+    para = cell;
+  };
   const closeSidebar = (terminated: boolean) => {
     if (!sidebar) return;
     // Only `\esbe` terminates a sidebar explicitly; an implicit close (fragment end or a
@@ -1240,21 +1262,7 @@ export function usfmFragmentToUsjContent(
           // isRecognizedTableCell) is an unknown marker that ENDS the table (and the next
           // `\tr` starts a fresh one).
           if (cellMatch && isRecognizedTableCell(cellMatch)) {
-            closeCharStack();
-            const [, alignInfix, spanStart, spanEnd] = cellMatch;
-            // The cell keeps only the starting column in its marker (`thc3-4` → `thc3`);
-            // the span width becomes `colspan`, a string of columns spanned (`thc3-4` → "2").
-            const cell: TableCellObject = {
-              type: "table:cell",
-              marker: spanEnd ? token.marker.slice(0, token.marker.indexOf("-")) : token.marker,
-              align: TABLE_CELL_ALIGN_BY_INFIX[alignInfix],
-              content: [],
-            };
-            if (spanEnd) cell.colspan = String(Number(spanEnd) + 1 - Number(spanStart));
-            getContent(tableRow).push(cell);
-            // The cell becomes the current content container: text, char spans, notes, and
-            // verses flow into it through the ordinary `para`-based container logic.
-            para = cell;
+            pushTableCell(tableRow, token.marker, cellMatch);
             break;
           }
         }
@@ -1331,6 +1339,20 @@ export function usfmFragmentToUsjContent(
         break;
       }
       case "charOpen": {
+        // A cell marker inside an OPEN row is a cell, whichever token kind the stylesheet's
+        // classification made it: usfm.sty declares `\th1`/`\tc1`/… as Character styles, so with a
+        // real project sheet they arrive here rather than as paragraph tokens, and without this a
+        // table copied out of the editor pastes back as loose char spans inside empty rows.
+        // Guarded on an open row — only `\tr` opens one — so a char span that merely shares a
+        // cell marker's name outside a table keeps its ordinary resolution, and a NESTED span
+        // (`\+tc1`) is never a cell.
+        if (!note && !isNoteContext && tableRow && !token.isNested) {
+          const cellMatch = TABLE_CELL_MARKER_REGEX.exec(token.marker);
+          if (cellMatch && isRecognizedTableCell(cellMatch)) {
+            pushTableCell(tableRow, token.marker, cellMatch);
+            break;
+          }
+        }
         // A new non-nested char marker auto-closes open char styles (PT9) — but never
         // across an open note's boundary: the frames enclosing the note stay open.
         if (!token.isNested) {

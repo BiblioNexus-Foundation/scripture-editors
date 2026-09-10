@@ -47,7 +47,7 @@ import {
   NBSP,
   textTypeState,
 } from "shared";
-import { $isImmutableNoteCallerNode } from "shared-react";
+import { $isImmutableNoteCallerNode, $opaqueBlockAncestor } from "shared-react";
 
 /** Spaces in runs display as NBSP so they are visible while typing. */
 export function $displayWhitespaceTransform(node: TextNode): void {
@@ -503,6 +503,31 @@ function $noteCallerText(callerNode: LexicalNode): string {
 }
 
 /**
+ * Whether this block-level element opens a new LINE of copied USFM, or is engine-internal to an
+ * opaque construct and must stay on the construct's own line.
+ *
+ * A sidebar's nested `\p` and a table's rows and cells are real block-level nodes, so the walk's
+ * "one `\n` per non-inline boundary" rule would spread ONE construct over several lines. A paste of
+ * that text replays every `\n` as a paragraph split, and Tier 2 re-tokenizes strictly one paragraph
+ * at a time (`$requestTier2ForNode` always rebuilds a single-element array), so the `\esb`/`\esbe`
+ * and `\tr`/`\th`/`\tc` assembly `usfmFragmentToUsj.ts` already implements never sees the whole
+ * construct in one pass: the sidebar comes back unclosed with its paragraph hoisted out, and the
+ * table comes back as empty row wrappers with the cells stranded as sibling paragraphs.
+ *
+ * Keeping the construct byte-contiguous is what lets a single-paragraph rebuild reassemble it. USFM
+ * markers self-delimit, so the one-line form is valid USFM of the same document — just not the
+ * line-per-marker layout a USFM writer would emit, which is a deliberate trade for a paste that
+ * survives.
+ *
+ * The construct's own outermost node still starts its own line: only a block boundary with an
+ * opaque ancestor ABOVE it is suppressed, so a table stays separated from the prose around it.
+ */
+function $startsBlockLine(node: LexicalNode): boolean {
+  const parent = node.getParent();
+  return !parent || $opaqueBlockAncestor(parent) === undefined;
+}
+
+/**
  * Source-faithful USFM text of `selection` — the `text/plain` leg of Standard-view copy/cut. Walks
  * `selection.getNodes()` the same way `RangeSelection.getTextContent()` does (single `\n` between
  * non-inline block boundaries, anchor/focus offsets respected on the boundary text nodes,
@@ -520,6 +545,8 @@ function $noteCallerText(callerNode: LexicalNode): string {
  *    instead of becoming phantom spaces; every other NBSP (marker-trailing spaces, a char span's
  *    structural leading separator, a verse's own marker-to-number gap) represents a real source
  *    space and still maps to one. Data-NBSP (displayed as `~`) is untouched either way.
+ * 3. A block boundary INSIDE an opaque construct contributes no line break, so the construct
+ *    copies out on ONE line (see {@link $startsBlockLine}).
  */
 export function $selectionToUsfmText(selection: RangeSelection): string {
   const nodes = selection.getNodes();
@@ -533,7 +560,7 @@ export function $selectionToUsfmText(selection: RangeSelection): string {
   let prevWasElement = true;
   for (const node of nodes) {
     if ($isElementNode(node) && !node.isInline()) {
-      if (!prevWasElement) text += "\n";
+      if (!prevWasElement && $startsBlockLine(node)) text += "\n";
       prevWasElement = !node.isEmpty();
       continue;
     }

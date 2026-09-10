@@ -23,12 +23,13 @@
  *
  * The OTHER USJ corpus in this repo, `libs/test-data/src/data/2sa.usj.ts` (141 paragraphs; IS
  * single-chapter — one top-level chapter object, despite the size), is deliberately NOT included
- * here. It was tried against this exact harness and does not round-trip clean: it hits the
- * `"sidebar (esb)"` gap below three times (2SA's own sidebar coverage), PLUS several additional,
- * unrelated fidelity gaps this sweep's one-construct-per-fixture design has no clean way to
- * itemize as a single byte diff (an empty `\b` blank-line paragraph folds into literal text inside
- * a `p` paragraph; a verse's derived `sid` attribute is dropped; a `\ref` cross-reference target
- * degrades differently than the corpus's own dedicated `ref` fixture above). `tier2Rebuild.corpus
+ * here. It was tried against this exact harness and did not round-trip clean: it hit the sidebar
+ * gap three times (2SA's own sidebar coverage) — since closed — PLUS several additional, unrelated
+ * fidelity gaps this sweep's one-construct-per-fixture design has no clean way to itemize as a
+ * single byte diff (an empty `\b` blank-line paragraph folds into literal text inside a `p`
+ * paragraph; a verse's derived `sid` attribute is dropped; a `\ref` cross-reference target degrades
+ * differently than the corpus's own dedicated `ref` fixture above). It has not been re-measured
+ * since the sidebar gap closed, so how much of that residual survives is unknown. `tier2Rebuild.corpus
  * .test.tsx` already exercises this exact fixture, but for a narrower, DIFFERENT property (an
  * unedited `$rebuildParas` call refusing as a fixed point) — that coverage does not include the
  * paste path (NBSP normalization, `\c`/`\id` strip, own-marker-wins dedup) this sweep does, so
@@ -117,30 +118,6 @@ function chapterHeaderSkeletonUsj(usj: Usj): Usj {
  *   `["See Genesis 1:1 for details."]`, the `ref` wrapper gone. Inherent to the construct — a raw
  *   USFM export of this same fixture has the identical gap, independent of clipboard mechanics.
  *
- * - **"sidebar (esb)"** — NOT a tokenizer gap: `usfmFragmentToUsj.ts` already implements the
- *   `\esb`/`\esbe` pairing (its `SIDEBAR_MARKER`/`SIDEBAR_END_MARKER` assembly case tracks an open
- *   sidebar across tokens and closes it on `\esbe`). The real mechanism is structural, upstream of
- *   tokenizing: a sidebar's nested `\p` child is a real `ParaNode`, and `$selectionToUsfmText` (the
- *   copy walker) inserts a `\n` before any non-inline `ElementNode` boundary it crosses — a
- *   `ParaNode` is non-inline, so a `\n` lands between `\esb \cat History\cat*` and the nested
- *   paragraph's own content, even though both came from ONE sidebar. On paste, the line replay
- *   dispatches an `INSERT_PARAGRAPH_COMMAND` for every `\n`, so that single `\n` turns into TWO
- *   sibling `ParaNode`s where the source had one sidebar wrapping one paragraph. Tier 2 then
- *   re-tokenizes strictly per paragraph — `$requestTier2ForNode` (tier2Rebuild.utils.ts), the only
- *   production call site, always invokes `$rebuildParas([current], context)` with a single-element
- *   array — so the tokenizer's "current open sidebar" state can never span the two separate
- *   `$rebuildParas` calls the two now-sibling paragraphs each trigger; each is tokenized alone, and
- *   the pairing that DOES exist in `usfmFragmentToUsj.ts` never gets the chance to run across both
- *   lines at once. Result: an UNCLOSED sidebar (`closed:"false"`, no content), the inner paragraph
- *   hoisted OUT to become a top-level sibling, and a stray EMPTY paragraph with marker `"esbe"`.
- *   Tables hit the identical mode — their rows and cells are real block-level `ElementNode`s
- *   (`ImmutableTableNode`/`ImmutableTableRowNode`/`ImmutableTableCellNode`), so the walker's
- *   non-inline-boundary rule fires for every one of them; see the "table with header and cells"
- *   entry below. A real fix means grouping a paste's newly-inserted SIBLING paragraphs that originated
- *   from one selection back into a single rebuild fragment before Tier 2 tokenizes — a Tier-2
- *   architecture change (rebuild granularity, not a per-paragraph tweak), genuinely out of this
- *   work item's scope. The byte-level corruption stays pinned here rather than fixed.
- *
  * - **"closed=false body char span (implicit close, no closer)"** — a `closed="false"` char span
  *   has, by definition, no closing marker byte anywhere in its own USFM. When such a span is not
  *   the last thing in its paragraph (`Tell the <char closed="false">Lord</char> plainly.`), the
@@ -150,17 +127,6 @@ function chapterHeaderSkeletonUsj(usj: Usj): Usj {
  *   `" plainly."` string gone). Inherent to the encoding, not a paste-path regression — the
  *   sibling `"unclosed note (closed=false)"` fixture, whose unclosed span IS the last thing in its
  *   paragraph, has no such trailing content to lose and round-trips clean.
- *
- * - **"table with header and cells"** — the SAME rebuild-scoping gap as the sidebar entry above,
- *   reaching tables now that a table's rows and cells are real block-level `ElementNode`s
- *   (`ImmutableTableNode`/`ImmutableTableRowNode`/`ImmutableTableCellNode`) rather than the inline
- *   `UnknownNode`s they used to be. The copy walker inserts a `\n` at every non-inline element
- *   boundary it crosses, so one table copies out as eight lines (`\tr `, `\th1 Day`, `\th2 Tribe`,
- *   …); paste replays each line as its own paragraph, and Tier 2 re-tokenizes strictly per
- *   paragraph, so the `\tr`/`\th`/`\tc` assembly `usfmFragmentToUsj.ts` already implements never
- *   sees the whole table in one pass. Result: empty `table:row` wrappers and the cells stranded as
- *   sibling paragraphs. The fix is the same one the sidebar entry names — grouping a paste's
- *   newly-split sibling paragraphs back into one rebuild fragment — and is equally out of scope.
  *
  * - **"milestones (ts)"** — a COMPOUND of two deliberate behaviors, neither of them a byte-level
  *   copy or normalization defect: the copied text is byte-correct
@@ -197,11 +163,6 @@ const KNOWN_LOSSY: { name: string; reason: string }[] = [
     reason: "USJ <ref> wrapper carries no USFM bytes; content survives as prose",
   },
   {
-    name: "sidebar (esb)",
-    reason:
-      "copy's \\n before the sidebar's nested \\p splits one paste into two ParaNodes; Tier 2 rebuilds per-paragraph so the sidebar pairing usfmFragmentToUsj.ts already has never sees both",
-  },
-  {
     name: "closed=false body char span (implicit close, no closer)",
     reason: "no closer byte to mark where an unclosed span's content ends before trailing prose",
   },
@@ -209,11 +170,6 @@ const KNOWN_LOSSY: { name: string; reason: string }[] = [
     name: "paragraph-leading space (display rule)",
     reason:
       "consumeSeparator() eats the whole whitespace run after a marker, matching P9's NormalizeUsfm parity — accepted, not a bug",
-  },
-  {
-    name: "table with header and cells",
-    reason:
-      "a table's rows and cells are real block-level ElementNodes, so copy puts each on its own line and paste splits one table into eight sibling paragraphs Tier 2 rebuilds one at a time — the same rebuild-scoping gap as the sidebar above",
   },
   {
     name: "milestones (ts)",
