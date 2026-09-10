@@ -2044,6 +2044,29 @@ describe("usfmFragmentToUsjContent — peripheral divisions (\\periph)", () => {
     ]);
   });
 
+  it("refuses a marker line that spells its title twice, keeping every byte literal", () => {
+    // `alt` is the division TITLE, which periph spells as marker-line text rather than a pipe pair
+    // (`unknownUsfm.utils.ts` renders it that way, so the editor can never produce this shape) — a
+    // line carrying both spellings has two conflicting readings and no lossless one, so it refuses
+    // the list like any other ambiguous attribute list rather than silently dropping a title.
+    expect(usfmFragmentToUsjContent('\\periph Title|alt="Z"\\mt1 X')).toEqual([
+      { type: "para", marker: "periph", content: ['Title|alt="Z"'] },
+      { type: "para", marker: "mt1", content: ["X"] },
+    ]);
+  });
+
+  it("reads a titleless marker line's `alt` pair as the division title", () => {
+    // No collision, so nothing is ambiguous and the pair is the only spelling present.
+    expect(usfmFragmentToUsjContent('\\periph |alt="Z" id="t"\\mt1 X')).toEqual([
+      {
+        type: "periph",
+        alt: "Z",
+        id: "t",
+        content: [{ type: "para", marker: "mt1", content: ["X"] }],
+      },
+    ]);
+  });
+
   it("opens no division inside note content, where peripheral divisions do not occur", () => {
     expect(
       usfmFragmentToUsjContent("\\ft text \\periph Title\\mt1 The Title", { isNoteContext: true }),

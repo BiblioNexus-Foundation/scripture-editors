@@ -70,6 +70,7 @@ import {
   $isRangeSelection,
   $isTextNode,
   $setState,
+  CONTROLLED_TEXT_INSERTION_COMMAND,
   CUT_COMMAND,
   LexicalEditor,
   PASTE_COMMAND,
@@ -130,16 +131,23 @@ if (typeof globalStubs.ClipboardEvent === "undefined")
 
 type EditorHandle = LexicalEditor;
 
-/** Types `text` one character at a time via `selection.insertText`, each in its own commit — the
- * same update path a real keystroke takes (matches the idiom in markerEditTier2Trigger.utils.test.tsx). */
+/**
+ * Types `text` one character at a time through `CONTROLLED_TEXT_INSERTION_COMMAND`, each in its own
+ * commit — the command a real keystroke dispatches, not the `selection.insertText` primitive
+ * underneath it.
+ *
+ * The difference is load-bearing for every "paste ≡ typed" pin here. `MarkerEditPlugin` registers a
+ * NORMAL-priority listener on this command that runs `$prepareReplaceSelection`
+ * (`markerEditDeletion.utils.ts`), which performs the delete half itself whenever the replaced
+ * selection covers marker-glyph bytes — exactly the selections these pins use. Driving
+ * `insertText` directly would skip that listener and compare the paste path against the same
+ * primitive the paste path ends in, which no equivalence claim can rest on.
+ */
 async function typeCharByChar(editor: EditorHandle, text: string): Promise<void> {
   for (const character of text) {
-    await act(async () =>
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) selection.insertText(character);
-      }),
-    );
+    await act(async () => {
+      editor.dispatchCommand(CONTROLLED_TEXT_INSERTION_COMMAND, character);
+    });
   }
 }
 
@@ -523,15 +531,16 @@ describe("multi-line payload collapses to a single space, per newline (attribute
   });
 });
 
-describe("marker-bearing payload: literal value text, no strip, no chapter node", () => {
-  it('paste "\\c 5" into the attribute run: the bytes survive literally, no chapter node is created', async () => {
+describe("marker-bearing payload: literal value text, no strip — and what the settle then does with it", () => {
+  /** The run-end caret of TJ's repro, the shape the whole attribute-context path was built for. */
+  function $selectRunEnd(): void {
+    const run = $charAttributeRun($firstChar());
+    run.select(run.getTextContentSize(), run.getTextContentSize());
+  }
+
+  it('paste "\\c 5" at the run\'s end: the bytes survive the paste literally, un-stripped', async () => {
     const { editor } = await testEnvironmentWithCharSync($charFixture);
-    await act(async () =>
-      editor.update(() => {
-        const run = $charAttributeRun($firstChar());
-        run.select(run.getTextContentSize(), run.getTextContentSize());
-      }),
-    );
+    await act(async () => editor.update($selectRunEnd));
 
     await pasteAndFlush(editor, { "text/plain": "\\c 5" });
 
@@ -545,6 +554,39 @@ describe("marker-bearing payload: literal value text, no strip, no chapter node"
       usj.content.filter((item) => typeof item !== "string" && item.type === "chapter"),
     ).toEqual([]);
     expect(usj.content.filter((item): item is string => typeof item === "string")).toEqual([]);
+  });
+
+  it("and at the settle those bytes DO re-tokenize — identically to the same bytes typed there", async () => {
+    // The value-byte carve-out is justified by paste ≡ TYPING, not by "these bytes never
+    // re-tokenize": the attribute tag survives the insertion, but the caret-departure settle
+    // re-tokenizes the whole paragraph and reads `\c 5` as the chapter marker it spells. Recorded
+    // here rather than left invisible behind an unsettled assertion. The residual — marker bytes
+    // reaching a value at all — is the TYPED `\c` hole (Deferred item 2 in the semantics doc),
+    // which paste inherits by design; closing it for paste alone would eat bytes out of an
+    // attribute value that were never a chapter token, and would break the equivalence below.
+    const pasted = await testEnvironmentWithCharSync($charFixture);
+    await act(async () => pasted.editor.update($selectRunEnd));
+    await pasteAndFlush(pasted.editor, { "text/plain": "\\c 5" });
+    await departAndSettle(pasted.editor, () => $bodyTextNode().select(0, 0));
+
+    const typed = await testEnvironmentWithCharSync($charFixture);
+    await act(async () => typed.editor.update($selectRunEnd));
+    await typeCharByChar(typed.editor, "\\c 5");
+    await departAndSettle(typed.editor, () => $bodyTextNode().select(0, 0));
+
+    // Asserted as the concrete settled shape, so the residual is visible in the suite rather than
+    // hidden inside an equivalence that would also pass if both arms were clean.
+    expect(usjOf(pasted.editor).content).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [{ type: "char", marker: "nd", closed: "false", content: ['asdf|who="hi"'] }],
+      },
+      { type: "chapter", marker: "c", number: "5" },
+      { type: "unmatched", marker: "nd*" },
+      { type: "para", marker: "p", content: [" body"] },
+    ]);
+    expect(usjOf(pasted.editor)).toEqual(usjOf(typed.editor));
   });
 });
 
@@ -815,29 +857,98 @@ describe("mixed selection: the pasted bytes are BODY content, not attribute-valu
     expect(usjOf(pasted.editor)).toEqual(usjOf(typed.editor));
   });
 
-  it("leaves a range wholly INSIDE the run on attribute-value semantics — a pasted \\c stays literal there", async () => {
+  it("leaves a range wholly INSIDE the run on attribute-value semantics — a pasted \\c stays literal there, and settles as typing it would", async () => {
     // The boundary of the rule above, in its non-collapsed form (the collapsed-caret form is pinned
-    // in the "marker-bearing payload" describe). The run survives this replacement still tagged
-    // "attribute", so the bytes really are value text and the strip must not touch them.
-    const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
-    await act(async () =>
-      editor.update(() => {
-        const run = $charAttributeRun($firstChar());
-        const text = run.getTextContent(); // '|who="hi"'
-        run.select(text.indexOf('"') + 1, text.lastIndexOf('"'));
-      }),
-    );
+    // in the "marker-bearing payload" describe). The strip must not touch these bytes: they are
+    // value text at insertion time, and paste must put them where typing them would.
+    //
+    // Settled deliberately, and the settled shape asserted concretely: the attribute tag survives
+    // the insertion but not the caret-departure re-tokenization, so `\c 5` DOES become a chapter
+    // marker here — the typed `\c` hole (Deferred item 2), inherited by design rather than
+    // introduced. An assertion that stopped before the settle would read "safe" over a corrupt
+    // document, which is the shape this suite exists to refuse.
+    function $selectValueInterior(): void {
+      const run = $charAttributeRun($firstChar());
+      const text = run.getTextContent(); // '|who="hi"'
+      run.select(text.indexOf('"') + 1, text.lastIndexOf('"'));
+    }
 
-    await pasteAndFlush(editor, { "text/plain": "\\c 5" });
+    const pasted = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => pasted.editor.update($selectValueInterior));
+    await pasteAndFlush(pasted.editor, { "text/plain": "\\c 5" });
 
-    editor.getEditorState().read(() => {
+    pasted.editor.getEditorState().read(() => {
       expect($charAttributeRun($firstChar()).getTextContent()).toBe('|who="\\c 5"');
     });
-    const content = usjOf(editor).content;
-    expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
-      [],
-    );
+
+    await departAndSettle(pasted.editor, () => $bodyTextNode().select(0, 0));
+
+    const typed = await testEnvironmentWithCharSync($inlineCharFixture);
+    await act(async () => typed.editor.update($selectValueInterior));
+    await typeCharByChar(typed.editor, "\\c 5");
+    await departAndSettle(typed.editor, () => $bodyTextNode().select(0, 0));
+
+    expect(usjOf(pasted.editor).content).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [
+          "before ",
+          { type: "char", marker: "nd", closed: "false", content: ['asdf|who="'] },
+        ],
+      },
+      { type: "chapter", marker: "c", number: '5"' },
+      { type: "unmatched", marker: "nd*" },
+      " after",
+      { type: "para", marker: "p", content: ["body"] },
+    ]);
+    expect(usjOf(pasted.editor)).toEqual(usjOf(typed.editor));
   });
+
+  it.each([
+    ["a range ending at the trailing text's start", "runEndToTrailingStart"],
+    ["a BACKWARD range from the trailing text into the run", "backwardTrailingToRun"],
+    ["a range covering the run, the closer and all the trailing text", "runStartToTrailingEnd"],
+  ] as const)(
+    "strips a pasted \\c for %s too — the rule is about touching, not about which end touches",
+    async (_name, shape) => {
+      // The report for this branch measured four mixed-selection shapes; only one was pinned. The
+      // other three live here so the claim is in the suite rather than in a transcript.
+      const { editor } = await testEnvironmentWithCharSync($inlineCharFixture);
+      await act(async () =>
+        editor.update(() => {
+          const run = $charAttributeRun($firstChar());
+          const trailing = $trailingBodyText();
+          if (shape === "backwardTrailingToRun") {
+            trailing.select(3, 3);
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) selection.focus.set(run.getKey(), 1, "text");
+            return;
+          }
+          const start = shape === "runStartToTrailingEnd" ? 0 : run.getTextContentSize();
+          run.select(start, start);
+          const selection = $getSelection();
+          if ($isRangeSelection(selection))
+            selection.focus.set(
+              trailing.getKey(),
+              shape === "runStartToTrailingEnd" ? trailing.getTextContentSize() : 0,
+              "text",
+            );
+        }),
+      );
+
+      await pasteAndFlush(editor, { "text/plain": "\\c 5" });
+      await departAndSettle(editor, () => $bodyTextNode().select(0, 0));
+
+      const content = usjOf(editor).content;
+      expect(content.filter((item) => typeof item !== "string" && item.type === "chapter")).toEqual(
+        [],
+      );
+      // A chapter token also closes its paragraph, stranding the rest as bare top-level strings —
+      // asserted so the pin cannot pass on a document that merely renamed the damage.
+      expect(content.filter((item): item is string => typeof item === "string")).toEqual([]);
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------------------------

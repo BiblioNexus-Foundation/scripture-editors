@@ -74,6 +74,9 @@ const TABLE_ROW_MARKER = "tr";
 const SIDEBAR_MARKER = "esb";
 const SIDEBAR_END_MARKER = "esbe";
 const PERIPH_MARKER = "periph";
+/** The USJ property a periph's marker-line title lands on — the same name a pipe pair would use,
+ * which is why a line carrying both spellings is refused rather than resolved. */
+const PERIPH_TITLE_ATTRIBUTE = "alt";
 
 /**
  * Table cell marker names: `t` + header/cell (`h`/`c`) + optional alignment infix (`r`/`c`) +
@@ -1015,7 +1018,12 @@ export function usfmFragmentToUsjContent(
    *
    * A list that does not parse degrades the whole division to an ordinary paragraph carrying the
    * literal bytes, exactly as an unfoldable figure span degrades — every byte the author wrote
-   * stays where they can see and fix it.
+   * stays where they can see and fix it. A list that spells the TITLE a second time (`alt`,
+   * alongside a non-empty marker-line title) degrades for the same reason and by the same rule:
+   * the two spellings are the same USJ property, there is no reading that keeps both, and picking
+   * one would silently destroy bytes the author can still see. `alt` on a TITLELESS line collides
+   * with nothing and is read normally. The editor can never author the colliding shape — periph's
+   * display renders `alt` AS the marker-line title (`unknownUsfm.utils.ts`), never as a pipe pair.
    *
    * @param atBlockBoundary - Whether the token that ended the line starts a new block (or the
    *   fragment ended). The line's trailing line break is structural there, the same rule the text
@@ -1030,14 +1038,21 @@ export function usfmFragmentToUsjContent(
     const pipeIndex = value.indexOf("|");
     const attributes =
       pipeIndex >= 0 ? parseAttributeText(value.slice(pipeIndex + 1), PERIPH_MARKER) : undefined;
-    if (pipeIndex >= 0 && !attributes) {
+    const title = pipeIndex >= 0 ? value.slice(0, pipeIndex) : value;
+    if (pipeIndex >= 0 && (!attributes || (title && attributes[PERIPH_TITLE_ATTRIBUTE]))) {
       startParagraph(PERIPH_MARKER, value);
       return;
     }
-    const title = pipeIndex >= 0 ? value.slice(0, pipeIndex) : value;
-    periph = { type: "periph", ...(title ? { alt: toUsjText(title) } : {}), ...attributes };
-    periph.content = [];
-    result.push(periph);
+    const opened: MarkerObject = {
+      type: "periph",
+      ...(title ? { [PERIPH_TITLE_ATTRIBUTE]: toUsjText(title) } : {}),
+      ...attributes,
+    };
+    opened.content = [];
+    // Landed BEFORE `periph` is set, for the same reason the sidebar assembly does it: an already
+    // open division would otherwise take the new one into its own content.
+    blockTarget().push(opened);
+    periph = opened;
     para = undefined;
   };
 

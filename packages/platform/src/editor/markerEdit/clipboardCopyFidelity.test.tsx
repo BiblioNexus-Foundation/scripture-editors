@@ -314,6 +314,28 @@ describe("attributes a construct carries in bytes the display had to reconstruct
     );
   });
 
+  it("emits no category bytes for a selection that stops before the note's content", async () => {
+    // The category bytes belong to the region AFTER the caller separator, so a selection ending at
+    // that separator must not pull them in: it would put `\\cat People\\cat*` on the clipboard for a
+    // range the user never covered, with no `\\f` opener in front of the run that follows.
+    const { editor } = await renderUsjEditor(categorizedNoteUsj());
+    await act(async () =>
+      editor.update(() => {
+        const note = findOnlyNote($getRoot());
+        const separator = note.getChildren()[2]; // opening glyph, caller, separator
+        const first = note.getFirstDescendant();
+        if (!separator || !first) throw new Error("note is missing its caller separator");
+        const selection = $createRangeSelection();
+        selection.anchor = $createPoint(first.getKey(), 0, "text");
+        selection.focus = $createPoint(separator.getKey(), 0, "text");
+        $setSelection(selection);
+      }),
+    );
+    const { event, getData } = copyEvent();
+    await act(async () => editor.dispatchCommand(COPY_COMMAND, event));
+    expect(getData("text/plain")).toBe("\\f -");
+  });
+
   it("copies a spanning cell's width as the span suffix its marker name carries", async () => {
     const { editor } = await renderUsjEditor(spanningCellTableUsj());
     await act(async () => editor.update($selectWholeDocument));

@@ -323,18 +323,25 @@ function $isSelectionInAttributeContext(selection: RangeSelection): boolean {
  * attribute context, or a range whose anchor and focus are the same node and that node is in
  * attribute context.
  *
- * This is the only shape whose pasted bytes are genuinely attribute VALUE bytes. The value-byte
- * carve-outs ({@link $insertPastedTextIntoAttributeContext}) are earned by exactly one fact: the
- * bytes land in a node that stays tagged "attribute", which `$textNodeTier2Transform` skips, so
- * they are never read as markers and never re-tokenize.
+ * This is the only shape whose pasted bytes are genuinely attribute VALUE bytes, and therefore the
+ * only one whose value-byte carve-outs ({@link $insertPastedTextIntoAttributeContext}) are earned.
+ * What earns them is paste ≡ TYPING: the bytes land where the same keystrokes would land, and this
+ * editor's whole attribute-context contract is that a paste in a value behaves as typing there
+ * does. It is NOT that the bytes never re-tokenize — measured, that is false: the `"attribute"` tag
+ * survives the insertion, but the caret-departure settle re-tokenizes the paragraph, so a pasted
+ * `\c 5` in a value DOES become a chapter marker. It becomes one identically when TYPED, which is
+ * why this is the typed-`\c` hole the semantics doc defers (Deferred item 2), inherited rather than
+ * introduced. Extending the strip to cover it would eat bytes out of an attribute value that were
+ * never a chapter token — the very regression the carve-out exists to prevent — and would break the
+ * equivalence. Both halves are pinned settled, on concrete USJ, in
+ * `attributeContextPasteFidelity.test.tsx`.
  *
- * A selection that merely TOUCHES attribute context does not have that property. Removing the
+ * A selection that merely TOUCHES attribute context does not land in a value at all. Removing the
  * range takes the bytes out of the run, and when the range covers a char span's closing glyph it
- * deletes the closer too, so the whole span re-tokenizes around whatever just arrived. Measured
- * both ways round — a range starting in body text and reaching INTO the run, and a range starting
- * inside the run and reaching PAST the closer — a pasted `\c 5` produced a real chapter node
- * mid-paragraph, which is exactly the save-loop poisoning {@link $stripPastedChapterAndBookId}
- * exists to prevent (`attributeContextPasteFidelity.test.tsx`).
+ * deletes the closer too, so what arrives is ordinary paragraph content — measured both ways round,
+ * a range starting in body text and reaching INTO the run, and a range starting inside the run and
+ * reaching PAST the closer. Those bytes get body content's rules, which is a divergence from typing
+ * in exactly the two places body paste always diverges from it.
  */
 function $isSelectionWithinOneAttributeNode(selection: RangeSelection): boolean {
   const { anchor, focus } = selection;
@@ -358,11 +365,14 @@ function $isSelectionWithinOneAttributeNode(selection: RangeSelection): boolean 
  * The two BODY-content paste rules — the `\c`/`\id` strip and the positional NBSP mapping, the only
  * two places a paste deliberately diverges from typing the same bytes — are skipped only for a
  * selection that stays wholly inside one attribute node ({@link $isSelectionWithinOneAttributeNode}).
- * There the bytes really are value text: a pasted `\c 5` is literal, not a structural marker, and
- * `$displayWhitespaceTransform` (this file) already skips textType "attribute" nodes outright, so a
- * literal NBSP a user TYPES into an attribute run is never touched and a pasted one must not be
- * either. A selection that only TOUCHES an attribute run does not qualify: its bytes end up as
- * ordinary paragraph content that re-tokenizes, so they get body content's rules. What does NOT
+ * There the bytes go where the same keystrokes would put them, and paste must not diverge: a pasted
+ * `\c 5` is inserted literally exactly as a typed one is, and a pasted NBSP passes through exactly
+ * as a typed one does (`$displayWhitespaceTransform`, this file, skips textType "attribute" nodes
+ * outright). What the SETTLE then makes of those bytes is the same for both — a `\c 5` in a value
+ * re-tokenizes into a chapter marker whether it was typed or pasted, which is the deferred typed-`\c`
+ * hole rather than a paste defect; see {@link $isSelectionWithinOneAttributeNode}. A selection that
+ * only TOUCHES an attribute run does not qualify: its bytes end up as ordinary paragraph content, so
+ * they get body content's rules. What does NOT
  * change with them is the insertion MECHANISM — one `insertText`, never the paragraph-splitting
  * line replay and never Lexical's rich-paste node insertion, both of which corrupt the
  * attribute-run end of the range. A multi-line payload landing in body content this way therefore
@@ -546,8 +556,15 @@ function $isNoteInternalDisplaySeparator(node: TextNode): boolean {
  * Placed AFTER the separator's own space and with none of its own, which is where the file has the
  * span: `\f + \cat People\cat*\fr 1:1 …` — a trailing space here would re-tokenize into a stray
  * text child inside the note.
+ *
+ * `isLast` is what keeps it inside the selection. These bytes stand for the region AFTER the
+ * separator, so a selection that STOPS there covers none of them: emitting anyway put
+ * `\cat People\cat*` on the clipboard for a range the user never selected, with no `\f` opener in
+ * front of the run that followed (measured: `\f -\cat People\cat*`). The sibling caller rule
+ * guards its own boundary the same way.
  */
-function $collapsedNoteCategoryBytes(node: TextNode): string {
+function $collapsedNoteCategoryBytes(node: TextNode, isLast: boolean): string {
+  if (isLast) return "";
   if (node.getTextContent() !== NBSP) return "";
   const note = node.getParent();
   if (!$isNoteNode(note)) return "";
@@ -648,7 +665,7 @@ export function $selectionToUsfmText(selection: RangeSelection): string {
       }
       text += $isNoteInternalDisplaySeparator(node)
         ? ""
-        : nodeText.replaceAll(NBSP, " ") + $collapsedNoteCategoryBytes(node);
+        : nodeText.replaceAll(NBSP, " ") + $collapsedNoteCategoryBytes(node, node === lastNode);
     } else if (
       ($isDecoratorNode(node) || $isLineBreakNode(node)) &&
       (node !== lastNode || !selection.isCollapsed())
