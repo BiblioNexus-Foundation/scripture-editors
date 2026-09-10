@@ -32,9 +32,14 @@ converting, e.g.:
 ```ts
 import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
 
-globalThis.DOMParser = DOMParser;
-globalThis.XMLSerializer = XMLSerializer;
+Reflect.set(globalThis, "DOMParser", DOMParser);
+Reflect.set(globalThis, "XMLSerializer", XMLSerializer);
 ```
+
+`Reflect.set` avoids assigning xmldom's looser DOM types to TypeScript's native DOM types.
+`usxStringToUsj` only requires `DOMParser`; `usjToUsxString` also requires `XMLSerializer`.
+Malformed XML throws an `Error` beginning with `Invalid USX:` in either environment. Parser
+exceptions are retained as the error's `cause`.
 
 ## Usage
 

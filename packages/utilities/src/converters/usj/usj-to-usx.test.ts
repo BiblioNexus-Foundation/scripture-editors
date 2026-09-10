@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import {
   usjGen1v1,
   usjGen1v1ImpliedPara,

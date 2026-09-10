@@ -25,23 +25,19 @@ let verseEid: string | undefined;
  * @public
  */
 export function usjToUsxString(usj: Usj): string {
-  assertDomEnvironment("usjToUsxString");
+  assertDomEnvironment(usjToUsxString.name, ["DOMParser", "XMLSerializer"]);
   const usxDoc = new DOMParser().parseFromString(`<${USX_TYPE}/>`, "text/xml");
-  if (usxDoc.documentElement) {
-    usxDoc.documentElement.setAttribute("version", USX_VERSION);
-    usjToUsxDom(usj, usxDoc);
-  }
+  usxDoc.documentElement.setAttribute("version", USX_VERSION);
+  usjToUsxDom(usj, usxDoc);
   return new XMLSerializer().serializeToString(usxDoc);
 }
 
-export function usjToUsxDom(usj: Usj, usxDoc: Document): Element | undefined {
-  if (!usxDoc.documentElement) return undefined;
-
+export function usjToUsxDom(usj: Usj, usxDoc: Document): Element {
   for (const [index, markerContent] of usj.content.entries()) {
     const isLastItem = index === usj.content.length - 1;
     convertUsjRecurse(markerContent, usxDoc.documentElement, usxDoc, isLastItem);
   }
-  return usxDoc.documentElement ?? undefined;
+  return usxDoc.documentElement;
 }
 
 function convertUsjRecurse(

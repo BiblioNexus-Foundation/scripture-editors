@@ -525,7 +525,7 @@ importers:
   packages/utilities:
     devDependencies:
       '@xmldom/xmldom':
-        specifier: ^0.9.10
+        specifier: ^0.9.12
         version: 0.9.12
       lexical:
         specifier: ^0.43.0

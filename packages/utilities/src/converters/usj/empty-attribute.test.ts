@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import type { MarkerObject } from "./usj.model.js";
 import { usjToUsxString } from "./usj-to-usx.js";
 import { usxStringToUsj } from "./usx-to-usj.js";

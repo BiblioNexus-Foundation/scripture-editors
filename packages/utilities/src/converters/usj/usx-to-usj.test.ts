@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import {
   usjGen1v1,
   usjGen1v1ImpliedPara,
@@ -54,7 +53,14 @@ describe("USX to USJ Converter", () => {
   });
 
   it("should throw on malformed USX", () => {
-    expect(() => usxStringToUsj('<usx version="3.1"><para style="p">unclosed</usx>')).toThrow();
+    expect(() => usxStringToUsj('<usx version="3.1"><para style="p">unclosed</usx>')).toThrow(
+      /^Invalid USX:/,
+    );
+  });
+
+  it("does not require XMLSerializer when parsing", () => {
+    vi.stubGlobal("XMLSerializer", undefined);
+    expect(usxStringToUsj(usxGen1v1)).toEqual(usjGen1v1);
   });
 
   it("should throw a helpful error when DOMParser is not available", () => {

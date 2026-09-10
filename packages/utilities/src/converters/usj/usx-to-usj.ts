@@ -22,16 +22,25 @@ interface Attribs {
  * @param usxString - The USX string to convert.
  * @returns The converted USJ object.
  * @throws If no DOM environment is available or the USX is not well-formed XML.
+ * Malformed XML produces an `Error` beginning with `Invalid USX:`. If the DOM implementation
+ * throws while parsing, its original error is preserved as the cause.
  *
  * @public
  */
 export function usxStringToUsj(usxString: string): Usj {
-  assertDomEnvironment("usxStringToUsj");
+  assertDomEnvironment(usxStringToUsj.name, ["DOMParser"]);
   const parser = new DOMParser();
-  const inputUsxDom = parser.parseFromString(usxString, "text/xml");
+  let inputUsxDom: Document;
+  try {
+    inputUsxDom = parser.parseFromString(usxString, "text/xml");
+  } catch (cause) {
+    throw new Error(`Invalid USX: ${cause instanceof Error ? cause.message : String(cause)}`, {
+      cause,
+    });
+  }
   // Native DOMParser reports malformed XML with a `parsererror` element instead of throwing.
-  const parserError = inputUsxDom.getElementsByTagName("parsererror")[0];
-  if (parserError) throw new Error(`Invalid USX: ${parserError.textContent}`);
+  if (inputUsxDom.documentElement.tagName === "parsererror")
+    throw new Error(`Invalid USX: ${inputUsxDom.documentElement.textContent}`);
 
   return usxDomToUsj(inputUsxDom.documentElement);
 }
