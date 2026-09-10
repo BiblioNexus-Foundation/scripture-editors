@@ -193,7 +193,7 @@ To restyle beyond CSS overrides, copy the sources out of this repo instead:
 - Marker Menu [/libs/shared/src/styles/nodes-menu.css](/libs/shared/src/styles/nodes-menu.css)
 - TreeView, `debug` only [/packages/platform/src/editor/debug-tree-view.css](/packages/platform/src/editor/debug-tree-view.css) — the only stylesheet with no published subpath at all, because `debug` is an experimental dev-only prop and the file carries unscoped `pre` selectors that would restyle every `<pre>` on your page. Copy it if you turn `debug` on.
 
-`toolbar.css` references its icons from [/packages/platform/assets](/packages/platform/assets) by absolute URL, so a hand-copied stylesheet also needs those assets served from your web root. Swap the vendored imports for `styles.css` rather than stacking both, or the rules double up.
+`toolbar.css` references its icons from [/packages/platform/assets](/packages/platform/assets) by absolute URL, so a hand-copied stylesheet also needs those assets served from your web root. Swap the vendored imports for the matching published stylesheets (`styles.css`, `toolbar.css`, `context-menu.css` and `nodes-menu.css`) rather than stacking both, or the rules double up.
 
 Comment styles, if using `<Marginal />`:
 
