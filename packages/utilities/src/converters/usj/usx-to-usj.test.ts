@@ -65,7 +65,7 @@ describe("USX to USJ Converter", () => {
 
   it("should throw a helpful error when DOMParser is not available", () => {
     vi.stubGlobal("DOMParser", undefined);
-    expect(() => usxStringToUsj(usxGen1v1)).toThrow(/DOM environment/);
+    expect(() => usxStringToUsj(usxGen1v1)).toThrow(/^usxStringToUsj requires a DOM environment/);
   });
 
   afterEach(() => {

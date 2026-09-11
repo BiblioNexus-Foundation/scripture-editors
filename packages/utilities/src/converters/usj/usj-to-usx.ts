@@ -25,7 +25,7 @@ let verseEid: string | undefined;
  * @public
  */
 export function usjToUsxString(usj: Usj): string {
-  assertDomEnvironment(usjToUsxString.name, ["DOMParser", "XMLSerializer"]);
+  assertDomEnvironment("usjToUsxString", ["DOMParser", "XMLSerializer"]);
   const usxDoc = new DOMParser().parseFromString(`<${USX_TYPE}/>`, "text/xml");
   usxDoc.documentElement.setAttribute("version", USX_VERSION);
   usjToUsxDom(usj, usxDoc);

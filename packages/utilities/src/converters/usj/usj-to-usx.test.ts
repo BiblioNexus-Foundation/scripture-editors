@@ -82,12 +82,12 @@ describe("USJ to USX Converter", () => {
 
   it("should throw a helpful error when DOMParser is not available", () => {
     vi.stubGlobal("DOMParser", undefined);
-    expect(() => usjToUsxString(EMPTY_USJ)).toThrow(/DOM environment/);
+    expect(() => usjToUsxString(EMPTY_USJ)).toThrow(/^usjToUsxString requires a DOM environment/);
   });
 
   it("should throw a helpful error when XMLSerializer is not available", () => {
     vi.stubGlobal("XMLSerializer", undefined);
-    expect(() => usjToUsxString(EMPTY_USJ)).toThrow(/DOM environment/);
+    expect(() => usjToUsxString(EMPTY_USJ)).toThrow(/^usjToUsxString requires a DOM environment/);
   });
 
   afterEach(() => {

@@ -28,7 +28,7 @@ interface Attribs {
  * @public
  */
 export function usxStringToUsj(usxString: string): Usj {
-  assertDomEnvironment(usxStringToUsj.name, ["DOMParser"]);
+  assertDomEnvironment("usxStringToUsj", ["DOMParser"]);
   const parser = new DOMParser();
   let inputUsxDom: Document;
   try {

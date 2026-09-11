@@ -39,6 +39,10 @@ export default defineConfig({
       // Don't forget to update your package.json as well.
       formats: ["es" as const, "cjs" as const],
     },
+    rollupOptions: {
+      // open the HTML file manually or set `open` to true
+      // plugins: [visualizer({ filename: "dist/bundle-analysis.html", open: false })],
+    },
   },
   test: {
     watch: false,
