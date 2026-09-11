@@ -59,6 +59,7 @@ import {
   LexicalEditor,
   HISTORIC_TAG,
   REDO_COMMAND,
+  SKIP_DOM_SELECTION_TAG,
   UNDO_COMMAND,
 } from "lexical";
 import {
@@ -592,9 +593,20 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       // would tear down the host's op loop for the same reason the remote branch above reports and
       // drops instead of throwing.
       assertNotBlockVerse("apply an update");
+      // An update to an editor the user is not in must not pull DOM focus into it. Lexical
+      // reconciles the DOM selection after every commit, and writing a selection inside a
+      // `contenteditable` focuses that element as an intrinsic browser side effect - so a
+      // programmatic update would yank the caret out of whatever the user IS typing in (a host's
+      // note editor applying its edits back into the Scripture text, say). When this editor does
+      // hold focus the reconcile is exactly right and stays: that is how a collaborator's op keeps
+      // the local caret in the correct place.
+      const rootElement = editorRef.current?.getRootElement();
+      const holdsFocus =
+        !!rootElement && rootElement.contains(rootElement.ownerDocument.activeElement);
       editorRef.current?.update(
         () => {
           if (source === "remote") $addUpdateTag(DELTA_CHANGE_TAG);
+          if (!holdsFocus) $addUpdateTag(SKIP_DOM_SELECTION_TAG);
           $applyUpdate(ops, viewOptions, nodeOptions, stableLogger);
         },
         { discrete: true },
