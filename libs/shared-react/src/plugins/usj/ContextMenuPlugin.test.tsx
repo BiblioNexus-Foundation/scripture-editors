@@ -110,6 +110,42 @@ describe("ContextMenuPlugin keyboard selection", () => {
   });
 });
 
+describe("ContextMenuPlugin accessibility", () => {
+  it("names the option list as a listbox so its options are announceable", async () => {
+    await openMenuWithEndNoteHighlighted(vi.fn());
+
+    const list = menuList();
+    if (!list) throw new Error("menu list did not render");
+    // `role="option"` is only meaningful inside a listbox; on a bare `ul` a screen reader has no
+    // list to announce a position within.
+    expect(list.getAttribute("role")).toBe("listbox");
+    expect(list.getAttribute("aria-label")).toBeTruthy();
+    expect(list.id).toBeTruthy();
+  });
+
+  it("points the focused editor at the highlighted option", async () => {
+    const { rootElement } = await openMenuWithEndNoteHighlighted(vi.fn());
+
+    // Focus stays in the contenteditable while the menu is open (that is what keeps the selection
+    // the chosen item acts on), so the highlight has to be announced from there.
+    const list = menuList();
+    expect(rootElement.getAttribute("aria-controls")).toBe(list?.id);
+    const highlighted = document.querySelector(".typeahead-popover li.selected");
+    expect(highlighted?.id).toBeTruthy();
+    expect(rootElement.getAttribute("aria-activedescendant")).toBe(highlighted?.id);
+  });
+
+  it("stops pointing at an option once the menu closes", async () => {
+    const { rootElement } = await openMenuWithEndNoteHighlighted(vi.fn());
+
+    await pressKeyOnDocument("Escape");
+
+    expect(menuList()).toBeNull();
+    expect(rootElement.hasAttribute("aria-activedescendant")).toBe(false);
+    expect(rootElement.hasAttribute("aria-controls")).toBe(false);
+  });
+});
+
 describe("ContextMenuPlugin scrolling", () => {
   it("stays open when the scroll happens INSIDE the menu", async () => {
     await openMenuWithEndNoteHighlighted(vi.fn());
