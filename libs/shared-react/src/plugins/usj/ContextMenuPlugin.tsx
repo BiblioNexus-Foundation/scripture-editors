@@ -165,6 +165,8 @@ export function ContextMenuPlugin({
     return [...builtIn, ...extra];
   }, [editor, isReadonly, extraOptions]);
 
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const closeMenu = useCallback(() => {
     setMenuState((prev) => ({ ...prev, isOpen: false }));
     setSelectedIndex(undefined);
@@ -192,7 +194,15 @@ export function ContextMenuPlugin({
   // Close menu on scroll
   useEffect(() => {
     if (!menuState.isOpen) return;
-    const handleScroll = () => {
+    const handleScroll = (event: Event) => {
+      // A scroll INSIDE the menu is the user reaching items below the fold, and the menu has to
+      // survive it: this listener is on `window` in capture phase, which fires for a descendant's
+      // non-bubbling scroll event too, so closing on every scroll would leave a menu taller than
+      // its own `max-height` impossible to scroll at all. Only a scroll of something else leaves
+      // the menu stale — it is positioned in fixed viewport coordinates, so the content it was
+      // opened over has moved out from under it.
+      const target = event.target as Node | null;
+      if (target && menuRef.current?.contains(target)) return;
       closeMenu();
     };
     globalThis.addEventListener("scroll", handleScroll, true);
@@ -250,8 +260,6 @@ export function ContextMenuPlugin({
       }),
     [editor],
   );
-
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Clamp menu position to viewport bounds before first paint to prevent off-screen rendering.
   useLayoutEffect(() => {
