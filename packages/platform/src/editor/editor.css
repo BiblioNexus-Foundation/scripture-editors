@@ -221,12 +221,14 @@ pre::-webkit-scrollbar-thumb {
   scrollbar-width: none;
 }
 
-/* The 200px cap above is sized for the typeahead's long, FILTERABLE list, where scrolling past a
-   fold is the point. The context menu is a short fixed list (~36px per item), so the same cap just
-   hid its last items behind a fold nothing scrolls to. Cap it to the viewport instead: every item
-   shows whenever there is room, and the menu still can't outgrow the screen when there isn't.
-   Needs the `.typeahead-popover` qualifier to out-specify the rule above — the plugin puts both
-   classes on the menu's outer element and nests a second `.typeahead-popover` inside it. */
+/* The 200px cap on `.typeahead-popover ul` is sized for the marker typeahead's long, FILTERABLE
+   list, where scrolling past a fold is the point. The right-click context menu reuses the same
+   popover markup but is a short fixed list (~36px per item) with no filter to narrow it, so under
+   that cap its last items sit behind a fold. Capped to the viewport instead: the menu portal is
+   `position: fixed`, so `vh` is the height of the panel it opens in. Every item shows whenever
+   there is room, and the menu still can't outgrow the panel when there isn't.
+   Needs the `.typeahead-popover` qualifier to out-specify that rule — the plugin puts both classes
+   on the menu's outer element and nests a second `.typeahead-popover` inside it. */
 .typeahead-popover.auto-embed-menu ul {
   max-height: calc(100vh - 16px);
 }
