@@ -12,12 +12,14 @@ import { usxStringToUsj } from "@eten-tech-foundation/scripture-utilities";
 import { SerializedEditorState, SerializedLexicalNode } from "lexical";
 import {
   isSerializedAttributeRunNode,
+  isSerializedBookNode,
   isSerializedImmutableTableCellNode,
   isSerializedImmutableTableNode,
   isSerializedImmutableTableRowNode,
   isSerializedImmutableTypedTextNode,
   isSerializedMarkerNode,
   isSerializedMilestoneNode,
+  isSerializedNoteNode,
   isSerializedParaNode,
   isSerializedTextNode,
   isSerializedUnknownNode,
@@ -264,5 +266,17 @@ describe("corpus forward anchors (standard view)", () => {
     if (!isSerializedTextNode(target)) throw new Error("Ref has no target text");
     expect(target.text).toBe("Genesis 1:1");
     expect(target.mode).toBe("token");
+  });
+
+  it("book id line: description text and a note there both load as book children", () => {
+    const state = serializeFixture("note in the book id line");
+
+    const book = state.root.children.find((child) => isSerializedBookNode(child));
+    if (!isSerializedBookNode(book)) throw new Error("No book node found");
+    const [text, note] = dataChildren(book.children);
+    if (!isSerializedTextNode(text)) throw new Error("Book id description text is missing");
+    expect(text.text).toBe("Corpus fixture");
+    if (!isSerializedNoteNode(note)) throw new Error("The note in the \\id line is missing");
+    expect(note.marker).toBe("fe");
   });
 });

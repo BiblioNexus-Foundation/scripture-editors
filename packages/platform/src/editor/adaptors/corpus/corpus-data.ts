@@ -223,6 +223,17 @@ ${USX_FOOTER}`,
 ${USX_FOOTER}`,
   },
   {
+    // A note inside the \\id line. The book element is a content container like any other para:
+    // whatever the file puts after the book code has to survive the load, or the editor shows a
+    // truncated \\id line and the next save writes that truncation back to disk.
+    name: "note in the book id line",
+    usx: `<usx version="3.0">
+  <book code="RUT" style="id">Corpus fixture<note caller="+" style="fe"><char style="fr" closed="false">1:0 </char><char style="ft" closed="false">An endnote.</char></note></book>
+  <chapter number="1" style="c" />
+  <para style="p"><verse number="1" style="v" />Verse text.</para>
+${USX_FOOTER}`,
+  },
+  {
     // Paragraph leading-space display rule: a paragraph whose first content text starts
     // with a single leading space. Standard view displays that space as NBSP; the reverse
     // adaptor inverts it back (and normalizeSpaceRuns leaves a lone space alone), so the pair
