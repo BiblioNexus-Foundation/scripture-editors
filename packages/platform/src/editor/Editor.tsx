@@ -102,7 +102,9 @@ import {
   $getRangeFromUsjSelection,
   $getReplaceEmbedOps,
   $insertNote,
+  $selectAfterNote,
   $selectNote,
+  $selectNoteTextOffset,
   AnnotationPlugin,
   AnnotationRange,
   AnnotationRef,
@@ -436,6 +438,22 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
     if (effectiveIsReadonly) throw new Error(`Cannot ${operation} in readonly mode`);
   };
 
+  /**
+   * Whether this editor's content-editable root contains the active element.
+   *
+   * An update to an editor the user is NOT in must not pull DOM focus into it: Lexical reconciles
+   * the DOM selection after every commit, and writing a selection inside a `contenteditable`
+   * focuses that element as an intrinsic browser side effect - so a programmatic update would yank
+   * the caret out of whatever the user IS typing in (a host's note editor applying its edits back
+   * into the Scripture text, say). Commits made while this returns `false` carry Lexical's
+   * `SKIP_DOM_SELECTION_TAG`. When this editor DOES hold focus the reconcile is exactly right and
+   * stays: that is how a collaborator's op keeps the local caret in the correct place.
+   */
+  const holdsDomFocus = () => {
+    const rootElement = editorRef.current?.getRootElement();
+    return !!rootElement && rootElement.contains(rootElement.ownerDocument.activeElement);
+  };
+
   const initialConfig = useMemo<InitialConfigType>(
     () => ({
       namespace: "platformEditor",
@@ -593,16 +611,7 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
       // would tear down the host's op loop for the same reason the remote branch above reports and
       // drops instead of throwing.
       assertNotBlockVerse("apply an update");
-      // An update to an editor the user is not in must not pull DOM focus into it. Lexical
-      // reconciles the DOM selection after every commit, and writing a selection inside a
-      // `contenteditable` focuses that element as an intrinsic browser side effect - so a
-      // programmatic update would yank the caret out of whatever the user IS typing in (a host's
-      // note editor applying its edits back into the Scripture text, say). When this editor does
-      // hold focus the reconcile is exactly right and stays: that is how a collaborator's op keeps
-      // the local caret in the correct place.
-      const rootElement = editorRef.current?.getRootElement();
-      const holdsFocus =
-        !!rootElement && rootElement.contains(rootElement.ownerDocument.activeElement);
+      const holdsFocus = holdsDomFocus();
       editorRef.current?.update(
         () => {
           if (source === "remote") $addUpdateTag(DELTA_CHANGE_TAG);
@@ -942,6 +951,26 @@ const Editor = forwardRef(function Editor<TLogger extends LoggerBasic>(
           $selectNote(noteNode, viewOptions);
           if (!noteNode.getIsCollapsed()) expandedNoteKeyRef.current = noteNode.getKey();
         }
+      });
+    },
+    selectAfterNote(noteKeyOrIndex) {
+      editorRef.current?.update(() => {
+        // Placing a caret is a selection-only commit, so the focus rule matters more here than
+        // anywhere: a host putting the caret past a note it is showing elsewhere (a footnotes
+        // pane whose row editor holds focus) must not have that editor blurred underneath it.
+        if (!holdsDomFocus()) $addUpdateTag(SKIP_DOM_SELECTION_TAG);
+        const noteNode = $getNoteByKeyOrIndex(noteKeyOrIndex);
+        if (noteNode) $selectAfterNote(noteNode);
+      });
+    },
+    selectNoteTextOffset(noteKeyOrIndex, utf16Offset) {
+      editorRef.current?.update(() => {
+        const noteNode = $getNoteByKeyOrIndex(noteKeyOrIndex);
+        if (!noteNode) return;
+        // A note with no content text has nowhere to put an offset; land where an offset-less
+        // request would, so the caret is always somewhere sensible inside the note.
+        if (!$selectNoteTextOffset(noteNode, utf16Offset)) $selectNote(noteNode, viewOptions);
+        if (!noteNode.getIsCollapsed()) expandedNoteKeyRef.current = noteNode.getKey();
       });
     },
     getNoteOps(noteKeyOrIndex) {

@@ -192,7 +192,9 @@ export interface EditorRef {
     removeCharacterMarker(marker?: string): boolean;
     replaceCharacterMarker(toMarker: string, fromMarker?: string): boolean;
     replaceEmbedUpdate(embedNodeKey: string, insertEmbedOps: DeltaOp[]): void;
+    selectAfterNote(noteKeyOrIndex: string | number): void;
     selectNote(noteKeyOrIndex: string | number): void;
+    selectNoteTextOffset(noteKeyOrIndex: string | number, utf16Offset: number): void;
     setAnnotation(selection: AnnotationRange, type: string, id: string, callbacks?: {
         onClick?: TypedMarkOnClick;
         onRemove?: TypedMarkOnRemove;

@@ -27,6 +27,15 @@ refused. The public surface grew substantially; nothing was removed.
 - `EditorRef.highlightNote` — applies PT9's selected-caller style (a thin top-and-bottom border,
   class `caller_highlight`) to one note's caller at a time, through `NoteCallerHighlightPlugin`;
   purely presentational, and `undefined` clears it.
+- `EditorRef.selectAfterNote` — puts the caret immediately after a note (past its caller in a
+  collapsed note), where PT9 leaves it once the user is done with the note. Never pulls DOM focus
+  into an editor that does not already hold it, so a host can park the Scripture caret while the
+  user goes on typing in a note editor elsewhere.
+- `EditorRef.selectNoteTextOffset` — puts the caret at an offset within a note's own text, counting
+  the note's CONTENT only: marker glyphs, attribute display runs, NBSP spacers, an opening glyph's
+  separator prefix, and an expanded editable note's caller are all skipped. That makes the offset
+  origin the note's USJ text, so a host that captured a position over its own rendering of the same
+  note resolves to the same character in any `markerMode`.
 - `generateUsjCss` — builds a project stylesheet from `StyleInfo`.
 - `getMarkerMenuItems` / `getEnterMenuItems` / `filterAndRankItems` — the marker-menu item source and
   ranking a host needs to build its own marker palette.
