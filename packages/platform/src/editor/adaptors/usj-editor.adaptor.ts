@@ -286,13 +286,10 @@ function isStandardView(): boolean {
   return hasStandardViewWhitespace(_viewOptions);
 }
 
-function getTextContent(markers: MarkerContent[] | undefined): string {
-  if (!markers || markers.length !== 1 || typeof markers[0] !== "string") return "";
-
-  return markers[0];
-}
-
-function createBook(markerObject: MarkerObject): SerializedBookNode {
+function createBook(
+  markerObject: MarkerObject,
+  childNodes: SerializedLexicalNode[],
+): SerializedBookNode {
   let { marker } = markerObject;
   if (marker !== BOOK_MARKER) {
     _logger?.warn(`Unexpected book marker '${marker}'!`);
@@ -312,10 +309,12 @@ function createBook(markerObject: MarkerObject): SerializedBookNode {
     // tag visible in the gutter alongside the other paragraph-level markers (\h, \s1, \p, ...).
     children.push(createImmutableTypedText("marker", openingMarkerText(marker) + NBSP, true));
   }
-  const text = getTextContent(markerObject.content);
-  // Display-encode like any other text content: the reverse adaptor inverts display whitespace
-  // on all text nodes (book children included), so raw book text would corrupt on save.
-  if (text) children.push(createText(isStandardView() ? usjTextToDisplay(text) : text));
+  // The \\id line is a content container like any other paragraph: whatever follows the book code
+  // — description text, and any marker a file happens to carry there — has to reach the editor, or
+  // the line renders truncated and the next save writes that truncation back to disk. Recursing
+  // also display-encodes text the way the reverse adaptor expects, since that inverts display
+  // whitespace on all text nodes, book children included.
+  children.push(...childNodes);
   const unknownAttributes = getUnknownAttributes(markerObject, BOOK_MARKER_OBJECT_PROPS);
 
   return removeUndefinedProperties({
@@ -1214,7 +1213,7 @@ function recurseNodes(
     } else {
       switch (markerContent.type) {
         case BookNode.getType():
-          nodes.push(createBook(markerContent));
+          nodes.push(createBook(markerContent, recurseNodes(markerContent.content)));
           break;
         case ChapterNode.getType():
           nodes.push(createChapter(markerContent));
