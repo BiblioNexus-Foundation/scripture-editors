@@ -559,11 +559,78 @@ export interface EditorRef {
    */
   selectNote(noteKeyOrIndex: string | number): void;
   /**
+   * EXPERIMENTAL: Put the caret immediately AFTER the given note, where PT9 leaves it once the
+   * user is done with a note - in a collapsed note (which renders as its caller alone) that is the
+   * position just past the caller.
+   *
+   * @remarks
+   * Never pulls DOM focus into this editor: when this editor's root does not hold focus the commit
+   * carries Lexical's `SKIP_DOM_SELECTION_TAG`, so a host driving this from ANOTHER editor (a
+   * footnotes pane's inline note editor, say) keeps the caret the user is actually typing in. The
+   * selection is still recorded, so a later {@link EditorRef.focus} lands on it.
+   *
+   * @param noteKeyOrIndex - The note key or document-order index (see
+   *   {@link EditorRef.getNoteIndex}).
+   */
+  selectAfterNote(noteKeyOrIndex: string | number): void;
+  /**
+   * EXPERIMENTAL: Put the caret at an offset within a note's own text.
+   *
+   * @remarks
+   * The offset counts the note's CONTENT only. Every display artifact this editor's
+   * {@link ViewOptions} add around that content - marker glyphs (`markerMode: "editable"` and
+   * `"visible"` alike), attribute display runs, engine-owned NBSP spacers, an opening glyph's NBSP
+   * separator prefix, and an expanded editable note's caller - is skipped, so the offset origin is
+   * the note's USJ text and a host that captured a position over its OWN rendering of the same
+   * note resolves to the same character whichever marker mode this editor is in.
+   *
+   * KNOWN GAP - TODO(PT-4322): text the source wrote directly inside the note rather than inside a
+   * `\ft`-style run is not counted, so a host that renders such text inline drifts by its length.
+   *
+   * An offset past the end of the note's text clamps to the end; a note with no content text falls
+   * back to {@link EditorRef.selectNote}.
+   *
+   * @param noteKeyOrIndex - The note key or document-order index (see
+   *   {@link EditorRef.getNoteIndex}).
+   * @param utf16Offset - Offset into the note's content text, in UTF-16 code units (the unit DOM
+   *   Selection APIs and Lexical text nodes both count in).
+   */
+  selectNoteTextOffset(noteKeyOrIndex: string | number, utf16Offset: number): void;
+  /**
    * EXPERIMENTAL: Get the note operations by editor key or at the given index in the editor, if any.
    * @param noteKeyOrIndex - The note key or index, e.g. index=1 would get the second note in the
    *   editor.
    */
   getNoteOps(noteKeyOrIndex: string | number): DeltaOp[] | undefined;
+  /**
+   * Document-order index of the note with the given key — the coordinate a USJ-built notes list
+   * (e.g. a footnotes pane) addresses notes by, and the same index `noteCallerOnClick` reports.
+   * @param noteKey - The note node's key (e.g. from `insertMarker` or `noteCallerOnClick`).
+   * @returns The index, or `undefined` when the key is not a note in the document.
+   */
+  getNoteIndex(noteKey: string): number | undefined;
+  /**
+   * Key of the note at the given document-order index (the inverse of `getNoteIndex`), so a host
+   * that addresses notes by index can hand the editor the key `replaceEmbedUpdate` needs.
+   * @param noteIndex - The document-order index of the note (e.g. from `getNoteIndex` or a
+   *   USJ-built notes list).
+   * @returns The key, or `undefined` when no note exists at that index.
+   */
+  getNoteKey(noteIndex: number): string | undefined;
+  /**
+   * Highlights the caller of the given note in the text with PT9's selected-note style (a thin
+   * top-and-bottom border, class `caller_highlight`), replacing any previous highlight. Pass
+   * `undefined` to clear. Purely presentational: never changes the document.
+   *
+   * Silently does nothing for a note BUILT expanded under `markerMode: "editable"`, whose caller
+   * is plain text rather than the immutable caller element the style attaches to — a note built
+   * collapsed keeps that element through an expand toggle, so Standard view is unaffected. The
+   * note is resolved when this is called and never retried, so a call made before the document
+   * has loaded, or with a stale key or an out-of-range index, is discarded and clears any
+   * highlight already showing.
+   * @param noteKeyOrIndex - Note key or document-order index (see `getNoteIndex`).
+   */
+  highlightNote(noteKeyOrIndex: string | number | undefined): void;
   /** Ref to the end of the toolbar - INTERNAL USE ONLY to dynamically add controls in the toolbar. */
   toolbarEndRef: RefObject<HTMLElement | null> | null;
 }

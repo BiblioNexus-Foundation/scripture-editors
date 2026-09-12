@@ -630,15 +630,19 @@ describe("editable-mode marker menu harness", () => {
       await dispatchKeyDown(editor, " ");
 
       expect(document.querySelector(".autocomplete-menu-container")).toBeNull();
-      editor.getEditorState().read(() => {
-        const para = requireDefined($getRoot().getChildren().filter($isParaNode)[0], "para");
-        const markers = para
-          .getChildren()
-          .filter($isCharNode)
-          .map((char) => char.getMarker());
-        expect(markers).toContain("nd");
-        expect(markers).toContain("wj");
-      });
+      // Space commits the typed literal at once; the char node it becomes settles afterwards, so
+      // poll for it as the first-session assertion above does.
+      await waitFor(() =>
+        editor.getEditorState().read(() => {
+          const para = requireDefined($getRoot().getChildren().filter($isParaNode)[0], "para");
+          const markers = para
+            .getChildren()
+            .filter($isCharNode)
+            .map((char) => char.getMarker());
+          expect(markers).toContain("nd");
+          expect(markers).toContain("wj");
+        }),
+      );
     });
 
     it("with an EMPTY filter, `\\` lands a literal backslash and does NOT reopen", async () => {
