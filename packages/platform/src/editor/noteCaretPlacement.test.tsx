@@ -12,6 +12,7 @@ import Editorial from "../Editorial";
 import { EditorOptions, EditorRef } from "./editor.model";
 import { MarkerObject, Usj } from "@eten-tech-foundation/scripture-utilities";
 import { act, render } from "@testing-library/react";
+import { afterAll, beforeAll } from "vitest";
 import { createRef } from "react";
 import {
   $getRoot,
@@ -31,6 +32,30 @@ function requireDefined<T>(value: T | undefined | null, message: string): T {
   if (value === undefined || value === null) throw new Error(message);
   return value;
 }
+
+// jsdom implements `getBoundingClientRect` on Element but not on Range, and Lexical measures the
+// selection through a Range whenever it scrolls a collapsed caret into view after a commit — so
+// the focused-editor cases below throw asynchronously, outside the test's own stack. Installed
+// HERE rather than in test-setup.ts: `markerMenuContext.utils.test.tsx` asserts that a missing
+// Range rect is what leaves `anchorRect` undefined headlessly, so this must not be global.
+const originalRangeRect = Range.prototype.getBoundingClientRect;
+beforeAll(() => {
+  Range.prototype.getBoundingClientRect = () =>
+    ({
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: 0,
+      height: 0,
+      toJSON: () => ({}),
+    }) as DOMRect;
+});
+afterAll(() => {
+  Range.prototype.getBoundingClientRect = originalRangeRect;
+});
 
 const options: EditorOptions = {
   hasSpellCheck: false,
