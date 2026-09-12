@@ -5,6 +5,7 @@ import {
   regularizeSpaces,
 } from "./usfmFragmentToUsj.js";
 import { NBSP } from "../../nodes/usj/node-constants.js";
+import { defaultStyleInfo } from "../../utils/usfm/defaultStyleInfo.js";
 import { createMarkerLookup, StyleInfo } from "../../utils/usfm/styleInfo.js";
 
 describe("usfmFragmentToUsjContent — core", () => {
@@ -1504,6 +1505,99 @@ describe("stylesheet-first classification", () => {
   });
 });
 
+describe("cell markers under a real stylesheet, which classifies them as Character", () => {
+  // usfm.sty declares every `\th…`/`\tc…` as a Character style, so with a project sheet in play a
+  // cell marker reaches assembly as a `charOpen` token, not a paragraph one — the shape the app
+  // actually runs. ParatextData derives a cell from the marker NAME either way, and the alignment
+  // comes from the name's infix (`thc3` → center, `thr5` → end), so the two token kinds must land
+  // on the same cell.
+  const sheetLookup = createMarkerLookup(defaultStyleInfo);
+
+  it("assembles align-infix cells that arrive as character tokens", () => {
+    expect(
+      usfmFragmentToUsjContent("\\tr \\thc3 middle\\thr5 right", { getMarker: sheetLookup }),
+    ).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              { type: "table:cell", marker: "thc3", align: "center", content: ["middle"] },
+              { type: "table:cell", marker: "thr5", align: "end", content: ["right"] },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("a RANGED cell marker is not in the sheet at all, so it still arrives as a paragraph token", () => {
+    // usfm.sty declares `\tcr1`, never `\tcr1-4` — a span is spelled by ParatextData's range rule,
+    // not by a stylesheet entry — so a ranged cell is an UNKNOWN marker even under a project sheet
+    // and reaches assembly through the paragraph arm. Colspan assembly is therefore untouched by
+    // the character-token arm above; both arms build the cell through the same `pushTableCell`.
+    expect(usfmFragmentToUsjContent("\\tr \\tcr1-4 wide", { getMarker: sheetLookup })).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              { type: "table:cell", marker: "tcr1", align: "end", colspan: "4", content: ["wide"] },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("a cell-named character marker with NO open row stays an ordinary char span", () => {
+    // The cell arm is guarded on an open `\tr`; only that opens a row. Without the guard, a span
+    // that merely shares a cell marker's name would be assembled into a table that does not exist.
+    expect(
+      usfmFragmentToUsjContent("\\p before \\thc3 middle", { getMarker: sheetLookup }),
+    ).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [
+          "before ",
+          { type: "char", marker: "thc3", content: ["middle"], closed: "false" },
+        ],
+      },
+    ]);
+  });
+
+  it("a NESTED cell-named marker inside a cell is a char span, not a second cell", () => {
+    expect(
+      usfmFragmentToUsjContent("\\tr \\thc3 middle \\+tc1 inner\\+tc1*", {
+        getMarker: sheetLookup,
+      }),
+    ).toEqual([
+      {
+        type: "table",
+        content: [
+          {
+            type: "table:row",
+            marker: "tr",
+            content: [
+              {
+                type: "table:cell",
+                marker: "thc3",
+                align: "center",
+                content: ["middle ", { type: "char", marker: "tc1", content: ["inner"] }],
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+});
+
 describe("PT9 unknown-marker handling", () => {
   it("unknown marker in body context becomes a paragraph (UsfmParser.DetermineUnknownTokenType)", () => {
     const content = usfmFragmentToUsjContent("\\p before \\zfoo after");
@@ -1844,6 +1938,148 @@ describe("usfmFragmentToUsjContent — figures parse without a project styleshee
           " after",
         ],
       },
+    ]);
+  });
+});
+
+describe("usfmFragmentToUsjContent — peripheral divisions (\\periph)", () => {
+  const PERIPH_USJ = {
+    type: "periph",
+    alt: "Title Page",
+    id: "title",
+    content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+  };
+
+  it("assembles a periph division, splitting its marker-line text into alt and attributes", () => {
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"\\mt1 The Title')).toEqual([
+      PERIPH_USJ,
+    ]);
+  });
+
+  it("reads the line-per-marker spelling identically — the next marker delimits the attribute run, not the line break", () => {
+    // A USFM writer puts `\periph` on its own line, but the newline is ordinary whitespace to a
+    // tokenizer: the marker line's text ends where the next `\marker` begins either way. That is
+    // what lets an opaque construct copy out on ONE line and still parse (`$startsBlockLine`,
+    // whitespaceDisplay.plugin.utils.ts) — and it is why a periph's content can be reassembled at
+    // all, since a Tier-2 rebuild only ever re-tokenizes a single paragraph's bytes.
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"\n\\mt1 The Title')).toEqual([
+      PERIPH_USJ,
+    ]);
+  });
+
+  it("takes every following block into the division — periph has no closing marker", () => {
+    expect(
+      usfmFragmentToUsjContent('\\periph Title Page|id="title"\\mt1 The Title\\p Body.'),
+    ).toEqual([
+      {
+        type: "periph",
+        alt: "Title Page",
+        id: "title",
+        content: [
+          { type: "para", marker: "mt1", content: ["The Title"] },
+          { type: "para", marker: "p", content: ["Body."] },
+        ],
+      },
+    ]);
+  });
+
+  it("ends one division at the next, since peripheral divisions never nest", () => {
+    expect(usfmFragmentToUsjContent("\\periph One\\p a\\periph Two\\p b")).toEqual([
+      { type: "periph", alt: "One", content: [{ type: "para", marker: "p", content: ["a"] }] },
+      { type: "periph", alt: "Two", content: [{ type: "para", marker: "p", content: ["b"] }] },
+    ]);
+  });
+
+  it("keeps a marker-line with no attributes as pure alt text, its structural line break included", () => {
+    expect(usfmFragmentToUsjContent("\\periph Title Page\n\\mt1 The Title")).toEqual([
+      {
+        type: "periph",
+        alt: "Title Page",
+        content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+      },
+    ]);
+  });
+
+  it("keeps an attributes-only marker-line free of an empty alt", () => {
+    expect(usfmFragmentToUsjContent('\\periph |id="title"\\mt1 The Title')).toEqual([
+      {
+        type: "periph",
+        id: "title",
+        content: [{ type: "para", marker: "mt1", content: ["The Title"] }],
+      },
+    ]);
+  });
+
+  it("emits a contentless division for a marker line with nothing after it", () => {
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id="title"')).toEqual([
+      { type: "periph", alt: "Title Page", id: "title" },
+    ]);
+  });
+
+  it("nests a sidebar inside the open division rather than beside it", () => {
+    expect(
+      usfmFragmentToUsjContent("\\periph One\\esb \\cat History\\cat*\\p in sidebar\\esbe"),
+    ).toEqual([
+      {
+        type: "periph",
+        alt: "One",
+        content: [
+          {
+            type: "sidebar",
+            marker: "esb",
+            category: "History",
+            content: [{ type: "para", marker: "p", content: ["in sidebar"] }],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("degrades to an ordinary paragraph when the attribute list does not parse, keeping every byte", () => {
+    // Same refusal as every other attribute list here: `|id=""` is not a reading Paratext agrees
+    // with, so the bytes stay literal text where the author can see and fix them.
+    expect(usfmFragmentToUsjContent('\\periph Title Page|id=""\\mt1 The Title')).toEqual([
+      { type: "para", marker: "periph", content: ['Title Page|id=""'] },
+      { type: "para", marker: "mt1", content: ["The Title"] },
+    ]);
+  });
+
+  it("refuses a marker line that spells its title twice, keeping every byte literal", () => {
+    // `alt` is the division TITLE, which periph spells as marker-line text rather than a pipe pair
+    // (`unknownUsfm.utils.ts` renders it that way, so the editor can never produce this shape) — a
+    // line carrying both spellings has two conflicting readings and no lossless one, so it refuses
+    // the list like any other ambiguous attribute list rather than silently dropping a title.
+    expect(usfmFragmentToUsjContent('\\periph Title|alt="Z"\\mt1 X')).toEqual([
+      { type: "para", marker: "periph", content: ['Title|alt="Z"'] },
+      { type: "para", marker: "mt1", content: ["X"] },
+    ]);
+  });
+
+  it("reads a titleless marker line's `alt` pair as the division title", () => {
+    // No collision, so nothing is ambiguous and the pair is the only spelling present.
+    expect(usfmFragmentToUsjContent('\\periph |alt="Z" id="t"\\mt1 X')).toEqual([
+      {
+        type: "periph",
+        alt: "Z",
+        id: "t",
+        content: [{ type: "para", marker: "mt1", content: ["X"] }],
+      },
+    ]);
+  });
+
+  it("opens no division inside note content, where peripheral divisions do not occur", () => {
+    expect(
+      usfmFragmentToUsjContent("\\ft text \\periph Title\\mt1 The Title", { isNoteContext: true }),
+    ).toEqual([
+      {
+        type: "para",
+        marker: "p",
+        content: [
+          { type: "char", marker: "ft", content: ["text "], closed: "false" },
+          { type: "char", marker: "periph", content: ["Title"], closed: "false" },
+        ],
+      },
+      { type: "para", marker: "mt1", content: ["The Title"] },
     ]);
   });
 });

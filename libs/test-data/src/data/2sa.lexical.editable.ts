@@ -9695,7 +9695,7 @@ export const lexicalEditable2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "marker",
-                    marker: "thc3",
+                    marker: "thc3-4",
                     markerSyntax: "opening",
                     text: "",
                     detail: 0,
@@ -9944,7 +9944,7 @@ export const lexicalEditable2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "marker",
-                    marker: "thr4",
+                    marker: "thr4-5",
                     markerSyntax: "opening",
                     text: "",
                     detail: 0,
@@ -10021,7 +10021,7 @@ export const lexicalEditable2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "marker",
-                    marker: "tcr1",
+                    marker: "tcr1-4",
                     markerSyntax: "opening",
                     text: "",
                     detail: 0,

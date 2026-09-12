@@ -128,7 +128,9 @@ function renameFigureFileToSrc(attributes: UnknownAttributes): UnknownAttributes
 }
 
 /**
- * The cell's opening marker with its span suffix re-encoded from `colspan`. The tokenizer
+ * The cell's opening marker with its span suffix re-encoded from `colspan`. Exported because a
+ * cell's display bytes are built by `ImmutableTableCellNode`'s own adaptor path (the kind stopped
+ * being an `UnknownNode`), and both builders must spell a spanning cell the same way. The tokenizer
  * (usfmFragmentToUsj.ts, table-cell assembly) splits a spanning cell marker apart on the way in —
  * `\thc3-4` becomes marker `thc3` (span suffix trimmed off after the start column) plus colspan
  * `"2"` (the COUNT of columns spanned, end − start + 1) — so rendering the stored marker bare
@@ -137,7 +139,7 @@ function renameFigureFileToSrc(attributes: UnknownAttributes): UnknownAttributes
  * marker with no trailing start column to count from yields the bare marker rather than a garbage
  * suffix.
  */
-function tableCellMarkerWithSpan(
+export function tableCellMarkerWithSpan(
   marker: string | undefined,
   colspan: string | undefined,
 ): string | undefined {

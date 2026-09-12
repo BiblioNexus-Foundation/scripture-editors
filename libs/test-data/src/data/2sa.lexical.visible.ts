@@ -6393,7 +6393,7 @@ export const lexicalVisible2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "immutable-typed-text",
-                    text: "\\thc3 ",
+                    text: "\\thc3-4 ",
                     textType: "marker",
                     version: 1,
                   },
@@ -6540,7 +6540,7 @@ export const lexicalVisible2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "immutable-typed-text",
-                    text: "\\thr4 ",
+                    text: "\\thr4-5 ",
                     textType: "marker",
                     version: 1,
                   },
@@ -6583,7 +6583,7 @@ export const lexicalVisible2Sa: SerializedEditorState = {
                 children: [
                   {
                     type: "immutable-typed-text",
-                    text: "\\tcr1 ",
+                    text: "\\tcr1-4 ",
                     textType: "marker",
                     version: 1,
                   },

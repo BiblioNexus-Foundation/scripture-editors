@@ -4,6 +4,7 @@
  * Everything Tier 1 cannot express routes to Tier 2 ($requestTier2ForNode).
  */
 
+import { isCharKindMarker, isParaKindMarker } from "./markerKind.utils";
 import {
   BARE_OPENER_REGEX,
   CLOSER_FORM_REGEX,
@@ -63,7 +64,6 @@ import {
   getEditableCallerText,
   getVisibleOpenMarkerText,
   ImmutableUnmatchedNode,
-  isMilestoneHeuristicName,
   leadingAttributeNames,
   MarkerLookup,
   MarkerNode,
@@ -74,6 +74,7 @@ import {
   textTypeState,
   VerseNode,
 } from "shared";
+import { StructureProtectionMode } from "shared-react";
 
 /**
  * The engine's mutable per-editor state, threaded through every marker-edit transform and command
@@ -111,6 +112,30 @@ export interface MarkerEditContext extends Tier2Context {
    */
   collapsedDeleteCaretParas?: Set<NodeKey>;
   /**
+   * Narrows `Tier2Context.pasteRebuildArmed` from optional to REQUIRED: the marker-edit engine
+   * (`MarkerEditPlugin.tsx`) always constructs and maintains this field, unlike a bare
+   * `Tier2Context` a test may build directly to exercise the tokenizer/rebuild machinery alone
+   * (where "not a paste rebuild" is simply the field's absence). See its doc comment on
+   * `Tier2Context` for what it does.
+   */
+  pasteRebuildArmed: { current: boolean };
+  /**
+   * Narrows `Tier2Context.pastePendedKeys` from optional to REQUIRED, for the same reason as
+   * {@link pasteRebuildArmed}: the engine always constructs and maintains the set. See its doc
+   * comment on `Tier2Context` for what carries the provenance and why it cannot leak.
+   */
+  pastePendedKeys: Set<NodeKey>;
+  /**
+   * Mirrors the host `Editor`'s `structureProtectionMode` option. Read by
+   * `$handlePasteForStandardView` (whitespaceDisplay.plugin.utils.ts), which must decline a
+   * `"protected"` document's paste so `StructureKeyboardPlugin`'s HTML sanitizer still governs it
+   * — both register at `COMMAND_PRIORITY_HIGH`, and the marker-edit engine mounts first, so
+   * without this check its unconditional external-paste claim would starve the sanitizer. Wiring,
+   * not engine state: refreshed every render alongside `viewOptions`/`getMarker`/`logger` rather
+   * than gating the registration effect, so toggling it doesn't tear down and reset the engine.
+   */
+  structureProtectionMode: StructureProtectionMode;
+  /**
    * Literal text already submitted to `$requestTier2ForNode` this commit.
    * `$rebuildParas` is deterministic (the degradation property): a paragraph
    * whose rebuild still contains a fragment the tokenizer cannot resolve into anything new
@@ -124,35 +149,6 @@ export interface MarkerEditContext extends Tier2Context {
    * Reset every commit by the plugin's update listener.
    */
   rebuildAttempted: Set<string>;
-}
-
-// Milestone-name heuristic shared with the fragment tokenizer (`isMilestoneHeuristicName`):
-// only stylesheet-family milestone names (`\qt#-s/-e`, `\ts-s/-e`) plus annotation comment
-// markers — see its doc comment for why bare `ts`/`t-s`/`t-e` and the z-prefix wildcard are
-// deliberately excluded. Keeping one predicate here and in the tokenizer means Tier-1 kind
-// guards and Tier-2 re-tokenization can never disagree about what is positionally a milestone.
-
-/** Same-positional-kind rule for paragraph openers. Stylesheet-first:
- * a marker the effective sheet KNOWS classifies by its styleType; heuristics
- * cover only markers absent from the sheet. Unknown markers stay as typed
- * (Tier-1 renames to unknown markers stay in place). */
-function isParaKindMarker(marker: string, getMarkerFn: MarkerLookup): boolean {
-  const clean = marker.replace(/^\+/, "");
-  if (clean === "v" || clean === "c") return false;
-  const kind = getMarkerFn(clean)?.type;
-  if (kind !== undefined && kind !== MarkerType.Unknown) return kind === MarkerType.Paragraph;
-  if (NoteNode.isValidMarker(clean) || isMilestoneHeuristicName(clean)) return false;
-  return true;
-}
-
-/** Same-positional-kind rule for char openers (see isParaKindMarker). */
-function isCharKindMarker(marker: string, getMarkerFn: MarkerLookup): boolean {
-  const clean = marker.replace(/^\+/, "");
-  if (clean === "v" || clean === "c") return false;
-  const kind = getMarkerFn(clean)?.type;
-  if (kind !== undefined && kind !== MarkerType.Unknown) return kind === MarkerType.Character;
-  if (NoteNode.isValidMarker(clean) || isMilestoneHeuristicName(clean)) return false;
-  return true;
 }
 
 /**
@@ -1215,6 +1211,17 @@ function $exceptKeysAround(exceptKey: NodeKey | undefined): Set<NodeKey> {
 }
 
 /**
+ * Takes `key`'s paste provenance ({@link MarkerEditContext.pastePendedKeys}) for the rebuild about
+ * to be routed for it, and clears it: one key, one use, so a later rebuild of the same paragraph —
+ * typed input, an idle re-settle — is an ordinary typed rebuild again. `undefined` (not `false`)
+ * for a key with no provenance, so the rebuild falls back to its own default ("is this the paste's
+ * own update") rather than being told it is not a paste.
+ */
+function consumePasteProvenance(key: NodeKey, context: MarkerEditContext): true | undefined {
+  return context.pastePendedKeys.delete(key) || undefined;
+}
+
+/**
  * Completion trigger. PT9 completes mid-edit markers via its 1s debounced
  * reformat; our deterministic equivalents are Enter, blur, and the caret
  * leaving the node (`exceptKey` keeps the node still being edited pending — widened to the
@@ -1253,6 +1260,7 @@ export function $resolvePendingMarkers(
     const node: LexicalNode | null = $getNodeByKey(key);
     if (!node?.isAttached()) {
       context.pendingKeys.delete(key);
+      context.pastePendedKeys.delete(key);
       continue;
     }
     if ($isMarkerNode(node)) {
@@ -1281,7 +1289,9 @@ export function $resolvePendingMarkers(
         context.logger?.debug(
           "[MarkerEdit] unknown-split paragraph rejoined its predecessor on marker degradation",
         );
-      } else mutated = $requestTier2ForNode(node, context) || mutated;
+      } else
+        mutated =
+          $requestTier2ForNode(node, context, consumePasteProvenance(key, context)) || mutated;
       continue;
     }
     // A pended run PIECE settles at its OWNER. `$settlePendedDisplayOwner` recognizes only owners
@@ -1344,7 +1354,8 @@ export function $resolvePendingMarkers(
       context.pendingKeys.add(targetKey);
       continue;
     }
-    mutated = $requestTier2ForNode(target, context) || mutated;
+    mutated =
+      $requestTier2ForNode(target, context, consumePasteProvenance(key, context)) || mutated;
   }
   return mutated;
 }

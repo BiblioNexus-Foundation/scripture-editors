@@ -2,6 +2,8 @@ import { UnknownAttributes } from "../usj/node-constants.js";
 import { MarkerObject } from "@eten-tech-foundation/scripture-utilities";
 import {
   $applyNodeReplacement,
+  $getSelection,
+  BaseSelection,
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
@@ -205,8 +207,89 @@ export class UnknownNode extends ElementNode {
     return false;
   }
 
+  // A CHILD-BEARING `UnknownNode` of any kind stays IN the copy. This affects ONLY the
+  // `application/x-lexical-editor` (lexical-JSON) flavor: `$appendNodesToHTML` (`@lexical/html`)
+  // computes this same `excludeFromCopy('html')` value, but `exportDOM()` above always returns
+  // `{element: null}` and `$appendNodesToHTML` returns early on a null `element` BEFORE ever
+  // consulting the exclusion value it just computed, so `text/html` output is byte-identical for
+  // every kind whatever this predicate answers (confirmed by reading `LexicalHtml.dev.js`).
+  // `'clone'` is never passed by any Lexical-shipped code path in the installed version (confirmed
+  // by reading `LexicalClipboard.dev.js`), so an unconditional `destination !== "clone"` would
+  // exclude every `UnknownNode` from the lexical-JSON flavor outright.
+  //
+  // Excluding a node does not drop it silently: `$appendNodesToJSON` HOISTS the excluded node's own
+  // children into its parent's list in its place. Every kind's marker and attribute bytes are
+  // content-free `ImmutableTypedTextNode` display decorators (`unknownDisplayParts` builds them
+  // identically for all of them), so hoisting strands decorators that still `decorate()` their own
+  // literal text as loose siblings with no owning wrapper: the pasted document RENDERS the
+  // construct's full USFM bytes while its USJ has lost the node and every attribute on it — a
+  // convincing display over missing data, which a save then persists with no error.
+  //
+  // The `getChildrenSize() > 0` guard excludes a node with no children of its OWN — of any kind,
+  // and for whatever reason it has none — because that is exactly when `text/plain` also emits
+  // nothing for it, and the two carriers must agree. Three shapes reach it, and only the first is
+  // a husk: an optbreak whose `//` display child was deleted (`markerEditTier1.utils.ts`'s
+  // husk-removal check recognizes it by that same zero-child shape); a content-less construct in
+  // an editable-marker view, where the marker/attribute display bytes `createUnknown`
+  // (`usj-editor.adaptor.ts`) prepends are themselves children, so only a kind with no display
+  // bytes at all can be childless; and, in a HIDDEN-marker view, ANY content-less construct — a
+  // caption-less `figure`, an empty `ref`, every optbreak — because `createUnknown` builds no
+  // display children there at all. The last is prose-copy semantics rather than a husk: a
+  // hidden-marker view copies what it shows, and it shows no bytes for a construct with no
+  // content.
+  //
+  // The guard does NOT, on its own, cover a DIFFERENT carrier-agreement gap: a selection whose
+  // ending boundary resolves to an ELEMENT-type point ON this node at offset 0 (touching the
+  // wrapper without covering any of its content) still marks a CHILD-BEARING node "selected" under
+  // Lexical's default `isSelected` (key-membership in `selection.getNodes()`, unaffected by this
+  // node's own child count), so `$appendNodesToJSON` would serialize a CHILDLESS placeholder for a
+  // node that has children, disagreeing with `text/plain` (`$selectionToUsfmText`, which walks that
+  // same `getNodes()` list and correctly emits nothing for this boundary). The `isSelected`
+  // override below closes that second gap at its actual source, since `excludeFromCopy` has no
+  // visibility into which of a node's children a given selection will include — for every
+  // construct whose display bytes lead, which is all of them but `ref`; see that override for the
+  // one shape it deliberately does not close, and why.
   override excludeFromCopy(destination: "clone" | "html"): boolean {
-    return destination !== "clone";
+    return this.getChildrenSize() > 0 ? false : destination !== "clone";
+  }
+
+  // An `UnknownNode` is only meaningfully "selected" (and so only copy-included, per the
+  // `excludeFromCopy` guard above) when at least one of its own children is — mirrors
+  // `$selectionToUsfmText`'s copy walker so both clipboard carriers agree at the same selection
+  // boundary, the same way Lexical's own base `isSelected` (`LexicalNode.prototype.isSelected`)
+  // already special-cases an inline DECORATOR node sitting as a parent's last child at an
+  // exactly-there boundary point, for the identical reason. Without this, a selection ending
+  // exactly at this node's own start (an ElementNode touch-boundary that covers none of its
+  // content) still counts the WRAPPER as selected via the default `ElementNode.isSelected`
+  // (key-membership in `selection.getNodes()`), while no child is — producing a childless entry in
+  // the `application/x-lexical-editor` copy with nothing corresponding to it in `text/plain`.
+  //
+  // Child MEMBERSHIP is the test, deliberately, and not the narrower "does the selection cover a
+  // child's CONTENT". The two differ for exactly one shape, because that boundary reaches the
+  // children two ways depending on what the first child IS. A construct whose display bytes lead
+  // (a `figure`'s `\fig ` glyph, an optbreak's `//`) starts with a DECORATOR: the element-type
+  // point stays one, no child is in `getNodes()`, and both carriers agree. A construct with no
+  // display bytes (a `ref`, whose container USFM never carried) starts with a real `TextNode`, and
+  // Lexical normalizes that same point into a TEXT point at the child's offset 0 — the child is in
+  // `getNodes()` contributing zero characters, so `text/plain` emits nothing for it while this
+  // predicate still answers true and the construct rides along in the lexical flavor.
+  //
+  // Answering false there is WORSE, not better, and measurably so. Excluding the wrapper does not
+  // drop it quietly: `$appendNodesToJSON` HOISTS its children in its place, and `createUnknown`
+  // stamps `mode:"token"` on every text child, which `$sliceSelectedTextNodeContent` refuses to
+  // slice — so the zero-width child keeps its full text, the emptied-text reset never fires, and
+  // the copy ends up carrying the construct's CHARACTERS with the wrapper and its attributes
+  // silently gone. That is the convincing-lie hazard this whole pair exists to prevent. Membership
+  // keeps the construct whole, so the lexical flavor is a SUPERSET of `text/plain` at that one
+  // boundary rather than a structural loss. Recorded as a residual (the clipboard semantics doc's
+  // "Deferred / Out of Scope" list) rather than papered over; closing it needs a lever Lexical does
+  // not offer — `exportNodeToJSON` requires every ElementNode's `exportJSON()` to return a
+  // `children` array, so a node cannot say "drop me AND my children".
+  override isSelected(selection?: BaseSelection | null): boolean {
+    const targetSelection = selection ?? $getSelection();
+    if (!targetSelection) return false;
+    const selectedNodes = targetSelection.getNodes();
+    return this.getChildren().some((child) => selectedNodes.some((node) => node.is(child)));
   }
 }
 
