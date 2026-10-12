@@ -29,93 +29,11 @@
  * - Apply [Delta Operation](https://github.com/slab/delta) changes to the editor and see Delta Operations when changes are made in the editor. For use with realtime collaborative editing.
  */
 
-export { default as Editorial } from "./Editorial";
+export * from "./editorial-entry";
 /**
  * @deprecated Marginal will be removed in a future release. Prefer {@link Editorial}. Install the
  * optional `yjs` peer dependency if you continue using margin comments during the transition.
  */
 export { default as Marginal } from "./marginal/Marginal";
-export {
-  CategoryType,
-  defaultStyleInfo,
-  GENERATOR_NOTE_CALLER,
-  HIDDEN_NOTE_CALLER,
-  MarkerType,
-} from "shared";
-export { generateUsjCss } from "./editor/generateUsjCss";
-export { getEnterMenuItems, getMarkerMenuItems } from "./editor/markerMenu/markerItemSource";
-export {
-  BLOCK_VERSE_VIEW_MODE,
-  directionToNames,
-  filterAndRankItems,
-  getDefaultViewMode,
-  getDefaultViewOptions,
-  getViewMode,
-  getViewOptions,
-  isBlockVerseLayout,
-  isInsertEmbedOpOfType,
-  PARAGRAPH_STRUCTURE_VIEW_MODE,
-  STANDARD_VIEW_MODE,
-  viewModeToViewNames,
-} from "shared-react";
-
-export type {
-  CommitTypedMarkerOptions,
-  EditorOptions,
-  EditorProps,
-  EditorRef,
-  TransientInput,
-} from "./editor/editor.model";
-export type { UsjCssOptions } from "./editor/generateUsjCss";
-export type { MarkerMenuContext, MarkerMenuItem } from "./editor/markerMenu/markerItemSource";
 export type { CommentBase, Comments, Thread } from "./marginal/comments/commenting";
 export type { MarginalRef, MarginalProps } from "./marginal/Marginal";
-export type {
-  DomMouseEvent,
-  LoggerBasic,
-  Marker,
-  MarkerLookup,
-  MarkerStyleInfo,
-  NodeOptions,
-  StyleInfo,
-  StyleType,
-  TypedMarkOnClick,
-  TypedMarkOnMouseEnter,
-  TypedMarkOnMouseLeave,
-  TypedMarkOnRemove,
-  TypedMarkRemovalCause,
-} from "shared";
-export type {
-  AddMissingComments,
-  Annotation,
-  AnnotationRange,
-  AnnotationReference,
-  ContextMenuOptionConfig,
-  DeltaOp,
-  DeltaOpInsertNoteEmbed,
-  DeltaSource,
-  FilterAndRankItems,
-  Item,
-  MarkerMode,
-  NoteCallerOnClick,
-  NoteMode,
-  OnStateChange,
-  OTChapterEmbed,
-  OTEmbedTypes,
-  OTMilestoneEmbed,
-  OTNoteEmbed,
-  OTParaAttribute,
-  OTUnknownEmbed,
-  OTUnmatchedEmbed,
-  OTVerseEmbed,
-  SelectionRange,
-  SortingOptions,
-  StateChangeSnapshot,
-  StructureProtectionMode,
-  TextDirection,
-  UsjLocation,
-  UsjNodeOptions,
-  VerseLayout,
-  ViewMode,
-  ViewOptions,
-} from "shared-react";
